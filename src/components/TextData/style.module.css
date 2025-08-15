@@ -1,0 +1,37 @@
+.container {
+    display: flex;
+    align-items: flex-start;
+    /*justify-content: space-between;*/
+    color: #333;
+    flex-direction: column;
+}
+
+.bold {
+    font-weight: bold;
+    margin-left: 1rem;
+}
+
+.buttonBox {
+    display: flex;
+    gap: 1rem;
+    margin-left: 1rem;
+    align-items: center;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #eee;
+    flex-direction: row;
+}
+
+.item:hover {
+    background-color: #e8f0fe;
+}
+
+.size {
+    font-weight: bold;
+    margin-right: 1rem;
+}

@@ -1,0 +1,118 @@
+@value primary from "@genai-fi/base/css/colours.module.css";
+
+.buttonBar {
+    display: flex;
+    flex-grow: 1;
+    margin: 0 4rem;
+    gap: 1rem;
+}
+
+.appbar {
+    z-index: 2;
+    position: static;
+    box-shadow: none;
+    background: #444;
+}
+
+.toolbar {
+    display: flex;
+    padding-right: 1rem;
+    align-items: center;
+    color: white;
+    min-height: 59px;
+}
+
+.buttonBar :global .MuiButton-root {
+    text-transform: none;
+}
+
+.buttonBar :global .MuiCircularProgress-root {
+    color: white;
+}
+
+.langBar {
+    display: flex;
+    gap: 0.5rem;
+    height: 100%;
+    align-items: center;
+    margin-right: 0.5rem;
+    color: white;
+}
+
+.langBar :global .MuiNativeSelect-root::before {
+    border-bottom: 1px solid white;
+}
+
+.langBar :global .MuiNativeSelect-root:hover::before {
+    border-bottom: 2px solid white;
+}
+
+.langBar :global .Mui-focused {
+    border-bottom: 1px solid #444;
+}
+
+.langBar :global .MuiNativeSelect-icon {
+    color: white;
+}
+
+.langBar select {
+    color: white;
+    font-size: 0.8rem;
+}
+
+.langBar option {
+    color: black;
+}
+
+.langBarWithSettings {
+    composes: langBar;
+}
+
+.logo {
+    background: primary;
+    padding-left: 0.5rem;
+    padding-right: 2rem;
+    gap: 0.8rem;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    align-self: stretch;
+}
+
+.logo h1 {
+    color: white;
+    margin: 0;
+}
+
+@media only screen and (max-width: 850px) {
+    :global .AppBar h1 {
+        display: none;
+    }
+}
+
+@media only screen and (max-height: 500px), (max-width: 700px) {
+    .buttonBar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0.2rem 1rem;
+        flex-grow: 1;
+        align-items: center;
+    }
+    .langBar {
+        flex-wrap: wrap;
+        gap: 0.2rem;
+        height: initial;
+    }
+    .langBarWithSettings {
+        display: none;
+    }
+    .appbar h1 {
+        display: none;
+    }
+
+    .logo {
+        display: none;
+    }
+}

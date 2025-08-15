@@ -1,0 +1,30 @@
+.title {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+    gap: 1rem;
+}
+
+.infoTitle {
+    composes: title;
+    background-color: #0e62cf;
+    color: white;
+}
+
+.title h2 {
+    margin: 0;
+    margin-left: 1rem;
+    font-size: 1.2rem;
+}
+
+.menu {
+    display: flex;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}

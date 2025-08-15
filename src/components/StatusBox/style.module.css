@@ -1,0 +1,10 @@
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    margin-left: auto;
+    background: rgba(0, 0, 0, 0.05);
+    border-left: 2px solid rgba(0, 0, 0, 0.06);
+}

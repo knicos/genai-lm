@@ -1,0 +1,36 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
+.container {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    margin: auto;
+    flex-direction: row;
+    gap: 1rem;
+    max-width: 80%;
+}
+
+.verticalBox {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.box {
+    border-radius: 15px;
+    background: white;
+    box-shadow: 2px 2px 4px #bbb;
+    overflow: hidden;
+}
+
+.boxPrimary {
+    composes: box;
+    background: secondary;
+    color: white;
+}
+
+.toolbar {
+    color: white;
+    display: flex;
+    margin-bottom: 1rem;
+}

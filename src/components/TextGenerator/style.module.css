@@ -1,0 +1,39 @@
+.container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /*justify-content: space-between;*/
+    color: #333;
+    flex-direction: column;
+    width: 600px;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #e8f0fe;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+    border-radius: 15px;
+    margin: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    background: #fafafa;
+    border-left: 2px solid #eee;
+}
+
+.buttonBox {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1;
+}
