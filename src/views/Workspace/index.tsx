@@ -10,9 +10,11 @@ import SampleViewer from '../../components/SampleViewer/SampleViewer';
 import useModelStatus from '../../utilities/useModelStatus';
 import AppBar from '../../components/AppBar';
 import Evaluation from '../../components/Evaluation/Evaluation';
+import ModelInfo from '../../components/ModelInfo/ModelInfo';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'model', end: 'textData', startPoint: 'right', endPoint: 'left' },
+    { start: 'model', end: 'info', startPoint: 'bottom', endPoint: 'top' },
     { start: 'textData', end: 'trainer', startPoint: 'right', endPoint: 'left' },
     { start: 'textData', end: 'textBrowser', startPoint: 'bottom', endPoint: 'top' },
     { start: 'trainer', end: 'evaluation', startPoint: 'bottom', endPoint: 'top' },
@@ -41,15 +43,26 @@ export function Component() {
             />
             <WorkflowLayout connections={CONNECTIONS}>
                 <div
-                    className={style.box}
-                    data-widget="model"
+                    className={style.verticalBox}
+                    data-widget="container"
                 >
-                    <ModelLoader
-                        model={model}
-                        onModel={(m: TeachableLLM) => {
-                            setModel(m);
-                        }}
-                    />
+                    <div
+                        className={style.box}
+                        data-widget="model"
+                    >
+                        <ModelLoader
+                            model={model}
+                            onModel={(m: TeachableLLM) => {
+                                setModel(m);
+                            }}
+                        />
+                    </div>
+                    <div
+                        className={style.box}
+                        data-widget="info"
+                    >
+                        <ModelInfo model={model} />
+                    </div>
                 </div>
                 <div
                     className={style.verticalBox}

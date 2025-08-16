@@ -4,7 +4,7 @@ import prettyNumber from '../../utilities/prettyNumber';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../BoxTitle/BoxTitle';
 import { IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import AddIcon from '@mui/icons-material/Add';
 import useModelStatus from '../../utilities/useModelStatus';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BoxMenu from '../BoxTitle/BoxMenu';
@@ -48,7 +48,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     color="secondary"
                     onClick={() => fileRef.current?.click()}
                 >
-                    <FolderOpenIcon color="inherit" />
+                    <AddIcon color="inherit" />
                 </IconButton>
             </BoxMenu>
             <List style={{ width: '100%' }}>

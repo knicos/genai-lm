@@ -40,5 +40,14 @@
         "error": "An error occurred with the model",
         "none": "No model loaded",
         "awaitingTokens": "Awaiting tokens..."
+    },
+    "info": {
+        "title": "Model Information",
+        "selectModel": "Please select a model to see its information.",
+        "parameters": "Parameters",
+        "transformers": "Transformers",
+        "heads": "Attention Heads",
+        "embedding": "Embedding",
+        "context": "Context Length"
     }
 }

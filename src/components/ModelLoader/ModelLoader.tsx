@@ -42,7 +42,7 @@ export default function ModelLoader({ onModel, model }: Props) {
                 done={done}
                 busy={!done && !!model}
             ></BoxTitle>
-            <List>
+            <List style={{ maxHeight: '250px', overflowY: 'auto' }}>
                 {manifest.map((m, ix) => (
                     <ListItemButton
                         selected={selectedModel === ix}

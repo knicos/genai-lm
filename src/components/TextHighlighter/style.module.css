@@ -1,3 +1,5 @@
+@value primary from "@genai-fi/base/css/colours.module.css";
+
 .tokens {
     box-sizing: border-box;
     outline: none;
@@ -24,19 +26,19 @@
 }
 
 .cursor {
-    background: #ddd;
-    color: #ddd;
+    background: primary;
+    color: primary;
     animation: blink 1s infinite;
 }
 
 @keyframes blink {
     0% {
-        opacity: 1;
+        opacity: 0.6;
     }
     50% {
         opacity: 0;
     }
     100% {
-        opacity: 1;
+        opacity: 0.6;
     }
 }
