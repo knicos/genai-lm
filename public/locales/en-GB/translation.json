@@ -1,4 +1,13 @@
 {
+    "app": {
+        "save": "Save",
+        "load": "Open",
+        "saveTitle": "Save Model",
+        "saveMessage": "Enter a name for your model:",
+        "saveName": "Model Name",
+        "saveSave": "Save",
+        "saveCancel": "Cancel"
+    },
     "data": {
         "title": "Data"
     },

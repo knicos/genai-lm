@@ -1,10 +1,8 @@
-import LoadDialog from './LoadDialog';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import * as tf from '@tensorflow/tfjs';
-import { IconButton, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import manifest from './manifest.json';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -12,11 +10,10 @@ import BoxTitle from '../BoxTitle/BoxTitle';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
+    model?: TeachableLLM;
 }
 
-export default function ModelLoader({ onModel }: Props) {
-    const [open, setOpen] = useState(false);
-    const [model, setModel] = useState<TeachableLLM | undefined>();
+export default function ModelLoader({ onModel, model }: Props) {
     const [done, setDone] = useState(false);
     const [selectedModel, setSelectedModel] = useState<number>(-1);
 
@@ -42,16 +39,6 @@ export default function ModelLoader({ onModel }: Props) {
         <div className={style.container}>
             <BoxTitle
                 title="Model"
-                button={
-                    <IconButton
-                        disabled={!!model}
-                        color="secondary"
-                        style={{ border: !!model ? '1px solid #eee' : '1px solid rgb(174, 37, 174)' }}
-                        onClick={() => setOpen(true)}
-                    >
-                        <FolderOpenIcon color="inherit" />
-                    </IconButton>
-                }
                 done={done}
                 busy={!done && !!model}
             ></BoxTitle>
@@ -75,7 +62,7 @@ export default function ModelLoader({ onModel }: Props) {
                                     }
                                 }
                                 const newModel = TeachableLLM.loadModel(tf, m.url);
-                                setModel(newModel);
+                                onModel(newModel);
                             } else {
                                 if (model) {
                                     console.log('Disposing old model');
@@ -87,7 +74,7 @@ export default function ModelLoader({ onModel }: Props) {
                                     }
                                 }
                                 const newModel = TeachableLLM.create(tf, m.config);
-                                setModel(newModel);
+                                onModel(newModel);
                             }
                         }}
                     >
@@ -106,13 +93,6 @@ export default function ModelLoader({ onModel }: Props) {
                     </ListItemButton>
                 ))}
             </List>
-            <LoadDialog
-                open={open}
-                onClose={() => setOpen(false)}
-                onModel={async (data: string | File) => {
-                    setModel(TeachableLLM.loadModel(tf, data));
-                }}
-            />
         </div>
     );
 }

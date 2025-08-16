@@ -35,13 +35,17 @@ export function Component() {
 
     return (
         <>
-            <AppBar />
+            <AppBar
+                onModel={setModel}
+                model={model}
+            />
             <WorkflowLayout connections={CONNECTIONS}>
                 <div
                     className={style.box}
                     data-widget="model"
                 >
                     <ModelLoader
+                        model={model}
                         onModel={(m: TeachableLLM) => {
                             setModel(m);
                         }}
