@@ -49,37 +49,40 @@ function ErrorComponent() {
     );
 }
 
-const router = createBrowserRouter(
-    createRoutesFromElements(
+export const routes = createRoutesFromElements(
+    <Route
+        path="/"
+        ErrorBoundary={ErrorComponent}
+    >
         <Route
-            path="/"
-            ErrorBoundary={ErrorComponent}
-        >
-            <Route
-                index
-                element={
-                    <Navigate
-                        replace
-                        to="/workspace"
-                    />
-                }
-            />
+            index
+            element={
+                <Navigate
+                    replace
+                    to="/workspace"
+                />
+            }
+        />
 
-            <Route
-                path="workspace"
-                lazy={() => import('./views/Workspace')}
-            />
-        </Route>
-    )
+        <Route
+            path="workspace"
+            lazy={() => import('./views/Workspace')}
+        />
+    </Route>
 );
+const defaultRouter = createBrowserRouter(routes);
 
-function App() {
+interface Props {
+    router?: typeof defaultRouter;
+}
+
+function App({ router }: Props) {
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
                 <Provider>
                     <React.Suspense fallback={'...'}>
-                        <RouterProvider router={router} />
+                        <RouterProvider router={router || defaultRouter} />
                     </React.Suspense>
                 </Provider>
             </ThemeProvider>

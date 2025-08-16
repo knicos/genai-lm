@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import prettyNumber from '../../utilities/prettyNumber';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../BoxTitle/BoxTitle';
-import loadTextData from '../../utilities/textLoader';
 import { IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import useModelStatus from '../../utilities/useModelStatus';

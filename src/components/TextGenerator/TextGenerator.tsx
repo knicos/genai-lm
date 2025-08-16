@@ -100,7 +100,10 @@ export default function TextGenerator({ model }: Props) {
     }, [generator]);
 
     return (
-        <div className={style.container}>
+        <div
+            className={style.container}
+            data-testid="textgenerator"
+        >
             <BoxTitle
                 title="Generator"
                 done={ready && !busy}
