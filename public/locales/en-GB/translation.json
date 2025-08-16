@@ -1,0 +1,35 @@
+{
+    "data": {
+        "title": "Data"
+    },
+    "training": {
+        "title": "Training",
+        "samples": "samples",
+        "start": "Train"
+    },
+    "generator": {
+        "title": "Generator",
+        "generate": "Generate",
+        "promptPlaceholder": "Optional prompt..."
+    },
+    "samples": {
+        "title": "Samples",
+        "noSamples": "No samples available",
+        "moreSamples": "You should have more samples",
+        "total": "Total"
+    },
+    "evaluation": {
+        "title": "Evaluation",
+        "quality": "Quality"
+    },
+    "modelStatus": {
+        "warmup": "Model is warming up...",
+        "ready": "Model is ready",
+        "training": "Model is training...",
+        "loading": "Model is loading...",
+        "busy": "Model is busy...",
+        "error": "An error occurred with the model",
+        "none": "No model loaded",
+        "awaitingTokens": "Awaiting tokens..."
+    }
+}

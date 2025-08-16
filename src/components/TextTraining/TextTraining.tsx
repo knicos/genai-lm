@@ -7,6 +7,7 @@ import useModelStatus from '../../utilities/useModelStatus';
 import prettyNumber from '../../utilities/prettyNumber';
 import { IconButton } from '@mui/material';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     model?: TeachableLLM;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function TextTraining({ model, dataset }: Props) {
+    const { t } = useTranslation();
     const [trainer, setTrainer] = useState<ReturnType<TeachableLLM['trainer']> | undefined>();
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(false);
@@ -36,11 +38,11 @@ export default function TextTraining({ model, dataset }: Props) {
     return (
         <div className={style.container}>
             <BoxTitle
-                title="Training"
+                title={t('training.title')}
                 done={done}
                 busy={!done && !!trainer}
             />
-            {`${prettyNumber((epochs || 0) * 32)} samples`}
+            {`${prettyNumber((epochs || 0) * 32)} ${t('training.samples')}`}
 
             <div className={style.buttonBox}>
                 <Button
@@ -66,7 +68,7 @@ export default function TextTraining({ model, dataset }: Props) {
                         }
                     }}
                 >
-                    Train
+                    {t('training.start')}
                 </Button>
                 <IconButton
                     onClick={() => {

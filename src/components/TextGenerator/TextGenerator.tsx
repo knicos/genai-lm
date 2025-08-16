@@ -7,6 +7,7 @@ import { Button } from '@genai-fi/base';
 import ModelStatus from '../ModelStatus/ModelStatus';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../BoxTitle/BoxTitle';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     model?: TeachableLLM;
@@ -31,6 +32,7 @@ async function wait(ms: number): Promise<void> {
 }
 
 export default function TextGenerator({ model }: Props) {
+    const { t } = useTranslation();
     const [generator, setGenerator] = useState<ReturnType<TeachableLLM['generator']> | undefined>();
     const [text, setText] = useState<string>('');
     const [attentionData, setAttentionData] = useState<number[][]>([]);
@@ -105,7 +107,7 @@ export default function TextGenerator({ model }: Props) {
             data-testid="textgenerator"
         >
             <BoxTitle
-                title="Generator"
+                title={t('generator.title')}
                 done={ready && !busy}
                 busy={busy}
             />
@@ -126,7 +128,7 @@ export default function TextGenerator({ model }: Props) {
                     <TextField
                         variant="outlined"
                         size="small"
-                        placeholder="Optional prompt..."
+                        placeholder={t('generator.promptPlaceholder')}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                     />
@@ -155,7 +157,7 @@ export default function TextGenerator({ model }: Props) {
                                 });
                         }}
                     >
-                        Generate
+                        {t('generator.generate')}
                     </Button>
                     <ModelStatus model={model} />
                 </div>

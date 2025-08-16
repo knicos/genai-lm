@@ -4,6 +4,7 @@ import BoxTitle from '../BoxTitle/BoxTitle';
 import ScoreGauge from '../ScoreGauge/ScoreGauge';
 import { useEffect, useState } from 'react';
 import useModelStatus from '../../utilities/useModelStatus';
+import { useTranslation } from 'react-i18next';
 
 function lossToQuality(loss: number, vocabSize: number): number {
     const targetLoss = 1;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export default function Evaluation({ model }: Props) {
+    const { t } = useTranslation();
     const [quality, setQuality] = useState<number>(0);
     const status = useModelStatus(model);
 
@@ -68,13 +70,13 @@ export default function Evaluation({ model }: Props) {
     return (
         <div className={style.container}>
             <BoxTitle
-                title="Evaluation"
+                title={t('evaluation.title')}
                 info
                 done={!!model}
             />
             <div style={{ marginBottom: '1rem' }} />
             <ScoreGauge
-                label="Quality"
+                label={t('evaluation.quality')}
                 value={quality}
                 maxValue={1}
                 showValue

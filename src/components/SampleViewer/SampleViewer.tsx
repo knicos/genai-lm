@@ -5,6 +5,7 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 import BoxTitle from '../BoxTitle/BoxTitle';
 import prettyNumber from '../../utilities/prettyNumber';
 import BoxMenu from '../BoxTitle/BoxMenu';
+import { useTranslation } from 'react-i18next';
 
 const PADDING = 10;
 
@@ -27,6 +28,7 @@ function requiredSamples(parameters: number) {
 }
 
 export default function SampleViewer({ samples, contextSize, parameters }: Props) {
+    const { t } = useTranslation();
     const [index, setIndex] = useState(0);
 
     const joinedSamples = useMemo(() => {
@@ -48,13 +50,13 @@ export default function SampleViewer({ samples, contextSize, parameters }: Props
     return (
         <div className={style.container}>
             <BoxTitle
-                title="Samples"
+                title={t('samples.title')}
                 info
                 done={samples.length > 0}
             />
             <BoxMenu>
                 <div>
-                    <span className={style.bold}>Total: </span>
+                    <span className={style.bold}>{t('samples.total')}: </span>
                     {`${prettyNumber(joinedSamples?.length || 0)}`}
                 </div>
                 <IconButton
@@ -75,12 +77,12 @@ export default function SampleViewer({ samples, contextSize, parameters }: Props
             )}
             {samples.length === 0 && (
                 <div className={style.sample}>
-                    <Alert severity="warning">No samples available</Alert>
+                    <Alert severity="warning">{t('samples.noSamples')}</Alert>
                 </div>
             )}
             {samples.length > 0 && joinedSamples.length < requiredSamples(parameters || 0) && (
                 <div className={style.sample}>
-                    <Alert severity="info">You should have more samples</Alert>
+                    <Alert severity="info">{t('samples.moreSamples')}</Alert>
                 </div>
             )}
         </div>

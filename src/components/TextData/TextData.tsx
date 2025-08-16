@@ -8,6 +8,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import useModelStatus from '../../utilities/useModelStatus';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BoxMenu from '../BoxTitle/BoxMenu';
+import { useTranslation } from 'react-i18next';
 
 interface DataEntry {
     name: string;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function TextData({ model, onDatasetChange }: Props) {
+    const { t } = useTranslation();
     const [done, setDone] = useState(false);
     const [busy, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -36,7 +38,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     return (
         <div className={style.container}>
             <BoxTitle
-                title="Data"
+                title={t('data.title')}
                 done={done}
                 busy={busy}
             />
@@ -85,7 +87,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     onChange={async (e) => {
                         if (e.target.files && e.target.files.length > 0) {
                             const file = e.target.files[0];
-                            console.log('File', file.name, file.type);
                             setBusy(true);
                             const text = await loadTextData(file);
 

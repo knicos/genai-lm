@@ -30,7 +30,7 @@ export default function ApplicationBar() {
                         width="48"
                         height="48"
                     />
-                    <h1>GenAI Generator</h1>
+                    <h1>Teachable Generator</h1>
                 </Link>
                 <div className={style.buttonBar}></div>
                 <div className={style.langBar}>
