@@ -1,13 +1,14 @@
 import style from './style.module.css';
 import { TextField } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import TextHighlighter from '../TextHighlighter/TextHighlighter';
 import { Button } from '@genai-fi/base';
 import ModelStatus from '../ModelStatus/ModelStatus';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
+import XAIView from './XAIView';
 
 interface Props {
     model?: TeachableLLM;
@@ -31,11 +32,26 @@ async function wait(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function createTopKTokens(
+    probabilities: number[],
+    k: number,
+    tokeniser: CharTokeniser
+): { token: string; probability: number }[] {
+    const tokenProbabilities = probabilities.map((prob, idx) => ({
+        token: tokeniser.vocab[idx],
+        probability: prob,
+    }));
+    tokenProbabilities.sort((a, b) => b.probability - a.probability);
+    return tokenProbabilities.slice(0, k);
+}
+
 export default function TextGenerator({ model }: Props) {
     const { t } = useTranslation();
     const [generator, setGenerator] = useState<ReturnType<TeachableLLM['generator']> | undefined>();
     const [text, setText] = useState<string>('');
     const [attentionData, setAttentionData] = useState<number[][]>([]);
+    const [probabilities, setProbabilities] = useState<number[][]>([]);
+    const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
     const [prompt, setPrompt] = useState<string>('');
     const [selected, setSelected] = useState<number>(0);
     const status = useModelStatus(model);
@@ -43,12 +59,19 @@ export default function TextGenerator({ model }: Props) {
     const [busy, setBusy] = useState(false);
 
     const attentionRef = useRef<number[][]>([]);
+    const probRef = useRef<number[][]>([]);
 
     useEffect(() => {
         if (status === 'ready') {
             setReady(true);
         }
     }, [status]);
+
+    useEffect(() => {
+        if (ready) {
+            setTopKTokens(createTopKTokens(probabilities[selected] || [], 5, model?.tokeniser as CharTokeniser));
+        }
+    }, [probabilities, selected, model, ready]);
 
     useEffect(() => {
         if (ready && model) {
@@ -87,11 +110,15 @@ export default function TextGenerator({ model }: Props) {
 
     useEffect(() => {
         if (generator) {
-            const h = (_: number[], newText: string, attention?: number[][]) => {
+            const h = (_: number[], newText: string, attention?: number[][], probabilities?: number[][]) => {
                 setText((prevText) => prevText + newText);
 
                 if (attention) {
                     attentionRef.current = [...attentionRef.current, ...attention];
+                }
+
+                if (probabilities) {
+                    probRef.current = [...probRef.current, ...probabilities];
                 }
             };
             generator.on('tokens', h);
@@ -111,18 +138,21 @@ export default function TextGenerator({ model }: Props) {
                 done={ready && !busy}
                 busy={busy}
             />
-            <TextHighlighter
-                text={text}
-                mode="probability"
-                onSelectToken={(_, index) => setSelected(index)}
-                selected={selected}
-                probabilities={createProbabilities(
-                    attentionData,
-                    prompt.length === 0 ? 1 : prompt.length,
-                    selected,
-                    text.length
-                )}
-            />
+            <div className={style.xaiRow}>
+                <TextHighlighter
+                    text={text}
+                    mode="probability"
+                    onSelectToken={(_, index) => setSelected(index)}
+                    selected={selected}
+                    probabilities={createProbabilities(
+                        attentionData,
+                        prompt.length === 0 ? 1 : prompt.length,
+                        selected,
+                        text.length
+                    )}
+                />
+                <XAIView probabilities={topKTokens} />
+            </div>
             <div className={style.titleRow}>
                 <div className={style.buttonBox}>
                     <TextField
@@ -140,20 +170,27 @@ export default function TextGenerator({ model }: Props) {
                             if (!generator) return;
                             setText(''); // Clear previous text
                             setAttentionData([]); // Clear previous attention data
+                            setProbabilities([]); // Clear previous probabilities
                             setBusy(true);
                             generator
                                 .generate(prompt.length > 0 ? prompt : undefined, {
                                     maxLength: 400,
                                     temperature: 0.8,
                                     includeAttention: true,
+                                    includeProbabilities: true,
                                     noCache: true,
+                                    usePadding: true,
                                 })
                                 .then(() => {
-                                    setBusy(false);
                                     if (attentionRef.current.length > 0) {
                                         setAttentionData(attentionRef.current);
                                         attentionRef.current = [];
                                     }
+                                    if (probRef.current.length > 0) {
+                                        setProbabilities(probRef.current);
+                                        probRef.current = [];
+                                    }
+                                    setBusy(false);
                                 });
                         }}
                     >

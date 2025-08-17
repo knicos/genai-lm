@@ -15,9 +15,16 @@
     },
     {
         "url": "https://store.gen-ai.fi/llm/nano_imdb3.zip",
-        "name": "English Pre-trained Medium (3M)",
+        "name": "English Pre-trained Medium (4M)",
         "description": "Trained on IMDB movie reviews",
         "parameters": 3.6,
+        "trained": true
+    },
+    {
+        "url": "https://store.gen-ai.fi/llm/finnish_medium_wiki.zip",
+        "name": "Finnish Pre-trained Medium (4M)",
+        "description": "Trained on wikipedia",
+        "parameters": 1.9,
         "trained": true
     },
     {

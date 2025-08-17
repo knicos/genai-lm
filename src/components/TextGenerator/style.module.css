@@ -1,3 +1,5 @@
+@value secondary, secondaryLight, backgroundDark2 from "@genai-fi/base/css/colours.module.css";
+
 .container {
     position: relative;
     display: flex;
@@ -36,4 +38,45 @@
     gap: 1rem;
     align-items: center;
     flex-grow: 1;
+}
+
+.xaiRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.xaiContainer {
+    width: 150px;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 3rem;
+    background: backgroundDark2;
+    border-bottom-right-radius: 15px;
+    border-top-right-radius: 15px;
+    color: white;
+    position: absolute;
+    left: 100%;
+}
+
+.xaiContainer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.probBar {
+    background: secondaryLight;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.probDetails {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
 }
