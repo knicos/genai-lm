@@ -1,5 +1,5 @@
 import style from './style.module.css';
-import { TextField } from '@mui/material';
+import { IconButton, TextField } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import TextHighlighter from '../TextHighlighter/TextHighlighter';
@@ -9,6 +9,8 @@ import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import XAIView from './XAIView';
+import TuneIcon from '@mui/icons-material/Tune';
+import GeneratorSettings from './GeneratorSettings';
 
 interface Props {
     model?: TeachableLLM;
@@ -57,6 +59,8 @@ export default function TextGenerator({ model }: Props) {
     const status = useModelStatus(model);
     const [ready, setReady] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [temperature, setTemperature] = useState<number>(1);
+    const [showSettings, setShowSettings] = useState<boolean>(false);
 
     const attentionRef = useRef<number[][]>([]);
     const probRef = useRef<number[][]>([]);
@@ -77,13 +81,8 @@ export default function TextGenerator({ model }: Props) {
         if (ready && model) {
             const generator = model.generator();
             setGenerator(generator);
-            setText(''); // Clear previous text
-            setAttentionData([]); // Clear previous attention data
-            /*generator.generate(undefined, {
-                maxLength: 400,
-                temperature: 0.8,
-                includeAttention: true,
-            });*/
+            setText('');
+            setAttentionData([]);
 
             const state = {
                 count: 0,
@@ -96,7 +95,7 @@ export default function TextGenerator({ model }: Props) {
                 setAttentionData([]); // Clear previous attention data
                 await generator.generate(undefined, {
                     maxLength: 200,
-                    temperature: 0.8,
+                    temperature: 1,
                     includeAttention: false,
                 });
                 await wait(40);
@@ -152,9 +151,18 @@ export default function TextGenerator({ model }: Props) {
                     )}
                 />
                 <XAIView probabilities={topKTokens} />
+                <GeneratorSettings
+                    open={showSettings}
+                    onClose={() => setShowSettings(false)}
+                    temperature={temperature}
+                    onTemperatureChange={setTemperature}
+                />
             </div>
             <div className={style.titleRow}>
                 <div className={style.buttonBox}>
+                    <IconButton onClick={() => setShowSettings(true)}>
+                        <TuneIcon />
+                    </IconButton>
                     <TextField
                         variant="outlined"
                         size="small"
@@ -175,7 +183,7 @@ export default function TextGenerator({ model }: Props) {
                             generator
                                 .generate(prompt.length > 0 ? prompt : undefined, {
                                     maxLength: 400,
-                                    temperature: 0.8,
+                                    temperature,
                                     includeAttention: true,
                                     includeProbabilities: true,
                                     noCache: true,
@@ -196,6 +204,7 @@ export default function TextGenerator({ model }: Props) {
                     >
                         {t('generator.generate')}
                     </Button>
+
                     <ModelStatus model={model} />
                 </div>
             </div>
