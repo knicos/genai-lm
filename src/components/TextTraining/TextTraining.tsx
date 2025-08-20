@@ -8,6 +8,7 @@ import prettyNumber from '../../utilities/prettyNumber';
 import { IconButton } from '@mui/material';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { useTranslation } from 'react-i18next';
+import { wait } from '../../utilities/wait';
 
 interface Props {
     model?: TeachableLLM;
@@ -18,7 +19,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useState<ReturnType<TeachableLLM['trainer']> | undefined>();
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
-    const [done, setDone] = useState(false);
+    const [done, setDone] = useState(true);
     const status = useModelStatus(model);
 
     const canTrain = !!model && !!dataset && status === 'ready' && dataset.length > 0;
@@ -35,12 +36,31 @@ export default function TextTraining({ model, dataset }: Props) {
         }
     }, [trainer]);
 
+    useEffect(() => {
+        if (model) {
+            if (model.status === 'ready') {
+                setTrainer(model.trainer());
+            } else {
+                const h = (s: string) => {
+                    if (s === 'ready') {
+                        setTrainer(model.trainer());
+                        model.off('status', h);
+                    }
+                };
+                model.on('status', h);
+                return () => {
+                    model.off('status', h);
+                };
+            }
+        }
+    }, [model]);
+
     return (
         <div className={style.container}>
             <BoxTitle
                 title={t('training.title')}
-                done={done}
-                busy={!done && !!trainer}
+                done={canTrain}
+                busy={!done}
             />
             {`${prettyNumber((epochs || 0) * 32)} ${t('training.samples')}`}
 
@@ -49,18 +69,18 @@ export default function TextTraining({ model, dataset }: Props) {
                     disabled={!canTrain || !model}
                     variant="contained"
                     onClick={async () => {
-                        if (model && dataset) {
+                        if (model && dataset && trainer) {
                             if (!model.tokeniser.trained) {
                                 await model.tokeniser.train(dataset);
                             }
-                            const newTrainer = model.trainer();
-                            setTrainer(newTrainer);
+
                             setDone(false);
                             setEpochs(0);
-                            newTrainer
+                            await wait(10);
+                            trainer
                                 .train(dataset, {
                                     batchSize: 32,
-                                    maxSteps: 300,
+                                    maxSteps: 30000,
                                 })
                                 .then(() => {
                                     setDone(true);

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import XAIView from './XAIView';
 import TuneIcon from '@mui/icons-material/Tune';
 import GeneratorSettings from './GeneratorSettings';
+import { wait } from '../../utilities/wait';
 
 interface Props {
     model?: TeachableLLM;
@@ -28,10 +29,6 @@ function createProbabilities(attentionData: number[][], offset: number, index: n
         }
     }
     return probabilities;
-}
-
-async function wait(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function createTopKTokens(
@@ -64,6 +61,7 @@ export default function TextGenerator({ model }: Props) {
 
     const attentionRef = useRef<number[][]>([]);
     const probRef = useRef<number[][]>([]);
+    const textRef = useRef<string>('');
 
     useEffect(() => {
         if (status === 'ready') {
@@ -93,11 +91,15 @@ export default function TextGenerator({ model }: Props) {
                 if (state.count % 2 !== 0) return;
                 setText(''); // Clear previous text
                 setAttentionData([]); // Clear previous attention data
-                await generator.generate(undefined, {
+                textRef.current = '';
+                const finalText = await generator.generate(undefined, {
                     maxLength: 200,
                     temperature: 1,
                     includeAttention: false,
+                    includeProbabilities: false,
                 });
+                setText(finalText);
+                textRef.current = '';
                 await wait(40);
             };
             model.on('trainStep', h);
@@ -110,7 +112,11 @@ export default function TextGenerator({ model }: Props) {
     useEffect(() => {
         if (generator) {
             const h = (_: number[], newText: string, attention?: number[][], probabilities?: number[][]) => {
-                setText((prevText) => prevText + newText);
+                //setText((prevText) => prevText + newText);
+                textRef.current += newText;
+                if (textRef.current.length % 5 === 0) {
+                    setText(textRef.current);
+                }
 
                 if (attention) {
                     attentionRef.current = [...attentionRef.current, ...attention];
@@ -180,6 +186,7 @@ export default function TextGenerator({ model }: Props) {
                             setAttentionData([]); // Clear previous attention data
                             setProbabilities([]); // Clear previous probabilities
                             setBusy(true);
+                            textRef.current = '';
                             generator
                                 .generate(prompt.length > 0 ? prompt : undefined, {
                                     maxLength: 400,
@@ -189,7 +196,9 @@ export default function TextGenerator({ model }: Props) {
                                     noCache: true,
                                     usePadding: true,
                                 })
-                                .then(() => {
+                                .then((finaltext: string) => {
+                                    setText(finaltext);
+                                    textRef.current = '';
                                     if (attentionRef.current.length > 0) {
                                         setAttentionData(attentionRef.current);
                                         attentionRef.current = [];
