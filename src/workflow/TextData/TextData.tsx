@@ -3,7 +3,7 @@ import style from './style.module.css';
 import prettyNumber from '../../utilities/prettyNumber';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import { Alert, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import useModelStatus from '../../utilities/useModelStatus';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -43,13 +43,18 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 busy={busy}
             />
             <BoxMenu>
-                <IconButton
-                    disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model}
-                    color="secondary"
-                    onClick={() => fileRef.current?.click()}
+                <Tooltip
+                    title={t('data.addTooltip')}
+                    arrow
                 >
-                    <AddIcon color="inherit" />
-                </IconButton>
+                    <IconButton
+                        disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model}
+                        color="secondary"
+                        onClick={() => fileRef.current?.click()}
+                    >
+                        <AddIcon color="inherit" />
+                    </IconButton>
+                </Tooltip>
             </BoxMenu>
             <List style={{ width: '100%' }}>
                 {data.map((entry, index) => (
@@ -78,6 +83,24 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     </ListItem>
                 ))}
             </List>
+            {data.length === 0 && model && (
+                <Alert
+                    severity="info"
+                    className={style.alert}
+                    style={{ margin: '1rem', maxWidth: '200px' }}
+                >
+                    {t('data.dataHint')}
+                </Alert>
+            )}
+            {data.length === 0 && !model && (
+                <Alert
+                    severity="warning"
+                    className={style.alert}
+                    style={{ margin: '1rem', maxWidth: '200px' }}
+                >
+                    {t('data.modelHint')}
+                </Alert>
+            )}
             <div className={style.buttonBox}>
                 <input
                     type="file"

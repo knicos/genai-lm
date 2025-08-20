@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './AppBar.module.css';
-import { IconButton, NativeSelect } from '@mui/material';
+import { IconButton, NativeSelect, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
@@ -133,14 +133,18 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         ))}
                     </NativeSelect>
                 </div>
-                <IconButton
-                    color="inherit"
-                    size="large"
-                    onClick={() => showSettings(true)}
-                    title={t('app.settings')}
+                <Tooltip
+                    title={t('app.settings.title')}
+                    arrow
                 >
-                    <SettingsIcon fontSize="large" />
-                </IconButton>
+                    <IconButton
+                        color="inherit"
+                        size="large"
+                        onClick={() => showSettings(true)}
+                    >
+                        <SettingsIcon fontSize="large" />
+                    </IconButton>
+                </Tooltip>
             </div>
             <SaveDialog
                 open={showSaveDialog}

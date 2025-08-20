@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
 import * as tf from '@tensorflow/tfjs';
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import manifest from './manifest.json';
@@ -19,7 +19,7 @@ export default function ModelLoader({ onModel, model }: Props) {
 
     useEffect(() => {
         if (model) {
-            onModel(model);
+            //onModel(model);
             if (model.ready) {
                 setDone(true);
             } else {
@@ -33,7 +33,7 @@ export default function ModelLoader({ onModel, model }: Props) {
             }
             setDone(true);
         }
-    }, [model, onModel]);
+    }, [model]);
 
     return (
         <div className={style.container}>
@@ -62,7 +62,9 @@ export default function ModelLoader({ onModel, model }: Props) {
                                     }
                                 }
                                 const newModel = TeachableLLM.loadModel(tf, m.url);
-                                onModel(newModel);
+                                waitForModel(newModel).then(() => {
+                                    onModel(newModel);
+                                });
                             } else {
                                 if (model) {
                                     console.log('Disposing old model');

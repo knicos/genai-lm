@@ -1,5 +1,5 @@
 import style from './style.module.css';
-import { IconButton, TextField } from '@mui/material';
+import { IconButton, TextField, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import TextHighlighter from '../../components/TextHighlighter/TextHighlighter';
@@ -180,9 +180,14 @@ export default function TextGenerator({ model }: Props) {
                 <div className={style.titleRow}>
                     <div className={style.buttonBox}>
                         {enableSettings && (
-                            <IconButton onClick={() => setShowSettings(true)}>
-                                <TuneIcon />
-                            </IconButton>
+                            <Tooltip
+                                title={t('generator.settingsTooltip')}
+                                arrow
+                            >
+                                <IconButton onClick={() => setShowSettings(true)}>
+                                    <TuneIcon />
+                                </IconButton>
+                            </Tooltip>
                         )}
                         <TextField
                             variant="outlined"

@@ -27,7 +27,10 @@
         "close": "Close"
     },
     "data": {
-        "title": "Data"
+        "title": "Data",
+        "addTooltip": "Add new data",
+        "dataHint": "Upload your text or CSV files for training.",
+        "modelHint": "Please select a model first."
     },
     "training": {
         "title": "Training",
@@ -37,13 +40,15 @@
     "generator": {
         "title": "Generator",
         "generate": "Generate",
-        "promptPlaceholder": "Optional prompt..."
+        "promptPlaceholder": "Optional prompt...",
+        "settingsTooltip": "Generator Settings"
     },
     "samples": {
         "title": "Samples",
-        "noSamples": "No samples available",
+        "noSamples": "No samples available, add training data to see samples.",
         "moreSamples": "You should have more samples",
-        "total": "Total"
+        "total": "Total",
+        "shuffle": "Shuffle Samples"
     },
     "evaluation": {
         "title": "Evaluation",

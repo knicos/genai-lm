@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import style from './style.module.css';
-import { Alert, IconButton } from '@mui/material';
+import { Alert, IconButton, Tooltip } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import prettyNumber from '../../utilities/prettyNumber';
@@ -59,13 +59,18 @@ export default function SampleViewer({ samples, contextSize, parameters }: Props
                     <span className={style.bold}>{t('samples.total')}: </span>
                     {`${prettyNumber(joinedSamples?.length || 0)}`}
                 </div>
-                <IconButton
-                    color="secondary"
-                    disabled={samples.length === 0}
-                    onClick={() => setIndex(Math.random() * (joinedSamples.length - contextSize - 1))}
+                <Tooltip
+                    title={t('samples.shuffle')}
+                    arrow
                 >
-                    <ShuffleIcon />
-                </IconButton>
+                    <IconButton
+                        color="secondary"
+                        disabled={samples.length === 0}
+                        onClick={() => setIndex(Math.random() * (joinedSamples.length - contextSize - 1))}
+                    >
+                        <ShuffleIcon />
+                    </IconButton>
+                </Tooltip>
             </BoxMenu>
             {samples.length > 0 && (
                 <div className={style.sample}>
