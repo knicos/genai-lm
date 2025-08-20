@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import style from './style.module.css';
-import TextTrainer from '../../components/TextTraining/TextTraining';
-import TextGenerator from '../../components/TextGenerator/TextGenerator';
+import TextTrainer from '../../workflow/TextTraining/TextTraining';
+import TextGenerator from '../../workflow/TextGenerator/TextGenerator';
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import ModelLoader from '../../components/ModelLoader/ModelLoader';
-import TextData from '../../components/TextData/TextData';
+import ModelLoader from '../../workflow/ModelLoader/ModelLoader';
+import TextData from '../../workflow/TextData/TextData';
 import { IConnection, WorkflowLayout } from '@genai-fi/base';
-import SampleViewer from '../../components/SampleViewer/SampleViewer';
+import SampleViewer from '../../workflow/SampleViewer/SampleViewer';
 import useModelStatus from '../../utilities/useModelStatus';
 import AppBar from '../../components/AppBar';
-import Evaluation from '../../components/Evaluation/Evaluation';
-import ModelInfo from '../../components/ModelInfo/ModelInfo';
+import Evaluation from '../../workflow/Evaluation/Evaluation';
+import ModelInfo from '../../workflow/ModelInfo/ModelInfo';
+import { useAtomValue } from 'jotai';
+import { workflowSteps } from '../../state/workflowSettings';
+import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'model', end: 'textData', startPoint: 'right', endPoint: 'left' },
@@ -25,15 +28,7 @@ export function Component() {
     const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const status = useModelStatus(model);
-
-    /*useEffect(() => {
-        if (textDataset && textDataset.length > 0) {
-            const tokeniser = new CharTokeniser();
-            tokeniser.train(textDataset);
-            const newModel = TeachableLLM.create(tf, tokeniser);
-            setModel(newModel);
-        }
-    }, [textDataset]);*/
+    const steps = useAtomValue(workflowSteps);
 
     return (
         <>
@@ -46,23 +41,27 @@ export function Component() {
                     className={style.verticalBox}
                     data-widget="container"
                 >
-                    <div
-                        className={style.box}
-                        data-widget="model"
-                    >
-                        <ModelLoader
-                            model={model}
-                            onModel={(m: TeachableLLM) => {
-                                setModel(m);
-                            }}
-                        />
-                    </div>
-                    <div
-                        className={style.box}
-                        data-widget="info"
-                    >
-                        <ModelInfo model={model} />
-                    </div>
+                    {steps.has('model') && (
+                        <div
+                            className={style.box}
+                            data-widget="model"
+                        >
+                            <ModelLoader
+                                model={model}
+                                onModel={(m: TeachableLLM) => {
+                                    setModel(m);
+                                }}
+                            />
+                        </div>
+                    )}
+                    {steps.has('modelInfo') && (
+                        <div
+                            className={style.box}
+                            data-widget="info"
+                        >
+                            <ModelInfo model={model} />
+                        </div>
+                    )}
                 </div>
                 <div
                     className={style.verticalBox}
@@ -78,16 +77,18 @@ export function Component() {
                             onDatasetChange={setTextDataset}
                         />
                     </div>
-                    <div
-                        className={style.box}
-                        data-widget="textBrowser"
-                    >
-                        <SampleViewer
-                            samples={textDataset}
-                            contextSize={model && status !== 'loading' ? model.config.blockSize : 128}
-                            parameters={model && status !== 'loading' ? model.getNumParams() : undefined}
-                        />
-                    </div>
+                    {steps.has('sampleExplore') && (
+                        <div
+                            className={style.box}
+                            data-widget="textBrowser"
+                        >
+                            <SampleViewer
+                                samples={textDataset}
+                                contextSize={model && status !== 'loading' ? model.config.blockSize : 128}
+                                parameters={model && status !== 'loading' ? model.getNumParams() : undefined}
+                            />
+                        </div>
+                    )}
                 </div>
                 <div
                     className={style.verticalBox}
@@ -102,12 +103,14 @@ export function Component() {
                             dataset={textDataset}
                         />
                     </div>
-                    <div
-                        className={style.box}
-                        data-widget="evaluation"
-                    >
-                        <Evaluation model={model} />
-                    </div>
+                    {steps.has('evaluation') && (
+                        <div
+                            className={style.box}
+                            data-widget="evaluation"
+                        >
+                            <Evaluation model={model} />
+                        </div>
+                    )}
                 </div>
                 <div
                     className={style.box}
@@ -116,6 +119,7 @@ export function Component() {
                     <TextGenerator model={model} />
                 </div>
             </WorkflowLayout>
+            <SettingsDialog />
         </>
     );
 }

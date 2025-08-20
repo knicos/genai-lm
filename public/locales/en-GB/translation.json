@@ -6,7 +6,25 @@
         "saveMessage": "Enter a name for your model:",
         "saveName": "Model Name",
         "saveSave": "Save",
-        "saveCancel": "Cancel"
+        "saveCancel": "Cancel",
+        "settings": {
+            "title": "Settings",
+            "general": "General",
+            "generator": "Generator",
+            "showModelSelect": "Show Models",
+            "showEvaluation": "Show Evaluation",
+            "showTrainer": "Show Trainer",
+            "showDataEntry": "Show Data Entry",
+            "showSampleExplore": "Show Sample Explore",
+            "showModelInfo": "Show Model Information",
+            "showSettings": "Show Settings",
+            "showPrompt": "Show Prompt Input",
+            "showProbabilities": "Show Probabilities",
+            "showAttention": "Show Attention",
+            "maxLength": "Maximum output length",
+            "temperature": "Temperature"
+        },
+        "close": "Close"
     },
     "data": {
         "title": "Data"

@@ -1,15 +1,16 @@
 import { IconButton, Slider } from '@mui/material';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
+import { useAtom } from 'jotai';
+import { generatorTemperature } from '../../state/generatorSettings';
 
 interface Props {
     open: boolean;
-    temperature: number;
-    onTemperatureChange: (newTemperature: number) => void;
     onClose: () => void;
 }
 
-export default function GeneratorSettings({ temperature, onTemperatureChange, onClose, open }: Props) {
+export default function GeneratorSettings({ onClose, open }: Props) {
+    const [temperature, setTemperature] = useAtom(generatorTemperature);
     return (
         <div className={open ? style.showSettings : style.settings}>
             <IconButton
@@ -23,7 +24,7 @@ export default function GeneratorSettings({ temperature, onTemperatureChange, on
                 <label>Temperature</label>
                 <Slider
                     value={temperature}
-                    onChange={(_, newValue) => onTemperatureChange(newValue as number)}
+                    onChange={(_, newValue) => setTemperature(newValue as number)}
                     min={0.5}
                     max={1.5}
                     step={0.1}

@@ -2,16 +2,25 @@ import style from './style.module.css';
 import { IconButton, TextField } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
-import TextHighlighter from '../TextHighlighter/TextHighlighter';
+import TextHighlighter from '../../components/TextHighlighter/TextHighlighter';
 import { Button } from '@genai-fi/base';
-import ModelStatus from '../ModelStatus/ModelStatus';
+import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import useModelStatus from '../../utilities/useModelStatus';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import XAIView from './XAIView';
 import TuneIcon from '@mui/icons-material/Tune';
 import GeneratorSettings from './GeneratorSettings';
 import { wait } from '../../utilities/wait';
+import { useAtomValue } from 'jotai';
+import {
+    generatorMaxLength,
+    generatorShowAttention,
+    generatorShowProbabilities,
+    generatorShowPrompt,
+    generatorShowSettings,
+    generatorTemperature,
+} from '../../state/generatorSettings';
 
 interface Props {
     model?: TeachableLLM;
@@ -56,8 +65,13 @@ export default function TextGenerator({ model }: Props) {
     const status = useModelStatus(model);
     const [ready, setReady] = useState(false);
     const [busy, setBusy] = useState(false);
-    const [temperature, setTemperature] = useState<number>(1);
     const [showSettings, setShowSettings] = useState<boolean>(false);
+    const enableSettings = useAtomValue(generatorShowSettings);
+    const enableAttention = useAtomValue(generatorShowAttention);
+    const enableProbabilities = useAtomValue(generatorShowProbabilities);
+    const enablePrompt = useAtomValue(generatorShowPrompt);
+    const temperature = useAtomValue(generatorTemperature);
+    const maxLength = useAtomValue(generatorMaxLength);
 
     const attentionRef = useRef<number[][]>([]);
     const probRef = useRef<number[][]>([]);
@@ -160,63 +174,65 @@ export default function TextGenerator({ model }: Props) {
                 <GeneratorSettings
                     open={showSettings}
                     onClose={() => setShowSettings(false)}
-                    temperature={temperature}
-                    onTemperatureChange={setTemperature}
                 />
             </div>
-            <div className={style.titleRow}>
-                <div className={style.buttonBox}>
-                    <IconButton onClick={() => setShowSettings(true)}>
-                        <TuneIcon />
-                    </IconButton>
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        placeholder={t('generator.promptPlaceholder')}
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                    />
-                    <Button
-                        size="large"
-                        variant="contained"
-                        disabled={!generator || busy}
-                        onClick={() => {
-                            if (!generator) return;
-                            setText(''); // Clear previous text
-                            setAttentionData([]); // Clear previous attention data
-                            setProbabilities([]); // Clear previous probabilities
-                            setBusy(true);
-                            textRef.current = '';
-                            generator
-                                .generate(prompt.length > 0 ? prompt : undefined, {
-                                    maxLength: 400,
-                                    temperature,
-                                    includeAttention: true,
-                                    includeProbabilities: true,
-                                    noCache: true,
-                                    usePadding: true,
-                                })
-                                .then((finaltext: string) => {
-                                    setText(finaltext);
-                                    textRef.current = '';
-                                    if (attentionRef.current.length > 0) {
-                                        setAttentionData(attentionRef.current);
-                                        attentionRef.current = [];
-                                    }
-                                    if (probRef.current.length > 0) {
-                                        setProbabilities(probRef.current);
-                                        probRef.current = [];
-                                    }
-                                    setBusy(false);
-                                });
-                        }}
-                    >
-                        {t('generator.generate')}
-                    </Button>
+            {enablePrompt && (
+                <div className={style.titleRow}>
+                    <div className={style.buttonBox}>
+                        {enableSettings && (
+                            <IconButton onClick={() => setShowSettings(true)}>
+                                <TuneIcon />
+                            </IconButton>
+                        )}
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            placeholder={t('generator.promptPlaceholder')}
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                        />
+                        <Button
+                            size="large"
+                            variant="contained"
+                            disabled={!generator || busy}
+                            onClick={() => {
+                                if (!generator) return;
+                                setText(''); // Clear previous text
+                                setAttentionData([]); // Clear previous attention data
+                                setProbabilities([]); // Clear previous probabilities
+                                setBusy(true);
+                                textRef.current = '';
+                                generator
+                                    .generate(prompt.length > 0 ? prompt : undefined, {
+                                        maxLength,
+                                        temperature,
+                                        includeAttention: enableAttention,
+                                        includeProbabilities: enableProbabilities,
+                                        noCache: enableAttention,
+                                        usePadding: enableAttention,
+                                    })
+                                    .then((finaltext: string) => {
+                                        setText(finaltext);
+                                        textRef.current = '';
+                                        if (attentionRef.current.length > 0) {
+                                            setAttentionData(attentionRef.current);
+                                            attentionRef.current = [];
+                                        }
+                                        if (probRef.current.length > 0) {
+                                            setProbabilities(probRef.current);
+                                            probRef.current = [];
+                                        }
+                                        setBusy(false);
+                                    });
+                            }}
+                        >
+                            {t('generator.generate')}
+                        </Button>
 
-                    <ModelStatus model={model} />
+                        <ModelStatus model={model} />
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

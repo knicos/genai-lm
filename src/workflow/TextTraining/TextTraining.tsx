@@ -2,13 +2,15 @@ import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
 import prettyNumber from '../../utilities/prettyNumber';
 import { IconButton } from '@mui/material';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
+import { useAtomValue } from 'jotai';
+import { trainerBatchSize, trainerLearningRate, trainerMaxSteps } from '../../state/trainerSettings';
 
 interface Props {
     model?: TeachableLLM;
@@ -21,6 +23,9 @@ export default function TextTraining({ model, dataset }: Props) {
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const status = useModelStatus(model);
+    const batchSize = useAtomValue(trainerBatchSize);
+    const maxSteps = useAtomValue(trainerMaxSteps);
+    const learningRate = useAtomValue(trainerLearningRate);
 
     const canTrain = !!model && !!dataset && status === 'ready' && dataset.length > 0;
 
@@ -62,7 +67,7 @@ export default function TextTraining({ model, dataset }: Props) {
                 done={canTrain}
                 busy={!done}
             />
-            {`${prettyNumber((epochs || 0) * 32)} ${t('training.samples')}`}
+            {`${prettyNumber((epochs || 0) * batchSize)} ${t('training.samples')}`}
 
             <div className={style.buttonBox}>
                 <Button
@@ -79,8 +84,9 @@ export default function TextTraining({ model, dataset }: Props) {
                             await wait(10);
                             trainer
                                 .train(dataset, {
-                                    batchSize: 32,
-                                    maxSteps: 30000,
+                                    batchSize,
+                                    maxSteps,
+                                    learningRate,
                                 })
                                 .then(() => {
                                     setDone(true);

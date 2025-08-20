@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import style from './style.module.css';
 import { Alert, IconButton } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import prettyNumber from '../../utilities/prettyNumber';
-import BoxMenu from '../BoxTitle/BoxMenu';
+import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
 
 const PADDING = 10;

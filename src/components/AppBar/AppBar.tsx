@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './AppBar.module.css';
-import { NativeSelect } from '@mui/material';
+import { IconButton, NativeSelect } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
@@ -10,6 +10,9 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { saveAs } from 'file-saver';
 import * as tf from '@tensorflow/tfjs';
 import SaveDialog from './SaveDialog';
+import { useSetAtom } from 'jotai';
+import { uiShowSettings } from '../../state/uiState';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 export const LANGS = [{ name: 'en-GB', label: 'English' }];
 
@@ -24,6 +27,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
     const [isloading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [showSaveDialog, setShowSaveDialog] = useState(false);
+    const showSettings = useSetAtom(uiShowSettings);
 
     const doChangeLanguage = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -129,6 +133,14 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         ))}
                     </NativeSelect>
                 </div>
+                <IconButton
+                    color="inherit"
+                    size="large"
+                    onClick={() => showSettings(true)}
+                    title={t('app.settings')}
+                >
+                    <SettingsIcon fontSize="large" />
+                </IconButton>
             </div>
             <SaveDialog
                 open={showSaveDialog}

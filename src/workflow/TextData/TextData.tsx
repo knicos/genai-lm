@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import prettyNumber from '../../utilities/prettyNumber';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import useModelStatus from '../../utilities/useModelStatus';
 import DeleteIcon from '@mui/icons-material/Delete';
-import BoxMenu from '../BoxTitle/BoxMenu';
+import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
 
 interface DataEntry {

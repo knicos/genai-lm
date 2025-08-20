@@ -1,6 +1,6 @@
 import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
 import style from './style.module.css';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from '@mui/material';

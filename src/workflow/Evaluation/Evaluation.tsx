@@ -1,7 +1,7 @@
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import style from './style.module.css';
-import BoxTitle from '../BoxTitle/BoxTitle';
-import ScoreGauge from '../ScoreGauge/ScoreGauge';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
+import ScoreGauge from '../../components/ScoreGauge/ScoreGauge';
 import { useEffect, useState } from 'react';
 import useModelStatus from '../../utilities/useModelStatus';
 import { useTranslation } from 'react-i18next';

@@ -6,7 +6,7 @@ import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import manifest from './manifest.json';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import BoxTitle from '../BoxTitle/BoxTitle';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
