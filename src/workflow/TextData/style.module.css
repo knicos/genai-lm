@@ -1,9 +1,12 @@
+@value bgSubdued1 from "@genai-fi/base/css/colours.module.css";
+
 .container {
     display: flex;
     align-items: flex-start;
     /*justify-content: space-between;*/
     color: #333;
     flex-direction: column;
+    width: 390px;
 }
 
 .bold {
@@ -34,4 +37,53 @@
 .size {
     font-weight: bold;
     margin-right: 1rem;
+}
+
+.content {
+    width: 100%;
+    position: relative;
+    min-height: 300px;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.textInputContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    background: bgSubdued1;
+    align-items: flex-start;
+    animation: fadeIn 0.2s 1;
+}
+
+.textInputContainer textarea {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.buttonRow {
+    display: flex;
+    gap: 1rem;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0.1;
+    }
+    100% {
+        opacity: 1;
+    }
 }

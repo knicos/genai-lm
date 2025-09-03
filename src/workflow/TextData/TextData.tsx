@@ -3,12 +3,15 @@ import style from './style.module.css';
 import prettyNumber from '../../utilities/prettyNumber';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { Alert, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip } from '@mui/material';
+import { Alert, IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import useModelStatus from '../../utilities/useModelStatus';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
+import { VerticalButton } from '@genai-fi/base';
+import TextInput from './TextInput';
 
 interface DataEntry {
     name: string;
@@ -29,6 +32,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const fileRef = useRef<HTMLInputElement>(null);
     const status = useModelStatus(model);
     const [data, setData] = useState<DataEntry[]>([]);
+    const [showInput, setShowInput] = useState(false);
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
@@ -43,96 +47,119 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 busy={busy}
             />
             <BoxMenu>
-                <Tooltip
-                    title={t('data.addTooltip')}
-                    arrow
+                <VerticalButton
+                    disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => setShowInput(true)}
+                    startIcon={<AddIcon color="inherit" />}
                 >
-                    <IconButton
-                        disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model}
-                        color="secondary"
-                        onClick={() => fileRef.current?.click()}
-                    >
-                        <AddIcon color="inherit" />
-                    </IconButton>
-                </Tooltip>
+                    {t('data.add')}
+                </VerticalButton>
+                <VerticalButton
+                    disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => fileRef.current?.click()}
+                    startIcon={<UploadFileIcon color="inherit" />}
+                >
+                    {t('data.upload')}
+                </VerticalButton>
             </BoxMenu>
-            <List style={{ width: '100%' }}>
-                {data.map((entry, index) => (
-                    <ListItem
-                        key={index}
-                        className={style.item}
-                        secondaryAction={
-                            <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => {
-                                    setData((prev) => prev.filter((_, i) => i !== index));
-                                }}
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                        }
-                    >
-                        <ListItemAvatar>
-                            <div className={style.size}>{prettyNumber(entry.size)}</div>
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={entry.name}
-                            secondary={entry.content[0].slice(0, 30) + (entry.content[0].length > 30 ? '...' : '')}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-            {data.length === 0 && model && (
-                <Alert
-                    severity="info"
-                    className={style.alert}
-                    style={{ margin: '1rem', maxWidth: '200px' }}
-                >
-                    {t('data.dataHint')}
-                </Alert>
-            )}
-            {data.length === 0 && !model && (
-                <Alert
-                    severity="warning"
-                    className={style.alert}
-                    style={{ margin: '1rem', maxWidth: '200px' }}
-                >
-                    {t('data.modelHint')}
-                </Alert>
-            )}
-            <div className={style.buttonBox}>
-                <input
-                    type="file"
-                    accept=".txt,.csv"
-                    ref={fileRef}
-                    style={{ display: 'none' }}
-                    onChange={async (e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                            const file = e.target.files[0];
-                            setBusy(true);
-                            const text = await loadTextData(file);
-
-                            if (model) {
-                                const tokeniser = model.tokeniser;
-                                if (tokeniser && !tokeniser.trained) {
-                                    await tokeniser.train(text);
-                                }
+            <div className={style.content}>
+                <List style={{ width: '100%', maxHeight: '300px', overflowY: 'auto' }}>
+                    {data.map((entry, index) => (
+                        <ListItem
+                            key={index}
+                            className={style.item}
+                            secondaryAction={
+                                <IconButton
+                                    edge="end"
+                                    aria-label="delete"
+                                    onClick={() => {
+                                        setData((prev) => prev.filter((_, i) => i !== index));
+                                    }}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
                             }
+                        >
+                            <ListItemAvatar>
+                                <div className={style.size}>{prettyNumber(entry.size)}</div>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={entry.name}
+                                secondary={entry.content[0].slice(0, 30) + (entry.content[0].length > 30 ? '...' : '')}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+                {data.length === 0 && model && (
+                    <Alert
+                        severity="info"
+                        className={style.alert}
+                        style={{ margin: '1rem auto', maxWidth: '250px' }}
+                    >
+                        {t('data.dataHint')}
+                    </Alert>
+                )}
+                {data.length === 0 && !model && (
+                    <Alert
+                        severity="warning"
+                        className={style.alert}
+                        style={{ margin: '1rem auto', maxWidth: '250px' }}
+                    >
+                        {t('data.modelHint')}
+                    </Alert>
+                )}
+                {showInput && (
+                    <TextInput
+                        onClose={() => setShowInput(false)}
+                        onText={(text) => {
                             setData((prev) => [
                                 ...prev,
                                 {
-                                    name: file.name,
-                                    content: text,
-                                    size: text.reduce((acc, curr) => acc + curr.length, 0),
+                                    name: t('data.untitled'),
+                                    content: [text],
+                                    size: text.length,
                                 },
                             ]);
-                            setDone(true);
-                            setBusy(false);
-                        }
-                    }}
-                />
+                            setShowInput(false);
+                        }}
+                    />
+                )}
             </div>
+
+            <input
+                type="file"
+                accept=".txt,.csv"
+                ref={fileRef}
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        setBusy(true);
+                        const text = await loadTextData(file);
+
+                        if (model) {
+                            const tokeniser = model.tokeniser;
+                            if (tokeniser && !tokeniser.trained) {
+                                await tokeniser.train(text);
+                            }
+                        }
+                        setData((prev) => [
+                            ...prev,
+                            {
+                                name: file.name,
+                                content: text,
+                                size: text.reduce((acc, curr) => acc + curr.length, 0),
+                            },
+                        ]);
+                        setDone(true);
+                        setBusy(false);
+                    }
+                }}
+            />
         </div>
     );
 }

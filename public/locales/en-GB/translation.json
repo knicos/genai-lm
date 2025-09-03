@@ -29,8 +29,14 @@
     "data": {
         "title": "Data",
         "addTooltip": "Add new data",
-        "dataHint": "Upload your text or CSV files for training.",
-        "modelHint": "Please select a model first."
+        "dataHint": "Write text or upload various types of files (txt, csv, pdf, docx) for training data. Any text can be used but there should be a lot of it.",
+        "modelHint": "Please select a model first.",
+        "add": "Write",
+        "upload": "Upload",
+        "untitled": "Text",
+        "addText": "Add",
+        "cancel": "Cancel",
+        "textPlaceholder": "Write or paste your own text here..."
     },
     "training": {
         "title": "Training",

@@ -7,7 +7,7 @@
     /*justify-content: space-between;*/
     color: #333;
     flex-direction: column;
-    width: 600px;
+    width: 500px;
 }
 
 .titleRow {
@@ -21,6 +21,7 @@
     margin: 1rem;
     position: relative;
     overflow: hidden;
+    box-shadow: 2px 2px 4px #bbb;
 }
 
 .status {
