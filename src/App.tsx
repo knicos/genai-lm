@@ -11,6 +11,8 @@ import { Provider } from 'jotai';
 import './App.css';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { theme } from '@genai-fi/base';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface RouterError {
     status: number;
@@ -81,9 +83,11 @@ function App({ router }: Props) {
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
                 <Provider>
-                    <React.Suspense fallback={'...'}>
-                        <RouterProvider router={router || defaultRouter} />
-                    </React.Suspense>
+                    <DndProvider backend={HTML5Backend}>
+                        <React.Suspense fallback={'...'}>
+                            <RouterProvider router={router || defaultRouter} />
+                        </React.Suspense>
+                    </DndProvider>
                 </Provider>
             </ThemeProvider>
         </StyledEngineProvider>

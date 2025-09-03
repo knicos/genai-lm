@@ -1,4 +1,4 @@
-@value bgSubdued1 from "@genai-fi/base/css/colours.module.css";
+@value bgSubdued1, primary from "@genai-fi/base/css/colours.module.css";
 
 .container {
     display: flex;
@@ -19,24 +19,6 @@
     gap: 1rem;
     margin-left: 1rem;
     align-items: center;
-}
-
-.item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid #eee;
-    flex-direction: row;
-}
-
-.item:hover {
-    background-color: #e8f0fe;
-}
-
-.size {
-    font-weight: bold;
-    margin-right: 1rem;
 }
 
 .content {
@@ -86,4 +68,25 @@
     100% {
         opacity: 1;
     }
+}
+
+.dropHint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 1.2rem;
+    color: #333;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.8;
+    background: white;
+    margin: 1rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed primary;
+    border-radius: 15px;
 }

@@ -36,7 +36,10 @@
         "untitled": "Text",
         "addText": "Add",
         "cancel": "Cancel",
-        "textPlaceholder": "Write or paste your own text here..."
+        "textPlaceholder": "Write or paste your own text here...",
+        "dropHint": "Drop files here...",
+        "dropError": "You can only drop files with text (txt, csv, pdf, docx).",
+        "ok": "OK"
     },
     "training": {
         "title": "Training",

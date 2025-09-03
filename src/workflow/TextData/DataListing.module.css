@@ -1,0 +1,17 @@
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #eee;
+    flex-direction: row;
+}
+
+.item:hover {
+    background-color: #e8f0fe;
+}
+
+.size {
+    font-weight: bold;
+    margin-right: 1rem;
+}

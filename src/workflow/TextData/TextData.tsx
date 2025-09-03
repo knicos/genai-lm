@@ -1,28 +1,51 @@
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
-import prettyNumber from '../../utilities/prettyNumber';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { Alert, IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
 import useModelStatus from '../../utilities/useModelStatus';
-import DeleteIcon from '@mui/icons-material/Delete';
-import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
-import { VerticalButton } from '@genai-fi/base';
 import TextInput from './TextInput';
-
-interface DataEntry {
-    name: string;
-    content: string[];
-    size: number;
-}
+import DataListing, { DataEntry } from './DataListing';
+import DataMenu from './DataMenu';
+import { useDrop } from 'react-dnd';
+import { NativeTypes } from 'react-dnd-html5-backend';
+import InfoPanel from './InfoPanel';
 
 interface Props {
     model?: TeachableLLM;
     dataset?: string[];
     onDatasetChange: (dataset: string[]) => void;
+}
+
+interface DragObject {
+    files?: File[];
+    html?: string;
+    text?: string;
+    items: DataTransferItemList;
+    dataTransfer: DataTransfer;
+}
+
+function handleTextLoad(
+    name: string,
+    text: string[],
+    model: TeachableLLM | undefined,
+    setData: Dispatch<React.SetStateAction<DataEntry[]>>
+) {
+    if (!model) return;
+
+    const tokeniser = model.tokeniser;
+    if (tokeniser && !tokeniser.trained) {
+        tokeniser.train(text);
+    }
+
+    setData((prev) => [
+        ...prev,
+        {
+            name,
+            content: text,
+            size: text.reduce((acc, curr) => acc + curr.length, 0),
+        },
+    ]);
 }
 
 export default function TextData({ model, onDatasetChange }: Props) {
@@ -33,11 +56,49 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const status = useModelStatus(model);
     const [data, setData] = useState<DataEntry[]>([]);
     const [showInput, setShowInput] = useState(false);
+    const [showDropError, setShowDropError] = useState(false);
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
         onDatasetChange(newDataset);
     }, [data, onDatasetChange]);
+
+    const [dropProps, drop] = useDrop(
+        {
+            accept: [NativeTypes.URL, NativeTypes.HTML, NativeTypes.FILE, NativeTypes.TEXT],
+            async drop(items: DragObject) {
+                setBusy(true);
+                console.log(items);
+                if (items.files) {
+                    try {
+                        for (const file of items.files) {
+                            const text = await loadTextData(file);
+                            handleTextLoad(file.name, text, model, setData);
+                        }
+                    } catch (error) {
+                        console.error('Error loading files:', error);
+                        setShowDropError(true);
+                    }
+                } else if (items.text) {
+                    handleTextLoad(t('data.untitled'), [items.text], model, setData);
+                } else if (items.html) {
+                    const element = document.createElement('div');
+                    element.innerHTML = items.html;
+                    handleTextLoad(t('data.untitled'), [element.textContent], model, setData);
+                }
+                setDone(true);
+                setBusy(false);
+            },
+            collect(monitor) {
+                const can = monitor.canDrop();
+                return {
+                    highlighted: can,
+                    hovered: monitor.isOver(),
+                };
+            },
+        },
+        []
+    );
 
     return (
         <div className={style.container}>
@@ -46,72 +107,36 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 done={done}
                 busy={busy}
             />
-            <BoxMenu>
-                <VerticalButton
-                    disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => setShowInput(true)}
-                    startIcon={<AddIcon color="inherit" />}
-                >
-                    {t('data.add')}
-                </VerticalButton>
-                <VerticalButton
-                    disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => fileRef.current?.click()}
-                    startIcon={<UploadFileIcon color="inherit" />}
-                >
-                    {t('data.upload')}
-                </VerticalButton>
-            </BoxMenu>
-            <div className={style.content}>
-                <List style={{ width: '100%', maxHeight: '300px', overflowY: 'auto' }}>
-                    {data.map((entry, index) => (
-                        <ListItem
-                            key={index}
-                            className={style.item}
-                            secondaryAction={
-                                <IconButton
-                                    edge="end"
-                                    aria-label="delete"
-                                    onClick={() => {
-                                        setData((prev) => prev.filter((_, i) => i !== index));
-                                    }}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            }
-                        >
-                            <ListItemAvatar>
-                                <div className={style.size}>{prettyNumber(entry.size)}</div>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={entry.name}
-                                secondary={entry.content[0].slice(0, 30) + (entry.content[0].length > 30 ? '...' : '')}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
-                {data.length === 0 && model && (
-                    <Alert
-                        severity="info"
-                        className={style.alert}
-                        style={{ margin: '1rem auto', maxWidth: '250px' }}
-                    >
-                        {t('data.dataHint')}
-                    </Alert>
-                )}
-                {data.length === 0 && !model && (
-                    <Alert
-                        severity="warning"
-                        className={style.alert}
-                        style={{ margin: '1rem auto', maxWidth: '250px' }}
-                    >
-                        {t('data.modelHint')}
-                    </Alert>
-                )}
+            <DataMenu
+                disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
+                onWrite={() => setShowInput(true)}
+                onUpload={() => fileRef.current?.click()}
+            />
+            <div
+                className={style.content}
+                ref={drop as unknown as RefObject<HTMLDivElement>}
+            >
+                <DataListing
+                    data={data}
+                    onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
+                />
+                <InfoPanel
+                    show={data.length === 0 && !!model}
+                    severity="info"
+                    message={t('data.dataHint')}
+                />
+                <InfoPanel
+                    show={data.length === 0 && !model}
+                    severity="warning"
+                    message={t('data.modelHint')}
+                />
+                <InfoPanel
+                    show={showDropError}
+                    severity="error"
+                    message={t('data.dropError')}
+                    onClose={() => setShowDropError(false)}
+                />
+
                 {showInput && (
                     <TextInput
                         onClose={() => setShowInput(false)}
@@ -128,11 +153,12 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         }}
                     />
                 )}
+                {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
             </div>
 
             <input
                 type="file"
-                accept=".txt,.csv"
+                accept=".txt,.csv,.pdf,.doc,.docx"
                 ref={fileRef}
                 style={{ display: 'none' }}
                 onChange={async (e) => {
@@ -140,21 +166,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         const file = e.target.files[0];
                         setBusy(true);
                         const text = await loadTextData(file);
-
-                        if (model) {
-                            const tokeniser = model.tokeniser;
-                            if (tokeniser && !tokeniser.trained) {
-                                await tokeniser.train(text);
-                            }
-                        }
-                        setData((prev) => [
-                            ...prev,
-                            {
-                                name: file.name,
-                                content: text,
-                                size: text.reduce((acc, curr) => acc + curr.length, 0),
-                            },
-                        ]);
+                        handleTextLoad(file.name, text, model, setData);
                         setDone(true);
                         setBusy(false);
                     }

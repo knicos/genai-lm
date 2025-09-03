@@ -38,12 +38,12 @@ export default function TextHighlighter({ text, mode, probabilities, onSelectTok
         const tokens = tokenized.map((token, ix) => {
             let color = '#ffffff00'; // Default color
             if (selected === ix) {
-                color = '#ffeb3b';
+                color = '#9b8c07ff';
             } else if (mode === 'tokens') {
                 color = COLORS[ix % COLORS.length];
             } else if (mode === 'probability') {
                 const probability = normalisedProbabilities ? normalisedProbabilities[ix] || 0 : 0;
-                const adjusted = adjustProbability(probability, 0.1);
+                const adjusted = adjustProbability(probability, 0.2);
                 color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
             }
             return { text: token, color };
