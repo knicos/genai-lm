@@ -25,7 +25,7 @@ interface DragObject {
     dataTransfer: DataTransfer;
 }
 
-function handleTextLoad(
+async function handleTextLoad(
     name: string,
     text: string[],
     model: TeachableLLM | undefined,
@@ -35,7 +35,7 @@ function handleTextLoad(
 
     const tokeniser = model.tokeniser;
     if (tokeniser && !tokeniser.trained) {
-        tokeniser.train(text);
+        await tokeniser.train(text);
     }
 
     setData((prev) => [
@@ -68,23 +68,22 @@ export default function TextData({ model, onDatasetChange }: Props) {
             accept: [NativeTypes.URL, NativeTypes.HTML, NativeTypes.FILE, NativeTypes.TEXT],
             async drop(items: DragObject) {
                 setBusy(true);
-                console.log(items);
                 if (items.files) {
                     try {
                         for (const file of items.files) {
                             const text = await loadTextData(file);
-                            handleTextLoad(file.name, text, model, setData);
+                            await handleTextLoad(file.name, text, model, setData);
                         }
                     } catch (error) {
                         console.error('Error loading files:', error);
                         setShowDropError(true);
                     }
                 } else if (items.text) {
-                    handleTextLoad(t('data.untitled'), [items.text], model, setData);
+                    await handleTextLoad(t('data.untitled'), [items.text], model, setData);
                 } else if (items.html) {
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
-                    handleTextLoad(t('data.untitled'), [element.textContent], model, setData);
+                    await handleTextLoad(t('data.untitled'), [element.textContent], model, setData);
                 }
                 setDone(true);
                 setBusy(false);
@@ -97,7 +96,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 };
             },
         },
-        []
+        [model]
     );
 
     return (
@@ -166,7 +165,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         const file = e.target.files[0];
                         setBusy(true);
                         const text = await loadTextData(file);
-                        handleTextLoad(file.name, text, model, setData);
+                        await handleTextLoad(file.name, text, model, setData);
                         setDone(true);
                         setBusy(false);
                     }
