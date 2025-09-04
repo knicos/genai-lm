@@ -90,7 +90,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         width="48"
                         height="48"
                     />
-                    <h1>Teachable Generator</h1>
+                    <h1>Language Machine</h1>
                 </Link>
                 <div className={style.buttonBar}>
                     <BusyButton

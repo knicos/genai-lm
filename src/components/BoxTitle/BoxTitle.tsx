@@ -1,5 +1,5 @@
 import StatusBox from '../StatusBox/StatusBox';
-import style from './style.module.css';
+import styleModule from './style.module.css';
 
 interface Props {
     title: string;
@@ -7,11 +7,15 @@ interface Props {
     done?: boolean;
     busy?: boolean;
     info?: boolean;
+    style?: React.CSSProperties;
 }
 
-export default function BoxTitle({ title, button, done, busy, info }: Props) {
+export default function BoxTitle({ title, button, done, busy, info, style }: Props) {
     return (
-        <div className={info ? style.infoTitle : style.title}>
+        <div
+            className={info ? styleModule.infoTitle : styleModule.title}
+            style={style}
+        >
             <h2>{title}</h2>
             {button}
             <StatusBox

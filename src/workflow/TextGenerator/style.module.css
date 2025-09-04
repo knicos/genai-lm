@@ -5,10 +5,10 @@
     display: flex;
     align-items: center;
     /*justify-content: space-between;*/
-    color: white;
+    color: #222;
     flex-direction: column;
     width: 500px;
-    background: backgroundDark2;
+    background: white;
 }
 
 .titleRow {

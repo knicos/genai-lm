@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
+import { Dispatch, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import style from './style.module.css';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
@@ -10,6 +10,7 @@ import DataMenu from './DataMenu';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import InfoPanel from './InfoPanel';
+import DataProgress from '../../components/DataProgress/DataProgress';
 
 interface Props {
     model?: TeachableLLM;
@@ -99,6 +100,11 @@ export default function TextData({ model, onDatasetChange }: Props) {
         [model]
     );
 
+    const totalSamples = useMemo(
+        () => data.reduce((acc, entry) => acc + entry.content.reduce((acc, curr) => acc + curr.length, 0), 0),
+        [data]
+    );
+
     return (
         <div className={style.container}>
             <BoxTitle
@@ -110,6 +116,11 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
                 onWrite={() => setShowInput(true)}
                 onUpload={() => fileRef.current?.click()}
+                totalSamples={totalSamples}
+            />
+            <DataProgress
+                samplesProcessed={totalSamples}
+                desiredSamples={(model?.getNumParams() || 0) * 2}
             />
             <div
                 className={style.content}

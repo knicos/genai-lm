@@ -16,7 +16,7 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@genai-fi/base": "^4.0.5",
-        "@genai-fi/nanogpt": "^0.2.4",
+        "@genai-fi/nanogpt": "^0.2.5",
         "@mui/icons-material": "^7.3.1",
         "@mui/material": "^7.3.1",
         "@tensorflow/tfjs": "^4.22.0",

@@ -156,6 +156,7 @@ export default function TextGenerator({ model }: Props) {
                 title={t('generator.title')}
                 done={ready && !busy}
                 busy={busy}
+                style={{ backgroundColor: '#444', color: 'white' }}
             />
             <div className={style.xaiRow}>
                 <TextHighlighter

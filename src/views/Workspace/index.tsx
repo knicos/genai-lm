@@ -6,8 +6,6 @@ import { TeachableLLM } from '@genai-fi/nanogpt';
 import ModelLoader from '../../workflow/ModelLoader/ModelLoader';
 import TextData from '../../workflow/TextData/TextData';
 import { IConnection, WorkflowLayout } from '@genai-fi/base';
-import SampleViewer from '../../workflow/SampleViewer/SampleViewer';
-import useModelStatus from '../../utilities/useModelStatus';
 import AppBar from '../../components/AppBar';
 import Evaluation from '../../workflow/Evaluation/Evaluation';
 import ModelInfo from '../../workflow/ModelInfo/ModelInfo';
@@ -16,7 +14,7 @@ import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 
 const CONNECTIONS: IConnection[] = [
-    { start: 'model', end: 'textData', startPoint: 'right', endPoint: 'left' },
+    { start: 'model', end: 'trainer', startPoint: 'right', endPoint: 'left' },
     { start: 'model', end: 'info', startPoint: 'bottom', endPoint: 'top' },
     { start: 'textData', end: 'trainer', startPoint: 'right', endPoint: 'left' },
     { start: 'textData', end: 'textBrowser', startPoint: 'bottom', endPoint: 'top' },
@@ -27,7 +25,6 @@ const CONNECTIONS: IConnection[] = [
 export function Component() {
     const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
     const [textDataset, setTextDataset] = useState<string[]>([]);
-    const status = useModelStatus(model);
     const steps = useAtomValue(workflowSteps);
 
     return (
@@ -54,19 +51,6 @@ export function Component() {
                             />
                         </div>
                     )}
-                    {steps.has('modelInfo') && (
-                        <div
-                            className={style.box}
-                            data-widget="info"
-                        >
-                            <ModelInfo model={model} />
-                        </div>
-                    )}
-                </div>
-                <div
-                    className={style.verticalBox}
-                    data-widget="container"
-                >
                     <div
                         className={style.box}
                         data-widget="textData"
@@ -77,16 +61,12 @@ export function Component() {
                             onDatasetChange={setTextDataset}
                         />
                     </div>
-                    {steps.has('sampleExplore') && (
+                    {steps.has('modelInfo') && (
                         <div
                             className={style.box}
-                            data-widget="textBrowser"
+                            data-widget="info"
                         >
-                            <SampleViewer
-                                samples={textDataset}
-                                contextSize={model && status !== 'loading' ? model.config.blockSize : 128}
-                                parameters={model && status !== 'loading' ? model.getNumParams() : undefined}
-                            />
+                            <ModelInfo model={model} />
                         </div>
                     )}
                 </div>
