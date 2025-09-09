@@ -15,6 +15,7 @@
     flex-direction: column;
     gap: 3rem;
     align-items: center;
+    width: 100%;
 }
 
 .box {
@@ -23,6 +24,7 @@
     box-shadow: 2px 2px 4px #bbb;
     overflow: hidden;
     animation: fadein 0.5s 1;
+    width: 100%;
 }
 
 .boxPrimary {

@@ -37,11 +37,13 @@ export function Component() {
                 <div
                     className={style.verticalBox}
                     data-widget="container"
+                    style={{ width: '390px', maxWidth: '100%' }}
                 >
                     {steps.has('model') && (
                         <div
                             className={style.box}
                             data-widget="model"
+                            style={{ maxWidth: '330px' }}
                         >
                             <ModelLoader
                                 model={model}
@@ -54,6 +56,7 @@ export function Component() {
                     <div
                         className={style.box}
                         data-widget="textData"
+                        style={{ maxWidth: '390px' }}
                     >
                         <TextData
                             model={model}
@@ -95,6 +98,7 @@ export function Component() {
                 <div
                     className={style.box}
                     data-widget="generator"
+                    style={{ maxWidth: '500px' }}
                 >
                     <TextGenerator model={model} />
                 </div>

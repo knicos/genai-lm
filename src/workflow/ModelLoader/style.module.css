@@ -4,6 +4,19 @@
     /*justify-content: space-between;*/
     color: #333;
     flex-direction: column;
+    min-width: 330px;
+    min-height: 340px;
+}
+
+.container :global .MuiTabs-root button {
+    text-transform: none;
+}
+
+.container :global .MuiTabs-root {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
 }
 
 .buttonBox {

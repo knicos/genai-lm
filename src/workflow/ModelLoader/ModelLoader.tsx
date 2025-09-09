@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
-import * as tf from '@tensorflow/tfjs';
-import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 import manifest from './manifest.json';
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
+import ModelList from './ModelList';
+import { Tab, Tabs } from '@mui/material';
+import CustomModel from './CustomModel';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
@@ -14,8 +14,9 @@ interface Props {
 }
 
 export default function ModelLoader({ onModel, model }: Props) {
+    const { t } = useTranslation();
     const [done, setDone] = useState(false);
-    const [selectedModel, setSelectedModel] = useState<number>(-1);
+    const [tab, setTab] = useState(0);
 
     useEffect(() => {
         if (model) {
@@ -38,63 +39,38 @@ export default function ModelLoader({ onModel, model }: Props) {
     return (
         <div className={style.container}>
             <BoxTitle
-                title="Model"
+                title={t('model.title')}
                 done={done}
                 busy={!done && !!model}
             ></BoxTitle>
-            <List style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                {manifest.map((m, ix) => (
-                    <ListItemButton
-                        selected={selectedModel === ix}
-                        key={ix}
-                        className={style.modelItem}
-                        onClick={() => {
-                            setSelectedModel(ix);
-                            console.log('Selected model:', m.name);
-                            if (m.url) {
-                                if (model) {
-                                    console.log('Disposing old model');
-                                    try {
-                                        model.dispose();
-                                    } catch (e) {
-                                        console.error('Error disposing old model:', e);
-                                        return undefined;
-                                    }
-                                }
-                                const newModel = TeachableLLM.loadModel(tf, m.url);
-                                waitForModel(newModel).then(() => {
-                                    onModel(newModel);
-                                });
-                            } else {
-                                if (model) {
-                                    console.log('Disposing old model');
-                                    try {
-                                        model.dispose();
-                                    } catch (e) {
-                                        console.error('Error disposing old model:', e);
-                                        return undefined;
-                                    }
-                                }
-                                const newModel = TeachableLLM.create(tf, m.config);
-                                onModel(newModel);
-                            }
-                        }}
-                    >
-                        <ListItemIcon>
-                            {selectedModel === ix ? (
-                                <RadioButtonCheckedIcon color="primary" />
-                            ) : (
-                                <RadioButtonUncheckedIcon color="disabled" />
-                            )}
-                        </ListItemIcon>
-
-                        <ListItemText
-                            primary={m.name}
-                            secondary={m.description}
-                        />
-                    </ListItemButton>
-                ))}
-            </List>
+            <Tabs
+                value={tab}
+                onChange={(_, v) => setTab(v)}
+            >
+                <Tab label={t('model.trained')} />
+                <Tab label={t('model.untrained')} />
+                <Tab label={t('model.custom')} />
+            </Tabs>
+            {tab === 0 && (
+                <ModelList
+                    manifest={manifest.filter((m) => m.trained)}
+                    model={model}
+                    onModel={onModel}
+                />
+            )}
+            {tab === 1 && (
+                <ModelList
+                    manifest={manifest.filter((m) => !m.trained)}
+                    model={model}
+                    onModel={onModel}
+                />
+            )}
+            {tab === 2 && (
+                <CustomModel
+                    model={model}
+                    onModel={onModel}
+                />
+            )}
         </div>
     );
 }

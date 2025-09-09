@@ -42,6 +42,14 @@
         "ok": "OK",
         "samples": "Samples"
     },
+    "model": {
+        "parameters": "Parameters",
+        "memory": "Memory",
+        "title": "Model",
+        "trained": "Trained",
+        "untrained": "Untrained",
+        "custom": "Custom"
+    },
     "training": {
         "title": "Training",
         "samples": "samples",
@@ -82,5 +90,14 @@
         "heads": "Attention Heads",
         "embedding": "Embedding",
         "context": "Context Length"
+    },
+    "validation": {
+        "invalid_number": "Invalid number",
+        "out_of_range": "Value must be between {{min}} and {{max}}",
+        "required": "This field is required",
+        "positive_integer": "Value must be a positive integer",
+        "unknown_error": "An unknown error occurred",
+        "nEmbed_divisible_nHead": "Embedding size must be divisible by heads",
+        "headDim_even": "Try another head number"
     }
 }
