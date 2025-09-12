@@ -3,15 +3,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-left: auto;
 }
 
 .size {
     font-weight: bold;
-    margin-right: 1rem;
 }
 
 .label {
     font-size: 0.8rem;
-    margin-right: 1rem;
 }

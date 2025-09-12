@@ -12,6 +12,7 @@ export default function ProgressBox({ totalSamples }: Props) {
         <NumberBox
             value={totalSamples}
             label={t('data.samples')}
+            style={{ marginLeft: 'auto' }}
         />
     );
 }

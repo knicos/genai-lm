@@ -4,13 +4,13 @@ import style from './style.module.css';
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
-import prettyNumber from '../../utilities/prettyNumber';
-import { IconButton } from '@mui/material';
-import StopCircleIcon from '@mui/icons-material/StopCircle';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
 import { useAtomValue } from 'jotai';
 import { trainerBatchSize, trainerLearningRate, trainerMaxSteps } from '../../state/trainerSettings';
+import NumberBox from '../../components/NumberBox/NumberBox';
 
 interface Props {
     model?: TeachableLLM;
@@ -22,12 +22,13 @@ export default function TextTraining({ model, dataset }: Props) {
     const [trainer, setTrainer] = useState<ReturnType<TeachableLLM['trainer']> | undefined>();
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
+    const [training, setTraining] = useState(false);
     const status = useModelStatus(model);
     const batchSize = useAtomValue(trainerBatchSize);
     const maxSteps = useAtomValue(trainerMaxSteps);
     const learningRate = useAtomValue(trainerLearningRate);
 
-    const canTrain = !!model && !!dataset && status === 'ready' && dataset.length > 0;
+    const canTrain = !!model && !!dataset && dataset.length > 0;
 
     useEffect(() => {
         if (trainer) {
@@ -64,23 +65,40 @@ export default function TextTraining({ model, dataset }: Props) {
         <div className={style.container}>
             <BoxTitle
                 title={t('training.title')}
-                done={canTrain}
+                done={status === 'ready' && canTrain}
                 busy={!done}
             />
-            {`${prettyNumber((epochs || 0) * batchSize)} ${t('training.samples')}`}
+            <NumberBox
+                value={(epochs || 0) * batchSize}
+                label={t('training.samples')}
+            />
 
             <div className={style.buttonBox}>
                 <Button
-                    disabled={!canTrain || !model}
+                    fullWidth
+                    disabled={!canTrain || (!done && !training)}
                     variant="contained"
+                    startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
                     onClick={async () => {
                         if (model && dataset && trainer) {
                             if (!model.tokeniser.trained) {
                                 await model.tokeniser.train(dataset);
                             }
 
+                            if (training) {
+                                trainer.stop();
+                                setTraining(false);
+                                return;
+                            }
+
+                            if (!done) {
+                                // already training
+                                return;
+                            }
+
+                            setTraining(true);
                             setDone(false);
-                            setEpochs(0);
+                            // setEpochs(0);
                             await wait(10);
                             trainer
                                 .train(dataset, {
@@ -90,24 +108,13 @@ export default function TextTraining({ model, dataset }: Props) {
                                 })
                                 .then(() => {
                                     setDone(true);
+                                    setTraining(false);
                                 });
                         }
                     }}
                 >
-                    {t('training.start')}
+                    {done ? t('training.start') : t('training.stop')}
                 </Button>
-                <IconButton
-                    onClick={() => {
-                        if (trainer) {
-                            trainer.stop();
-                            setDone(true);
-                        }
-                    }}
-                    disabled={status !== 'training' || !trainer}
-                    color="secondary"
-                >
-                    <StopCircleIcon fontSize="large" />
-                </IconButton>
             </div>
         </div>
     );

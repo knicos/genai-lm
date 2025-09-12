@@ -53,7 +53,8 @@
     "training": {
         "title": "Training",
         "samples": "samples",
-        "start": "Train"
+        "start": "Train",
+        "stop": "Pause"
     },
     "generator": {
         "title": "Generator",
