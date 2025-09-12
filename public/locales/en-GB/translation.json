@@ -59,7 +59,11 @@
         "title": "Generator",
         "generate": "Generate",
         "promptPlaceholder": "Optional prompt...",
-        "settingsTooltip": "Generator Settings"
+        "settingsTooltip": "Generator Settings",
+        "pause": "Pause",
+        "editPlaceholder": "Type an optional prompt here...",
+        "reset": "Reset",
+        "copy": "Copy to Clipboard"
     },
     "samples": {
         "title": "Samples",

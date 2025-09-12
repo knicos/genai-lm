@@ -1,10 +1,9 @@
 import style from './style.module.css';
-import { IconButton, TextField, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import TextHighlighter from '../../components/TextHighlighter/TextHighlighter';
 import { Button } from '@genai-fi/base';
-import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +20,11 @@ import {
     generatorShowSettings,
     generatorTemperature,
 } from '../../state/generatorSettings';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ModelStatus from '../../components/ModelStatus/ModelStatus';
 
 interface Props {
     model?: TeachableLLM;
@@ -60,11 +64,11 @@ export default function TextGenerator({ model }: Props) {
     const [attentionData, setAttentionData] = useState<number[][]>([]);
     const [probabilities, setProbabilities] = useState<number[][]>([]);
     const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
-    const [prompt, setPrompt] = useState<string>('');
     const [selected, setSelected] = useState<number>(0);
     const status = useModelStatus(model);
     const [ready, setReady] = useState(false);
-    const [busy, setBusy] = useState(false);
+    const [generate, setGenerate] = useState(false);
+    const [hasGenerated, setHasGenerated] = useState(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const enableSettings = useAtomValue(generatorShowSettings);
     const enableAttention = useAtomValue(generatorShowAttention);
@@ -72,10 +76,14 @@ export default function TextGenerator({ model }: Props) {
     const enablePrompt = useAtomValue(generatorShowPrompt);
     const temperature = useAtomValue(generatorTemperature);
     const maxLength = useAtomValue(generatorMaxLength);
+    const [showStatus, setShowStatus] = useState<boolean>(false);
 
     const attentionRef = useRef<number[][]>([]);
     const probRef = useRef<number[][]>([]);
     const textRef = useRef<string>('');
+    const busyRef = useRef<boolean>(false);
+
+    const disable = status === 'training';
 
     useEffect(() => {
         if (status === 'ready') {
@@ -106,12 +114,15 @@ export default function TextGenerator({ model }: Props) {
                 setText(''); // Clear previous text
                 setAttentionData([]); // Clear previous attention data
                 textRef.current = '';
+                setGenerate(true);
+                setHasGenerated(true);
                 const finalText = await generator.generate(undefined, {
                     maxLength: 200,
                     temperature: 1,
                     includeAttention: false,
                     includeProbabilities: false,
                 });
+                setGenerate(false);
                 setText(finalText);
                 textRef.current = '';
                 await wait(40);
@@ -128,9 +139,9 @@ export default function TextGenerator({ model }: Props) {
             const h = (_: number[], newText: string, attention?: number[][], probabilities?: number[][]) => {
                 //setText((prevText) => prevText + newText);
                 textRef.current += newText;
-                if (textRef.current.length % 5 === 0) {
-                    setText(textRef.current);
-                }
+                //if (textRef.current.length % 5 === 0) {
+                setText(textRef.current);
+                //}
 
                 if (attention) {
                     attentionRef.current = [...attentionRef.current, ...attention];
@@ -154,88 +165,135 @@ export default function TextGenerator({ model }: Props) {
         >
             <BoxTitle
                 title={t('generator.title')}
-                done={ready && !busy}
-                busy={busy}
+                done={ready && !generate}
+                busy={generate}
                 style={{ backgroundColor: '#444', color: 'white' }}
             />
             <div className={style.xaiRow}>
                 <TextHighlighter
                     text={text}
-                    mode="probability"
+                    mode={!hasGenerated ? 'edit' : enableAttention && !generate ? 'probability' : 'plain'}
                     onSelectToken={(_, index) => setSelected(index)}
                     selected={selected}
-                    probabilities={createProbabilities(
-                        attentionData,
-                        prompt.length === 0 ? 1 : prompt.length,
-                        selected,
-                        text.length
-                    )}
+                    probabilities={createProbabilities(attentionData, 1, selected, text.length)}
+                    active={generate}
+                    onChange={(newText) => {
+                        setText(newText);
+                        textRef.current = newText;
+                    }}
                 />
                 <XAIView probabilities={topKTokens} />
                 <GeneratorSettings
                     open={showSettings}
                     onClose={() => setShowSettings(false)}
                 />
+                <ModelStatus
+                    model={model}
+                    show={showStatus}
+                    onClose={() => setShowStatus(false)}
+                />
             </div>
             {enablePrompt && (
                 <div className={style.titleRow}>
-                    <div className={style.buttonBox}>
+                    <Button
+                        size="large"
+                        variant="contained"
+                        disabled={disable}
+                        startIcon={generate ? <PauseIcon /> : <PlayArrowIcon />}
+                        onClick={() => {
+                            if (!generator || (status !== 'ready' && status !== 'busy')) {
+                                setShowStatus(true);
+                                return;
+                            }
+                            if (busyRef.current) {
+                                generator.stop();
+                                return;
+                            }
+                            busyRef.current = true;
+                            //setText(''); // Clear previous text
+                            //setAttentionData([]); // Clear previous attention data
+                            //setProbabilities([]); // Clear previous probabilities
+                            setGenerate(true);
+                            setHasGenerated(true);
+                            //textRef.current = '';
+                            generator
+                                .generate(textRef.current.length > 0 ? textRef.current : undefined, {
+                                    maxLength,
+                                    temperature,
+                                    includeAttention: enableAttention,
+                                    includeProbabilities: enableProbabilities,
+                                    noCache: enableAttention,
+                                    usePadding: enableAttention,
+                                })
+                                .then(() => {
+                                    setText(textRef.current);
+                                    //textRef.current = '';
+                                    if (attentionRef.current.length > 0) {
+                                        setAttentionData(attentionRef.current);
+                                        //attentionRef.current = [];
+                                    }
+                                    if (probRef.current.length > 0) {
+                                        setProbabilities(probRef.current);
+                                        //probRef.current = [];
+                                    }
+                                    setGenerate(false);
+                                    busyRef.current = false;
+                                });
+                        }}
+                    >
+                        {generate ? t('generator.pause') : t('generator.generate')}
+                    </Button>
+                    <div className={style.iconButtons}>
+                        <Tooltip
+                            title={t('generator.reset')}
+                            arrow
+                        >
+                            <IconButton
+                                color="inherit"
+                                disabled={disable}
+                                onClick={() => {
+                                    if (generate && generator) {
+                                        generator.stop();
+                                    }
+                                    setHasGenerated(false);
+                                    setText('');
+                                    textRef.current = '';
+                                    setAttentionData([]);
+                                    attentionRef.current = [];
+                                    setProbabilities([]);
+                                    probRef.current = [];
+                                    setSelected(-1);
+                                }}
+                            >
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                            title={t('generator.copy')}
+                            arrow
+                        >
+                            <IconButton
+                                color="inherit"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(textRef.current);
+                                }}
+                            >
+                                <ContentCopyIcon />
+                            </IconButton>
+                        </Tooltip>
                         {enableSettings && (
                             <Tooltip
                                 title={t('generator.settingsTooltip')}
                                 arrow
                             >
-                                <IconButton onClick={() => setShowSettings(true)}>
+                                <IconButton
+                                    color="inherit"
+                                    onClick={() => setShowSettings(true)}
+                                >
                                     <TuneIcon />
                                 </IconButton>
                             </Tooltip>
                         )}
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder={t('generator.promptPlaceholder')}
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                        />
-                        <Button
-                            size="large"
-                            variant="contained"
-                            disabled={!generator || busy}
-                            onClick={() => {
-                                if (!generator) return;
-                                setText(''); // Clear previous text
-                                setAttentionData([]); // Clear previous attention data
-                                setProbabilities([]); // Clear previous probabilities
-                                setBusy(true);
-                                textRef.current = '';
-                                generator
-                                    .generate(prompt.length > 0 ? prompt : undefined, {
-                                        maxLength,
-                                        temperature,
-                                        includeAttention: enableAttention,
-                                        includeProbabilities: enableProbabilities,
-                                        noCache: enableAttention,
-                                        usePadding: enableAttention,
-                                    })
-                                    .then((finaltext: string) => {
-                                        setText(finaltext);
-                                        textRef.current = '';
-                                        if (attentionRef.current.length > 0) {
-                                            setAttentionData(attentionRef.current);
-                                            attentionRef.current = [];
-                                        }
-                                        if (probRef.current.length > 0) {
-                                            setProbabilities(probRef.current);
-                                            probRef.current = [];
-                                        }
-                                        setBusy(false);
-                                    });
-                            }}
-                        >
-                            {t('generator.generate')}
-                        </Button>
-
-                        <ModelStatus model={model} />
                     </div>
                 </div>
             )}

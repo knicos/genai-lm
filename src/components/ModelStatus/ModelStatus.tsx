@@ -1,17 +1,21 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import style from './style.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
+    show: boolean;
     model?: TeachableLLM;
+    onClose: () => void;
 }
 
 type Status = 'warmup' | 'awaitingTokens' | 'ready' | 'training' | 'loading' | 'busy' | 'error' | 'none';
 
-export default function ModelStatus({ model }: Props) {
+export default function ModelStatus({ model, show, onClose }: Props) {
     const { t } = useTranslation();
     const [status, setStatus] = useState<Status>('none');
+    const closeRef = useRef(onClose);
+    closeRef.current = onClose;
 
     useEffect(() => {
         if (!model) {
@@ -29,7 +33,11 @@ export default function ModelStatus({ model }: Props) {
         }
     }, [model]);
 
-    return status === 'ready' || status === 'busy' ? null : (
+    useEffect(() => {
+        closeRef.current();
+    }, [status]);
+
+    return status === 'ready' || status === 'busy' || !show ? null : (
         <div className={style.container}>
             {model ? <p>{t(`modelStatus.${status}`)}</p> : <p>{t('modelStatus.none')}</p>}
         </div>
