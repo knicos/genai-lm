@@ -1,0 +1,23 @@
+[
+    {
+        "title": "IMDB Movie Reviews (English)",
+        "url": "https://store.gen-ai.fi/llm/data/imdb-movie-reviews.csv",
+        "lang": "en",
+        "size": 66,
+        "mime": "text/csv"
+    },
+    {
+        "title": "Shakespeare (English)",
+        "url": "https://store.gen-ai.fi/llm/data/shakespeare.txt",
+        "lang": "en",
+        "size": 1,
+        "mime": "text/plain"
+    },
+    {
+        "title": "Movie subtitles (Finnish)",
+        "url": "https://store.gen-ai.fi/llm/data/movie-subtitles-finnish.txt",
+        "lang": "fi",
+        "size": 55,
+        "mime": "text/plain"
+    }
+]

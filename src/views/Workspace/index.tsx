@@ -12,14 +12,49 @@ import ModelInfo from '../../workflow/ModelInfo/ModelInfo';
 import { useAtomValue } from 'jotai';
 import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
+import Annotation from './Annotation';
 
 const CONNECTIONS: IConnection[] = [
-    { start: 'model', end: 'trainer', startPoint: 'right', endPoint: 'left' },
-    { start: 'model', end: 'info', startPoint: 'bottom', endPoint: 'top' },
-    { start: 'textData', end: 'trainer', startPoint: 'right', endPoint: 'left' },
+    {
+        start: 'model',
+        end: 'trainer',
+        startPoint: 'right',
+        endPoint: 'left',
+        annotationElement: (
+            <Annotation
+                label="Model"
+                type="model"
+            />
+        ),
+    },
+    { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
+    {
+        start: 'textData',
+        end: 'trainer',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: -0.6,
+        annotationElement: (
+            <Annotation
+                label="Data"
+                type="data"
+            />
+        ),
+    },
     { start: 'textData', end: 'textBrowser', startPoint: 'bottom', endPoint: 'top' },
     { start: 'trainer', end: 'evaluation', startPoint: 'bottom', endPoint: 'top' },
-    { start: 'trainer', end: 'generator', startPoint: 'right', endPoint: 'left' },
+    {
+        start: 'trainer',
+        end: 'generator',
+        startPoint: 'right',
+        endPoint: 'left',
+        annotationElement: (
+            <Annotation
+                label="Model"
+                type="model"
+            />
+        ),
+    },
 ];
 
 export function Component() {
@@ -39,6 +74,23 @@ export function Component() {
                     data-widget="container"
                     style={{ width: '390px', maxWidth: '100%' }}
                 >
+                    <div
+                        className={style.box}
+                        data-widget="textData"
+                        style={{ maxWidth: '390px', marginBottom: '5rem' }}
+                    >
+                        <TextData
+                            model={model}
+                            dataset={textDataset}
+                            onDatasetChange={setTextDataset}
+                        />
+                    </div>
+                </div>
+                <div
+                    className={style.verticalBox}
+                    data-widget="container"
+                    style={{ width: '390px', maxWidth: '100%', marginTop: '15rem' }}
+                >
                     {steps.has('model') && (
                         <div
                             className={style.box}
@@ -53,21 +105,11 @@ export function Component() {
                             />
                         </div>
                     )}
-                    <div
-                        className={style.box}
-                        data-widget="textData"
-                        style={{ maxWidth: '390px' }}
-                    >
-                        <TextData
-                            model={model}
-                            dataset={textDataset}
-                            onDatasetChange={setTextDataset}
-                        />
-                    </div>
                     {steps.has('modelInfo') && (
                         <div
                             className={style.box}
                             data-widget="info"
+                            style={{ width: 'unset' }}
                         >
                             <ModelInfo model={model} />
                         </div>
@@ -76,6 +118,7 @@ export function Component() {
                 <div
                     className={style.verticalBox}
                     data-widget="container"
+                    style={{ marginLeft: '5rem', marginRight: '5rem' }}
                 >
                     <div
                         className={style.box}

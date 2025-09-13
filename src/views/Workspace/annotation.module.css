@@ -1,0 +1,19 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
+.annotation {
+    color: white;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    background: white;
+    color: secondary;
+    border: 4px solid secondary;
+    box-shadow: 2px 2px 4px #bbb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    font-size: 0.8rem;
+    text-align: center;
+}

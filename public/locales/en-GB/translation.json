@@ -40,7 +40,8 @@
         "dropHint": "Drop files here...",
         "dropError": "You can only drop files with text (txt, csv, pdf, docx).",
         "ok": "OK",
-        "samples": "Samples"
+        "samples": "Samples",
+        "search": "Search"
     },
     "model": {
         "parameters": "Parameters",

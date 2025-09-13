@@ -2,7 +2,6 @@ import { Dispatch, RefObject, useEffect, useMemo, useRef, useState } from 'react
 import style from './style.module.css';
 import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import useModelStatus from '../../utilities/useModelStatus';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
 import DataListing, { DataEntry } from './DataListing';
@@ -11,6 +10,8 @@ import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import InfoPanel from './InfoPanel';
 import DataProgress from '../../components/DataProgress/DataProgress';
+import TextSearch from './TextSearch';
+import useModelStatus from '../../utilities/useModelStatus';
 
 interface Props {
     model?: TeachableLLM;
@@ -32,11 +33,11 @@ async function handleTextLoad(
     model: TeachableLLM | undefined,
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
-    if (!model) return;
-
-    const tokeniser = model.tokeniser;
-    if (tokeniser && !tokeniser.trained) {
-        await tokeniser.train(text);
+    if (model) {
+        const tokeniser = model.tokeniser;
+        if (tokeniser && !tokeniser.trained) {
+            await tokeniser.train(text);
+        }
     }
 
     setData((prev) => [
@@ -54,10 +55,11 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [done, setDone] = useState(false);
     const [busy, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
-    const status = useModelStatus(model);
     const [data, setData] = useState<DataEntry[]>([]);
     const [showInput, setShowInput] = useState(false);
+    const [showSearch, setShowSearch] = useState(false);
     const [showDropError, setShowDropError] = useState(false);
+    const status = useModelStatus(model);
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
@@ -113,14 +115,15 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 busy={busy}
             />
             <DataMenu
-                disabled={(status !== 'ready' && status !== 'awaitingTokens') || !model || showInput}
+                disabled={showInput || showSearch}
                 onWrite={() => setShowInput(true)}
+                onSearch={() => setShowSearch(true)}
                 onUpload={() => fileRef.current?.click()}
                 totalSamples={totalSamples}
             />
             <DataProgress
                 samplesProcessed={totalSamples}
-                desiredSamples={(model?.getNumParams() || 0) * 2}
+                desiredSamples={status !== 'loading' ? (model?.getNumParams() || 0) * 2 : 0}
             />
             <div
                 className={style.content}
@@ -131,14 +134,9 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
                 />
                 <InfoPanel
-                    show={data.length === 0 && !!model}
+                    show={data.length === 0}
                     severity="info"
                     message={t('data.dataHint')}
-                />
-                <InfoPanel
-                    show={data.length === 0 && !model}
-                    severity="warning"
-                    message={t('data.modelHint')}
                 />
                 <InfoPanel
                     show={showDropError}
@@ -160,6 +158,24 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                 },
                             ]);
                             setShowInput(false);
+                        }}
+                    />
+                )}
+                {showSearch && (
+                    <TextSearch
+                        onClose={() => setShowSearch(false)}
+                        onText={async (url, name, type) => {
+                            setShowSearch(false);
+                            setBusy(true);
+
+                            const response = await fetch(url);
+                            const text = await loadTextData(
+                                new File([await response.blob()], name, {
+                                    type,
+                                })
+                            );
+                            await handleTextLoad(name, text, model, setData);
+                            setBusy(false);
                         }}
                     />
                 )}
