@@ -118,7 +118,7 @@ export function Component() {
                 <div
                     className={style.verticalBox}
                     data-widget="container"
-                    style={{ marginLeft: '5rem', marginRight: '5rem' }}
+                    style={{ paddingLeft: '5rem', paddingRight: '5rem', boxSizing: 'border-box' }}
                 >
                     <div
                         className={style.box}
