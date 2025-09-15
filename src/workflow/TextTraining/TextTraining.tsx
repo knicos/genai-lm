@@ -30,6 +30,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const maxSteps = useAtomValue(trainerMaxSteps);
     const learningRate = useAtomValue(trainerLearningRate);
     const setTrainingAnimation = useSetAtom(trainingAnimation);
+    const [lr, setLR] = useState(0.0);
 
     const canTrain = !!model && !!dataset && dataset.length > 0;
 
@@ -67,6 +68,12 @@ export default function TextTraining({ model, dataset }: Props) {
             }
         }
     }, [model]);
+
+    useEffect(() => {
+        if (model && status === 'ready') {
+            setLR((cur) => (cur > 0 ? cur : model.model.log.length > 0 ? learningRate * 0.1 : learningRate));
+        }
+    }, [learningRate, model, status]);
 
     return (
         <Box
@@ -115,7 +122,7 @@ export default function TextTraining({ model, dataset }: Props) {
                                     .train(dataset, {
                                         batchSize,
                                         maxSteps,
-                                        learningRate,
+                                        learningRate: lr > 0 ? lr : learningRate,
                                     })
                                     .then(() => {
                                         setDone(true);
