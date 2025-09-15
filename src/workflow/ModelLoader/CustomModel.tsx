@@ -42,7 +42,6 @@ export default function CustomModel({ model, onModel }: Props) {
         const profile = estimateResources(config, 32);
         setParams(profile.numParams);
         setMemory(profile.trainingMemoryMB);
-        console.log('Profile', profile);
 
         try {
             validateConfig(config);
@@ -72,13 +71,13 @@ export default function CustomModel({ model, onModel }: Props) {
     useEffect(() => {
         if (model) {
             waitForModel(model).then(() => {
-                const isSame =
+                const same =
                     vocab === model?.config.vocabSize &&
                     context === model?.config.blockSize &&
                     layers === model?.config.nLayer &&
                     embedding === model?.config.nEmbed &&
                     heads === model?.config.nHead;
-                setSame(isSame);
+                setSame(same);
             });
         }
     }, [model, vocab, context, layers, embedding, heads]);

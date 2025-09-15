@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -21,31 +21,35 @@ export default function NumberInput({ value, onChange, min, max, integer, label,
         setStrValue(value.toString());
     }, [value]);
 
-    useEffect(() => {
-        if (strValue === '') {
-            setHasError(t('validation.required'));
-            return;
-        }
+    const doChange = useCallback(
+        (v: string) => {
+            setStrValue(v);
+            if (v === '') {
+                setHasError(t('validation.required'));
+                return;
+            }
 
-        if (!/^[0-9]*$/.test(strValue)) {
-            setHasError(t('validation.invalid_number'));
-            return;
-        }
+            if (!/^[0-9]*$/.test(v)) {
+                setHasError(t('validation.invalid_number'));
+                return;
+            }
 
-        const newValue = integer ? parseInt(strValue, 10) : parseFloat(strValue);
-        if (isNaN(newValue)) {
-            setHasError(t('validation.invalid_number'));
-            return;
-        }
+            const newValue = integer ? parseInt(v, 10) : parseFloat(v);
+            if (isNaN(newValue)) {
+                setHasError(t('validation.invalid_number'));
+                return;
+            }
 
-        if (newValue < min || newValue > max) {
-            setHasError(t('validation.out_of_range', { min, max }));
-            return;
-        }
+            if (newValue < min || newValue > max) {
+                setHasError(t('validation.out_of_range', { min, max }));
+                return;
+            }
 
-        setHasError(null);
-        onChange(newValue);
-    }, [strValue, onChange, min, max, integer, t]);
+            setHasError(null);
+            onChange(newValue);
+        },
+        [onChange, min, max, integer, t]
+    );
 
     return (
         <TextField
@@ -56,7 +60,7 @@ export default function NumberInput({ value, onChange, min, max, integer, label,
             inputMode="text"
             variant="filled"
             value={strValue}
-            onChange={(e) => setStrValue(e.target.value)}
+            onChange={(e) => doChange(e.target.value)}
         />
     );
 }
