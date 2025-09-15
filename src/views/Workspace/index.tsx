@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import TextTrainer from '../../workflow/TextTraining/TextTraining';
 import TextGenerator from '../../workflow/TextGenerator/TextGenerator';
@@ -38,6 +38,7 @@ const CONNECTIONS: IConnection[] = [
             <Annotation
                 label="Data"
                 type="data"
+                animate
             />
         ),
     },
@@ -52,6 +53,7 @@ const CONNECTIONS: IConnection[] = [
             <Annotation
                 label="Model"
                 type="model"
+                animate
             />
         ),
     },
@@ -61,6 +63,12 @@ export function Component() {
     const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
+    const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
+
+    // Hack to update lines when model changes
+    useEffect(() => {
+        setConn([...CONNECTIONS]);
+    }, [model, textDataset]);
 
     return (
         <>
@@ -68,23 +76,17 @@ export function Component() {
                 onModel={setModel}
                 model={model}
             />
-            <WorkflowLayout connections={CONNECTIONS}>
+            <WorkflowLayout connections={conn}>
                 <div
                     className={style.verticalBox}
                     data-widget="container"
                     style={{ width: '390px', maxWidth: '100%' }}
                 >
-                    <div
-                        className={style.box}
-                        data-widget="textData"
-                        style={{ maxWidth: '390px', marginBottom: '5rem' }}
-                    >
-                        <TextData
-                            model={model}
-                            dataset={textDataset}
-                            onDatasetChange={setTextDataset}
-                        />
-                    </div>
+                    <TextData
+                        model={model}
+                        dataset={textDataset}
+                        onDatasetChange={setTextDataset}
+                    />
                 </div>
                 <div
                     className={style.verticalBox}
@@ -92,18 +94,12 @@ export function Component() {
                     style={{ width: '390px', maxWidth: '100%', marginTop: '15rem' }}
                 >
                     {steps.has('model') && (
-                        <div
-                            className={style.box}
-                            data-widget="model"
-                            style={{ maxWidth: '330px' }}
-                        >
-                            <ModelLoader
-                                model={model}
-                                onModel={(m: TeachableLLM) => {
-                                    setModel(m);
-                                }}
-                            />
-                        </div>
+                        <ModelLoader
+                            model={model}
+                            onModel={(m: TeachableLLM) => {
+                                setModel(m);
+                            }}
+                        />
                     )}
                     {steps.has('modelInfo') && (
                         <div
@@ -120,15 +116,10 @@ export function Component() {
                     data-widget="container"
                     style={{ paddingLeft: '5rem', paddingRight: '5rem', boxSizing: 'border-box' }}
                 >
-                    <div
-                        className={style.box}
-                        data-widget="trainer"
-                    >
-                        <TextTrainer
-                            model={model}
-                            dataset={textDataset}
-                        />
-                    </div>
+                    <TextTrainer
+                        model={model}
+                        dataset={textDataset}
+                    />
                     {steps.has('evaluation') && (
                         <div
                             className={style.box}
@@ -138,13 +129,8 @@ export function Component() {
                         </div>
                     )}
                 </div>
-                <div
-                    className={style.box}
-                    data-widget="generator"
-                    style={{ maxWidth: '500px' }}
-                >
-                    <TextGenerator model={model} />
-                </div>
+
+                <TextGenerator model={model} />
             </WorkflowLayout>
             <SettingsDialog />
         </>

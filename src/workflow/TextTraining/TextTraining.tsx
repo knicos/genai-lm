@@ -8,9 +8,11 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { trainerBatchSize, trainerLearningRate, trainerMaxSteps } from '../../state/trainerSettings';
 import NumberBox from '../../components/NumberBox/NumberBox';
+import Box from '../../components/BoxTitle/Box';
+import { trainingAnimation } from '../../state/animations';
 
 interface Props {
     model?: TeachableLLM;
@@ -27,8 +29,13 @@ export default function TextTraining({ model, dataset }: Props) {
     const batchSize = useAtomValue(trainerBatchSize);
     const maxSteps = useAtomValue(trainerMaxSteps);
     const learningRate = useAtomValue(trainerLearningRate);
+    const setTrainingAnimation = useSetAtom(trainingAnimation);
 
     const canTrain = !!model && !!dataset && dataset.length > 0;
+
+    useEffect(() => {
+        setTrainingAnimation(training);
+    }, [training, setTrainingAnimation]);
 
     useEffect(() => {
         if (trainer) {
@@ -62,60 +69,65 @@ export default function TextTraining({ model, dataset }: Props) {
     }, [model]);
 
     return (
-        <div className={style.container}>
-            <BoxTitle
-                title={t('training.title')}
-                done={status === 'ready' && canTrain}
-                busy={!done}
-            />
-            <NumberBox
-                value={(epochs || 0) * batchSize}
-                label={t('training.samples')}
-            />
+        <Box
+            widget="trainer"
+            active={!!model || (!!dataset && dataset.length > 0)}
+        >
+            <div className={style.container}>
+                <BoxTitle
+                    title={t('training.title')}
+                    done={status === 'ready' && canTrain}
+                    busy={!done}
+                />
+                <NumberBox
+                    value={(epochs || 0) * batchSize}
+                    label={t('training.samples')}
+                />
 
-            <div className={style.buttonBox}>
-                <Button
-                    fullWidth
-                    disabled={!canTrain || (!done && !training)}
-                    variant="contained"
-                    startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
-                    onClick={async () => {
-                        if (model && dataset && trainer) {
-                            if (!model.tokeniser.trained) {
-                                await model.tokeniser.train(dataset);
-                            }
+                <div className={style.buttonBox}>
+                    <Button
+                        fullWidth
+                        disabled={!canTrain || (!done && !training)}
+                        variant="contained"
+                        startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
+                        onClick={async () => {
+                            if (model && dataset && trainer) {
+                                if (!model.tokeniser.trained) {
+                                    await model.tokeniser.train(dataset);
+                                }
 
-                            if (training) {
-                                trainer.stop();
-                                setTraining(false);
-                                return;
-                            }
-
-                            if (!done) {
-                                // already training
-                                return;
-                            }
-
-                            setTraining(true);
-                            setDone(false);
-                            // setEpochs(0);
-                            await wait(10);
-                            trainer
-                                .train(dataset, {
-                                    batchSize,
-                                    maxSteps,
-                                    learningRate,
-                                })
-                                .then(() => {
-                                    setDone(true);
+                                if (training) {
+                                    trainer.stop();
                                     setTraining(false);
-                                });
-                        }
-                    }}
-                >
-                    {done ? t('training.start') : t('training.stop')}
-                </Button>
+                                    return;
+                                }
+
+                                if (!done) {
+                                    // already training
+                                    return;
+                                }
+
+                                setTraining(true);
+                                setDone(false);
+                                // setEpochs(0);
+                                await wait(10);
+                                trainer
+                                    .train(dataset, {
+                                        batchSize,
+                                        maxSteps,
+                                        learningRate,
+                                    })
+                                    .then(() => {
+                                        setDone(true);
+                                        setTraining(false);
+                                    });
+                            }
+                        }}
+                    >
+                        {done ? t('training.start') : t('training.stop')}
+                    </Button>
+                </div>
             </div>
-        </div>
+        </Box>
     );
 }

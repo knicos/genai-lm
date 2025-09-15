@@ -15,8 +15,8 @@
     "dependencies": {
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
-        "@genai-fi/base": "^4.1.0",
-        "@genai-fi/nanogpt": "^0.2.10",
+        "@genai-fi/base": "^4.1.1",
+        "@genai-fi/nanogpt": "^0.2.12",
         "@mui/icons-material": "^7.3.1",
         "@mui/material": "^7.3.1",
         "@tensorflow/tfjs": "^4.22.0",

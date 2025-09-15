@@ -85,6 +85,14 @@
     margin: 0;
 }
 
+.little {
+    font-size: 0.8rem;
+    display: inline-block;
+    vertical-align: top;
+    transform: rotate(-15deg);
+    margin-right: 0.5rem;
+}
+
 @media only screen and (max-width: 850px) {
     :global .AppBar h1 {
         display: none;

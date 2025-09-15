@@ -25,6 +25,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ModelStatus from '../../components/ModelStatus/ModelStatus';
+import Box from '../../components/BoxTitle/Box';
 
 interface Props {
     model?: TeachableLLM;
@@ -159,144 +160,150 @@ export default function TextGenerator({ model }: Props) {
     }, [generator]);
 
     return (
-        <div
-            className={style.container}
-            data-testid="textgenerator"
+        <Box
+            widget="generator"
+            style={{ maxWidth: '500px' }}
+            active={!!model}
         >
-            <BoxTitle
-                title={t('generator.title')}
-                done={ready && !generate}
-                busy={generate}
-                style={{ backgroundColor: '#444', color: 'white' }}
-            />
-            <div className={style.xaiRow}>
-                <TextHighlighter
-                    text={text}
-                    mode={!hasGenerated ? 'edit' : enableAttention && !generate ? 'probability' : 'plain'}
-                    onSelectToken={(_, index) => setSelected(index)}
-                    selected={selected}
-                    probabilities={createProbabilities(attentionData, 1, selected, text.length)}
-                    active={generate}
-                    onChange={(newText) => {
-                        setText(newText);
-                        textRef.current = newText;
-                    }}
+            <div
+                className={style.container}
+                data-testid="textgenerator"
+            >
+                <BoxTitle
+                    title={t('generator.title')}
+                    done={ready && !generate}
+                    busy={generate}
+                    style={{ backgroundColor: '#444', color: 'white' }}
                 />
-                <XAIView probabilities={topKTokens} />
-                <GeneratorSettings
-                    open={showSettings}
-                    onClose={() => setShowSettings(false)}
-                />
-                <ModelStatus
-                    model={model}
-                    show={showStatus}
-                    onClose={() => setShowStatus(false)}
-                />
-            </div>
-            {enablePrompt && (
-                <div className={style.titleRow}>
-                    <Button
-                        size="large"
-                        variant="contained"
-                        disabled={disable}
-                        startIcon={generate ? <PauseIcon /> : <PlayArrowIcon />}
-                        onClick={() => {
-                            if (!generator || (status !== 'ready' && status !== 'busy')) {
-                                setShowStatus(true);
-                                return;
-                            }
-                            if (busyRef.current) {
-                                generator.stop();
-                                return;
-                            }
-                            busyRef.current = true;
-                            //setText(''); // Clear previous text
-                            //setAttentionData([]); // Clear previous attention data
-                            //setProbabilities([]); // Clear previous probabilities
-                            setGenerate(true);
-                            setHasGenerated(true);
-                            //textRef.current = '';
-                            generator
-                                .generate(textRef.current.length > 0 ? textRef.current : undefined, {
-                                    maxLength,
-                                    temperature,
-                                    includeAttention: enableAttention,
-                                    includeProbabilities: enableProbabilities,
-                                    noCache: enableAttention,
-                                    usePadding: enableAttention,
-                                })
-                                .then(() => {
-                                    setText(textRef.current);
-                                    //textRef.current = '';
-                                    if (attentionRef.current.length > 0) {
-                                        setAttentionData(attentionRef.current);
-                                        //attentionRef.current = [];
-                                    }
-                                    if (probRef.current.length > 0) {
-                                        setProbabilities(probRef.current);
-                                        //probRef.current = [];
-                                    }
-                                    setGenerate(false);
-                                    busyRef.current = false;
-                                });
+                <div className={style.xaiRow}>
+                    <TextHighlighter
+                        text={text}
+                        mode={!hasGenerated ? 'edit' : enableAttention && !generate ? 'probability' : 'plain'}
+                        onSelectToken={(_, index) => setSelected(index)}
+                        selected={selected}
+                        probabilities={createProbabilities(attentionData, 1, selected, text.length)}
+                        active={generate}
+                        onChange={(newText) => {
+                            setText(newText);
+                            textRef.current = newText;
                         }}
-                    >
-                        {generate ? t('generator.pause') : t('generator.generate')}
-                    </Button>
-                    <div className={style.iconButtons}>
-                        <Tooltip
-                            title={t('generator.reset')}
-                            arrow
+                    />
+                    <XAIView probabilities={topKTokens} />
+                    <GeneratorSettings
+                        open={showSettings}
+                        onClose={() => setShowSettings(false)}
+                    />
+                    <ModelStatus
+                        model={model}
+                        show={showStatus}
+                        onClose={() => setShowStatus(false)}
+                    />
+                </div>
+                {enablePrompt && (
+                    <div className={style.titleRow}>
+                        <Button
+                            size="large"
+                            variant="contained"
+                            disabled={disable}
+                            startIcon={generate ? <PauseIcon /> : <PlayArrowIcon />}
+                            onClick={() => {
+                                if (!generator || (status !== 'ready' && status !== 'busy')) {
+                                    setShowStatus(true);
+                                    return;
+                                }
+                                if (busyRef.current) {
+                                    generator.stop();
+                                    return;
+                                }
+                                busyRef.current = true;
+                                //setText(''); // Clear previous text
+                                //setAttentionData([]); // Clear previous attention data
+                                //setProbabilities([]); // Clear previous probabilities
+                                setGenerate(true);
+                                setHasGenerated(true);
+                                //textRef.current = '';
+                                generator
+                                    .generate(textRef.current.length > 0 ? textRef.current : undefined, {
+                                        maxLength,
+                                        temperature,
+                                        includeAttention: enableAttention,
+                                        includeProbabilities: enableProbabilities,
+                                        noCache: enableAttention,
+                                        usePadding: enableAttention,
+                                    })
+                                    .then(() => {
+                                        setText(textRef.current);
+                                        //textRef.current = '';
+                                        if (attentionRef.current.length > 0) {
+                                            setAttentionData(attentionRef.current);
+                                            //attentionRef.current = [];
+                                        }
+                                        if (probRef.current.length > 0) {
+                                            setProbabilities(probRef.current);
+                                            //probRef.current = [];
+                                        }
+                                        setGenerate(false);
+                                        busyRef.current = false;
+                                    });
+                            }}
                         >
-                            <IconButton
-                                color="inherit"
-                                disabled={disable}
-                                onClick={() => {
-                                    if (generate && generator) {
-                                        generator.stop();
-                                    }
-                                    setHasGenerated(false);
-                                    setText('');
-                                    textRef.current = '';
-                                    setAttentionData([]);
-                                    attentionRef.current = [];
-                                    setProbabilities([]);
-                                    probRef.current = [];
-                                    setSelected(-1);
-                                }}
-                            >
-                                <RefreshIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                            title={t('generator.copy')}
-                            arrow
-                        >
-                            <IconButton
-                                color="inherit"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(textRef.current);
-                                }}
-                            >
-                                <ContentCopyIcon />
-                            </IconButton>
-                        </Tooltip>
-                        {enableSettings && (
+                            {generate ? t('generator.pause') : t('generator.generate')}
+                        </Button>
+                        <div className={style.iconButtons}>
                             <Tooltip
-                                title={t('generator.settingsTooltip')}
+                                title={t('generator.reset')}
                                 arrow
                             >
                                 <IconButton
                                     color="inherit"
-                                    onClick={() => setShowSettings(true)}
+                                    disabled={disable}
+                                    onClick={() => {
+                                        if (generate && generator) {
+                                            generator.stop();
+                                        }
+                                        setHasGenerated(false);
+                                        setText('');
+                                        textRef.current = '';
+                                        setAttentionData([]);
+                                        attentionRef.current = [];
+                                        setProbabilities([]);
+                                        probRef.current = [];
+                                        setSelected(-1);
+                                    }}
                                 >
-                                    <TuneIcon />
+                                    <RefreshIcon />
                                 </IconButton>
                             </Tooltip>
-                        )}
+                            <Tooltip
+                                title={t('generator.copy')}
+                                arrow
+                            >
+                                <IconButton
+                                    color="inherit"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(textRef.current);
+                                    }}
+                                >
+                                    <ContentCopyIcon />
+                                </IconButton>
+                            </Tooltip>
+                            {enableSettings && (
+                                <Tooltip
+                                    title={t('generator.settingsTooltip')}
+                                    arrow
+                                >
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() => setShowSettings(true)}
+                                    >
+                                        <TuneIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </Box>
     );
 }

@@ -7,6 +7,7 @@ import ModelList from './ModelList';
 import { Tab, Tabs } from '@mui/material';
 import CustomModel from './CustomModel';
 import { useTranslation } from 'react-i18next';
+import Box from '../../components/BoxTitle/Box';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
@@ -37,40 +38,46 @@ export default function ModelLoader({ onModel, model }: Props) {
     }, [model]);
 
     return (
-        <div className={style.container}>
-            <BoxTitle
-                title={t('model.title')}
-                done={done}
-                busy={!done && !!model}
-            ></BoxTitle>
-            <Tabs
-                value={tab}
-                onChange={(_, v) => setTab(v)}
-            >
-                <Tab label={t('model.trained')} />
-                <Tab label={t('model.untrained')} />
-                <Tab label={t('model.custom')} />
-            </Tabs>
-            {tab === 0 && (
-                <ModelList
-                    manifest={manifest.filter((m) => m.trained)}
-                    model={model}
-                    onModel={onModel}
-                />
-            )}
-            {tab === 1 && (
-                <ModelList
-                    manifest={manifest.filter((m) => !m.trained)}
-                    model={model}
-                    onModel={onModel}
-                />
-            )}
-            {tab === 2 && (
-                <CustomModel
-                    model={model}
-                    onModel={onModel}
-                />
-            )}
-        </div>
+        <Box
+            widget="model"
+            style={{ maxWidth: '330px' }}
+            active={done}
+        >
+            <div className={style.container}>
+                <BoxTitle
+                    title={t('model.title')}
+                    done={done}
+                    busy={!done && !!model}
+                ></BoxTitle>
+                <Tabs
+                    value={tab}
+                    onChange={(_, v) => setTab(v)}
+                >
+                    <Tab label={t('model.trained')} />
+                    <Tab label={t('model.untrained')} />
+                    <Tab label={t('model.custom')} />
+                </Tabs>
+                {tab === 0 && (
+                    <ModelList
+                        manifest={manifest.filter((m) => m.trained)}
+                        model={model}
+                        onModel={onModel}
+                    />
+                )}
+                {tab === 1 && (
+                    <ModelList
+                        manifest={manifest.filter((m) => !m.trained)}
+                        model={model}
+                        onModel={onModel}
+                    />
+                )}
+                {tab === 2 && (
+                    <CustomModel
+                        model={model}
+                        onModel={onModel}
+                    />
+                )}
+            </div>
+        </Box>
     );
 }

@@ -12,6 +12,7 @@ import InfoPanel from './InfoPanel';
 import DataProgress from '../../components/DataProgress/DataProgress';
 import TextSearch from './TextSearch';
 import useModelStatus from '../../utilities/useModelStatus';
+import Box from '../../components/BoxTitle/Box';
 
 interface Props {
     model?: TeachableLLM;
@@ -108,96 +109,102 @@ export default function TextData({ model, onDatasetChange }: Props) {
     );
 
     return (
-        <div className={style.container}>
-            <BoxTitle
-                title={t('data.title')}
-                done={done}
-                busy={busy}
-            />
-            <DataMenu
-                disabled={showInput || showSearch}
-                onWrite={() => setShowInput(true)}
-                onSearch={() => setShowSearch(true)}
-                onUpload={() => fileRef.current?.click()}
-                totalSamples={totalSamples}
-            />
-            <DataProgress
-                samplesProcessed={totalSamples}
-                desiredSamples={status !== 'loading' ? (model?.getNumParams() || 0) * 2 : 0}
-            />
-            <div
-                className={style.content}
-                ref={drop as unknown as RefObject<HTMLDivElement>}
-            >
-                <DataListing
-                    data={data}
-                    onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
+        <Box
+            widget="textData"
+            style={{ maxWidth: '390px', marginBottom: '5rem' }}
+            active={data.length > 0}
+        >
+            <div className={style.container}>
+                <BoxTitle
+                    title={t('data.title')}
+                    done={done}
+                    busy={busy}
                 />
-                <InfoPanel
-                    show={data.length === 0}
-                    severity="info"
-                    message={t('data.dataHint')}
+                <DataMenu
+                    disabled={showInput || showSearch}
+                    onWrite={() => setShowInput(true)}
+                    onSearch={() => setShowSearch(true)}
+                    onUpload={() => fileRef.current?.click()}
+                    totalSamples={totalSamples}
                 />
-                <InfoPanel
-                    show={showDropError}
-                    severity="error"
-                    message={t('data.dropError')}
-                    onClose={() => setShowDropError(false)}
+                <DataProgress
+                    samplesProcessed={totalSamples}
+                    desiredSamples={status !== 'loading' ? (model?.getNumParams() || 0) * 2 : 0}
                 />
-
-                {showInput && (
-                    <TextInput
-                        onClose={() => setShowInput(false)}
-                        onText={(text) => {
-                            setData((prev) => [
-                                ...prev,
-                                {
-                                    name: t('data.untitled'),
-                                    content: [text],
-                                    size: text.length,
-                                },
-                            ]);
-                            setShowInput(false);
-                        }}
+                <div
+                    className={style.content}
+                    ref={drop as unknown as RefObject<HTMLDivElement>}
+                >
+                    <DataListing
+                        data={data}
+                        onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
                     />
-                )}
-                {showSearch && (
-                    <TextSearch
-                        onClose={() => setShowSearch(false)}
-                        onText={async (url, name, type) => {
-                            setShowSearch(false);
+                    <InfoPanel
+                        show={data.length === 0}
+                        severity="info"
+                        message={t('data.dataHint')}
+                    />
+                    <InfoPanel
+                        show={showDropError}
+                        severity="error"
+                        message={t('data.dropError')}
+                        onClose={() => setShowDropError(false)}
+                    />
+
+                    {showInput && (
+                        <TextInput
+                            onClose={() => setShowInput(false)}
+                            onText={(text) => {
+                                setData((prev) => [
+                                    ...prev,
+                                    {
+                                        name: t('data.untitled'),
+                                        content: [text],
+                                        size: text.length,
+                                    },
+                                ]);
+                                setShowInput(false);
+                            }}
+                        />
+                    )}
+                    {showSearch && (
+                        <TextSearch
+                            onClose={() => setShowSearch(false)}
+                            onText={async (url, name, type) => {
+                                setShowSearch(false);
+                                setBusy(true);
+
+                                const response = await fetch(url);
+                                const text = await loadTextData(
+                                    new File([await response.blob()], name, {
+                                        type,
+                                    })
+                                );
+                                await handleTextLoad(name, text, model, setData);
+                                setBusy(false);
+                            }}
+                        />
+                    )}
+                    {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
+                </div>
+
+                <input
+                    type="file"
+                    accept=".txt,.csv,.pdf,.doc,.docx"
+                    ref={fileRef}
+                    style={{ display: 'none' }}
+                    onChange={async (e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                            const file = e.target.files[0];
                             setBusy(true);
-
-                            const response = await fetch(url);
-                            const text = await loadTextData(
-                                new File([await response.blob()], name, {
-                                    type,
-                                })
-                            );
-                            await handleTextLoad(name, text, model, setData);
+                            const text = await loadTextData(file);
+                            await handleTextLoad(file.name, text, model, setData);
+                            setDone(true);
                             setBusy(false);
-                        }}
-                    />
-                )}
-                {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
+                        }
+                    }}
+                />
             </div>
-
-            <input
-                type="file"
-                accept=".txt,.csv,.pdf,.doc,.docx"
-                ref={fileRef}
-                style={{ display: 'none' }}
-                onChange={async (e) => {
-                    if (e.target.files && e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        setBusy(true);
-                        const text = await loadTextData(file);
-                        await handleTextLoad(file.name, text, model, setData);
-                        setDone(true);
-                        setBusy(false);
-                    }
-                }}
-            />
-        </div>
+        </Box>
     );
 }

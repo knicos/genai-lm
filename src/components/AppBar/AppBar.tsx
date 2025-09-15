@@ -90,7 +90,9 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         width="48"
                         height="48"
                     />
-                    <h1>Language Machine</h1>
+                    <h1>
+                        <div className={style.little}>Little</div>Language Machine
+                    </h1>
                 </Link>
                 <div className={style.buttonBar}>
                     <BusyButton
