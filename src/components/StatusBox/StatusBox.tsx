@@ -28,7 +28,7 @@ export default function StatusBox({ done = false, busy = false, info = false, da
             )}
             {!info && busy && !done && (
                 <AccessTimeIcon
-                    htmlColor={dark ? theme.dark.secondary : theme.light.secondary}
+                    htmlColor={dark ? theme.dark.error : theme.light.error}
                     fontSize="large"
                 />
             )}

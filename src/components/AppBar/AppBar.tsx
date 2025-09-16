@@ -10,9 +10,10 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { saveAs } from 'file-saver';
 import * as tf from '@tensorflow/tfjs';
 import SaveDialog from './SaveDialog';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { uiShowSettings } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { trainingAnimation } from '../../state/animations';
 
 export const LANGS = [{ name: 'en-GB', label: 'English' }];
 
@@ -28,6 +29,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
     const fileRef = useRef<HTMLInputElement>(null);
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const showSettings = useSetAtom(uiShowSettings);
+    const istraining = useAtomValue(trainingAnimation);
 
     const doChangeLanguage = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -97,6 +99,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                 <div className={style.buttonBar}>
                     <BusyButton
                         busy={isloading}
+                        disabled={istraining}
                         data-testid="open-project"
                         color="inherit"
                         variant="outlined"
@@ -107,7 +110,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                     </BusyButton>
                     <BusyButton
                         busy={!!saving}
-                        disabled={!model}
+                        disabled={!model || istraining}
                         data-testid="save-project"
                         color="inherit"
                         variant="outlined"
@@ -123,6 +126,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         onChange={doChangeLanguage}
                         variant="outlined"
                         data-testid="select-lang"
+                        disabled={istraining}
                         inputProps={{ 'aria-label': t('app.language') }}
                     >
                         {LANGS.map((lng) => (
@@ -143,6 +147,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         color="inherit"
                         size="large"
                         onClick={() => showSettings(true)}
+                        disabled={istraining}
                     >
                         <SettingsIcon fontSize="large" />
                     </IconButton>

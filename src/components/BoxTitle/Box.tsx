@@ -5,9 +5,10 @@ interface Props extends PropsWithChildren {
     style?: CSSProperties;
     widget?: string;
     active?: boolean;
+    disabled?: boolean;
 }
 
-export default function Box({ style, widget, active = true, children }: Props) {
+export default function Box({ style, widget, active = true, disabled = false, children }: Props) {
     return (
         <div
             className={boxstyle.box}
@@ -16,6 +17,7 @@ export default function Box({ style, widget, active = true, children }: Props) {
             style={style}
         >
             {children}
+            {disabled && <div className={boxstyle.disabled} />}
         </div>
     );
 }

@@ -100,10 +100,9 @@ export default function TextTraining({ model, dataset }: Props) {
                     busy={!done}
                 />
                 <NumberBox
-                    value={(epochs || 0) * batchSize}
+                    value={(epochs || 0) * batchSize * (status !== 'loading' ? model?.config.blockSize || 1 : 0)}
                     label={t('training.samples')}
                 />
-
                 <div className={style.buttonBox}>
                     <Button
                         fullWidth

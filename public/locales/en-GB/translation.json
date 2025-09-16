@@ -10,6 +10,7 @@
         "settings": {
             "title": "Settings",
             "general": "General",
+            "training": "Training",
             "generator": "Generator",
             "showModelSelect": "Show Models",
             "showEvaluation": "Show Evaluation",
@@ -22,7 +23,10 @@
             "showProbabilities": "Show Probabilities",
             "showAttention": "Show Attention",
             "maxLength": "Maximum output length",
-            "temperature": "Temperature"
+            "temperature": "Temperature",
+            "batchSize": "Batch Size",
+            "learningRate": "Learning Rate",
+            "showOutputText": "Show Progress Text"
         },
         "close": "Close"
     },

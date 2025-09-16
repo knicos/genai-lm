@@ -285,6 +285,7 @@ export default function TextGenerator({ model }: Props) {
                             >
                                 <IconButton
                                     color="inherit"
+                                    disabled={disable}
                                     onClick={() => {
                                         navigator.clipboard.writeText(textRef.current);
                                     }}
@@ -299,6 +300,7 @@ export default function TextGenerator({ model }: Props) {
                                 >
                                     <IconButton
                                         color="inherit"
+                                        disabled={disable}
                                         onClick={() => setShowSettings(true)}
                                     >
                                         <TuneIcon />

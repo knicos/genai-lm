@@ -8,6 +8,7 @@ import { Tab, Tabs } from '@mui/material';
 import CustomModel from './CustomModel';
 import { useTranslation } from 'react-i18next';
 import Box from '../../components/BoxTitle/Box';
+import useModelStatus from '../../utilities/useModelStatus';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
@@ -18,6 +19,7 @@ export default function ModelLoader({ onModel, model }: Props) {
     const { t } = useTranslation();
     const [done, setDone] = useState(false);
     const [tab, setTab] = useState(0);
+    const status = useModelStatus(model);
 
     useEffect(() => {
         if (model) {
@@ -42,6 +44,7 @@ export default function ModelLoader({ onModel, model }: Props) {
             widget="model"
             style={{ maxWidth: '330px' }}
             active={done}
+            disabled={status === 'training'}
         >
             <div className={style.container}>
                 <BoxTitle

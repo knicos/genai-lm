@@ -6,6 +6,7 @@ import { Button } from '@genai-fi/base';
 import GeneralSettings from './General';
 import GeneratorSettings from './Generator';
 import { uiShowSettings } from '../../state/uiState';
+import TrainingSettings from './Training';
 
 export default function SettingsDialog() {
     const { t } = useTranslation();
@@ -34,9 +35,11 @@ export default function SettingsDialog() {
                 >
                     <Tab label={t('app.settings.general')} />
                     <Tab label={t('app.settings.generator')} />
+                    <Tab label={t('app.settings.training')} />
                 </Tabs>
                 {tabNumber === 0 && <GeneralSettings />}
                 {tabNumber === 1 && <GeneratorSettings />}
+                {tabNumber === 2 && <TrainingSettings />}
             </DialogContent>
             <DialogActions>
                 <Button
