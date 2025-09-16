@@ -1,5 +1,5 @@
 import { Button } from '@genai-fi/base';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import style from './style.module.css';
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
@@ -34,6 +34,8 @@ export default function TextTraining({ model, dataset }: Props) {
 
     const canTrain = !!model && !!dataset && dataset.length > 0;
 
+    const totalSamples = useMemo(() => (dataset ? dataset.reduce((acc, curr) => acc + curr.length, 0) : 0), [dataset]);
+
     useEffect(() => {
         setTrainingAnimation(training);
     }, [training, setTrainingAnimation]);
@@ -42,13 +44,24 @@ export default function TextTraining({ model, dataset }: Props) {
         if (trainer) {
             const h = (log: TrainingLogEntry) => {
                 setEpochs(log.step);
+                const progress = (log.step * batchSize * (model?.config.blockSize || 1)) / (totalSamples || 1);
+                const estimateTime = log.time / (progress || 1);
+                const remaining = Math.max(0, estimateTime - log.time);
+                console.log(
+                    `Progress: ${(progress * 100).toFixed(2)}% - Estimated time remaining: ${(
+                        remaining /
+                        1000 /
+                        60 /
+                        60
+                    ).toFixed(2)}h`
+                );
             };
             trainer.on('log', h);
             return () => {
                 trainer.off('log', h);
             };
         }
-    }, [trainer]);
+    }, [trainer, totalSamples, batchSize, model]);
 
     useEffect(() => {
         if (model) {

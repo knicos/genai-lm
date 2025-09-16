@@ -34,7 +34,7 @@
     border-radius: 50%;
     vertical-align: middle;
     opacity: 0.8;
-    animation: pulse 1.5s infinite;
+    /*animation: pulse 1.5s infinite;*/
 }
 
 .cursor.active {

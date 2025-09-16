@@ -28,6 +28,7 @@
     },
     "data": {
         "title": "Data",
+        "textDialogTitle": "Text Content",
         "addTooltip": "Add new data",
         "dataHint": "Write text or upload various types of files (txt, csv, pdf, docx) for training data. Any text can be used but there should be a lot of it.",
         "modelHint": "Please select a model first.",
@@ -35,7 +36,9 @@
         "upload": "Upload",
         "untitled": "Text",
         "addText": "Add",
+        "save": "Save",
         "cancel": "Cancel",
+        "close": "Close",
         "textPlaceholder": "Write or paste your own text here...",
         "dropHint": "Drop files here...",
         "dropError": "You can only drop files with text (txt, csv, pdf, docx).",

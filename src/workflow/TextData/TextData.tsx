@@ -13,6 +13,7 @@ import DataProgress from '../../components/DataProgress/DataProgress';
 import TextSearch from './TextSearch';
 import useModelStatus from '../../utilities/useModelStatus';
 import Box from '../../components/BoxTitle/Box';
+import DataRows from './DataRows';
 
 interface Props {
     model?: TeachableLLM;
@@ -32,6 +33,7 @@ async function handleTextLoad(
     name: string,
     text: string[],
     model: TeachableLLM | undefined,
+    source: 'file' | 'input' | 'search',
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
     if (model) {
@@ -47,6 +49,7 @@ async function handleTextLoad(
             name,
             content: text,
             size: text.reduce((acc, curr) => acc + curr.length, 0),
+            source,
         },
     ]);
 }
@@ -61,6 +64,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [showSearch, setShowSearch] = useState(false);
     const [showDropError, setShowDropError] = useState(false);
     const status = useModelStatus(model);
+    const [selected, setSelected] = useState<number>(-1);
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
@@ -76,18 +80,18 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     try {
                         for (const file of items.files) {
                             const text = await loadTextData(file);
-                            await handleTextLoad(file.name, text, model, setData);
+                            await handleTextLoad(file.name, text, model, 'file', setData);
                         }
                     } catch (error) {
                         console.error('Error loading files:', error);
                         setShowDropError(true);
                     }
                 } else if (items.text) {
-                    await handleTextLoad(t('data.untitled'), [items.text], model, setData);
+                    await handleTextLoad(t('data.untitled'), [items.text], model, 'input', setData);
                 } else if (items.html) {
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
-                    await handleTextLoad(t('data.untitled'), [element.textContent], model, setData);
+                    await handleTextLoad(t('data.untitled'), [element.textContent], model, 'input', setData);
                 }
                 setDone(true);
                 setBusy(false);
@@ -108,6 +112,8 @@ export default function TextData({ model, onDatasetChange }: Props) {
         [data]
     );
 
+    const selectedItem = selected >= 0 && selected < data.length ? data[selected] : null;
+
     return (
         <Box
             widget="textData"
@@ -122,7 +128,10 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 />
                 <DataMenu
                     disabled={showInput || showSearch}
-                    onWrite={() => setShowInput(true)}
+                    onWrite={() => {
+                        setSelected(-1);
+                        setShowInput(true);
+                    }}
                     onSearch={() => setShowSearch(true)}
                     onUpload={() => fileRef.current?.click()}
                     totalSamples={totalSamples}
@@ -138,6 +147,16 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     <DataListing
                         data={data}
                         onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
+                        selected={selected}
+                        setSelected={(index: number) => {
+                            setSelected(index);
+                            if (index >= 0 && index < data.length) {
+                                const entry = data[index];
+                                if (entry.source === 'input') {
+                                    setShowInput(true);
+                                }
+                            }
+                        }}
                     />
                     <InfoPanel
                         show={data.length === 0}
@@ -150,19 +169,42 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         message={t('data.dropError')}
                         onClose={() => setShowDropError(false)}
                     />
-
+                    {selectedItem?.source === 'file' || selectedItem?.source === 'search' ? (
+                        <DataRows
+                            data={selectedItem}
+                            onClose={() => setSelected(-1)}
+                        />
+                    ) : null}
                     {showInput && (
                         <TextInput
+                            initialText={
+                                selectedItem && selectedItem.source === 'input' ? selectedItem.content[0] : undefined
+                            }
                             onClose={() => setShowInput(false)}
                             onText={(text) => {
-                                setData((prev) => [
-                                    ...prev,
-                                    {
-                                        name: t('data.untitled'),
-                                        content: [text],
-                                        size: text.length,
-                                    },
-                                ]);
+                                if (selectedItem) {
+                                    setData((prev) =>
+                                        prev.map((entry, i) =>
+                                            i === selected
+                                                ? {
+                                                      ...entry,
+                                                      content: [text],
+                                                      size: text.length,
+                                                  }
+                                                : entry
+                                        )
+                                    );
+                                } else {
+                                    setData((prev) => [
+                                        ...prev,
+                                        {
+                                            name: t('data.untitled'),
+                                            content: [text],
+                                            size: text.length,
+                                            source: 'input',
+                                        },
+                                    ]);
+                                }
                                 setShowInput(false);
                             }}
                         />
@@ -180,7 +222,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                         type,
                                     })
                                 );
-                                await handleTextLoad(name, text, model, setData);
+                                await handleTextLoad(name, text, model, 'search', setData);
                                 setBusy(false);
                             }}
                         />
@@ -190,15 +232,15 @@ export default function TextData({ model, onDatasetChange }: Props) {
 
                 <input
                     type="file"
-                    accept=".txt,.csv,.pdf,.doc,.docx"
+                    accept=".txt,.csv,.pdf,.doc,.docx,.parquet"
                     ref={fileRef}
                     style={{ display: 'none' }}
                     onChange={async (e) => {
                         if (e.target.files && e.target.files.length > 0) {
                             const file = e.target.files[0];
                             setBusy(true);
-                            const text = await loadTextData(file);
-                            await handleTextLoad(file.name, text, model, setData);
+                            const text = await loadTextData(file, { maxSize: 100000000 });
+                            await handleTextLoad(file.name, text, model, 'file', setData);
                             setDone(true);
                             setBusy(false);
                         }

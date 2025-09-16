@@ -26,6 +26,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import Box from '../../components/BoxTitle/Box';
+import { trainerOutputText } from '../../state/trainerSettings';
 
 interface Props {
     model?: TeachableLLM;
@@ -77,6 +78,7 @@ export default function TextGenerator({ model }: Props) {
     const enablePrompt = useAtomValue(generatorShowPrompt);
     const temperature = useAtomValue(generatorTemperature);
     const maxLength = useAtomValue(generatorMaxLength);
+    const outputText = useAtomValue(trainerOutputText);
     const [showStatus, setShowStatus] = useState<boolean>(false);
 
     const attentionRef = useRef<number[][]>([]);
@@ -109,31 +111,33 @@ export default function TextGenerator({ model }: Props) {
                 count: 0,
             };
 
-            const h = async () => {
-                state.count++;
-                if (state.count % 2 !== 0) return;
-                setText(''); // Clear previous text
-                setAttentionData([]); // Clear previous attention data
-                textRef.current = '';
-                setGenerate(true);
-                setHasGenerated(true);
-                const finalText = await generator.generate(undefined, {
-                    maxLength: 200,
-                    temperature: 1,
-                    includeAttention: false,
-                    includeProbabilities: false,
-                });
-                setGenerate(false);
-                setText(finalText);
-                textRef.current = '';
-                await wait(40);
-            };
-            model.on('trainStep', h);
-            return () => {
-                model.off('trainStep', h);
-            };
+            if (outputText) {
+                const h = async () => {
+                    state.count++;
+                    if (state.count % 2 !== 0) return;
+                    setText(''); // Clear previous text
+                    setAttentionData([]); // Clear previous attention data
+                    textRef.current = '';
+                    setGenerate(true);
+                    setHasGenerated(true);
+                    const finalText = await generator.generate(undefined, {
+                        maxLength: 200,
+                        temperature: 1,
+                        includeAttention: false,
+                        includeProbabilities: false,
+                    });
+                    setGenerate(false);
+                    setText(finalText);
+                    textRef.current = '';
+                    await wait(40);
+                };
+                model.on('trainStep', h);
+                return () => {
+                    model.off('trainStep', h);
+                };
+            }
         }
-    }, [model, ready]);
+    }, [model, ready, outputText]);
 
     useEffect(() => {
         if (generator) {
@@ -174,6 +178,7 @@ export default function TextGenerator({ model }: Props) {
                     done={ready && !generate}
                     busy={generate}
                     style={{ backgroundColor: '#444', color: 'white' }}
+                    dark={true}
                 />
                 <div className={style.xaiRow}>
                     <TextHighlighter

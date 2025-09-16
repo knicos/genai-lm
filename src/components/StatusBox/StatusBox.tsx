@@ -1,33 +1,36 @@
 import style from './style.module.css';
 import CheckIcon from '@mui/icons-material/Check';
-import { Spinner } from '@genai-fi/base';
 import InfoIcon from '@mui/icons-material/Info';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { theme } from '../../theme';
 
 interface Props {
     done?: boolean;
     busy?: boolean;
     info?: boolean;
+    dark?: boolean;
 }
 
-export default function StatusBox({ done = false, busy = false, info = false }: Props) {
+export default function StatusBox({ done = false, busy = false, info = false, dark = false }: Props) {
     return (
         <div className={style.status}>
             {!info && done && !busy && (
                 <CheckIcon
-                    color="success"
+                    htmlColor={dark ? theme.dark.success : theme.light.success}
                     fontSize="large"
                 />
             )}
             {!info && !done && !busy && (
                 <CheckIcon
-                    color="disabled"
+                    htmlColor={dark ? theme.dark.disabled : theme.light.disabled}
                     fontSize="large"
                 />
             )}
             {!info && busy && !done && (
-                <div style={{ transform: 'scale(0.5)' }}>
-                    <Spinner size="small" />
-                </div>
+                <AccessTimeIcon
+                    htmlColor={dark ? theme.dark.secondary : theme.light.secondary}
+                    fontSize="large"
+                />
             )}
             {info && done && (
                 <InfoIcon
@@ -37,7 +40,7 @@ export default function StatusBox({ done = false, busy = false, info = false }: 
             )}
             {info && !done && (
                 <InfoIcon
-                    color="disabled"
+                    htmlColor={dark ? theme.dark.disabled : theme.light.disabled}
                     fontSize="large"
                 />
             )}

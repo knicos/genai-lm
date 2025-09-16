@@ -92,3 +92,47 @@
     border: 1px dashed primary;
     border-radius: 15px;
 }
+
+.dataRow {
+    white-space: nowrap;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.dataRow:hover {
+    background: rgba(0, 130, 151, 0.08);
+}
+
+.dataText {
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.dataContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: bgSubdued1;
+    animation: fadeIn 0.2s 1;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.textDialog {
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 16px;
+    max-height: 80vh;
+    overflow-y: auto;
+}

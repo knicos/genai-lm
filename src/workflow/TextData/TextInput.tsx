@@ -1,16 +1,23 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import style from './style.module.css';
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
+    initialText?: string;
     onText: (text: string) => void;
     onClose: () => void;
 }
 
-export default function TextInput({ onText, onClose }: Props) {
+export default function TextInput({ initialText, onText, onClose }: Props) {
     const { t } = useTranslation();
     const ref = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        if (ref.current && initialText) {
+            ref.current.value = initialText;
+        }
+    }, [initialText]);
 
     return (
         <div className={style.textInputContainer}>
@@ -30,7 +37,7 @@ export default function TextInput({ onText, onClose }: Props) {
                     }}
                     variant="contained"
                 >
-                    {t('data.addText')}
+                    {initialText ? t('data.save') : t('data.addText')}
                 </Button>
                 <Button
                     onClick={onClose}

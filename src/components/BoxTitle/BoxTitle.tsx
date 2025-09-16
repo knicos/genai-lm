@@ -8,9 +8,10 @@ interface Props {
     busy?: boolean;
     info?: boolean;
     style?: React.CSSProperties;
+    dark?: boolean;
 }
 
-export default function BoxTitle({ title, button, done, busy, info, style }: Props) {
+export default function BoxTitle({ title, button, done, busy, info, style, dark }: Props) {
     return (
         <div
             className={info ? styleModule.infoTitle : styleModule.title}
@@ -22,6 +23,7 @@ export default function BoxTitle({ title, button, done, busy, info, style }: Pro
                 done={done}
                 busy={busy}
                 info={info}
+                dark={dark}
             />
         </div>
     );
