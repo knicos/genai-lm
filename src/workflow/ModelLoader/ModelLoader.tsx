@@ -3,7 +3,7 @@ import style from './style.module.css';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import manifest from './manifest.json';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import ModelList from './ModelList';
+import ModelList, { ManifestItem } from './ModelList';
 import { Tab, Tabs } from '@mui/material';
 import CustomModel from './CustomModel';
 import { useTranslation } from 'react-i18next';
@@ -23,19 +23,13 @@ export default function ModelLoader({ onModel, model }: Props) {
 
     useEffect(() => {
         if (model) {
-            //onModel(model);
-            if (model.ready) {
+            const h = () => {
                 setDone(true);
-            } else {
-                const h = (status: string) => {
-                    if (status === 'ready') setDone(true);
-                };
-                model.on('status', h);
-                return () => {
-                    model.off('status', h);
-                };
-            }
-            setDone(true);
+            };
+            model.on('loaded', h);
+            return () => {
+                model.off('loaded', h);
+            };
         }
     }, [model]);
 
@@ -62,14 +56,14 @@ export default function ModelLoader({ onModel, model }: Props) {
                 </Tabs>
                 {tab === 0 && (
                     <ModelList
-                        manifest={manifest.filter((m) => m.trained)}
+                        manifest={(manifest as ManifestItem[]).filter((m) => m.trained)}
                         model={model}
                         onModel={onModel}
                     />
                 )}
                 {tab === 1 && (
                     <ModelList
-                        manifest={manifest.filter((m) => !m.trained)}
+                        manifest={(manifest as ManifestItem[]).filter((m) => !m.trained)}
                         model={model}
                         onModel={onModel}
                     />

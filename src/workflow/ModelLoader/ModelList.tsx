@@ -3,7 +3,6 @@ import style from './style.module.css';
 import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import * as tf from '@tensorflow/tfjs';
 import { useState } from 'react';
 
 interface GPTConfig {
@@ -26,6 +25,7 @@ export interface ManifestItem {
     config?: Partial<GPTConfig>;
     parameters: number;
     trained: boolean;
+    tokeniser?: 'char' | 'bpe';
 }
 
 interface Props {
@@ -57,7 +57,7 @@ export default function ModelList({ manifest, model, onModel }: Props) {
                                     return undefined;
                                 }
                             }
-                            const newModel = TeachableLLM.loadModel(tf, m.url);
+                            const newModel = TeachableLLM.loadModel(m.url);
                             waitForModel(newModel).then(() => {
                                 onModel(newModel);
                             });
@@ -71,7 +71,7 @@ export default function ModelList({ manifest, model, onModel }: Props) {
                                     return undefined;
                                 }
                             }
-                            const newModel = TeachableLLM.create(tf, m.config);
+                            const newModel = TeachableLLM.create(m.tokeniser || 'char', m.config);
                             onModel(newModel);
                         }
                     }}

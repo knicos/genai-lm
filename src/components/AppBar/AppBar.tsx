@@ -8,7 +8,6 @@ import { BusyButton } from '@genai-fi/base';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { saveAs } from 'file-saver';
-import * as tf from '@tensorflow/tfjs';
 import SaveDialog from './SaveDialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { uiShowSettings } from '../../state/uiState';
@@ -57,7 +56,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
     const openFile = useCallback(
         (file: File) => {
             setIsLoading(true);
-            const model = TeachableLLM.loadModel(tf, file);
+            const model = TeachableLLM.loadModel(file);
             onModel(model);
             waitForModel(model).then(() => {
                 setIsLoading(false);

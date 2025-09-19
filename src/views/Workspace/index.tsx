@@ -67,8 +67,19 @@ export function Component() {
 
     // Hack to update lines when model changes
     useEffect(() => {
-        setConn([...CONNECTIONS]);
+        if (model) {
+            const h = () => {
+                setConn([...CONNECTIONS]);
+            };
+            model.on('loaded', h);
+            return () => {
+                model.off('loaded', h);
+            };
+        }
     }, [model, textDataset]);
+    useEffect(() => {
+        setConn([...CONNECTIONS]);
+    }, [textDataset]);
 
     return (
         <>

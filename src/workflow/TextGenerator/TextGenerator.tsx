@@ -32,11 +32,11 @@ interface Props {
     model?: TeachableLLM;
 }
 
-function createProbabilities(attentionData: number[][], offset: number, index: number, length: number): number[] {
+function createProbabilities(attentionData: number[][], offset: number, index: number): number[] {
     const data = attentionData[index];
     if (!data) return [];
     const realIndex = Math.min(index + offset - 1, data.length - 1);
-    const probabilities = new Array(length).fill(0);
+    const probabilities = new Array(attentionData.length).fill(0);
     for (let i = 0; i <= realIndex; i++) {
         const idx = index - realIndex + i - 1;
         if (idx >= 0) {
@@ -186,7 +186,12 @@ export default function TextGenerator({ model }: Props) {
                         mode={!hasGenerated ? 'edit' : enableAttention && !generate ? 'probability' : 'plain'}
                         onSelectToken={(_, index) => setSelected(index)}
                         selected={selected}
-                        probabilities={createProbabilities(attentionData, 1, selected, text.length)}
+                        probabilities={
+                            enableAttention && !generate && hasGenerated
+                                ? createProbabilities(attentionData, 1, selected)
+                                : undefined
+                        }
+                        tokeniser={model?.tokeniser}
                         active={generate}
                         onChange={(newText) => {
                             setText(newText);

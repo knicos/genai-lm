@@ -44,7 +44,7 @@ export default function TextTraining({ model, dataset }: Props) {
         if (trainer) {
             const h = (log: TrainingLogEntry) => {
                 setEpochs(log.step);
-                const progress = (log.step * batchSize * (model?.config.blockSize || 1)) / (totalSamples || 1);
+                const progress = (log.step * batchSize) / (totalSamples || 1);
                 const estimateTime = log.time / (progress || 1);
                 const remaining = Math.max(0, estimateTime - log.time);
                 console.log(
@@ -65,20 +65,14 @@ export default function TextTraining({ model, dataset }: Props) {
 
     useEffect(() => {
         if (model) {
-            if (model.status === 'ready') {
+            const h = () => {
                 setTrainer(model.trainer());
-            } else {
-                const h = (s: string) => {
-                    if (s === 'ready') {
-                        setTrainer(model.trainer());
-                        model.off('status', h);
-                    }
-                };
-                model.on('status', h);
-                return () => {
-                    model.off('status', h);
-                };
-            }
+                model.off('loaded', h);
+            };
+            model.on('loaded', h);
+            return () => {
+                model.off('loaded', h);
+            };
         }
     }, [model]);
 
@@ -100,7 +94,7 @@ export default function TextTraining({ model, dataset }: Props) {
                     busy={!done}
                 />
                 <NumberBox
-                    value={(epochs || 0) * batchSize * (status !== 'loading' ? model?.config.blockSize || 1 : 0)}
+                    value={(epochs || 0) * batchSize}
                     label={t('training.samples')}
                 />
                 <div className={style.buttonBox}>
@@ -112,7 +106,8 @@ export default function TextTraining({ model, dataset }: Props) {
                         onClick={async () => {
                             if (model && dataset && trainer) {
                                 if (!model.tokeniser.trained) {
-                                    await model.tokeniser.train(dataset);
+                                    await model.trainTokeniser(dataset);
+                                    await wait(10);
                                 }
 
                                 if (training) {

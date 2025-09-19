@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import style from './CustomModel.module.css';
 import NumberInput from '../../components/NumberInput/NumberInput';
 import { Button } from '@genai-fi/base';
-import * as tf from '@tensorflow/tfjs';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import { useTranslation } from 'react-i18next';
 
@@ -98,7 +97,7 @@ export default function CustomModel({ model, onModel }: Props) {
                                 return undefined;
                             }
                         }
-                        const newModel = TeachableLLM.create(tf, {
+                        const newModel = TeachableLLM.create('char', {
                             nLayer: layers,
                             nEmbed: embedding,
                             vocabSize: vocab,

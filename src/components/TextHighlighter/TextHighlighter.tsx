@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 
 interface TokenItem {
     text: string;
@@ -16,6 +17,7 @@ interface Props {
     selected?: number;
     onSelectToken?: (token: string, index: number) => void;
     active?: boolean;
+    tokeniser?: typeof TeachableLLM.prototype.tokeniser;
 }
 
 const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
@@ -38,34 +40,38 @@ export default function TextHighlighter({
     selected,
     active,
     onChange,
+    tokeniser,
 }: Props) {
     const { t } = useTranslation();
     const cursorRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
+    const [tokens, setTokens] = useState<TokenItem[]>([]);
 
-    const tokens = useMemo<TokenItem[]>(() => {
-        if (mode === 'edit' || mode === 'plain' || !probabilities) {
-            return [];
+    useEffect(() => {
+        if (mode === 'edit' || mode === 'plain' || !probabilities || !tokeniser) {
+            return;
         }
         const normalisedProbabilities = normProb(probabilities);
-        const tokenized = text.split('');
-        //console.log('Tokenized:', tokenized);
-        const tokens = tokenized.map((token, ix) => {
-            let color = '#ffffff00'; // Default color
-            if (selected === ix) {
-                color = '#9b8c07ff';
-            } else if (mode === 'tokens') {
-                color = COLORS[ix % COLORS.length];
-            } else if (mode === 'probability') {
-                const probability = normalisedProbabilities ? normalisedProbabilities[ix] || 0 : 0;
-                const adjusted = adjustProbability(probability, 0.2);
-                color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
-            }
-            return { text: token, color };
-        });
+        tokeniser.tokenise([text], false).then((tokenArray) => {
+            const tokenized = tokenArray[0] as string[];
+            //console.log('Tokenized:', tokenized);
+            const tokens = tokenized.map((token, ix) => {
+                let color = '#ffffff00'; // Default color
+                if (selected === ix) {
+                    color = '#9b8c07ff';
+                } else if (mode === 'tokens') {
+                    color = COLORS[ix % COLORS.length];
+                } else if (mode === 'probability') {
+                    const probability = normalisedProbabilities ? normalisedProbabilities[ix] || 0 : 0;
+                    const adjusted = adjustProbability(probability, 0.2);
+                    color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
+                }
+                return { text: token, color };
+            });
 
-        return tokens;
-    }, [text, mode, probabilities, selected]);
+            setTokens(tokens);
+        });
+    }, [text, mode, probabilities, selected, tokeniser]);
 
     useEffect(() => {
         if (cursorRef.current) {

@@ -32,17 +32,9 @@ interface DragObject {
 async function handleTextLoad(
     name: string,
     text: string[],
-    model: TeachableLLM | undefined,
     source: 'file' | 'input' | 'search',
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
-    if (model) {
-        const tokeniser = model.tokeniser;
-        if (tokeniser && !tokeniser.trained) {
-            await tokeniser.train(text);
-        }
-    }
-
     setData((prev) => [
         ...prev,
         {
@@ -79,19 +71,19 @@ export default function TextData({ model, onDatasetChange }: Props) {
                 if (items.files) {
                     try {
                         for (const file of items.files) {
-                            const text = await loadTextData(file);
-                            await handleTextLoad(file.name, text, model, 'file', setData);
+                            const text = await loadTextData(file, { maxSize: 200000000 });
+                            await handleTextLoad(file.name, text, 'file', setData);
                         }
                     } catch (error) {
                         console.error('Error loading files:', error);
                         setShowDropError(true);
                     }
                 } else if (items.text) {
-                    await handleTextLoad(t('data.untitled'), [items.text], model, 'input', setData);
+                    await handleTextLoad(t('data.untitled'), [items.text], 'input', setData);
                 } else if (items.html) {
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
-                    await handleTextLoad(t('data.untitled'), [element.textContent], model, 'input', setData);
+                    await handleTextLoad(t('data.untitled'), [element.textContent], 'input', setData);
                 }
                 setDone(true);
                 setBusy(false);
@@ -221,9 +213,10 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                 const text = await loadTextData(
                                     new File([await response.blob()], name, {
                                         type,
-                                    })
+                                    }),
+                                    { maxSize: 200000000 }
                                 );
-                                await handleTextLoad(name, text, model, 'search', setData);
+                                await handleTextLoad(name, text, 'search', setData);
                                 setBusy(false);
                             }}
                         />
@@ -240,8 +233,8 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         if (e.target.files && e.target.files.length > 0) {
                             const file = e.target.files[0];
                             setBusy(true);
-                            const text = await loadTextData(file, { maxSize: 100000000 });
-                            await handleTextLoad(file.name, text, model, 'file', setData);
+                            const text = await loadTextData(file, { maxSize: 200000000 });
+                            await handleTextLoad(file.name, text, 'file', setData);
                             setDone(true);
                             setBusy(false);
                         }

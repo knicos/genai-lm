@@ -39,7 +39,8 @@
             "dropout": 0.0,
             "useRope": true
         },
-        "trained": false
+        "trained": false,
+        "tokeniser": "char"
     },
     {
         "name": "Untrained Medium (3M)",
@@ -53,6 +54,22 @@
             "dropout": 0.0,
             "useRope": true
         },
-        "trained": false
+        "trained": false,
+        "tokeniser": "char"
+    },
+    {
+        "name": "Untrained Medium BPE (3M)",
+        "parameters": 3.6,
+        "config": {
+            "vocabSize": 2000,
+            "nLayer": 8,
+            "nHead": 6,
+            "nEmbed": 192,
+            "blockSize": 128,
+            "dropout": 0.0,
+            "useRope": true
+        },
+        "trained": false,
+        "tokeniser": "bpe"
     }
 ]
