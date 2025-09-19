@@ -62,7 +62,11 @@
         "title": "Training",
         "samples": "samples",
         "start": "Train",
-        "stop": "Pause"
+        "stop": "Pause",
+        "hours": "Hr",
+        "minutes": "Min",
+        "seconds": "Sec",
+        "remaining": "remaining"
     },
     "generator": {
         "title": "Generator",

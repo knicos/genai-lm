@@ -27,3 +27,14 @@
     padding: 0 1rem;
     box-sizing: border-box;
 }
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.2rem 1rem;
+    box-sizing: border-box;
+    background-color: rgba(0, 130, 151, 0.06);
+    border-top: 2px solid rgba(0, 130, 151, 0.1);
+    border-bottom: 2px solid rgba(0, 130, 151, 0.1);
+}

@@ -1,10 +1,10 @@
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import style from './style.module.css';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import ScoreGauge from '../../components/ScoreGauge/ScoreGauge';
 import { useEffect, useState } from 'react';
 import useModelStatus from '../../utilities/useModelStatus';
 import { useTranslation } from 'react-i18next';
+import Circle from '../../components/Clock/Circle';
 
 function lossToQuality(loss: number, vocabSize: number): number {
     const targetLoss = 1;
@@ -19,19 +19,15 @@ function lossToQuality(loss: number, vocabSize: number): number {
 }
 
 function qualityToColor(quality: number): string {
-    // Clamp quality between 0 and 1
-    const clampedQuality = Math.max(0, Math.min(1, quality));
+    // Interpolate between light gray and brand color based on quality
+    const brand = { r: 76, g: 175, b: 80 };
+    const gray = { r: 200, g: 200, b: 200 }; // Light gray
 
-    // Red component: starts at 255 (full red) and decreases to 0
-    const red = Math.round(255 * (1 - clampedQuality));
+    const r = Math.round(gray.r + (brand.r - gray.r) * quality);
+    const g = Math.round(gray.g + (brand.g - gray.g) * quality);
+    const b = Math.round(gray.b + (brand.b - gray.b) * quality);
 
-    // Green component: starts at 0 and increases to 255 (full green)
-    const green = Math.round(255 * clampedQuality);
-
-    // Blue component: stays at 0 for a pure red-to-green transition
-    const blue = 0;
-
-    return `rgb(${red}, ${green}, ${blue})`;
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
 interface Props {
@@ -71,17 +67,21 @@ export default function Evaluation({ model }: Props) {
         <div className={style.container}>
             <BoxTitle
                 title={t('evaluation.title')}
+                done={!!model && quality > 0}
                 info
-                done={!!model}
             />
             <div style={{ marginBottom: '1rem' }} />
-            <ScoreGauge
-                label={t('evaluation.quality')}
-                value={quality}
-                maxValue={1}
-                showValue
+            <Circle
+                radius={55}
+                progress={quality}
                 color={qualityToColor(quality)}
-            />
+            >
+                <div className={style.value}>
+                    {`${Math.round(quality * 100)}`}
+                    <span className={style.percentage}>%</span>
+                </div>
+                <div className={style.label}>{t('evaluation.quality')}</div>
+            </Circle>
             <div style={{ marginBottom: '1rem' }} />
         </div>
     );

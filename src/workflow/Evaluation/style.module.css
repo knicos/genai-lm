@@ -1,0 +1,17 @@
+.value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #444;
+}
+
+.percentage {
+    font-size: 0.6em;
+    color: #444;
+    margin-left: 0.1rem;
+    font-weight: normal;
+}
+
+.label {
+    font-size: 0.8em;
+    color: #444;
+}

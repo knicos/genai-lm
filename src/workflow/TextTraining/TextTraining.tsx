@@ -13,10 +13,20 @@ import { trainerBatchSize, trainerLearningRate, trainerMaxSteps } from '../../st
 import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
+import Clock from '../../components/Clock/Clock';
+import Remaining from './Remaining';
 
 interface Props {
     model?: TeachableLLM;
     dataset?: string[];
+}
+
+interface TrainingProgress {
+    duration: number;
+    totalSamples: number;
+    samplesPerSecond: number;
+    remaining: number;
+    progress: number;
 }
 
 export default function TextTraining({ model, dataset }: Props) {
@@ -31,6 +41,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const learningRate = useAtomValue(trainerLearningRate);
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
+    const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
 
     const canTrain = !!model && !!dataset && dataset.length > 0;
 
@@ -42,19 +53,9 @@ export default function TextTraining({ model, dataset }: Props) {
 
     useEffect(() => {
         if (trainer) {
-            const h = (log: TrainingLogEntry) => {
+            const h = (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
-                const progress = (log.step * batchSize) / (totalSamples || 1);
-                const estimateTime = log.time / (progress || 1);
-                const remaining = Math.max(0, estimateTime - log.time);
-                console.log(
-                    `Progress: ${(progress * 100).toFixed(2)}% - Estimated time remaining: ${(
-                        remaining /
-                        1000 /
-                        60 /
-                        60
-                    ).toFixed(2)}h`
-                );
+                setTrainingProgress(progress);
             };
             trainer.on('log', h);
             return () => {
@@ -93,10 +94,17 @@ export default function TextTraining({ model, dataset }: Props) {
                     done={status === 'ready' && canTrain}
                     busy={!done}
                 />
-                <NumberBox
-                    value={(epochs || 0) * batchSize}
-                    label={t('training.samples')}
+                <Clock
+                    duration={trainingProgress?.duration || 0}
+                    totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
                 />
+                <div className={style.stats}>
+                    <NumberBox
+                        value={(epochs || 0) * batchSize}
+                        label={t('training.samples')}
+                    />
+                    <Remaining remaining={trainingProgress?.remaining || 0} />
+                </div>
                 <div className={style.buttonBox}>
                     <Button
                         fullWidth

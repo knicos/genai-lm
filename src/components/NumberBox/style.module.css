@@ -3,10 +3,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: #444;
 }
 
 .size {
     font-weight: bold;
+    font-size: 0.9rem;
 }
 
 .label {

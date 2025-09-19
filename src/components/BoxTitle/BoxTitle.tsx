@@ -14,7 +14,7 @@ interface Props {
 export default function BoxTitle({ title, button, done, busy, info, style, dark }: Props) {
     return (
         <div
-            className={info ? styleModule.infoTitle : styleModule.title}
+            className={styleModule.title}
             style={style}
         >
             <h2>{title}</h2>

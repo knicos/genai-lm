@@ -34,7 +34,7 @@ export default function StatusBox({ done = false, busy = false, info = false, da
             )}
             {info && done && (
                 <InfoIcon
-                    htmlColor="white"
+                    htmlColor="#75a4e2"
                     fontSize="large"
                 />
             )}
