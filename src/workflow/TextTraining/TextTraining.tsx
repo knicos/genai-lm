@@ -40,6 +40,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
+    const [needsTraining, setNeedsTraining] = useState(true);
     const status = useModelStatus(model);
     const batchSize = useAtomValue(trainerBatchSize);
     const maxSteps = useAtomValue(trainerMaxSteps);
@@ -49,7 +50,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
 
-    const canTrain = !!model && !!dataset && dataset.length > 0;
+    const canTrain = !!model && !!dataset && dataset.length > 0 && status !== 'loading' && status !== 'busy';
 
     const totalSamples = useMemo(() => (dataset ? dataset.reduce((acc, curr) => acc + curr.length, 0) : 0), [dataset]);
 
@@ -75,6 +76,7 @@ export default function TextTraining({ model, dataset }: Props) {
         if (model) {
             const h = () => {
                 setTrainer(model.trainer());
+                setNeedsTraining((old) => old || model.model.log.length === 0);
                 model.off('loaded', h);
             };
             model.on('loaded', h);
@@ -83,6 +85,12 @@ export default function TextTraining({ model, dataset }: Props) {
             };
         }
     }, [model]);
+
+    useEffect(() => {
+        if (dataset && dataset.length > 0) {
+            setNeedsTraining(true);
+        }
+    }, [dataset]);
 
     useEffect(() => {
         if (model && status === 'ready') {
@@ -98,8 +106,9 @@ export default function TextTraining({ model, dataset }: Props) {
             <div className={style.container}>
                 <BoxTitle
                     title={t('training.title')}
-                    done={status === 'ready' && canTrain}
-                    busy={!done}
+                    status={
+                        !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
+                    }
                 />
                 <div>
                     <Clock
@@ -140,8 +149,9 @@ export default function TextTraining({ model, dataset }: Props) {
 
                                 setTraining(true);
                                 setDone(false);
+                                setNeedsTraining(false);
                                 // setEpochs(0);
-                                await wait(10);
+                                await wait(200);
                                 model.model.checkpointing = checkpointing;
                                 // model.enableProfiler = true;
                                 trainer

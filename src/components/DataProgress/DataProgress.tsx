@@ -25,7 +25,10 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             <div className={style.baseBar} />
             <div
                 className={style.progress}
-                style={{ width: `${progress}%`, backgroundColor: qualityToColor(progress / 100) }}
+                style={{
+                    width: `${desiredSamples > 0 ? progress : 0}%`,
+                    backgroundColor: qualityToColor(progress / 100),
+                }}
             />
 
             <div

@@ -4,6 +4,7 @@ interface ThemeColors {
     disabled: string;
     success: string;
     error: string;
+    info: string;
 }
 
 interface Theme {
@@ -18,6 +19,7 @@ export const theme: Theme = {
         disabled: '#bdbdbd',
         success: '#4caf50',
         error: '#f44336',
+        info: '#75a4e2',
     },
     dark: {
         primary: '#009FB8',
@@ -25,5 +27,6 @@ export const theme: Theme = {
         disabled: '#616161',
         success: '#81c784',
         error: '#e57373',
+        info: '#75a4e2',
     },
 };

@@ -39,8 +39,7 @@ export default function ModelInfo({ model }: Props) {
         <div className={style.container}>
             <BoxTitle
                 title={t('info.title')}
-                info
-                done={!!model}
+                status={model ? 'done' : 'info'}
             />
             <div className={style.innerContainer}>
                 {!info && <Alert severity="info">{t('info.selectModel')}</Alert>}

@@ -68,7 +68,7 @@ export default function TextGenerator({ model }: Props) {
     const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
     const [selected, setSelected] = useState<number>(0);
     const status = useModelStatus(model);
-    const [ready, setReady] = useState(false);
+    //const [ready, setReady] = useState(false);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -88,11 +88,13 @@ export default function TextGenerator({ model }: Props) {
 
     const disable = status === 'training';
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (status === 'ready') {
             setReady(true);
         }
-    }, [status]);
+    }, [status]);*/
+
+    const ready = status !== 'loading';
 
     useEffect(() => {
         if (ready) {
@@ -104,8 +106,15 @@ export default function TextGenerator({ model }: Props) {
         if (ready && model) {
             const generator = model.generator();
             setGenerator(generator);
+
+            setHasGenerated(false);
             setText('');
+            textRef.current = '';
             setAttentionData([]);
+            attentionRef.current = [];
+            setProbabilities([]);
+            probRef.current = [];
+            setSelected(-1);
 
             const state = {
                 count: 0,
@@ -175,8 +184,7 @@ export default function TextGenerator({ model }: Props) {
             >
                 <BoxTitle
                     title={t('generator.title')}
-                    done={ready && !generate}
-                    busy={generate}
+                    status={!model ? 'disabled' : generate ? 'busy' : ready && !generate ? 'done' : 'waiting'}
                     style={{ backgroundColor: '#444', color: 'white' }}
                     dark={true}
                 />
@@ -191,7 +199,7 @@ export default function TextGenerator({ model }: Props) {
                                 ? createProbabilities(attentionData, 1, selected)
                                 : undefined
                         }
-                        tokeniser={model?.tokeniser}
+                        tokeniser={status !== 'loading' ? model?.tokeniser : undefined}
                         active={generate}
                         onChange={(newText) => {
                             setText(newText);

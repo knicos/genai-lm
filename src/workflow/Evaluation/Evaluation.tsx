@@ -56,8 +56,7 @@ export default function Evaluation({ model }: Props) {
         <div className={style.container}>
             <BoxTitle
                 title={t('evaluation.title')}
-                done={!!model && quality > 0}
-                info
+                status={!!model && quality > 0 ? 'done' : 'disabled'}
             />
             <div style={{ marginBottom: '1rem' }} />
             <Circle

@@ -51,8 +51,7 @@ export default function SampleViewer({ samples, contextSize, parameters }: Props
         <div className={style.container}>
             <BoxTitle
                 title={t('samples.title')}
-                info
-                done={samples.length > 0}
+                status={samples.length > 0 ? 'done' : 'disabled'}
             />
             <BoxMenu>
                 <div>

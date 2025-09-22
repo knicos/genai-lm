@@ -1,6 +1,6 @@
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import style from './style.module.css';
-import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useState } from 'react';
@@ -58,9 +58,10 @@ export default function ModelList({ manifest, model, onModel }: Props) {
                                 }
                             }
                             const newModel = TeachableLLM.loadModel(m.url);
-                            waitForModel(newModel).then(() => {
+                            onModel(newModel);
+                            /*waitForModel(newModel).then(() => {
                                 onModel(newModel);
-                            });
+                            });*/
                         } else {
                             if (model) {
                                 console.log('Disposing old model');

@@ -70,7 +70,7 @@
         "remaining": "remaining"
     },
     "generator": {
-        "title": "Generator",
+        "title": "Generation",
         "generate": "Generate",
         "promptPlaceholder": "Optional prompt...",
         "settingsTooltip": "Generator Settings",

@@ -48,7 +48,6 @@ async function handleTextLoad(
 
 export default function TextData({ model, onDatasetChange }: Props) {
     const { t } = useTranslation();
-    const [done, setDone] = useState(false);
     const [busy, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [data, setData] = useState<DataEntry[]>([]);
@@ -57,6 +56,8 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [showDropError, setShowDropError] = useState(false);
     const status = useModelStatus(model);
     const [selected, setSelected] = useState<number>(-1);
+
+    const done = data.length > 0;
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
@@ -85,7 +86,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     element.innerHTML = items.html;
                     await handleTextLoad(t('data.untitled'), [element.textContent], 'input', setData);
                 }
-                setDone(true);
                 setBusy(false);
             },
             collect(monitor) {
@@ -116,8 +116,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
             <div className={style.container}>
                 <BoxTitle
                     title={t('data.title')}
-                    done={done}
-                    busy={busy}
+                    status={busy ? 'busy' : done ? 'done' : 'waiting'}
                 />
                 <DataMenu
                     disabled={showInput || showSearch}
@@ -235,7 +234,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             setBusy(true);
                             const text = await loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(file.name, text, 'file', setData);
-                            setDone(true);
                             setBusy(false);
                         }
                     }}

@@ -23,6 +23,7 @@ export default function ModelLoader({ onModel, model }: Props) {
 
     useEffect(() => {
         if (model) {
+            setDone(false);
             const h = () => {
                 setDone(true);
             };
@@ -43,8 +44,7 @@ export default function ModelLoader({ onModel, model }: Props) {
             <div className={style.container}>
                 <BoxTitle
                     title={t('model.title')}
-                    done={done}
-                    busy={!done && !!model}
+                    status={done ? 'done' : !done && !!model ? 'busy' : 'waiting'}
                 ></BoxTitle>
                 <Tabs
                     value={tab}
