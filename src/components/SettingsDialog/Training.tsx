@@ -2,13 +2,19 @@ import { Checkbox, FormControl, FormControlLabel, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
-import { trainerBatchSize, trainerLearningRate, trainerOutputText } from '../../state/trainerSettings';
+import {
+    trainerBatchSize,
+    trainerCheckpointing,
+    trainerLearningRate,
+    trainerOutputText,
+} from '../../state/trainerSettings';
 
 export default function TrainingSettings() {
     const { t } = useTranslation();
     const [batchSize, setBatchSize] = useAtom(trainerBatchSize);
     const [learningRate, setLearningRate] = useAtom(trainerLearningRate);
     const [outputText, setOutputText] = useAtom(trainerOutputText);
+    const [checkpointing, setCheckpointing] = useAtom(trainerCheckpointing);
 
     return (
         <div className={style.column}>
@@ -56,6 +62,17 @@ export default function TrainingSettings() {
                         />
                     }
                     label={t('app.settings.showOutputText')}
+                />
+            </FormControl>
+            <FormControl>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={checkpointing}
+                            onChange={(_, checked) => setCheckpointing(checked)}
+                        />
+                    }
+                    label={t('app.settings.checkpointing')}
                 />
             </FormControl>
         </div>

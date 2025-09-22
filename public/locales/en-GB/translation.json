@@ -26,7 +26,8 @@
             "temperature": "Temperature",
             "batchSize": "Batch Size",
             "learningRate": "Learning Rate",
-            "showOutputText": "Show Progress Text"
+            "showOutputText": "Show Progress Text",
+            "checkpointing": "Gradient Checkpointing"
         },
         "close": "Close"
     },

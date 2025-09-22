@@ -9,7 +9,12 @@ import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { trainerBatchSize, trainerLearningRate, trainerMaxSteps } from '../../state/trainerSettings';
+import {
+    trainerBatchSize,
+    trainerCheckpointing,
+    trainerLearningRate,
+    trainerMaxSteps,
+} from '../../state/trainerSettings';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
@@ -38,6 +43,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const status = useModelStatus(model);
     const batchSize = useAtomValue(trainerBatchSize);
     const maxSteps = useAtomValue(trainerMaxSteps);
+    const checkpointing = useAtomValue(trainerCheckpointing);
     const learningRate = useAtomValue(trainerLearningRate);
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
@@ -55,6 +61,7 @@ export default function TextTraining({ model, dataset }: Props) {
         if (trainer) {
             const h = (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
+                model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
             };
             trainer.on('log', h);
@@ -94,16 +101,18 @@ export default function TextTraining({ model, dataset }: Props) {
                     done={status === 'ready' && canTrain}
                     busy={!done}
                 />
-                <Clock
-                    duration={trainingProgress?.duration || 0}
-                    totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
-                />
-                <div className={style.stats}>
-                    <NumberBox
-                        value={(epochs || 0) * batchSize}
-                        label={t('training.samples')}
+                <div>
+                    <Clock
+                        duration={trainingProgress?.duration || 0}
+                        totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
                     />
-                    <Remaining remaining={trainingProgress?.remaining || 0} />
+                    <div className={style.stats}>
+                        <NumberBox
+                            value={(epochs || 0) * batchSize}
+                            label={t('training.samples')}
+                        />
+                        <Remaining remaining={trainingProgress?.remaining || 0} />
+                    </div>
                 </div>
                 <div className={style.buttonBox}>
                     <Button
@@ -133,6 +142,8 @@ export default function TextTraining({ model, dataset }: Props) {
                                 setDone(false);
                                 // setEpochs(0);
                                 await wait(10);
+                                model.model.checkpointing = checkpointing;
+                                // model.enableProfiler = true;
                                 trainer
                                     .train(dataset, {
                                         batchSize,
