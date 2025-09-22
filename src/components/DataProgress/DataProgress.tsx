@@ -1,3 +1,4 @@
+import { qualityToColor } from '../../utilities/colours';
 import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
 import StarIcon from '@mui/icons-material/Star';
@@ -21,25 +22,10 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             aria-valuemax={120}
             aria-label="Data Progress"
         >
+            <div className={style.baseBar} />
             <div
-                className={`${style.segment} ${style.bad}`}
-                style={{ opacity: '0.9' }}
-            />
-            <div
-                className={`${style.segment} ${style.bad}`}
-                style={{ opacity: '0.6' }}
-            />
-            <div
-                className={`${style.segment} ${style.bad}`}
-                style={{ opacity: '0.5' }}
-            />
-            <div
-                className={`${style.segment} ${style.good}`}
-                style={{ opacity: '0.6' }}
-            />
-            <div
-                className={`${style.segment} ${style.good}`}
-                style={{ opacity: '0.6' }}
+                className={style.progress}
+                style={{ width: `${progress}%`, backgroundColor: qualityToColor(progress / 100) }}
             />
 
             <div
@@ -54,10 +40,6 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             >
                 {prettyNumber(desiredSamples)}
             </div>
-            <div
-                className={style.blob}
-                style={{ left: `calc(${progress}% - 10px)` }}
-            />
         </div>
     );
 }
