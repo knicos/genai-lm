@@ -1,6 +1,14 @@
 import { atom } from 'jotai';
 
-export type WorkflowSteps = 'model' | 'data' | 'sampleExplore' | 'trainer' | 'evaluation' | 'modelInfo' | 'generator';
+export type WorkflowSteps =
+    | 'model'
+    | 'data'
+    | 'sampleExplore'
+    | 'trainer'
+    | 'evaluation'
+    | 'modelInfo'
+    | 'generator'
+    | 'xai';
 
 const DEFAULT_STEPS: WorkflowSteps[] = ['model', 'data', 'trainer', 'evaluation', 'generator'];
 

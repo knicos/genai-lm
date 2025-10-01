@@ -2,7 +2,7 @@ import style from './style.module.css';
 import { IconButton, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
-import TextHighlighter from '../../components/TextHighlighter/TextHighlighter';
+import TextHighlighter, { ProbabilityItem } from '../../components/TextHighlighter/TextHighlighter';
 import { Button } from '@genai-fi/base';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
@@ -13,6 +13,7 @@ import GeneratorSettings from './GeneratorSettings';
 import { wait } from '../../utilities/wait';
 import { useAtomValue } from 'jotai';
 import {
+    generatorAttentionBlock,
     generatorMaxLength,
     generatorShowAttention,
     generatorShowProbabilities,
@@ -32,8 +33,15 @@ interface Props {
     model?: TeachableLLM;
 }
 
-function createProbabilities(attentionData: number[][], offset: number, index: number): number[] {
-    const data = attentionData[index];
+function createProbabilitiesForHead(
+    attentionData: number[][][][][],
+    offset: number,
+    index: number,
+    layer: number,
+    head: number
+): ProbabilityItem[] {
+    if (index < 0 || layer < 0 || head < 0) return [];
+    const data = attentionData[index][layer][head][0];
     if (!data) return [];
     const realIndex = Math.min(index + offset - 1, data.length - 1);
     const probabilities = new Array(attentionData.length).fill(0);
@@ -43,7 +51,58 @@ function createProbabilities(attentionData: number[][], offset: number, index: n
             probabilities[idx] = data[i] || 0;
         }
     }
-    return probabilities;
+
+    // Exaggerate and normalize
+    const exaggerated = adaptiveExaggerateAndNormalize(probabilities, 2);
+    return probabilities.map((_, i) => ({ index: head, probability: exaggerated[i] }));
+}
+
+function adaptiveExaggerateAndNormalize(scores: number[], maxExp: number): number[] {
+    if (scores.length === 0) return [];
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+
+    // Exaggeration: higher power for lower variance (flatter attention)
+    // Clamp exponent between 1.5 and 4 for stability
+    const exponent = Math.max(1.5, Math.min(maxExp, maxExp - variance * 6));
+
+    // Apply power scaling
+    const exaggerated = scores.map((s) => Math.pow(s, exponent));
+
+    // Normalize so max value is 1
+    const maxVal = Math.max(...exaggerated, 1e-8);
+    return exaggerated.map((s) => s / maxVal);
+}
+
+function createProbabilities(
+    attentionData: number[][][][][],
+    offset: number,
+    index: number,
+    layer: number
+): ProbabilityItem[] {
+    if (index < 0 || layer < 0) return [];
+    const headresults: ProbabilityItem[][] = [];
+    const numHeads = attentionData[0]?.[0]?.length || 0;
+    for (let h = 0; h < numHeads; h++) {
+        const headProbabilities = createProbabilitiesForHead(attentionData, offset, index, layer, h);
+        headresults.push(headProbabilities);
+    }
+
+    const result: ProbabilityItem[] = [];
+    for (let i = 0; i < headresults[0]?.length || 0; i++) {
+        // Select the maximum head probability for each token
+        let maxProb = 0;
+        let maxHead = -1;
+        for (let h = 0; h < headresults.length; h++) {
+            if (headresults[h][i] && headresults[h][i].probability > maxProb) {
+                maxProb = headresults[h][i].probability;
+                maxHead = headresults[h][i].index;
+            }
+        }
+        result.push({ index: maxHead, probability: maxProb });
+    }
+
+    return result;
 }
 
 function createTopKTokens(
@@ -63,7 +122,7 @@ export default function TextGenerator({ model }: Props) {
     const { t } = useTranslation();
     const [generator, setGenerator] = useState<ReturnType<TeachableLLM['generator']> | undefined>();
     const [text, setText] = useState<string>('');
-    const [attentionData, setAttentionData] = useState<number[][]>([]);
+    const [attentionData, setAttentionData] = useState<number[][][][][]>([]);
     const [probabilities, setProbabilities] = useState<number[][]>([]);
     const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
     const [selected, setSelected] = useState<number>(0);
@@ -74,6 +133,7 @@ export default function TextGenerator({ model }: Props) {
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const enableSettings = useAtomValue(generatorShowSettings);
     const enableAttention = useAtomValue(generatorShowAttention);
+    const attentionBlock = useAtomValue(generatorAttentionBlock);
     const enableProbabilities = useAtomValue(generatorShowProbabilities);
     const enablePrompt = useAtomValue(generatorShowPrompt);
     const temperature = useAtomValue(generatorTemperature);
@@ -81,7 +141,7 @@ export default function TextGenerator({ model }: Props) {
     const outputText = useAtomValue(trainerOutputText);
     const [showStatus, setShowStatus] = useState<boolean>(false);
 
-    const attentionRef = useRef<number[][]>([]);
+    const attentionRef = useRef<number[][][][][]>([]);
     const probRef = useRef<number[][]>([]);
     const textRef = useRef<string>('');
     const busyRef = useRef<boolean>(false);
@@ -132,7 +192,6 @@ export default function TextGenerator({ model }: Props) {
                     const finalText = await generator.generate(undefined, {
                         maxLength: 200,
                         temperature: 1,
-                        includeAttention: false,
                         includeProbabilities: false,
                     });
                     setGenerate(false);
@@ -150,7 +209,7 @@ export default function TextGenerator({ model }: Props) {
 
     useEffect(() => {
         if (generator) {
-            const h = (_: number[], newText: string, attention?: number[][], probabilities?: number[][]) => {
+            const h = (_: number[], newText: string, attention?: number[][][][], probabilities?: number[][]) => {
                 //setText((prevText) => prevText + newText);
                 textRef.current += newText;
                 //if (textRef.current.length % 5 === 0) {
@@ -158,7 +217,7 @@ export default function TextGenerator({ model }: Props) {
                 //}
 
                 if (attention) {
-                    attentionRef.current = [...attentionRef.current, ...attention];
+                    attentionRef.current = [...attentionRef.current, attention];
                 }
 
                 if (probabilities) {
@@ -196,7 +255,7 @@ export default function TextGenerator({ model }: Props) {
                         selected={selected}
                         probabilities={
                             enableAttention && !generate && hasGenerated
-                                ? createProbabilities(attentionData, 1, selected)
+                                ? createProbabilities(attentionData, 1, selected, attentionBlock)
                                 : undefined
                         }
                         tokeniser={status !== 'loading' ? model?.tokeniser : undefined}
@@ -244,10 +303,8 @@ export default function TextGenerator({ model }: Props) {
                                     .generate(textRef.current.length > 0 ? textRef.current : undefined, {
                                         maxLength,
                                         temperature,
-                                        includeAttention: enableAttention,
+                                        attentionScores: enableAttention,
                                         includeProbabilities: enableProbabilities,
-                                        noCache: enableAttention,
-                                        usePadding: enableAttention,
                                     })
                                     .then(() => {
                                         setText(textRef.current);

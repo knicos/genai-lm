@@ -13,6 +13,7 @@ import { useAtomValue } from 'jotai';
 import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import Annotation from './Annotation';
+import XAIBox from '../../workflow/XAI/XAI';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -57,6 +58,7 @@ const CONNECTIONS: IConnection[] = [
             />
         ),
     },
+    { start: 'generator', end: 'xai', startPoint: 'right', endPoint: 'left' },
 ];
 
 export function Component() {
@@ -140,8 +142,8 @@ export function Component() {
                         </div>
                     )}
                 </div>
-
                 <TextGenerator model={model} />
+                {steps.has('xai') && <XAIBox model={model} />}
             </WorkflowLayout>
             <SettingsDialog />
         </>

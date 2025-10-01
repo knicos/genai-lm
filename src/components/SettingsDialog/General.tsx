@@ -35,25 +35,6 @@ export default function GeneralSettings() {
             <FormControlLabel
                 control={
                     <Checkbox
-                        checked={workflow.has('modelInfo')}
-                        onChange={(_, checked) =>
-                            setWorkflow((old) => {
-                                const newWorkflow = new Set(old);
-                                if (checked) {
-                                    newWorkflow.add('modelInfo');
-                                } else {
-                                    newWorkflow.delete('modelInfo');
-                                }
-                                return newWorkflow;
-                            })
-                        }
-                    />
-                }
-                label={t('app.settings.showModelInfo')}
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
                         checked={workflow.has('data')}
                         onChange={(_, checked) =>
                             setWorkflow((old) => {
@@ -69,25 +50,6 @@ export default function GeneralSettings() {
                     />
                 }
                 label={t('app.settings.showDataEntry')}
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={workflow.has('sampleExplore')}
-                        onChange={(_, checked) =>
-                            setWorkflow((old) => {
-                                const newWorkflow = new Set(old);
-                                if (checked) {
-                                    newWorkflow.add('sampleExplore');
-                                } else {
-                                    newWorkflow.delete('sampleExplore');
-                                }
-                                return newWorkflow;
-                            })
-                        }
-                    />
-                }
-                label={t('app.settings.showSampleExplore')}
             />
             <FormControlLabel
                 control={
@@ -126,6 +88,25 @@ export default function GeneralSettings() {
                     />
                 }
                 label={t('app.settings.showEvaluation')}
+            />
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={workflow.has('xai')}
+                        onChange={(_, checked) =>
+                            setWorkflow((old) => {
+                                const newWorkflow = new Set(old);
+                                if (checked) {
+                                    newWorkflow.add('xai');
+                                } else {
+                                    newWorkflow.delete('xai');
+                                }
+                                return newWorkflow;
+                            })
+                        }
+                    />
+                }
+                label={t('app.settings.showXAI')}
             />
         </div>
     );

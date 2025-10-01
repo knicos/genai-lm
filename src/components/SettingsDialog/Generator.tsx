@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import style from './style.module.css';
 import {
     generatorMaxLength,
-    generatorShowAttention,
     generatorShowProbabilities,
     generatorShowPrompt,
     generatorShowSettings,
@@ -15,7 +14,6 @@ export default function GeneratorSettings() {
     const { t } = useTranslation();
     const [temperature, setTemperature] = useAtom(generatorTemperature);
     const [maxLength, setMaxLength] = useAtom(generatorMaxLength);
-    const [attention, setAttention] = useAtom(generatorShowAttention);
     const [probability, setProbability] = useAtom(generatorShowProbabilities);
     const [prompt, setPrompt] = useAtom(generatorShowPrompt);
     const [showSettings, setShowSettings] = useAtom(generatorShowSettings);
@@ -57,17 +55,6 @@ export default function GeneratorSettings() {
                 />
             </FormControl>
             <div className={style.spacer} />
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={attention}
-                            onChange={(_, checked) => setAttention(checked)}
-                        />
-                    }
-                    label={t('app.settings.showAttention')}
-                />
-            </FormControl>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <FormControlLabel
                     control={

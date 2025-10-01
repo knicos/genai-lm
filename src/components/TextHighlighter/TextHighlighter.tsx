@@ -6,6 +6,13 @@ import { TeachableLLM } from '@genai-fi/nanogpt';
 interface TokenItem {
     text: string;
     color: string;
+    opacity: number;
+    className?: string;
+}
+
+export interface ProbabilityItem {
+    index: number;
+    probability: number;
 }
 
 interface Props {
@@ -13,7 +20,7 @@ interface Props {
     onChange?: (text: string) => void;
     mode?: 'edit' | 'plain' | 'tokens' | 'probability';
     initialText?: string;
-    probabilities?: number[];
+    probabilities?: ProbabilityItem[];
     selected?: number;
     onSelectToken?: (token: string, index: number) => void;
     active?: boolean;
@@ -21,16 +28,6 @@ interface Props {
 }
 
 const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
-
-function adjustProbability(probability: number, min: number): number {
-    return probability < 0.01 ? 0 : probability * (1 - min) + min;
-}
-
-function normProb(probabilities: number[] | undefined): number[] {
-    if (!probabilities) return [];
-    const max = Math.max(...probabilities);
-    return probabilities.map((p) => (max > 0 ? p / max : 0));
-}
 
 export default function TextHighlighter({
     text,
@@ -46,27 +43,40 @@ export default function TextHighlighter({
     const cursorRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const [tokens, setTokens] = useState<TokenItem[]>([]);
+    const [locked, setLocked] = useState(false);
 
     useEffect(() => {
         if (mode === 'edit' || mode === 'plain' || !probabilities || !tokeniser) {
             return;
         }
-        const normalisedProbabilities = normProb(probabilities);
+
         tokeniser.tokenise([text], false).then((tokenArray) => {
             const tokenized = tokenArray[0] as string[];
             //console.log('Tokenized:', tokenized);
             const tokens = tokenized.map((token, ix) => {
                 let color = '#ffffff00'; // Default color
+                let opacity = 1;
+                let className: string | undefined = undefined;
                 if (selected === ix) {
-                    color = '#9b8c07ff';
+                    //color = '#9b8c07ff';
+                    className = style.selected;
                 } else if (mode === 'tokens') {
                     color = COLORS[ix % COLORS.length];
                 } else if (mode === 'probability') {
-                    const probability = normalisedProbabilities ? normalisedProbabilities[ix] || 0 : 0;
-                    const adjusted = adjustProbability(probability, 0.2);
-                    color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
+                    const probability = probabilities ? probabilities[ix] : { index: -1, probability: 0 };
+
+                    if (!probability) {
+                        return { text: token, color, opacity };
+                    }
+
+                    const adjusted = probability?.probability || 0;
+                    //color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
+                    if (adjusted > 0.2) {
+                        color = COLORS[probability.index % COLORS.length];
+                    }
+                    opacity = Math.max(0.2, adjusted);
                 }
-                return { text: token, color };
+                return { text: token, color, opacity, className };
             });
 
             setTokens(tokens);
@@ -90,7 +100,7 @@ export default function TextHighlighter({
         <div className={style.outerContainer}>
             <div
                 className={style.container}
-                onMouseLeave={() => onSelectToken && onSelectToken('', -1)}
+                onMouseLeave={() => onSelectToken && !locked && onSelectToken('', -1)}
             >
                 <div
                     className={style.tokens}
@@ -101,10 +111,15 @@ export default function TextHighlighter({
                         tokens.map((t, id) => (
                             <span
                                 onMouseEnter={() => {
+                                    if (onSelectToken && !locked) onSelectToken(t.text, id);
+                                }}
+                                onClick={() => {
+                                    if (selected === id) setLocked((old) => !old);
                                     if (onSelectToken) onSelectToken(t.text, id);
                                 }}
                                 key={id}
-                                style={{ backgroundColor: t.color }}
+                                style={t.className ? undefined : { backgroundColor: t.color, opacity: t.opacity }}
+                                className={t.className}
                             >
                                 {t.text}
                             </span>

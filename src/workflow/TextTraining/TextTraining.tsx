@@ -153,7 +153,7 @@ export default function TextTraining({ model, dataset }: Props) {
                                 // setEpochs(0);
                                 await wait(200);
                                 model.model.checkpointing = checkpointing;
-                                // model.enableProfiler = true;
+                                model.enableProfiler = true;
                                 trainer
                                     .train(dataset, {
                                         batchSize,

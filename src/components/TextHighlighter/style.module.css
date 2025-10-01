@@ -7,12 +7,17 @@
     min-height: 100%;
 }
 
+.tokens span {
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
 .container {
     position: relative;
     width: 100%;
     max-width: 600px;
     font-size: 1.4rem;
-    line-height: 1.5;
     white-space: pre-wrap;
     min-height: 100%;
 }
@@ -55,6 +60,10 @@
         transform: scale(0.8);
         opacity: 0.8;
     }
+}
+
+.selected {
+    text-shadow: 0 0 8px secondary;
 }
 
 .editable {

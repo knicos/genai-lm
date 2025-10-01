@@ -27,7 +27,8 @@
             "batchSize": "Batch Size",
             "learningRate": "Learning Rate",
             "showOutputText": "Show Progress Text",
-            "checkpointing": "Gradient Checkpointing"
+            "checkpointing": "Gradient Checkpointing",
+            "showXAI": "Show XAI"
         },
         "close": "Close"
     },
@@ -117,5 +118,8 @@
         "unknown_error": "An unknown error occurred",
         "nEmbed_divisible_nHead": "Embedding size must be divisible by heads",
         "headDim_even": "Try another head number"
+    },
+    "xai": {
+        "title": "Explain"
     }
 }

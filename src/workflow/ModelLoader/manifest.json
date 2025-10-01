@@ -64,7 +64,7 @@
             "vocabSize": 2000,
             "nLayer": 8,
             "nHead": 6,
-            "nEmbed": 192,
+            "nEmbed": 384,
             "blockSize": 128,
             "dropout": 0.0,
             "useRope": true
