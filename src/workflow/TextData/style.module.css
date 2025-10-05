@@ -93,6 +93,13 @@
     border-radius: 15px;
 }
 
+.headerBar {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 0 2rem;
+}
+
 .dataRow {
     white-space: nowrap;
     padding-left: 1rem;

@@ -1,0 +1,148 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
+.dataCard {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    overflow: hidden;
+    background: white;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.dataCard.disabled {
+    cursor: initial;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.expandedCard {
+    composes: dataCard;
+    position: absolute;
+    z-index: 2000;
+    box-shadow: 0 0 10px #888;
+    border-radius: 8px;
+    animation: scaleIn 0.2s ease-in-out;
+    cursor: initial;
+    width: 360px;
+}
+
+.scaleOut {
+    animation: scaleOut 0.2s ease-in-out;
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+@keyframes scaleOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.sampleBox {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    position: relative;
+    border-radius: 8px;
+}
+
+.simple {
+    background: repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 2px,
+            transparent 2px,
+            transparent 8px
+        ),
+        linear-gradient(135deg, #c7ebc7 0%, #ace0c2 50%, #afd2d8 100%);
+}
+
+.normal {
+    background: repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08) 0px,
+            rgba(255, 255, 255, 0.08) 2px,
+            transparent 2px,
+            transparent 8px
+        ),
+        linear-gradient(135deg, #c7ebe6 0%, #acd4e0 50%, #b5afd8 100%);
+}
+
+.complex {
+    background: repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08) 0px,
+            rgba(255, 255, 255, 0.08) 2px,
+            transparent 2px,
+            transparent 8px
+        ),
+        linear-gradient(135deg, #c7d8eb 0%, #b7ace0 50%, #ceafd8 100%);
+}
+
+.sampleText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 100px;
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+.expandedCard .sampleText {
+    height: auto;
+    max-height: 400px;
+    overflow: auto;
+    font-size: 1rem;
+    padding: 2rem;
+}
+
+.expandedCard button {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    border: 2px solid secondary;
+    background: white;
+}
+
+.expandedCard button:hover {
+    background: secondary;
+    color: white;
+}
+
+.sizeText {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    background: #444;
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(50%);
+}
+
+.dataCard h2 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-left: 0;
+    margin-top: 0.5rem;
+}

@@ -28,12 +28,19 @@
         "trained": true
     },
     {
+        "url": "https://store.gen-ai.fi/llm/BPE_Stories.zip",
+        "name": "English Stories Pre-trained Large (12M)",
+        "description": "Trained on children's stories",
+        "parameters": 12,
+        "trained": true
+    },
+    {
         "name": "Untrained Small (2M)",
         "parameters": 1.9,
         "config": {
             "vocabSize": 200,
             "nLayer": 4,
-            "nHead": 6,
+            "nHead": 3,
             "nEmbed": 192,
             "blockSize": 128,
             "dropout": 0.0,
@@ -48,7 +55,7 @@
         "config": {
             "vocabSize": 200,
             "nLayer": 8,
-            "nHead": 6,
+            "nHead": 3,
             "nEmbed": 192,
             "blockSize": 128,
             "dropout": 0.0,
@@ -58,13 +65,73 @@
         "tokeniser": "char"
     },
     {
-        "name": "Untrained Medium BPE (3M)",
+        "name": "Untrained Medium BPE (4M)",
         "parameters": 3.6,
         "config": {
             "vocabSize": 2000,
             "nLayer": 8,
+            "nHead": 3,
+            "nEmbed": 192,
+            "blockSize": 128,
+            "dropout": 0.0,
+            "useRope": true
+        },
+        "trained": false,
+        "tokeniser": "bpe"
+    },
+    {
+        "name": "Untrained Large BPE (12M)",
+        "parameters": 12,
+        "config": {
+            "vocabSize": 4000,
+            "nLayer": 6,
             "nHead": 6,
             "nEmbed": 384,
+            "blockSize": 128,
+            "dropout": 0.0,
+            "useRope": true
+        },
+        "trained": false,
+        "tokeniser": "bpe"
+    },
+    {
+        "name": "Untrained XL BPE (15M)",
+        "parameters": 15,
+        "config": {
+            "vocabSize": 4000,
+            "nLayer": 8,
+            "nHead": 6,
+            "nEmbed": 384,
+            "blockSize": 128,
+            "dropout": 0.0,
+            "useRope": true
+        },
+        "trained": false,
+        "tokeniser": "bpe"
+    },
+    {
+        "name": "Untrained XXL BPE (27M)",
+        "parameters": 27,
+        "config": {
+            "vocabSize": 6000,
+            "nLayer": 6,
+            "nHead": 6,
+            "nEmbed": 576,
+            "blockSize": 128,
+            "dropout": 0.0,
+            "useRope": true
+        },
+        "trained": false,
+        "tokeniser": "bpe"
+    },
+    {
+        "name": "Untrained XXXL BPE (35M)",
+        "parameters": 35,
+        "config": {
+            "vocabSize": 6000,
+            "nLayer": 8,
+            "nHead": 6,
+            "nEmbed": 576,
             "blockSize": 128,
             "dropout": 0.0,
             "useRope": true

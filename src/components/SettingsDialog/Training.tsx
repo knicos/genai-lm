@@ -29,9 +29,9 @@ export default function TrainingSettings() {
                     aria-labelledby="batch-label"
                     value={batchSize}
                     onChange={(_, value) => setBatchSize(value as number)}
-                    min={1}
+                    min={4}
                     max={64}
-                    step={8}
+                    step={4}
                     valueLabelDisplay="auto"
                 />
             </FormControl>

@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react';
-import style from './style.module.css';
-import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
-import { List, ListItemButton } from '@mui/material';
+import { Dialog, DialogContent, FormControl, IconButton, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import DataCardView from '../../components/DataCardView/DataCardView';
+import { DataCardItem } from '../../components/DataCard/DataCard';
+import { DataRowSet } from '../../components/DataCardRow/DataCardRow';
+import style from './style.module.css';
+import CloseIcon from '@mui/icons-material/Close';
 
-interface DataManifestEntry {
-    title: string;
-    url: string;
-    mime: string;
-    size: number;
-    lang: string;
+interface DataSetManifest {
+    dataSets: DataCardItem[];
+    categories: Record<string, { name: string; dataSetIds: string[] }[]>;
+    languages: Record<string, string>;
+}
+
+function groupByCategory(lang: string, manifest: DataSetManifest | null): DataRowSet[] {
+    if (!manifest) return [];
+    const itemMap = new Map(manifest.dataSets.map((item) => [item.id, item]));
+    return (manifest.categories[lang] || []).map((cat) => ({
+        title: cat.name,
+        cards: cat.dataSetIds.map((id) => itemMap.get(id)).filter((item): item is DataCardItem => item !== undefined),
+    }));
 }
 
 interface Props {
@@ -19,37 +29,63 @@ interface Props {
 
 export default function TextSearch({ onText, onClose }: Props) {
     const { t } = useTranslation();
-    const [manifest, setManifest] = useState<DataManifestEntry[]>([]);
+    const [lang, setLang] = useState(navigator.language.split('-')[0]);
+    const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
+    //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
+    const [dataRows, setDataRows] = useState<DataRowSet[]>([]);
 
     useEffect(() => {
         fetch('/dataManifest.json')
             .then((res) => res.json())
-            .then((data) => setManifest(data))
-            .catch(() => setManifest([]));
-    }, []);
+            .then((data: DataSetManifest) => {
+                //setManifest(data);
+                setDataRows(groupByCategory(lang, data));
+                setLangs(Object.entries(data.languages).map(([code, name]) => ({ code, name })));
+            })
+            .catch(() => setDataRows([]));
+    }, [lang]);
 
     return (
-        <div className={style.textInputContainer}>
-            <List style={{ overflowY: 'auto', width: '100%' }}>
-                {manifest.map((entry) => (
-                    <ListItemButton
-                        key={entry.url}
-                        onClick={() => {
-                            onText(entry.url, entry.title, entry.mime);
-                        }}
+        <Dialog
+            open
+            onClose={onClose}
+            maxWidth="lg"
+            fullWidth
+            sx={{ '& .MuiPaper-root': { maxHeight: 'unset', height: '100%', margin: '0', borderRadius: '0' } }}
+        >
+            <DialogContent sx={{ padding: '0' }}>
+                <div className={style.headerBar}>
+                    <FormControl size="small">
+                        <Select
+                            aria-label={t('data.language')}
+                            value={lang}
+                            onChange={(e: SelectChangeEvent) => setLang(e.target.value)}
+                        >
+                            {langs.map((l) => (
+                                <MenuItem
+                                    key={l.code}
+                                    value={l.code}
+                                >
+                                    {l.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <div style={{ flexGrow: 1 }} />
+                    <IconButton
+                        onClick={onClose}
+                        aria-label={t('data.close')}
                     >
-                        {entry.title}
-                    </ListItemButton>
-                ))}
-            </List>
-            <div className={style.buttonRow}>
-                <Button
-                    onClick={onClose}
-                    variant="outlined"
-                >
-                    {t('data.cancel')}
-                </Button>
-            </div>
-        </div>
+                        <CloseIcon fontSize="large" />
+                    </IconButton>
+                </div>
+                <DataCardView
+                    data={dataRows}
+                    onSelect={(card) => {
+                        onText(card.url, card.title, card.mime);
+                    }}
+                />
+            </DialogContent>
+        </Dialog>
     );
 }
