@@ -449,6 +449,81 @@
             "author": "",
             "popularity": 0,
             "sample": "Kolpura is an extinct genus from a well-known class of fossil marine arthropods, the trilobites. It lived during the Cambrian Period, which lasted from approximately 542 to 488 million years ago."
+        },
+        {
+            "id": "wiki-fi-1",
+            "title": "Wikipedia I",
+            "url": "https://store.gen-ai.fi/llm/data/genai_wiki_fi_1.parquet",
+            "lang": "fi",
+            "size": 60,
+            "mime": "application/parquet",
+            "complexity": "complex",
+            "instruct": false,
+            "restriction": 0,
+            "originURL": "",
+            "author": "",
+            "popularity": 0,
+            "sample": "U2 on irlantilainen rock-yhtye, joka on perustettu Dublinissa vuonna 1976. Yhtyeen kokoonpanon muodostavat laulaja Bono, kitaristi The Edge, basisti Adam Clayton ja rumpali Larry Mullen Jr.. U2:n musiikilliset juuret ovat post-punkissa, mutta se on uransa aikana ammentanut musiikkiinsa vaikutteita lukuisista populaarimusiikin tyylilajeista."
+        },
+        {
+            "id": "wiki-fi-2",
+            "title": "Wikipedia II",
+            "url": "https://store.gen-ai.fi/llm/data/genai_wiki_fi_2.parquet",
+            "lang": "fi",
+            "size": 42,
+            "mime": "application/parquet",
+            "complexity": "complex",
+            "instruct": false,
+            "restriction": 0,
+            "originURL": "",
+            "author": "",
+            "popularity": 0,
+            "sample": "Amharat ovat Etiopian ylängöillä Addis Ababan pohjoispuolella asuva amaharan kieltä puhuva kansa. Amharat ovat suurimpia Etiopian etnisistä ryhmistä ja he dominoivat maan talous- ja poliittista elämää. Amharoja on noin 15 000 000."
+        },
+        {
+            "id": "wiki-fi-3",
+            "title": "Wikipedia III",
+            "url": "https://store.gen-ai.fi/llm/data/genai_wiki_fi_3.parquet",
+            "lang": "fi",
+            "size": 60,
+            "mime": "application/parquet",
+            "complexity": "complex",
+            "instruct": false,
+            "restriction": 0,
+            "originURL": "",
+            "author": "",
+            "popularity": 0,
+            "sample": "Valmiusyhtymä on Suomen puolustusvoimien rauhanajan prikaati, meripuolustusalue tai lennosto, joka pitää yllä korkeaa valmiutta."
+        },
+        {
+            "id": "sites-fi-1",
+            "title": "Verkkosivusto I",
+            "url": "https://store.gen-ai.fi/llm/data/genai_sites_fi_1.parquet",
+            "lang": "fi",
+            "size": 50,
+            "mime": "application/parquet",
+            "complexity": "complex",
+            "instruct": false,
+            "restriction": 0,
+            "originURL": "",
+            "author": "",
+            "popularity": 0,
+            "sample": "Pietarsaaren autoliikkeiden aukioloajat Aukioloajat.com on Suomen laajin aukioloaikoja listaava sivusto. Alla näkyvällä kartalla näet kaikki Pietarsaaren autoliikkeet, jotka on lisätty sivuillemme."
+        },
+        {
+            "id": "sites-fi-2",
+            "title": "Verkkosivusto II",
+            "url": "https://store.gen-ai.fi/llm/data/genai_sites_fi_2.parquet",
+            "lang": "fi",
+            "size": 44,
+            "mime": "application/parquet",
+            "complexity": "complex",
+            "instruct": false,
+            "restriction": 0,
+            "originURL": "",
+            "author": "",
+            "popularity": 0,
+            "sample": "Uutuuksia Ajankohtaista Ruoka Superfood ja Rawfood Hygieniatuotteet Ihon hoito Hiusten hoito ja värjäys Kosmetiikka Kuukautiskupit ja siteet Itsehoito ja hemmottelu Eteeriset öljyt Itsehoitovälineet Suitsukkeet Yrttiuutteet ja kukkatipat Muut tuotteet Ekopesuaineet Taloustarvikkeet Lastenhoito Kirjat Kylmätuotteet Luomuhedelmät ja -vihannekset Maitotuotteet Tuoreet leivät Pakasteet Tee tilaus tänään, niin lähetämme sinulle kaupan päälle Lavera-sarjan pienen käsivoiteen! Kaupanpäällisvoiteen koko on 20 ml."
         }
     ],
     "categories": {
@@ -499,6 +574,10 @@
             {
                 "name": "Elokuvia",
                 "dataSetIds": ["movie-subtitles-fi"]
+            },
+            {
+                "name": "Verkkosivustoja",
+                "dataSetIds": ["sites-fi-1", "sites-fi-2", "wiki-fi-1", "wiki-fi-2", "wiki-fi-3"]
             }
         ]
     },
