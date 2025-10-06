@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { IconButton, Portal } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
+import CheckIcon from '@mui/icons-material/Check';
+import Downloader from '../../utilities/downloader';
 
 const EXPANDSIZE = 20;
 
@@ -18,7 +20,7 @@ export interface DataCardItem {
 }
 
 interface Props extends DataCardItem {
-    onSelect: (card: DataCardItem) => void;
+    onSelect: (card: DataCardItem, downloader: Downloader) => void;
     onHighlight: (id: string | null) => void;
     highlighted?: boolean;
     disabled?: boolean;
@@ -29,6 +31,8 @@ export default function DataCard({ onSelect, onHighlight, highlighted, disabled,
     const cardRef = useRef<HTMLDivElement>(null);
     const [coords, setCoords] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
     const [expanded, setExpanded] = useState(highlighted || false);
+    const [downloader, setDownloader] = useState<Downloader | null>(null);
+    const [done, setDone] = useState(false);
     const { title, sample, complexity, size } = card;
 
     const handleExpand = () => {
@@ -102,9 +106,15 @@ export default function DataCard({ onSelect, onHighlight, highlighted, disabled,
                         <IconButton
                             size="large"
                             color="secondary"
-                            onClick={() => onSelect(card)}
+                            disabled={downloader !== null}
+                            onClick={() => {
+                                const downloader = Downloader.downloadFile(card.url, card.title, card.mime);
+                                downloader.on('end', () => setDone(true));
+                                setDownloader(downloader);
+                                onSelect(card, downloader);
+                            }}
                         >
-                            <DownloadIcon fontSize="large" />
+                            {done ? <CheckIcon fontSize="large" /> : <DownloadIcon fontSize="large" />}
                         </IconButton>
                     </div>
                 </Portal>

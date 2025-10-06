@@ -6,6 +6,8 @@ import { DataCardItem } from '../../components/DataCard/DataCard';
 import { DataRowSet } from '../../components/DataCardRow/DataCardRow';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
+import Downloader from '../../utilities/downloader';
+import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
 
 interface DataSetManifest {
     dataSets: DataCardItem[];
@@ -23,11 +25,12 @@ function groupByCategory(lang: string, manifest: DataSetManifest | null): DataRo
 }
 
 interface Props {
-    onText: (text: string, name: string, type: string) => void;
+    onDownload(downloader: Downloader): void;
+    downloads: Downloader[];
     onClose: () => void;
 }
 
-export default function TextSearch({ onText, onClose }: Props) {
+export default function TextSearch({ onDownload, downloads, onClose }: Props) {
     const { t } = useTranslation();
     const [lang, setLang] = useState(navigator.language.split('-')[0]);
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
@@ -72,6 +75,7 @@ export default function TextSearch({ onText, onClose }: Props) {
                         </Select>
                     </FormControl>
                     <div style={{ flexGrow: 1 }} />
+                    <DownloadProgress downloads={downloads} />
                     <IconButton
                         onClick={onClose}
                         aria-label={t('data.close')}
@@ -81,8 +85,8 @@ export default function TextSearch({ onText, onClose }: Props) {
                 </div>
                 <DataCardView
                     data={dataRows}
-                    onSelect={(card) => {
-                        onText(card.url, card.title, card.mime);
+                    onSelect={(_, downloader) => {
+                        onDownload(downloader);
                     }}
                 />
             </DialogContent>

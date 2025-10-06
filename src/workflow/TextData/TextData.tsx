@@ -14,6 +14,7 @@ import TextSearch from './TextSearch';
 import useModelStatus from '../../utilities/useModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
+import Downloader from '../../utilities/downloader';
 
 interface Props {
     model?: TeachableLLM;
@@ -56,6 +57,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [showDropError, setShowDropError] = useState(false);
     const status = useModelStatus(model);
     const [selected, setSelected] = useState<number>(-1);
+    const [downloads, setDownloads] = useState<Downloader[]>([]);
 
     const done = data.length > 0;
 
@@ -116,7 +118,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
             <div className={style.container}>
                 <BoxTitle
                     title={t('data.title')}
-                    status={busy ? 'busy' : done ? 'done' : 'waiting'}
+                    status={busy || downloads.length > 0 ? 'busy' : done ? 'done' : 'waiting'}
                 />
                 <DataMenu
                     disabled={showInput || showSearch}
@@ -127,10 +129,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     onSearch={() => setShowSearch(true)}
                     onUpload={() => fileRef.current?.click()}
                     totalSamples={totalSamples}
-                />
-                <DataProgress
-                    samplesProcessed={totalSamples}
-                    desiredSamples={status !== 'loading' ? (model?.getNumParams() || 0) * 2 : 0}
                 />
                 <div
                     className={style.content}
@@ -204,24 +202,25 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     {showSearch && (
                         <TextSearch
                             onClose={() => setShowSearch(false)}
-                            onText={async (url, name, type) => {
-                                setShowSearch(false);
-                                setBusy(true);
-
-                                const response = await fetch(url);
-                                const text = await loadTextData(
-                                    new File([await response.blob()], name, {
-                                        type,
-                                    }),
-                                    { maxSize: 200000000 }
-                                );
-                                await handleTextLoad(name, text, 'search', setData);
-                                setBusy(false);
+                            downloads={downloads}
+                            onDownload={(downloader) => {
+                                setDownloads((prev) => [...prev, downloader]);
+                                downloader.on('end', async (file) => {
+                                    const text = loadTextData(file, { maxSize: 200000000 });
+                                    await handleTextLoad(file.name, await text, 'search', setData);
+                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                                });
                             }}
                         />
                     )}
                     {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
                 </div>
+                {status !== 'loading' && (
+                    <DataProgress
+                        samplesProcessed={totalSamples}
+                        desiredSamples={(model?.getNumParams() || 0) * 2}
+                    />
+                )}
 
                 <input
                     type="file"

@@ -1,0 +1,95 @@
+import EE from 'eventemitter3';
+
+export type DownloadEvents = 'start' | 'progress' | 'end' | 'error';
+
+export default class Downloader {
+    private ee = new EE<DownloadEvents>();
+    public readonly url: string;
+    public readonly name: string;
+    public readonly type: string;
+    private file?: File;
+    private _total = 0;
+    private _loaded = 0;
+
+    get loaded() {
+        return this._loaded;
+    }
+
+    get total() {
+        return this._total;
+    }
+
+    constructor(url: string, name: string, type: string) {
+        this.url = url;
+        this.name = name;
+        this.type = type;
+    }
+
+    private async start() {
+        this.ee.emit('start');
+        try {
+            const response = await fetch(this.url);
+
+            if (!response.ok || !response.body) {
+                throw new Error(`Failed to download file: ${response.statusText}`);
+            }
+
+            const contentLength = response.headers.get('Content-Length');
+            const total = contentLength ? parseInt(contentLength, 10) : 0;
+            this._total = total;
+            let loaded = 0;
+
+            const reader = response.body.getReader();
+            const chunks: BlobPart[] = [];
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (value) {
+                    chunks.push(value);
+                    loaded += value.length;
+                    this._loaded = loaded;
+                    this.ee.emit('progress', loaded, total);
+                }
+            }
+
+            const file = new File(chunks, this.name, { type: this.type });
+            this.file = file;
+            this.ee.emit('end', file);
+        } catch (error) {
+            this.ee.emit('error', error);
+        }
+    }
+
+    public getFile(): File | undefined {
+        return this.file;
+    }
+
+    on(event: 'start', listener: () => void): void;
+    on(event: 'progress', listener: (loaded: number, total: number) => void): void;
+    on(event: 'end', listener: (file: File) => void): void;
+    on(event: 'error', listener: (error: unknown) => void): void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public on(event: DownloadEvents, listener: (...args: any[]) => void) {
+        if (event === 'end' && this.file) {
+            listener(this.file);
+            return;
+        }
+        this.ee.on(event, listener);
+    }
+
+    off(event: 'start', listener: () => void): void;
+    off(event: 'progress', listener: (loaded: number, total: number) => void): void;
+    off(event: 'end', listener: (file: File) => void): void;
+    off(event: 'error', listener: (error: unknown) => void): void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public off(event: DownloadEvents, listener: (...args: any[]) => void) {
+        this.ee.off(event, listener);
+    }
+
+    static downloadFile(url: string, name: string, type: string): Downloader {
+        const downloader = new Downloader(url, name, type);
+        downloader.start();
+        return downloader;
+    }
+}

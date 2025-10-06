@@ -50,7 +50,8 @@
         "dropError": "You can only drop files with text (txt, csv, pdf, docx).",
         "ok": "OK",
         "samples": "Samples",
-        "search": "Search"
+        "search": "Search",
+        "downloading": "Downloading {{count}} file(s)"
     },
     "model": {
         "parameters": "Parameters",

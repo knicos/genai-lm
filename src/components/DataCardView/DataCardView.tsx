@@ -1,10 +1,11 @@
+import Downloader from '../../utilities/downloader';
 import { DataCardItem } from '../DataCard/DataCard';
 import DataCardRow, { DataRowSet } from '../DataCardRow/DataCardRow';
 import style from './style.module.css';
 
 interface Props {
     data: DataRowSet[];
-    onSelect: (card: DataCardItem) => void;
+    onSelect: (card: DataCardItem, downloader: Downloader) => void;
 }
 
 export default function DataCardView({ data, onSelect }: Props) {

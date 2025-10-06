@@ -3,6 +3,7 @@ import DataCard, { DataCardItem } from '../DataCard/DataCard';
 import style from './style.module.css';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Downloader from '../../utilities/downloader';
 
 export interface DataRowSet {
     title: string;
@@ -10,7 +11,7 @@ export interface DataRowSet {
 }
 
 interface Props extends DataRowSet {
-    onSelect: (card: DataCardItem) => void;
+    onSelect: (card: DataCardItem, downloader: Downloader) => void;
 }
 
 export default function DataCardRow({ title, cards, onSelect }: Props) {
