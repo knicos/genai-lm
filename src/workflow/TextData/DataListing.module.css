@@ -2,9 +2,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid #eee;
+    margin: 0.5rem 1rem;
+    border-radius: 8px;
+    overflow: hidden;
     flex-direction: row;
+    box-sizing: border-box;
+    max-width: calc(100% - 2rem);
+    padding: 0;
 }
 
 .item:hover {
@@ -13,10 +17,17 @@
 
 .size {
     font-weight: bold;
-    margin-right: 1rem;
 }
 
 .label {
     font-size: 0.8rem;
+}
+
+.avatar {
+    text-align: center;
+    background: #444;
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem;
     margin-right: 1rem;
 }

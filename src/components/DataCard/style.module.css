@@ -1,4 +1,4 @@
-@value secondary from "@genai-fi/base/css/colours.module.css";
+@value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
 
 .dataCard {
     display: flex;
@@ -8,6 +8,7 @@
     background: white;
     cursor: pointer;
     transition: opacity 0.3s ease;
+    user-select: none;
 }
 
 .dataCard.disabled {
@@ -20,11 +21,14 @@
     composes: dataCard;
     position: absolute;
     z-index: 2000;
-    box-shadow: 0 0 10px #888;
+    box-shadow: 0 0 4px #888;
     border-radius: 8px;
     animation: scaleIn 0.2s ease-in-out;
     cursor: initial;
     width: 360px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .scaleOut {
@@ -70,7 +74,7 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #c7ebc7 0%, #ace0c2 50%, #afd2d8 100%);
+        linear-gradient(135deg, #c7ebc7 0%, #ace0c2 50%, #7ddac5 100%);
 }
 
 .normal {
@@ -81,7 +85,7 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #c7ebe6 0%, #acd4e0 50%, #b5afd8 100%);
+        linear-gradient(135deg, #a5e1f8 0%, #baddfa 50%, #a89fff 100%);
 }
 
 .complex {
@@ -92,7 +96,7 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #c7d8eb 0%, #b7ace0 50%, #ceafd8 100%);
+        linear-gradient(135deg, #ddd4ff 0%, #d7c2ff 50%, #ffaad5 100%);
 }
 
 .sampleText {
@@ -103,30 +107,32 @@
     font-style: italic;
 }
 
-.expandedCard .sampleText {
-    height: auto;
-    max-height: 400px;
+.sampleTextExpanded {
+    height: 140px;
     overflow: auto;
-    font-size: 1rem;
-    padding: 2rem;
+    font-size: 1.2rem;
+    font-style: italic;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-.expandedCard button {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    border: 2px solid secondary;
-    background: white;
+.expandedSampleBox {
+    background-color: #f9f9f9;
+    flex-grow: 1;
+    cursor: pointer;
 }
 
-.expandedCard button:hover {
-    background: secondary;
-    color: white;
+.buttonRow {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 2rem;
+    align-items: center;
 }
 
 .sizeText {
     position: absolute;
-    bottom: 0;
+    bottom: 0.8rem;
     right: 1rem;
     border-radius: 50%;
     aspect-ratio: 1/1;

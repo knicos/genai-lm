@@ -28,7 +28,8 @@
             "learningRate": "Learning Rate",
             "showOutputText": "Show Progress Text",
             "checkpointing": "Gradient Checkpointing",
-            "showXAI": "Show XAI"
+            "showXAI": "Show XAI",
+            "topP": "Top P (nucleus sampling)"
         },
         "close": "Close"
     },

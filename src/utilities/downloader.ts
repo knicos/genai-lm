@@ -7,6 +7,7 @@ export default class Downloader {
     public readonly url: string;
     public readonly name: string;
     public readonly type: string;
+    public readonly id: string;
     private file?: File;
     private _total = 0;
     private _loaded = 0;
@@ -19,7 +20,8 @@ export default class Downloader {
         return this._total;
     }
 
-    constructor(url: string, name: string, type: string) {
+    constructor(id: string, url: string, name: string, type: string) {
+        this.id = id;
         this.url = url;
         this.name = name;
         this.type = type;
@@ -87,8 +89,8 @@ export default class Downloader {
         this.ee.off(event, listener);
     }
 
-    static downloadFile(url: string, name: string, type: string): Downloader {
-        const downloader = new Downloader(url, name, type);
+    static downloadFile(id: string, url: string, name: string, type: string): Downloader {
+        const downloader = new Downloader(id, url, name, type);
         downloader.start();
         return downloader;
     }

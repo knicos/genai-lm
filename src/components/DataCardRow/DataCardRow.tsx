@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import DataCard, { DataCardItem } from '../DataCard/DataCard';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import DataCard from '../DataCard/DataCard';
 import style from './style.module.css';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Downloader from '../../utilities/downloader';
+import { DataCardItem } from '../DataCard/type';
 
 export interface DataRowSet {
     title: string;
@@ -12,9 +13,10 @@ export interface DataRowSet {
 
 interface Props extends DataRowSet {
     onSelect: (card: DataCardItem, downloader: Downloader) => void;
+    selectedSet?: Set<string>;
 }
 
-export default function DataCardRow({ title, cards, onSelect }: Props) {
+export default function DataCardRow({ title, cards, onSelect, selectedSet }: Props) {
     const [highlighted, setHighlighted] = useState<string | null>(null);
     const [width, setWidth] = useState(0);
     const listRef = useRef<HTMLUListElement>(null);
@@ -48,6 +50,14 @@ export default function DataCardRow({ title, cards, onSelect }: Props) {
         }
     }, [offset]);
 
+    const handleHighlight = useCallback((id: string, close?: boolean) => {
+        setHighlighted((old) => {
+            if (!close) return id;
+            if (old === id && close) return null;
+            return old;
+        });
+    }, []);
+
     return (
         <div className={style.dataCardRow}>
             <h1>{title}</h1>
@@ -58,14 +68,9 @@ export default function DataCardRow({ title, cards, onSelect }: Props) {
                             <DataCard
                                 {...card}
                                 disabled={ix < offset || ix >= offset + numVisible}
+                                used={selectedSet ? selectedSet.has(card.id) : false}
                                 onSelect={onSelect}
-                                onHighlight={(id: string | null) => {
-                                    setHighlighted((old) => {
-                                        if (id !== null) return id;
-                                        if (old === card.id) return null;
-                                        return old;
-                                    });
-                                }}
+                                onHighlight={handleHighlight}
                                 highlighted={highlighted === card.id}
                             />
                         </li>

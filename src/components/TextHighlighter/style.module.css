@@ -20,6 +20,7 @@
     font-size: 1.4rem;
     white-space: pre-wrap;
     min-height: 100%;
+    word-break: break-word;
 }
 
 .outerContainer {

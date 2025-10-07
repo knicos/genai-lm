@@ -15,6 +15,7 @@ import useModelStatus from '../../utilities/useModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
 import Downloader from '../../utilities/downloader';
+import { v4 as uuid } from 'uuid';
 
 interface Props {
     model?: TeachableLLM;
@@ -31,6 +32,7 @@ interface DragObject {
 }
 
 async function handleTextLoad(
+    id: string,
     name: string,
     text: string[],
     source: 'file' | 'input' | 'search',
@@ -39,6 +41,7 @@ async function handleTextLoad(
     setData((prev) => [
         ...prev,
         {
+            id,
             name,
             content: text,
             size: text.reduce((acc, curr) => acc + curr.length, 0),
@@ -58,11 +61,13 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const status = useModelStatus(model);
     const [selected, setSelected] = useState<number>(-1);
     const [downloads, setDownloads] = useState<Downloader[]>([]);
+    const [selectedSet, setSelectedSet] = useState<Set<string>>();
 
     const done = data.length > 0;
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
+        setSelectedSet(new Set(data.map((entry) => entry.id)));
         onDatasetChange(newDataset);
     }, [data, onDatasetChange]);
 
@@ -75,18 +80,18 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     try {
                         for (const file of items.files) {
                             const text = await loadTextData(file, { maxSize: 200000000 });
-                            await handleTextLoad(file.name, text, 'file', setData);
+                            await handleTextLoad(uuid(), file.name, text, 'file', setData);
                         }
                     } catch (error) {
                         console.error('Error loading files:', error);
                         setShowDropError(true);
                     }
                 } else if (items.text) {
-                    await handleTextLoad(t('data.untitled'), [items.text], 'input', setData);
+                    await handleTextLoad(uuid(), t('data.untitled'), [items.text], 'input', setData);
                 } else if (items.html) {
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
-                    await handleTextLoad(t('data.untitled'), [element.textContent], 'input', setData);
+                    await handleTextLoad(uuid(), t('data.untitled'), [element.textContent], 'input', setData);
                 }
                 setBusy(false);
             },
@@ -188,6 +193,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                     setData((prev) => [
                                         ...prev,
                                         {
+                                            id: uuid(),
                                             name: t('data.untitled'),
                                             content: [text],
                                             size: text.length,
@@ -201,13 +207,14 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     )}
                     {showSearch && (
                         <TextSearch
+                            selectedSet={selectedSet}
                             onClose={() => setShowSearch(false)}
                             downloads={downloads}
                             onDownload={(downloader) => {
                                 setDownloads((prev) => [...prev, downloader]);
                                 downloader.on('end', async (file) => {
                                     const text = loadTextData(file, { maxSize: 200000000 });
-                                    await handleTextLoad(file.name, await text, 'search', setData);
+                                    await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
                                     setDownloads((prev) => prev.filter((d) => d !== downloader));
                                 });
                             }}
@@ -232,7 +239,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             const file = e.target.files[0];
                             setBusy(true);
                             const text = await loadTextData(file, { maxSize: 200000000 });
-                            await handleTextLoad(file.name, text, 'file', setData);
+                            await handleTextLoad(uuid(), file.name, text, 'file', setData);
                             setBusy(false);
                         }
                     }}

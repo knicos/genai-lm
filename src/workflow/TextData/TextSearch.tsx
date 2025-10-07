@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, FormControl, IconButton, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import DataCardView from '../../components/DataCardView/DataCardView';
-import { DataCardItem } from '../../components/DataCard/DataCard';
 import { DataRowSet } from '../../components/DataCardRow/DataCardRow';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
 import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
+import { DataCardItem } from '../../components/DataCard/type';
 
 interface DataSetManifest {
     dataSets: DataCardItem[];
@@ -28,9 +28,10 @@ interface Props {
     onDownload(downloader: Downloader): void;
     downloads: Downloader[];
     onClose: () => void;
+    selectedSet?: Set<string>;
 }
 
-export default function TextSearch({ onDownload, downloads, onClose }: Props) {
+export default function TextSearch({ onDownload, downloads, onClose, selectedSet }: Props) {
     const { t } = useTranslation();
     const [lang, setLang] = useState(navigator.language.split('-')[0]);
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
@@ -54,7 +55,7 @@ export default function TextSearch({ onDownload, downloads, onClose }: Props) {
             onClose={onClose}
             maxWidth="lg"
             fullWidth
-            sx={{ '& .MuiPaper-root': { maxHeight: 'unset', height: '100%', margin: '0', borderRadius: '0' } }}
+            sx={{ '& .MuiPaper-root': { margin: '0', borderRadius: '0' } }}
         >
             <DialogContent sx={{ padding: '0' }}>
                 <div className={style.headerBar}>
@@ -88,6 +89,7 @@ export default function TextSearch({ onDownload, downloads, onClose }: Props) {
                     onSelect={(_, downloader) => {
                         onDownload(downloader);
                     }}
+                    selectedSet={selectedSet}
                 />
             </DialogContent>
         </Dialog>

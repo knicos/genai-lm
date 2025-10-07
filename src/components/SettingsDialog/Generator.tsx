@@ -8,6 +8,7 @@ import {
     generatorShowPrompt,
     generatorShowSettings,
     generatorTemperature,
+    generatorTopP,
 } from '../../state/generatorSettings';
 
 export default function GeneratorSettings() {
@@ -17,6 +18,7 @@ export default function GeneratorSettings() {
     const [probability, setProbability] = useAtom(generatorShowProbabilities);
     const [prompt, setPrompt] = useAtom(generatorShowPrompt);
     const [showSettings, setShowSettings] = useAtom(generatorShowSettings);
+    const [topP, setTopP] = useAtom(generatorTopP);
 
     return (
         <div className={style.column}>
@@ -34,6 +36,23 @@ export default function GeneratorSettings() {
                     min={0.5}
                     max={1.5}
                     step={0.1}
+                    valueLabelDisplay="auto"
+                />
+            </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <div
+                    id="topp-label"
+                    className={style.label}
+                >
+                    {t('app.settings.topP')}
+                </div>
+                <Slider
+                    aria-labelledby="topp-label"
+                    value={topP}
+                    onChange={(_, value) => setTopP(value as number)}
+                    min={0}
+                    max={1}
+                    step={0.01}
                     valueLabelDisplay="auto"
                 />
             </FormControl>

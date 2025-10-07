@@ -1,68 +1,61 @@
-import { useEffect, useRef, useState } from 'react';
+import { PointerEvent, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
-import { IconButton, Portal } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import CheckIcon from '@mui/icons-material/Check';
+import { Portal } from '@mui/material';
 import Downloader from '../../utilities/downloader';
+import ExpandedCard from './ExpandedCard';
+import { DataCardItem } from './type';
 
-const EXPANDSIZE = 20;
-
-export interface DataCardItem {
-    id: string;
-    title: string;
-    sample: string;
-    size: number;
-    url: string;
-    mime: string;
-    lang: string;
-    complexity: 'simple' | 'normal' | 'complex';
-    instruct: boolean;
-}
+const EXPANDSIZE = 40;
 
 interface Props extends DataCardItem {
     onSelect: (card: DataCardItem, downloader: Downloader) => void;
-    onHighlight: (id: string | null) => void;
+    onHighlight: (id: string, close?: boolean) => void;
     highlighted?: boolean;
     disabled?: boolean;
+    used?: boolean;
 }
 
-export default function DataCard({ onSelect, onHighlight, highlighted, disabled, ...card }: Props) {
+export default function DataCard({ onSelect, onHighlight, highlighted, disabled, used, ...card }: Props) {
     const [toClose, setToClose] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const [coords, setCoords] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
     const [expanded, setExpanded] = useState(highlighted || false);
     const [downloader, setDownloader] = useState<Downloader | null>(null);
     const [done, setDone] = useState(false);
-    const { title, sample, complexity, size } = card;
+    const touchRef = useRef(false);
+    const { title, sample, complexity, size, id } = card;
 
     const handleExpand = () => {
         onHighlight(card.id);
     };
 
     const handleClose = () => {
-        onHighlight(null);
+        onHighlight(id, true);
     };
 
     useEffect(() => {
-        if (highlighted) {
-            const timeout = setTimeout(() => {
-                if (cardRef.current) {
-                    const rect = cardRef.current.getBoundingClientRect();
-                    setCoords({
-                        top: rect.top - EXPANDSIZE,
-                        left: rect.left - EXPANDSIZE,
-                        width: rect.width + EXPANDSIZE * 2,
-                        height: rect.height + EXPANDSIZE * 2,
-                    });
-                }
-                setToClose(false);
-                setExpanded(true);
-            }, 500);
+        if (highlighted && !downloader) {
+            const timeout = setTimeout(
+                () => {
+                    if (cardRef.current) {
+                        const rect = cardRef.current.getBoundingClientRect();
+                        setCoords({
+                            top: rect.top - EXPANDSIZE,
+                            left: rect.left - EXPANDSIZE,
+                            width: rect.width + EXPANDSIZE * 2,
+                            height: rect.height + EXPANDSIZE * 2,
+                        });
+                    }
+                    setToClose(false);
+                    setExpanded(true);
+                },
+                touchRef.current ? 0 : 500
+            );
             return () => clearTimeout(timeout);
         } else {
             setToClose(true);
         }
-    }, [highlighted]);
+    }, [highlighted, downloader]);
 
     useEffect(() => {
         if (toClose) {
@@ -74,49 +67,78 @@ export default function DataCard({ onSelect, onHighlight, highlighted, disabled,
         }
     }, [toClose]);
 
+    useEffect(() => {
+        if (expanded && touchRef.current) {
+            const handleGlobalPointerDown = (e: PointerEvent | MouseEvent | TouchEvent) => {
+                // If the expanded card exists and the click/touch is outside, close it
+                const expandedCardEl = document.getElementById(`expanded-card-${id}`);
+                if (expandedCardEl && !expandedCardEl.contains(e.target as Node)) {
+                    onHighlight(id, true);
+                }
+            };
+
+            document.addEventListener('pointerdown', handleGlobalPointerDown);
+            document.addEventListener('touchstart', handleGlobalPointerDown);
+
+            return () => {
+                document.removeEventListener('pointerdown', handleGlobalPointerDown);
+                document.removeEventListener('touchstart', handleGlobalPointerDown);
+            };
+        }
+    }, [expanded, toClose, onHighlight, id]);
+
+    const fontSize = Math.max(0.7, Math.log(size) / Math.log(20));
+
     return (
         <>
             <div
                 className={`${style.dataCard} ${disabled ? style.disabled : ''}`}
                 role="button"
-                onClick={!disabled ? handleExpand : undefined}
-                onMouseEnter={!disabled ? handleExpand : undefined}
-                onMouseLeave={!disabled && !expanded ? handleClose : undefined}
+                onPointerUp={
+                    !disabled && !used
+                        ? (e: PointerEvent) => {
+                              //e.preventDefault();
+                              if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                                  touchRef.current = true;
+                                  handleExpand();
+                              } else {
+                                  if (downloader) return;
+                                  const d = Downloader.downloadFile(card.id, card.url, card.title, card.mime);
+                                  d.on('end', () => setDone(true));
+                                  setDownloader(d);
+                                  onSelect(card, d);
+                              }
+                          }
+                        : undefined
+                }
+                onMouseEnter={!disabled && !used ? handleExpand : undefined}
+                onMouseLeave={!disabled && !used && !expanded ? handleClose : undefined}
                 ref={cardRef}
             >
-                <div className={`${style.sampleBox} ${style[complexity]}`}>
+                <div className={`${style.sampleBox} ${downloader || used ? style.disabledBG : style[complexity]}`}>
                     <div className={style.sampleText}>{sample}</div>
-                    <div className={style.sizeText}>{size}M</div>
+                    <div
+                        className={style.sizeText}
+                        style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
+                    >
+                        {size >= 1 ? `${size}M` : `${size * 1000}K`}
+                    </div>
                 </div>
                 <h2>{title}</h2>
             </div>
             {expanded && (
                 <Portal container={() => document.getElementById('root') || document.body}>
-                    <div
-                        className={`${style.expandedCard} ${toClose ? style.scaleOut : ''}`}
-                        style={{
-                            top: coords?.top,
-                            left: coords?.left,
-                            width: coords?.width,
-                            height: coords?.height,
-                        }}
-                        onMouseLeave={handleClose}
-                    >
-                        <div className={style.sampleText}>{sample}</div>
-                        <IconButton
-                            size="large"
-                            color="secondary"
-                            disabled={downloader !== null}
-                            onClick={() => {
-                                const downloader = Downloader.downloadFile(card.url, card.title, card.mime);
-                                downloader.on('end', () => setDone(true));
-                                setDownloader(downloader);
-                                onSelect(card, downloader);
-                            }}
-                        >
-                            {done ? <CheckIcon fontSize="large" /> : <DownloadIcon fontSize="large" />}
-                        </IconButton>
-                    </div>
+                    <ExpandedCard
+                        coords={coords}
+                        toClose={toClose}
+                        downloader={downloader}
+                        done={done}
+                        handleClose={handleClose}
+                        onSelect={onSelect}
+                        setDownloader={setDownloader}
+                        setDone={setDone}
+                        card={card}
+                    />
                 </Portal>
             )}
         </>

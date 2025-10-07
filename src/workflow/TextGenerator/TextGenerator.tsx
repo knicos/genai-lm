@@ -20,6 +20,7 @@ import {
     generatorShowPrompt,
     generatorShowSettings,
     generatorTemperature,
+    generatorTopP,
 } from '../../state/generatorSettings';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -137,6 +138,7 @@ export default function TextGenerator({ model }: Props) {
     const enableProbabilities = useAtomValue(generatorShowProbabilities);
     const enablePrompt = useAtomValue(generatorShowPrompt);
     const temperature = useAtomValue(generatorTemperature);
+    const topP = useAtomValue(generatorTopP);
     const maxLength = useAtomValue(generatorMaxLength);
     const outputText = useAtomValue(trainerOutputText);
     const [showStatus, setShowStatus] = useState<boolean>(false);
@@ -193,6 +195,7 @@ export default function TextGenerator({ model }: Props) {
                         maxLength: 200,
                         temperature: 1,
                         includeProbabilities: false,
+                        topP: topP > 0 ? topP : undefined,
                     });
                     setGenerate(false);
                     setText(finalText);
@@ -205,7 +208,7 @@ export default function TextGenerator({ model }: Props) {
                 };
             }
         }
-    }, [model, ready, outputText]);
+    }, [model, ready, outputText, topP]);
 
     useEffect(() => {
         if (generator) {
@@ -284,7 +287,10 @@ export default function TextGenerator({ model }: Props) {
                             disabled={disable}
                             startIcon={generate ? <PauseIcon /> : <PlayArrowIcon />}
                             onClick={() => {
-                                if (!generator || (status !== 'ready' && status !== 'busy')) {
+                                if (
+                                    !generator ||
+                                    (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')
+                                ) {
                                     setShowStatus(true);
                                     return;
                                 }
@@ -305,6 +311,7 @@ export default function TextGenerator({ model }: Props) {
                                         temperature,
                                         attentionScores: enableAttention,
                                         includeProbabilities: enableProbabilities,
+                                        topP: topP > 0 ? topP : undefined,
                                     })
                                     .then(() => {
                                         setText(textRef.current);

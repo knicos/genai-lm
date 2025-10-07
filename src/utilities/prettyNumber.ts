@@ -4,7 +4,7 @@ export default function prettyNumber(num: number): string {
     } else if (num >= 1e6) {
         return `${(num / 1e6).toFixed(1)}M`;
     } else if (num >= 1e3) {
-        return `${(num / 1e3).toFixed(1)}K`;
+        return `${(num / 1e3).toFixed(0)}K`;
     } else {
         return num.toString();
     }
