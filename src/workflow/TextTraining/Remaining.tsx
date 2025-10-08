@@ -11,7 +11,7 @@ export default function Remaining({ remaining }: Props) {
     const totalSeconds = remaining / 1000;
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const seconds = Math.floor(totalSeconds % 60);
 
     if (hours > 0) {
         return (
