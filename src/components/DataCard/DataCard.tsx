@@ -6,6 +6,7 @@ import ExpandedCard from './ExpandedCard';
 import { DataCardItem } from './type';
 
 const EXPANDSIZE = 40;
+const EXPAND_DELAY = 800;
 
 interface Props extends DataCardItem {
     onSelect: (card: DataCardItem, downloader: Downloader) => void;
@@ -49,7 +50,7 @@ export default function DataCard({ onSelect, onHighlight, highlighted, disabled,
                     setToClose(false);
                     setExpanded(true);
                 },
-                touchRef.current ? 0 : 500
+                touchRef.current ? 0 : EXPAND_DELAY
             );
             return () => clearTimeout(timeout);
         } else {
@@ -97,7 +98,6 @@ export default function DataCard({ onSelect, onHighlight, highlighted, disabled,
                 onPointerUp={
                     !disabled && !used
                         ? (e: PointerEvent) => {
-                              //e.preventDefault();
                               if (e.pointerType === 'touch' || e.pointerType === 'pen') {
                                   touchRef.current = true;
                                   handleExpand();

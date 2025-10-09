@@ -5,6 +5,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import style from './style.module.css';
 import SampleWriter from './SampleWriter';
 import { DataCardItem } from './type';
+import { MouseEvent } from 'react';
 
 interface Props {
     coords: { top: number; left: number; width: number; height: number } | null;
@@ -31,7 +32,8 @@ export default function ExpandedCard({
 }: Props) {
     const sample = card.sample;
 
-    const handleDownload = () => {
+    const handleDownload = (e: MouseEvent) => {
+        e.stopPropagation();
         const downloader = Downloader.downloadFile(card.id, card.url, card.title, card.mime);
         downloader.on('end', () => setDone(true));
         setDownloader(downloader);

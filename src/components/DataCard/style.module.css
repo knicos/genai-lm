@@ -108,19 +108,21 @@
 }
 
 .sampleTextExpanded {
-    height: 140px;
+    max-height: 190px;
     overflow: auto;
     font-size: 1.2rem;
     font-style: italic;
     padding: 1.5rem;
     display: flex;
     flex-direction: column-reverse;
+    box-sizing: border-box;
 }
 
 .expandedSampleBox {
     background-color: #f9f9f9;
     flex-grow: 1;
     cursor: pointer;
+    height: 190px;
 }
 
 .buttonRow {
