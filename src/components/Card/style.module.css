@@ -1,0 +1,67 @@
+@value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
+
+.dataCard {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    overflow: hidden;
+    background: white;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    user-select: none;
+}
+
+.dataCard.disabled {
+    cursor: initial;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.expandedCard {
+    composes: dataCard;
+    position: absolute;
+    z-index: 2000;
+    box-shadow: 0 0 4px #888;
+    border-radius: 8px;
+    animation: scaleIn 0.2s ease-in-out;
+    cursor: initial;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.scaleOut {
+    animation: scaleOut 0.2s ease-in-out;
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+@keyframes scaleOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.dataCard h2 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-left: 0;
+    margin-top: 0.5rem;
+}

@@ -1,54 +1,87 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, FormControl, IconButton, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import CardView from '../../components/CardView/CardView';
-import { RowSet } from '../../components/CardRow/CardRow';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
+import { TeachableLLM } from '@genai-fi/nanogpt';
+import CardView from '../../components/CardView/CardView';
+import ModelCard from '../../components/ModelCard/ModelCard';
+import { RowSet } from '../../components/CardRow/CardRow';
+import { ModelCardItem } from '../../components/ModelCard/type';
 import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
-import { DataCardItem } from '../../components/DataCard/type';
-import DataCard from '../../components/DataCard/DataCard';
 
-interface DataSetManifest {
-    dataSets: DataCardItem[];
-    categories: Record<string, { name: string; dataSetIds: string[] }[]>;
+interface ModelManifest {
+    models: ModelCardItem[];
+    categories: Record<string, { name: string; modelIds: string[] }[]>;
     languages: Record<string, string>;
 }
 
-function groupByCategory(lang: string, manifest: DataSetManifest | null): RowSet<DataCardItem>[] {
+function groupByCategory(lang: string, manifest: ModelManifest | null): RowSet<ModelCardItem>[] {
     if (!manifest) return [];
-    const itemMap = new Map(manifest.dataSets.map((item) => [item.id, item]));
+    const itemMap = new Map(manifest.models.map((item) => [item.id, item]));
     return (manifest.categories[lang] || []).map((cat) => ({
         title: cat.name,
-        cards: cat.dataSetIds.map((id) => itemMap.get(id)).filter((item): item is DataCardItem => item !== undefined),
+        cards: cat.modelIds.map((id) => itemMap.get(id)).filter((item): item is ModelCardItem => item !== undefined),
     }));
 }
 
 interface Props {
-    onDownload(downloader: Downloader): void;
-    downloads: Downloader[];
+    model?: TeachableLLM;
+    onModel(model: TeachableLLM): void;
     onClose: () => void;
     selectedSet?: Set<string>;
 }
 
-export default function TextSearch({ onDownload, downloads, onClose, selectedSet }: Props) {
+export default function ModelSearch({ model, onModel, onClose, selectedSet }: Props) {
     const { t } = useTranslation();
     const [lang, setLang] = useState(navigator.language.split('-')[0]);
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
     //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
-    const [dataRows, setDataRows] = useState<RowSet<DataCardItem>[]>([]);
+    const [dataRows, setDataRows] = useState<RowSet<ModelCardItem>[]>([]);
+    const [download, setDownload] = useState<Downloader | null>(null);
 
     useEffect(() => {
-        fetch('/dataManifest.json')
+        fetch('/modelManifest.json')
             .then((res) => res.json())
-            .then((data: DataSetManifest) => {
+            .then((data: ModelManifest) => {
                 //setManifest(data);
+                console.log(data);
                 setDataRows(groupByCategory(lang, data));
                 setLangs(Object.entries(data.languages).map(([code, name]) => ({ code, name })));
             })
             .catch(() => setDataRows([]));
     }, [lang]);
+
+    const handleSelect = useCallback(
+        (card: ModelCardItem, downloader?: Downloader) => {
+            if (model) {
+                console.log('Disposing old model');
+                try {
+                    model.dispose();
+                } catch (e) {
+                    console.error('Error disposing old model:', e);
+                    return;
+                }
+            }
+            if (downloader) {
+                setDownload(downloader);
+                downloader.on('end', (file: File) => {
+                    const newModel = TeachableLLM.loadModel(file);
+                    newModel.meta.id = card.id;
+                    newModel.meta.name = card.name;
+                    onModel(newModel);
+                    setDownload(null);
+                });
+            } else if (!card.url) {
+                const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
+                newModel.meta.id = card.id;
+                newModel.meta.name = card.name;
+                onModel(newModel);
+            }
+        },
+        [model, onModel]
+    );
 
     return (
         <Dialog
@@ -77,7 +110,7 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                         </Select>
                     </FormControl>
                     <div style={{ flexGrow: 1 }} />
-                    <DownloadProgress downloads={downloads} />
+                    <DownloadProgress downloads={download ? [download] : []} />
                     <IconButton
                         onClick={onClose}
                         aria-label={t('data.close')}
@@ -85,13 +118,11 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                         <CloseIcon fontSize="large" />
                     </IconButton>
                 </div>
-                <CardView<DataCardItem, Downloader>
-                    CardComponent={DataCard}
+                <CardView
                     data={dataRows}
-                    onSelect={(_, downloader) => {
-                        if (downloader) onDownload(downloader);
-                    }}
+                    onSelect={handleSelect}
                     selectedSet={selectedSet}
+                    CardComponent={ModelCard}
                 />
             </DialogContent>
         </Dialog>

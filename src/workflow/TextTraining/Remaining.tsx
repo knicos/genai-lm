@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import NumberBox from '../../components/NumberBox/NumberBox';
+import splitTime from '../../utilities/splitTime';
 
 interface Props {
     remaining: number;
@@ -8,10 +9,7 @@ interface Props {
 export default function Remaining({ remaining }: Props) {
     const { t } = useTranslation();
 
-    const totalSeconds = remaining / 1000;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
+    const { hours, minutes, seconds } = splitTime(remaining);
 
     if (hours > 0) {
         return (

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TeachableLLM } from '@genai-fi/nanogpt';
-import manifest from './manifest.json';
+import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import ModelList, { ManifestItem } from './ModelList';
-import { Tab, Tabs } from '@mui/material';
-import CustomModel from './CustomModel';
 import { useTranslation } from 'react-i18next';
 import Box from '../../components/BoxTitle/Box';
 import useModelStatus from '../../utilities/useModelStatus';
+import ModelMenu from './ModelMenu';
+import ModelSearch from './ModelSearch';
+import ModelInfo from '../../components/ModelInfo/ModelInfo';
+import InfoPanel from '../TextData/InfoPanel';
 
 interface Props {
     onModel: (model: TeachableLLM) => void;
@@ -18,8 +18,8 @@ interface Props {
 export default function ModelLoader({ onModel, model }: Props) {
     const { t } = useTranslation();
     const [done, setDone] = useState(false);
-    const [tab, setTab] = useState(0);
     const status = useModelStatus(model);
+    const [showSearch, setShowSearch] = useState(false);
 
     useEffect(() => {
         if (model) {
@@ -46,32 +46,36 @@ export default function ModelLoader({ onModel, model }: Props) {
                     title={t('model.title')}
                     status={done ? 'done' : !done && !!model ? 'busy' : 'waiting'}
                 ></BoxTitle>
-                <Tabs
-                    value={tab}
-                    onChange={(_, v) => setTab(v)}
-                >
-                    <Tab label={t('model.trained')} />
-                    <Tab label={t('model.untrained')} />
-                    <Tab label={t('model.custom')} />
-                </Tabs>
-                {tab === 0 && (
-                    <ModelList
-                        manifest={(manifest as ManifestItem[]).filter((m) => m.trained)}
-                        model={model}
-                        onModel={onModel}
+                <ModelMenu
+                    onCreate={() => console.log('Create model')}
+                    onUpload={() => console.log('Upload model')}
+                    onSearch={() => setShowSearch(true)}
+                />
+                <div className={style.contentBox}>
+                    <InfoPanel
+                        show={!model}
+                        severity="info"
+                        message={t('model.modelHint')}
                     />
-                )}
-                {tab === 1 && (
-                    <ModelList
-                        manifest={(manifest as ManifestItem[]).filter((m) => !m.trained)}
-                        model={model}
+                    {model && status !== 'loading' && (
+                        <>
+                            <h2 className={style.modelName}>{model.meta.name || 'Unnamed Model'}</h2>
+                            <ModelInfo
+                                config={model.config}
+                                tokeniser={model.tokeniser instanceof CharTokeniser ? 'char' : 'bpe'}
+                                showTokens
+                                showLayers
+                                showContextSize
+                            />
+                        </>
+                    )}
+                </div>
+                {showSearch && (
+                    <ModelSearch
+                        onClose={() => setShowSearch(false)}
                         onModel={onModel}
-                    />
-                )}
-                {tab === 2 && (
-                    <CustomModel
                         model={model}
-                        onModel={onModel}
+                        selectedSet={model && model.meta.id ? new Set([model.meta.id]) : undefined}
                     />
                 )}
             </div>

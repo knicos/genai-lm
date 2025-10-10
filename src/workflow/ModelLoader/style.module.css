@@ -67,3 +67,26 @@
     align-items: center;
     gap: 1rem;
 }
+
+.headerBar {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 0 2rem;
+}
+
+.contentBox {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.modelName {
+    font-size: 1.1rem;
+    margin: 0;
+    margin-bottom: 1rem;
+}

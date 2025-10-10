@@ -1,22 +1,39 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import DataCard from '../DataCard/DataCard';
+import { ComponentType, useCallback, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import Downloader from '../../utilities/downloader';
-import { DataCardItem } from '../DataCard/type';
 
-export interface DataRowSet {
+export interface CardItem {
+    id: string;
+}
+
+export interface RowSet<T extends CardItem = CardItem> {
     title: string;
-    cards: DataCardItem[];
+    cards: T[];
 }
 
-interface Props extends DataRowSet {
-    onSelect: (card: DataCardItem, downloader: Downloader) => void;
+export interface CardComponentProps<T extends CardItem = CardItem, S = void> {
+    onSelect: (card: T, extra?: S) => void;
+    onHighlight: (id: string, close?: boolean) => void;
+    highlighted?: boolean;
+    disabled?: boolean;
+    used?: boolean;
+    card: T;
+}
+
+interface Props<T extends CardItem = CardItem, S = void> extends RowSet<T> {
+    onSelect: (card: T, extra?: S) => void;
     selectedSet?: Set<string>;
+    CardComponent: ComponentType<CardComponentProps<T, S>>;
 }
 
-export default function DataCardRow({ title, cards, onSelect, selectedSet }: Props) {
+export default function CardRow<T extends CardItem, S = void>({
+    title,
+    cards,
+    onSelect,
+    selectedSet,
+    CardComponent,
+}: Props<T, S>) {
     const [highlighted, setHighlighted] = useState<string | null>(null);
     const [width, setWidth] = useState(0);
     const listRef = useRef<HTMLUListElement>(null);
@@ -64,9 +81,9 @@ export default function DataCardRow({ title, cards, onSelect, selectedSet }: Pro
             <div className={style.container}>
                 <ul ref={listRef}>
                     {cards.map((card, ix) => (
-                        <li key={card.url}>
-                            <DataCard
-                                {...card}
+                        <li key={card.id}>
+                            <CardComponent
+                                card={card}
                                 disabled={ix < offset || ix >= offset + numVisible}
                                 used={selectedSet ? selectedSet.has(card.id) : false}
                                 onSelect={onSelect}

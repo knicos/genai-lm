@@ -1,0 +1,18 @@
+.modelInfo p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.8);
+    color: #444;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+}
+
+.modelInfo {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    font-size: 0.9rem;
+    gap: 0.2rem;
+}

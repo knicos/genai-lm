@@ -58,9 +58,20 @@
         "parameters": "Parameters",
         "memory": "Memory",
         "title": "Model",
-        "trained": "Trained",
-        "untrained": "Untrained",
-        "custom": "Custom"
+        "create": "Create",
+        "upload": "Upload",
+        "search": "Search",
+        "charTokeniser": "{{size}} characters",
+        "bpeTokeniser": "{{size}} tokens",
+        "layers": "{{count}} layers",
+        "contextSize": "Context of {{size}} tokens",
+        "duration": "{{duration}} of training",
+        "durationHours": "{{count}} hours",
+        "durationMinutes": "{{count}} minutes",
+        "durationSeconds": "{{count}} seconds",
+        "samples": "{{samples}} samples",
+        "embeddingSize": "Hidden size of {{size}}",
+        "modelHint": "Select or upload a model."
     },
     "training": {
         "title": "Training",

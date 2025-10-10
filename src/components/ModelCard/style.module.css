@@ -2,12 +2,19 @@
 
 .sampleBox {
     padding: 2rem;
-    background-color: #f9f9f9;
+    background-color: #e996e9;
     position: relative;
     border-radius: 8px;
+    height: 100px;
 }
 
-.simple {
+.infoContainer {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.untrained {
     background: repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.1) 0px,
@@ -15,29 +22,18 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #c7ebc7 0%, #ace0c2 50%, #7ddac5 100%);
+        linear-gradient(135deg, #ebdfc7 0%, #e0c9ac 50%, #dad87d 100%);
 }
 
-.normal {
+.trained {
     background: repeating-linear-gradient(
             135deg,
-            rgba(255, 255, 255, 0.08) 0px,
-            rgba(255, 255, 255, 0.08) 2px,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 2px,
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #a5e1f8 0%, #baddfa 50%, #a89fff 100%);
-}
-
-.complex {
-    background: repeating-linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.08) 0px,
-            rgba(255, 255, 255, 0.08) 2px,
-            transparent 2px,
-            transparent 8px
-        ),
-        linear-gradient(135deg, #ddd4ff 0%, #d7c2ff 50%, #ffaad5 100%);
+        linear-gradient(135deg, #c7caeb 0%, #b5ace0 50%, #8b7dda 100%);
 }
 
 .sampleText {
@@ -64,6 +60,7 @@
     flex-grow: 1;
     cursor: pointer;
     height: 190px;
+    position: relative;
 }
 
 .buttonRow {
