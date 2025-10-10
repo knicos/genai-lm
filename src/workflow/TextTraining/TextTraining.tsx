@@ -20,6 +20,7 @@ import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
 import Remaining from './Remaining';
+import useWakeLock from '../../utilities/wakeLock';
 
 interface Props {
     model?: TeachableLLM;
@@ -49,6 +50,8 @@ export default function TextTraining({ model, dataset }: Props) {
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
+
+    useWakeLock(training);
 
     const canTrain = !!model && !!dataset && dataset.length > 0 && status !== 'loading' && status !== 'busy';
 
