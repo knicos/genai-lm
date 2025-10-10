@@ -199,7 +199,7 @@ export default function TextGenerator({ model }: Props) {
                     });
                     setGenerate(false);
                     setText(finalText);
-                    textRef.current = '';
+                    textRef.current = finalText;
                     await wait(40);
                 };
                 model.on('trainStep', h);
