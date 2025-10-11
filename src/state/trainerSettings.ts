@@ -1,7 +1,8 @@
-import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { storage } from './storage';
 
-export const trainerBatchSize = atom<number>(32);
-export const trainerMaxSteps = atom<number>(30000);
-export const trainerLearningRate = atom<number>(1e-3);
-export const trainerOutputText = atom<boolean>(true);
-export const trainerCheckpointing = atom<boolean>(false);
+export const trainerBatchSize = atomWithStorage<number>('trainerBatchSize', 32, storage);
+export const trainerMaxSteps = atomWithStorage<number>('trainerMaxSteps', 30000, storage);
+export const trainerLearningRate = atomWithStorage<number>('trainerLearningRate', 1e-3, storage);
+export const trainerOutputText = atomWithStorage<boolean>('trainerOutputText', true, storage);
+export const trainerCheckpointing = atomWithStorage<boolean>('trainerCheckpointing', false, storage);

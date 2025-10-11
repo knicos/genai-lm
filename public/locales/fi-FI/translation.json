@@ -1,0 +1,138 @@
+{
+    "app": {
+        "save": "Tallenna",
+        "load": "Avaa",
+        "saveTitle": "Tallenna malli",
+        "saveMessage": "Anna mallille nimi:",
+        "saveName": "Mallin nimi",
+        "saveSave": "Tallenna",
+        "saveCancel": "Peruuta",
+        "settings": {
+            "title": "Asetukset",
+            "general": "Yleiset",
+            "training": "Opetus",
+            "generator": "Generointi",
+            "showModelSelect": "Näytä mallien valinta",
+            "showEvaluation": "Näytä arviointi-ikkuna",
+            "showTrainer": "Näytä opetusikkuna",
+            "showDataEntry": "Näytä dataikkuna",
+            "showSampleExplore": "Opetusdatan tarkasteleminen",
+            "showModelInfo": "Näytä mallin tiedot",
+            "showSettings": "Näytä asetukset",
+            "showPrompt": "Kehote (prompt)",
+            "showProbabilities": "Näytä todennäköisyydet",
+            "showAttention": "Visualisoi huomiomekanismi",
+            "maxLength": "Generoidun tekstin enimmäispituus",
+            "temperature": "Sattumanvaraisuus (temperature)",
+            "batchSize": "Tekstinäyte-erän koko",
+            "learningRate": "Oppimisnopeus",
+            "showOutputText": "Näytä mallin kehittyminen",
+            "checkpointing": "Gradienttitarkistuspisteet",
+            "showXAI": "Näytä selittävä tekoäly (XAI)",
+            "topP": "Top P -otanta"
+        },
+        "close": "Sulje"
+    },
+    "data": {
+        "title": "Opetusdata",
+        "textDialogTitle": "Tekstisisältö",
+        "addTooltip": "Lisää uutena opetusdatana",
+        "dataHint": "Kirjoita tekstiä tai lataa erilaisia tiedostotyyppejä (txt, csv, pdf, docx) opetusdataksi. Mitä enemmän tekstiä, sitä parempi.",
+        "modelHint": "Valitse ensin malli.",
+        "add": "Kirjoita",
+        "upload": "Lataa",
+        "untitled": "Teksti",
+        "addText": "Lisää",
+        "save": "Tallenna",
+        "cancel": "Peruuta",
+        "close": "Sulje",
+        "textPlaceholder": "Kirjoita tai liitä oma tekstisi tähän...",
+        "dropHint": "Pudota tiedostot tähän...",
+        "dropError": "Voit pudottaa vain tekstitiedostoja (txt, csv, pdf, docx).",
+        "ok": "OK",
+        "samples": "Tekstinäytteet",
+        "search": "Haku",
+        "downloading": "Ladataan {{count}} tiedosto(a)"
+    },
+    "model": {
+        "parameters": "Parametrit",
+        "memory": "Muisti",
+        "title": "Malli",
+        "create": "Luo uusi",
+        "upload": "Lataa",
+        "search": "Haku",
+        "charTokeniser": "{{size}} merkkiä",
+        "bpeTokeniser": "{{size}} merkkirypästä",
+        "layers": "{{count}} kerrosta",
+        "contextSize": "Konteksti-ikkuna {{size}}",
+        "duration": "{{duration}} opetusta",
+        "durationHours": "{{count}} tuntia",
+        "durationMinutes": "{{count}} minuuttia",
+        "durationSeconds": "{{count}} sekuntia",
+        "samples": "{{samples}} tekstinäytettä",
+        "embeddingSize": "Sisäinen koko {{size}}",
+        "modelHint": "Valitse tai lataa malli."
+    },
+    "training": {
+        "title": "Opetus",
+        "samples": "näytettä",
+        "start": "Opeta",
+        "stop": "Pysäytä",
+        "hours": "t",
+        "minutes": "m",
+        "seconds": "s",
+        "remaining": "jäljellä"
+    },
+    "generator": {
+        "title": "Tekstin generointi",
+        "generate": "Generoi",
+        "promptPlaceholder": "Valinnainen kehoteteksti...",
+        "settingsTooltip": "Generoinnin asetukset",
+        "pause": "Pysäytä",
+        "editPlaceholder": "Kirjoita halutessasi kehoteteksti tähän...",
+        "reset": "Tyhjennä",
+        "copy": "Kopioi leikepöydälle"
+    },
+    "samples": {
+        "title": "Tekstinäytteet",
+        "noSamples": "Näytteitä ei voi tarkastella nyt: lisää opetusdataa tarkastellaksesi näytteitä.",
+        "moreSamples": "Tekstinäytteitä pitäisi olla enemmän",
+        "total": "Yhteensä",
+        "shuffle": "Sekoita näytteiden järjestys"
+    },
+    "evaluation": {
+        "title": "Tarkkuus",
+        "quality": "Tarkkuus"
+    },
+    "modelStatus": {
+        "warmup": "Mallia valmistellaan...",
+        "ready": "Malli on valmis käyttöön",
+        "training": "Mallia opetetaan...",
+        "loading": "Mallia ladataan...",
+        "busy": "Malli käsittelee dataa...",
+        "error": "Mallissa tapahtui virhe",
+        "none": "Mallia ei ole ladattu",
+        "awaitingTokens": "Odotetaan merkkiryppäitä (token)..."
+    },
+    "info": {
+        "title": "Mallin tiedot",
+        "selectModel": "Valitse malli tarkastellaksesi sen tietoja.",
+        "parameters": "Parametreja",
+        "transformers": "Transformereita",
+        "heads": "Huomiokanavia",
+        "embedding": "Upotus",
+        "context": "Konteksti-ikkuna"
+    },
+    "validation": {
+        "invalid_number": "Virheellinen numero",
+        "out_of_range": "Arvon on oltava välillä  {{min}} ja {{max}}",
+        "required": "Tämä kenttä on pakollinen",
+        "positive_integer": "Arvon on oltava positiivinen kokonaisluku",
+        "unknown_error": "Tuntematon virhe tapahtui",
+        "nEmbed_divisible_nHead": "Upotuksen koon on oltava jaollinen headien määrällä",
+        "headDim_even": "Kokeile toista headien määrää"
+    },
+    "xai": {
+        "title": "Selitys"
+    }
+}

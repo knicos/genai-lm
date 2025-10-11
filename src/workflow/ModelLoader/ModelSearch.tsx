@@ -45,8 +45,6 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
         fetch('/modelManifest.json')
             .then((res) => res.json())
             .then((data: ModelManifest) => {
-                //setManifest(data);
-                console.log(data);
                 setDataRows(groupByCategory(lang, data));
                 setLangs(Object.entries(data.languages).map(([code, name]) => ({ code, name })));
             })

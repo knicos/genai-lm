@@ -29,7 +29,12 @@
             "showOutputText": "Show Progress Text",
             "checkpointing": "Gradient Checkpointing",
             "showXAI": "Show XAI",
-            "topP": "Top P (nucleus sampling)"
+            "topP": "Top P (nucleus sampling)",
+            "evaluationMetrics": "Evaluation Metrics",
+            "qualityMetric": "Quality",
+            "perplexityMetric": "Perplexity",
+            "lossMetric": "Loss",
+            "advancedMetrics": "Advanced Metrics"
         },
         "close": "Close"
     },
@@ -102,7 +107,12 @@
     },
     "evaluation": {
         "title": "Evaluation",
-        "quality": "Quality"
+        "quality": "Quality",
+        "perplexity": "Perplexity",
+        "loss": "Loss",
+        "samplesPerSecond": "Samples/s",
+        "memory": "Memory",
+        "gradientNorm": "Grad Norm"
     },
     "modelStatus": {
         "warmup": "Model is warming up...",

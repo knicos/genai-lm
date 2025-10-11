@@ -14,7 +14,10 @@ import { uiShowSettings } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 
-export const LANGS = [{ name: 'en-GB', label: 'English' }];
+export const LANGS = [
+    { name: 'en-GB', label: 'English' },
+    { name: 'fi-FI', label: 'Suomi' },
+];
 
 interface Props {
     model?: TeachableLLM;

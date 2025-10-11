@@ -21,6 +21,7 @@ import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
 import Remaining from './Remaining';
 import useWakeLock from '../../utilities/wakeLock';
+import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 
 interface Props {
     model?: TeachableLLM;
@@ -50,6 +51,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
+    const advanced = useAtomValue(evaluatorAdvanced);
 
     useWakeLock(training);
 
@@ -65,7 +67,7 @@ export default function TextTraining({ model, dataset }: Props) {
         if (trainer) {
             const h = (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
-                model?.getProfiler()?.printSummary();
+                //model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
             };
             trainer.on('log', h);
@@ -156,12 +158,13 @@ export default function TextTraining({ model, dataset }: Props) {
                                 // setEpochs(0);
                                 await wait(200);
                                 model.model.checkpointing = checkpointing;
-                                model.enableProfiler = true;
+                                model.enableProfiler = advanced;
                                 trainer
                                     .train(dataset, {
                                         batchSize,
                                         maxSteps,
                                         learningRate: lr > 0 ? lr : learningRate,
+                                        advancedMetrics: advanced,
                                     })
                                     .then(() => {
                                         setDone(true);

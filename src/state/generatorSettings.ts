@@ -1,10 +1,12 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { storage } from './storage';
 
-export const generatorTemperature = atom<number>(0.8);
-export const generatorTopK = atom<number>(10);
-export const generatorTopP = atom<number>(0.9);
-export const generatorMaxLength = atom<number>(40000);
-export const generatorShowAttention = atom<boolean>(false);
+export const generatorTemperature = atomWithStorage<number>('generatorTemperature', 0.8, storage);
+export const generatorTopK = atomWithStorage<number>('generatorTopK', 10, storage);
+export const generatorTopP = atomWithStorage<number>('generatorTopP', 0.9, storage);
+export const generatorMaxLength = atomWithStorage<number>('generatorMaxLength', 40000, storage);
+export const generatorShowAttention = atomWithStorage<boolean>('generatorShowAttention', false, storage);
 export const generatorAttentionBlock = atom<number>(5);
 export const generatorAttentionHead = atom<number>(0);
 export const generatorShowProbabilities = atom<boolean>(false);

@@ -15,3 +15,13 @@
     font-size: 0.8em;
     color: #444;
 }
+
+.advanced {
+    margin: 1rem;
+}
+
+.advancedItem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
