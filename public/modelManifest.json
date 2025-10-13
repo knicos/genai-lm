@@ -147,7 +147,7 @@
             "tokeniser": "char"
         },
         {
-            "id": "untrained-large",
+            "id": "untrained-medium-bpe",
             "name": "Medium BPE (4M)",
             "parameters": 4,
             "config": {
@@ -238,6 +238,7 @@
                 "modelIds": [
                     "untrained-small",
                     "untrained-medium",
+                    "untrained-medium-bpe",
                     "untrained-large",
                     "untrained-xl",
                     "untrained-xxl",
@@ -255,6 +256,7 @@
                 "modelIds": [
                     "untrained-small",
                     "untrained-medium",
+                    "untrained-medium-bpe",
                     "untrained-large",
                     "untrained-xl",
                     "untrained-xxl",

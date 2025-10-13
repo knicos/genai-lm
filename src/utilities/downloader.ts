@@ -3,14 +3,14 @@ import EE from 'eventemitter3';
 export type DownloadEvents = 'start' | 'progress' | 'end' | 'error';
 
 export default class Downloader {
-    private ee = new EE<DownloadEvents>();
+    protected ee = new EE<DownloadEvents>();
     public readonly url: string;
     public readonly name: string;
     public readonly type: string;
     public readonly id: string;
     private file?: File;
-    private _total = 0;
-    private _loaded = 0;
+    protected _total = 0;
+    protected _loaded = 0;
 
     get loaded() {
         return this._loaded;

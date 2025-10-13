@@ -33,7 +33,11 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #c7caeb 0%, #b5ace0 50%, #8b7dda 100%);
+        linear-gradient(135deg, #ccceec 0%, #c3baec 50%, #a197dd 100%);
+}
+
+.disabledBG {
+    border: 2px solid secondary;
 }
 
 .sampleText {

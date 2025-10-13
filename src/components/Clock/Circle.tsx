@@ -39,6 +39,7 @@ export default function Circle({ radius, children, progress, color }: Props) {
                     cx={radius}
                     cy={radius}
                     style={{ transform: `rotate(90deg)`, transformOrigin: '50% 50%' }}
+                    data-testid="circle-progress"
                 />
             </svg>
             <div className={style.centerText}>{children}</div>

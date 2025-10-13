@@ -4,8 +4,8 @@
     width: 100%;
     border-bottom: 2px solid rgba(0, 0, 0, 0.06);
     gap: 1rem;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
     overflow: hidden;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .box {
-    border-radius: 15px;
+    border-radius: 6px;
     background: white;
     box-shadow: 2px 2px 4px #bbb;
     overflow: hidden;

@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react-swc';
 export default defineConfig({
     test: {
         environment: 'jsdom',
-        setupFiles: './src/setupTests.ts',
+        setupFiles: ['./src/setupTests.ts', '@vitest/web-worker'],
         clearMocks: true,
         coverage: {
             provider: 'v8',

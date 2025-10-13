@@ -8,8 +8,7 @@ import Circle from '../../components/Clock/Circle';
 import { qualityToColor } from '../../utilities/colours';
 import { useAtomValue } from 'jotai';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
-
-const MEMORY_FACTOR = 2.6; // Empirical factor to estimate true memory usage
+import Box from '../../components/BoxTitle/Box';
 
 interface TrainingProgress {
     duration: number;
@@ -76,7 +75,7 @@ export default function Evaluation({ model }: Props) {
                 const { value, percentage } = createMetric(metric, log, model.config.vocabSize);
                 setMetricValue(value);
                 setMetricPercentage(percentage);
-                console.log('Training progress:', progress);
+
                 if (advanced) {
                     setAdvancedStats({
                         samplesPerSecond: progress.samplesPerSecond,
@@ -108,58 +107,60 @@ export default function Evaluation({ model }: Props) {
     }, [model, status, metric]);
 
     return (
-        <div className={style.container}>
-            <BoxTitle
-                title={t('evaluation.title')}
-                status={!!model && metricPercentage > 0 ? 'done' : 'disabled'}
-            />
-            <div style={{ marginBottom: '1rem' }} />
-            <Circle
-                radius={55}
-                progress={metricPercentage}
-                color={qualityToColor(metricPercentage)}
-            >
-                {metric === 'quality' && (
-                    <>
-                        <div className={style.value}>
-                            {`${Math.round(metricValue * 100)}`}
-                            <span className={style.percentage}>%</span>
+        <Box widget="evaluation">
+            <div className={style.container}>
+                <BoxTitle
+                    title={t('evaluation.title')}
+                    status={!!model && metricPercentage > 0 ? 'done' : 'disabled'}
+                />
+                <div style={{ marginBottom: '1rem' }} />
+                <Circle
+                    radius={55}
+                    progress={metricPercentage}
+                    color={qualityToColor(metricPercentage)}
+                >
+                    {metric === 'quality' && (
+                        <>
+                            <div className={style.value}>
+                                {`${Math.round(metricValue * 100)}`}
+                                <span className={style.percentage}>%</span>
+                            </div>
+                            <div className={style.label}>{t('evaluation.quality')}</div>
+                        </>
+                    )}
+                    {metric === 'perplexity' && (
+                        <>
+                            <div className={style.value}>{`${metricValue.toFixed(2)}`}</div>
+                            <div className={style.label}>{t('evaluation.perplexity')}</div>
+                        </>
+                    )}
+                    {metric === 'loss' && (
+                        <>
+                            <div className={style.value}>{`${metricValue.toFixed(2)}`}</div>
+                            <div className={style.label}>{t('evaluation.loss')}</div>
+                        </>
+                    )}
+                </Circle>
+                {advanced && advancedStats && (
+                    <div className={style.advanced}>
+                        <div className={style.advancedItem}>
+                            <div className={style.advancedLabel}>{t('evaluation.samplesPerSecond')}</div>
+                            <div className={style.advancedValue}>{advancedStats.samplesPerSecond.toFixed(0)}</div>
                         </div>
-                        <div className={style.label}>{t('evaluation.quality')}</div>
-                    </>
-                )}
-                {metric === 'perplexity' && (
-                    <>
-                        <div className={style.value}>{`${metricValue.toFixed(2)}`}</div>
-                        <div className={style.label}>{t('evaluation.perplexity')}</div>
-                    </>
-                )}
-                {metric === 'loss' && (
-                    <>
-                        <div className={style.value}>{`${metricValue.toFixed(2)}`}</div>
-                        <div className={style.label}>{t('evaluation.loss')}</div>
-                    </>
-                )}
-            </Circle>
-            {advanced && advancedStats && (
-                <div className={style.advanced}>
-                    <div className={style.advancedItem}>
-                        <div className={style.advancedLabel}>{t('evaluation.samplesPerSecond')}</div>
-                        <div className={style.advancedValue}>{advancedStats.samplesPerSecond.toFixed(0)}</div>
-                    </div>
-                    <div className={style.advancedItem}>
-                        <div className={style.advancedLabel}>{t('evaluation.memory')}</div>
-                        <div className={style.advancedValue}>
-                            {((advancedStats.memory * MEMORY_FACTOR) / 1024 / 1024 / 1024).toFixed(2)} GB
+                        <div className={style.advancedItem}>
+                            <div className={style.advancedLabel}>{t('evaluation.memory')}</div>
+                            <div className={style.advancedValue}>
+                                {(advancedStats.memory / 1024 / 1024 / 1024).toFixed(2)} GB
+                            </div>
+                        </div>
+                        <div className={style.advancedItem}>
+                            <div className={style.advancedLabel}>{t('evaluation.gradientNorm')}</div>
+                            <div className={style.advancedValue}>{advancedStats.gradientNorm.toFixed(2)}</div>
                         </div>
                     </div>
-                    <div className={style.advancedItem}>
-                        <div className={style.advancedLabel}>{t('evaluation.gradientNorm')}</div>
-                        <div className={style.advancedValue}>{advancedStats.gradientNorm.toFixed(2)}</div>
-                    </div>
-                </div>
-            )}
-            <div style={{ marginBottom: '1rem' }} />
-        </div>
+                )}
+                <div style={{ marginBottom: '1rem' }} />
+            </div>
+        </Box>
     );
 }

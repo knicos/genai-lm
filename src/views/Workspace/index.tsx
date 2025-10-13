@@ -14,6 +14,8 @@ import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import Annotation from './Annotation';
 import XAIBox from '../../workflow/XAI/XAI';
+import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
+import { deviceMemory } from '../../state/device';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -66,6 +68,7 @@ export function Component() {
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
+    const memory = useAtomValue(deviceMemory);
 
     // Hack to update lines when model changes
     useEffect(() => {
@@ -83,7 +86,9 @@ export function Component() {
         setConn([...CONNECTIONS]);
     }, [textDataset]);
 
-    return (
+    return memory === null ? (
+        <DeviceProbe />
+    ) : (
         <>
             <AppBar
                 onModel={setModel}
@@ -133,14 +138,7 @@ export function Component() {
                         model={model}
                         dataset={textDataset}
                     />
-                    {steps.has('evaluation') && (
-                        <div
-                            className={style.box}
-                            data-widget="evaluation"
-                        >
-                            <Evaluation model={model} />
-                        </div>
-                    )}
+                    {steps.has('evaluation') && <Evaluation model={model} />}
                 </div>
                 <TextGenerator model={model} />
                 {steps.has('xai') && <XAIBox model={model} />}

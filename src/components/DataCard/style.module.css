@@ -26,7 +26,7 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #a5e1f8 0%, #baddfa 50%, #a89fff 100%);
+        linear-gradient(135deg, #cce3ff 0%, #c7d9e9 50%, #b1bce5 100%);
 }
 
 .complex {
@@ -37,7 +37,7 @@
             transparent 2px,
             transparent 8px
         ),
-        linear-gradient(135deg, #ddd4ff 0%, #d7c2ff 50%, #ffaad5 100%);
+        linear-gradient(135deg, #ddd4ff 0%, #d7c2ff 50%, #d6a1fa 100%);
 }
 
 .sampleText {

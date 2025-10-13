@@ -21,6 +21,7 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             aria-valuemin={0}
             aria-valuemax={120}
             aria-label="Data Progress"
+            data-testid="progress-bar"
         >
             <div className={style.baseBar} />
             <div
@@ -29,11 +30,13 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
                     width: `${desiredSamples > 0 ? progress : 0}%`,
                     backgroundColor: qualityToColor(progress / 100),
                 }}
+                data-testid="progress-blob"
             />
 
             <div
                 className={style.target}
                 style={{ left: `calc(60% - 10px)` }}
+                data-testid="target-icon"
             >
                 <StarIcon fontSize="small" />
             </div>

@@ -38,6 +38,9 @@
         },
         "close": "Close"
     },
+    "deviceProbe": {
+        "probing": "Checking your hardware..."
+    },
     "data": {
         "title": "Data",
         "textDialogTitle": "Text Content",

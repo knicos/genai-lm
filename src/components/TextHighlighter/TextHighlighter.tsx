@@ -129,6 +129,7 @@ export default function TextHighlighter({
                         <textarea
                             ref={textRef}
                             className={style.editable}
+                            data-testid="input-box"
                             placeholder={t('generator.editPlaceholder')}
                             spellCheck="false"
                             autoComplete="off"
@@ -144,6 +145,7 @@ export default function TextHighlighter({
                         <div
                             className={`${style.cursor} ${active ? style.active : ''}`}
                             ref={cursorRef}
+                            data-testid="cursor"
                         ></div>
                     )}
                 </div>

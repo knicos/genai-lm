@@ -2,10 +2,15 @@ import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
+localStorage.setItem('deviceMemory', '0');
+
 declare global {
     // eslint-disable-next-line no-var
     var IS_REACT_ACT_ENVIRONMENT: boolean;
 }
+
+Element.prototype.scrollTo = () => {};
+Element.prototype.scrollIntoView = () => {};
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 

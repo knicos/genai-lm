@@ -22,6 +22,7 @@ export default function ExpandedCard<T extends CardItem>({
     return (
         <div
             id={`expanded-card-${card.id}`}
+            data-testid={`expanded-card-${card.id}`}
             className={`${style.expandedCard} ${toClose ? style.scaleOut : ''}`}
             style={{
                 top: coords?.top,

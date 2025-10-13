@@ -62,7 +62,7 @@
         "upload": "Lataa",
         "search": "Haku",
         "charTokeniser": "{{size}} merkkiä",
-        "bpeTokeniser": "{{size}} merkkirypästä",
+        "bpeTokeniser": "{{size}} sanaketta",
         "layers": "{{count}} kerrosta",
         "contextSize": "Konteksti-ikkuna {{size}}",
         "duration": "{{duration}} opetusta",
@@ -112,15 +112,15 @@
         "busy": "Malli käsittelee dataa...",
         "error": "Mallissa tapahtui virhe",
         "none": "Mallia ei ole ladattu",
-        "awaitingTokens": "Odotetaan merkkiryppäitä (token)..."
+        "awaitingTokens": "Odotetaan sanakkeita (token)..."
     },
     "info": {
         "title": "Mallin tiedot",
         "selectModel": "Valitse malli tarkastellaksesi sen tietoja.",
         "parameters": "Parametreja",
         "transformers": "Transformereita",
-        "heads": "Huomiokanavia",
-        "embedding": "Upotus",
+        "heads": "Huomiokärkiä",
+        "embedding": "Esitys",
         "context": "Konteksti-ikkuna"
     },
     "validation": {
@@ -129,8 +129,8 @@
         "required": "Tämä kenttä on pakollinen",
         "positive_integer": "Arvon on oltava positiivinen kokonaisluku",
         "unknown_error": "Tuntematon virhe tapahtui",
-        "nEmbed_divisible_nHead": "Upotuksen koon on oltava jaollinen headien määrällä",
-        "headDim_even": "Kokeile toista headien määrää"
+        "nEmbed_divisible_nHead": "Upotuksen koon on oltava jaollinen huomiokärkien määrällä",
+        "headDim_even": "Kokeile toista kärkien määrää"
     },
     "xai": {
         "title": "Selitys"

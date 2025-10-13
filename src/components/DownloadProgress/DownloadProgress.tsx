@@ -47,6 +47,7 @@ export default function DownloadProgress({ downloads }: Props) {
                 sx={{ width: '100%' }}
                 variant="determinate"
                 value={total > 0 ? (loaded / total) * 100 : 0}
+                data-testid="progress-bar"
             />
         </div>
     );
