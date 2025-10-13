@@ -15,7 +15,7 @@ import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import Annotation from './Annotation';
 import XAIBox from '../../workflow/XAI/XAI';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
-import { deviceMemory } from '../../state/device';
+import { deviceMemory, devicePerformProbe } from '../../state/device';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -69,6 +69,7 @@ export function Component() {
     const steps = useAtomValue(workflowSteps);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
     const memory = useAtomValue(deviceMemory);
+    const performProbe = useAtomValue(devicePerformProbe);
 
     // Hack to update lines when model changes
     useEffect(() => {
@@ -86,7 +87,7 @@ export function Component() {
         setConn([...CONNECTIONS]);
     }, [textDataset]);
 
-    return memory === null ? (
+    return performProbe && memory === null ? (
         <DeviceProbe />
     ) : (
         <>
