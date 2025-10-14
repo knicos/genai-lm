@@ -60,22 +60,24 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
         >
             <DialogContent sx={{ padding: '0' }}>
                 <div className={style.headerBar}>
-                    <FormControl size="small">
-                        <Select
-                            aria-label={t('data.language')}
-                            value={lang}
-                            onChange={(e: SelectChangeEvent) => setLang(e.target.value)}
-                        >
-                            {langs.map((l) => (
-                                <MenuItem
-                                    key={l.code}
-                                    value={l.code}
-                                >
-                                    {l.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {langs.length > 0 && (
+                        <FormControl size="small">
+                            <Select
+                                aria-label={t('data.language')}
+                                value={lang}
+                                onChange={(e: SelectChangeEvent) => setLang(e.target.value)}
+                            >
+                                {langs.map((l) => (
+                                    <MenuItem
+                                        key={l.code}
+                                        value={l.code}
+                                    >
+                                        {l.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
                     <div style={{ flexGrow: 1 }} />
                     <DownloadProgress downloads={downloads} />
                     <IconButton

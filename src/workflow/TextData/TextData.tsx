@@ -16,6 +16,7 @@ import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
 import Downloader from '../../utilities/downloader';
 import { v4 as uuid } from 'uuid';
+import logger from '../../utilities/logger';
 
 interface Props {
     model?: TeachableLLM;
@@ -77,6 +78,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
             async drop(items: DragObject) {
                 setBusy(true);
                 if (items.files) {
+                    logger.log(`Loading ${items.files.length} dropped file(s)`);
                     try {
                         for (const file of items.files) {
                             const text = await loadTextData(file, { maxSize: 200000000 });
@@ -87,8 +89,10 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         setShowDropError(true);
                     }
                 } else if (items.text) {
+                    logger.log('Loading dropped text');
                     await handleTextLoad(uuid(), t('data.untitled'), [items.text], 'input', setData);
                 } else if (items.html) {
+                    logger.log('Loading dropped HTML content');
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
                     await handleTextLoad(uuid(), t('data.untitled'), [element.textContent], 'input', setData);
@@ -190,6 +194,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                         )
                                     );
                                 } else {
+                                    logger.log('Creating new text input');
                                     setData((prev) => [
                                         ...prev,
                                         {
@@ -213,6 +218,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             onDownload={(downloader) => {
                                 setDownloads((prev) => [...prev, downloader]);
                                 downloader.on('end', async (file) => {
+                                    logger.log(`Loading searched file: ${file.name}`);
                                     const text = loadTextData(file, { maxSize: 200000000 });
                                     await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
                                     setDownloads((prev) => prev.filter((d) => d !== downloader));
@@ -238,6 +244,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         if (e.target.files && e.target.files.length > 0) {
                             const file = e.target.files[0];
                             setBusy(true);
+                            logger.log('Loading opened file');
                             const text = await loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                             setBusy(false);

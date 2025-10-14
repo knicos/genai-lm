@@ -16,6 +16,8 @@ import Annotation from './Annotation';
 import XAIBox from '../../workflow/XAI/XAI';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceMemory, devicePerformProbe } from '../../state/device';
+import { useSearchParams } from 'react-router-dom';
+import logger, { initializeLogger } from '../../utilities/logger';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -70,12 +72,21 @@ export function Component() {
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
     const memory = useAtomValue(deviceMemory);
     const performProbe = useAtomValue(devicePerformProbe);
+    const [params] = useSearchParams();
+
+    useEffect(() => {
+        const token = params.get('t');
+        if (token) {
+            initializeLogger(token);
+        }
+    }, [params]);
 
     // Hack to update lines when model changes
     useEffect(() => {
         if (model) {
             const h = () => {
                 setConn([...CONNECTIONS]);
+                logger.log(`Model loaded: ${model.meta.name} (${model.getNumParams()} parameters)`);
             };
             model.on('loaded', h);
             return () => {

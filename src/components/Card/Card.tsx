@@ -122,7 +122,7 @@ export default function Card<T extends CardItem, S = void>({
                 onMouseEnter={!disabled && !used ? handleExpand : undefined}
                 onMouseLeave={!disabled && !used && !expanded ? handleClose : undefined}
                 ref={cardRef}
-                data-testId={`card-${card.id}`}
+                data-testid={`card-${card.id}`}
             >
                 {content}
             </div>

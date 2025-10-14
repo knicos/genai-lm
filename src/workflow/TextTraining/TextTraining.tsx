@@ -22,6 +22,7 @@ import Clock from '../../components/Clock/Clock';
 import Remaining from './Remaining';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
+import logger from '../../utilities/logger';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -71,6 +72,13 @@ export default function TextTraining({ model, dataset }: Props) {
                 setEpochs(log.step);
                 //model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
+                if (log.step % 100 === 0) {
+                    logger.log(
+                        `Training step ${log.step}, loss: ${log.loss.toFixed(
+                            4
+                        )}, rate: ${progress.samplesPerSecond.toFixed(1)} samples/sec`
+                    );
+                }
             };
             trainer.on('log', h);
             return () => {
@@ -169,6 +177,10 @@ export default function TextTraining({ model, dataset }: Props) {
                                     'GB'
                                 );
 
+                                logger.log(
+                                    `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
+                                );
+
                                 model.model.checkpointing = useCheckpointing;
                                 model.enableProfiler = advanced;
                                 trainer
@@ -181,6 +193,12 @@ export default function TextTraining({ model, dataset }: Props) {
                                     .then(() => {
                                         setDone(true);
                                         setTraining(false);
+                                        logger.log('Training stopped');
+                                    })
+                                    .catch((err) => {
+                                        setDone(true);
+                                        setTraining(false);
+                                        logger.error(`Training error: ${err.message}`);
                                     });
                             }
                         }}

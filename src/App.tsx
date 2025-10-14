@@ -13,6 +13,7 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { theme } from '@genai-fi/base';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import logger from './utilities/logger';
 
 interface RouterError {
     status: number;
@@ -32,13 +33,15 @@ function ErrorComponent() {
     const json = JSON.stringify(error);
     const str = json === '{}' && 'toString' in (error as Error) ? (error as Error).toString() : 'Unknown';
 
+    logger.error(`Router error: ${str}`);
+
     return (
         <section className="errorView">
             <h1>Something went wrong</h1>
             <p>
                 Please report this issue to{' '}
                 <a
-                    href="https://github.com/knicos/genai-somekone/issues"
+                    href="https://github.com/knicos/genai-/issues"
                     target="_blank"
                     rel="noreferrer"
                 >
