@@ -22,9 +22,16 @@ class Logger {
 
     private send(level: string, message: string): void {
         if (!this.token) return;
-        // Placeholder for sending logs to an external service
-        // e.g., HTTP request to a logging server
-        console.log(`[${level} - ${this.id}]: ${message}`);
+
+        fetch(import.meta.env.VITE_LOGGING_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: this.token, message, level, id: this.id }),
+        }).catch((err) => {
+            console.error('Failed to send log:', err);
+        });
     }
 }
 

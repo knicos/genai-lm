@@ -39,7 +39,7 @@
         "close": "Sulje",
         "annotations": {
             "model": "Malli",
-            "data": "Data"
+            "data": "Aineisto"
         }
     },
     "deviceProbe": {
