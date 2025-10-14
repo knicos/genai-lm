@@ -25,7 +25,7 @@ const CONNECTIONS: IConnection[] = [
         endPoint: 'left',
         annotationElement: (
             <Annotation
-                label="Model"
+                label="app.annotations.model"
                 type="model"
             />
         ),
@@ -39,7 +39,7 @@ const CONNECTIONS: IConnection[] = [
         startOffset: -0.6,
         annotationElement: (
             <Annotation
-                label="Data"
+                label="app.annotations.data"
                 type="data"
                 animate
             />
@@ -54,7 +54,7 @@ const CONNECTIONS: IConnection[] = [
         endPoint: 'left',
         annotationElement: (
             <Annotation
-                label="Model"
+                label="app.annotations.model"
                 type="model"
                 animate
             />

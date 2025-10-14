@@ -1,43 +1,55 @@
 {
     "app": {
+        "little": "Pieni",
+        "languageMachine": "Kielikone",
         "save": "Tallenna",
         "load": "Avaa",
-        "saveTitle": "Tallenna malli",
-        "saveMessage": "Anna mallille nimi:",
-        "saveName": "Mallin nimi",
+        "saveTitle": "Tallenna kielimalli",
+        "saveMessage": "Anna kielimallille nimi:",
+        "saveName": "Kielimallin nimi",
         "saveSave": "Tallenna",
         "saveCancel": "Peruuta",
         "settings": {
             "title": "Asetukset",
             "general": "Yleiset",
-            "training": "Opetus",
+            "training": "Opettaminen",
             "generator": "Generointi",
-            "showModelSelect": "Näytä mallien valinta",
+            "showModelSelect": "Näytä kielimallien valinta",
             "showEvaluation": "Näytä arviointi-ikkuna",
             "showTrainer": "Näytä opetusikkuna",
             "showDataEntry": "Näytä dataikkuna",
-            "showSampleExplore": "Opetusdatan tarkasteleminen",
-            "showModelInfo": "Näytä mallin tiedot",
             "showSettings": "Näytä asetukset",
             "showPrompt": "Kehote (prompt)",
             "showProbabilities": "Näytä todennäköisyydet",
             "showAttention": "Visualisoi huomiomekanismi",
             "maxLength": "Generoidun tekstin enimmäispituus",
-            "temperature": "Sattumanvaraisuus (temperature)",
+            "temperature": "Sattumanvaraisuus (lämpötila)",
             "batchSize": "Tekstinäyte-erän koko",
             "learningRate": "Oppimisnopeus",
             "showOutputText": "Näytä mallin kehittyminen",
             "checkpointing": "Gradienttitarkistuspisteet",
             "showXAI": "Näytä selittävä tekoäly (XAI)",
-            "topP": "Top P -otanta"
+            "topP": "Top P -otanta",
+            "evaluationMetrics": "Evaluation Metrics",
+            "qualityMetric": "Quality",
+            "perplexityMetric": "Perplexity",
+            "lossMetric": "Loss",
+            "advancedMetrics": "Advanced Metrics"
         },
-        "close": "Sulje"
+        "close": "Sulje",
+        "annotations": {
+            "model": "Malli",
+            "data": "Data"
+        }
+    },
+    "deviceProbe": {
+        "probing": "Tarkastellaan laitteistosi suorituskykyä"
     },
     "data": {
-        "title": "Opetusdata",
+        "title": "Opetusaineisto",
         "textDialogTitle": "Tekstisisältö",
-        "addTooltip": "Lisää uutena opetusdatana",
-        "dataHint": "Kirjoita tekstiä tai lataa erilaisia tiedostotyyppejä (txt, csv, pdf, docx) opetusdataksi. Mitä enemmän tekstiä, sitä parempi.",
+        "addTooltip": "Lisää uutena opetusaineistona",
+        "dataHint": "Kirjoita tekstiä tai lataa erilaisia tiedostotyyppejä (txt, csv, pdf, docx) opetusaineistoksi. Mitä enemmän tekstiä, sitä parempi.",
         "modelHint": "Valitse ensin malli.",
         "add": "Kirjoita",
         "upload": "Lataa",
@@ -50,33 +62,33 @@
         "dropHint": "Pudota tiedostot tähän...",
         "dropError": "Voit pudottaa vain tekstitiedostoja (txt, csv, pdf, docx).",
         "ok": "OK",
-        "samples": "Tekstinäytteet",
-        "search": "Haku",
+        "samples": "Tekstinäytettä",
+        "search": "Hae",
         "downloading": "Ladataan {{count}} tiedosto(a)"
     },
     "model": {
         "parameters": "Parametrit",
         "memory": "Muisti",
-        "title": "Malli",
+        "title": "Kielimalli",
         "create": "Luo uusi",
         "upload": "Lataa",
         "search": "Haku",
         "charTokeniser": "{{size}} merkkiä",
         "bpeTokeniser": "{{size}} sanaketta",
         "layers": "{{count}} kerrosta",
-        "contextSize": "Konteksti-ikkuna {{size}}",
+        "contextSize": "Konteksti-ikkunan koko: {{size}}",
         "duration": "{{duration}} opetusta",
         "durationHours": "{{count}} tuntia",
         "durationMinutes": "{{count}} minuuttia",
         "durationSeconds": "{{count}} sekuntia",
         "samples": "{{samples}} tekstinäytettä",
         "embeddingSize": "Sisäinen koko {{size}}",
-        "modelHint": "Valitse tai lataa malli."
+        "modelHint": "Valitse tai lataa kielimalli."
     },
     "training": {
-        "title": "Opetus",
+        "title": "Opettaminen",
         "samples": "näytettä",
-        "start": "Opeta",
+        "start": "Opeta malli",
         "stop": "Pysäytä",
         "hours": "t",
         "minutes": "m",
@@ -84,8 +96,8 @@
         "remaining": "jäljellä"
     },
     "generator": {
-        "title": "Tekstin generointi",
-        "generate": "Generoi",
+        "title": "Tekstin luominen",
+        "generate": "Luo tekstiä",
         "promptPlaceholder": "Valinnainen kehoteteksti...",
         "settingsTooltip": "Generoinnin asetukset",
         "pause": "Pysäytä",
@@ -93,16 +105,14 @@
         "reset": "Tyhjennä",
         "copy": "Kopioi leikepöydälle"
     },
-    "samples": {
-        "title": "Tekstinäytteet",
-        "noSamples": "Näytteitä ei voi tarkastella nyt: lisää opetusdataa tarkastellaksesi näytteitä.",
-        "moreSamples": "Tekstinäytteitä pitäisi olla enemmän",
-        "total": "Yhteensä",
-        "shuffle": "Sekoita näytteiden järjestys"
-    },
     "evaluation": {
-        "title": "Tarkkuus",
-        "quality": "Tarkkuus"
+        "title": "Laatu",
+        "quality": "Laatu",
+        "perplexity": "Perplexisuus",
+        "loss": "Häviö",
+        "samplesPerSecond": "Näytteitä/s",
+        "memory": "Muisti",
+        "gradientNorm": "Gradientin normi"
     },
     "modelStatus": {
         "warmup": "Mallia valmistellaan...",
@@ -113,15 +123,6 @@
         "error": "Mallissa tapahtui virhe",
         "none": "Mallia ei ole ladattu",
         "awaitingTokens": "Odotetaan sanakkeita (token)..."
-    },
-    "info": {
-        "title": "Mallin tiedot",
-        "selectModel": "Valitse malli tarkastellaksesi sen tietoja.",
-        "parameters": "Parametreja",
-        "transformers": "Transformereita",
-        "heads": "Huomiokärkiä",
-        "embedding": "Esitys",
-        "context": "Konteksti-ikkuna"
     },
     "validation": {
         "invalid_number": "Virheellinen numero",

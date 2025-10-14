@@ -3,6 +3,7 @@ import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAtom } from 'jotai';
 import { generatorTemperature } from '../../state/generatorSettings';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     open: boolean;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function GeneratorSettings({ onClose, open }: Props) {
+    const { t } = useTranslation();
     const [temperature, setTemperature] = useAtom(generatorTemperature);
     return (
         <div className={open ? style.showSettings : style.settings}>
@@ -21,7 +23,7 @@ export default function GeneratorSettings({ onClose, open }: Props) {
                 <CloseIcon fontSize="large" />
             </IconButton>
             <div className={style.settingsInner}>
-                <label>Temperature</label>
+                <label>{t('app.settings.temperature')}</label>
                 <Slider
                     value={temperature}
                     onChange={(_, newValue) => setTemperature(newValue as number)}

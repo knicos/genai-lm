@@ -34,8 +34,8 @@ interface Props {
 }
 
 export default function ModelSearch({ model, onModel, onClose, selectedSet }: Props) {
-    const { t } = useTranslation();
-    const [lang, setLang] = useState(navigator.language.split('-')[0]);
+    const { t, i18n } = useTranslation();
+    const [lang, setLang] = useState(i18n.language.split('-')[0]);
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
     //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
     const [dataRows, setDataRows] = useState<RowSet<ModelCardItem>[]>([]);

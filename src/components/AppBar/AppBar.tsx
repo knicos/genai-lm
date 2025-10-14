@@ -13,11 +13,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { uiShowSettings } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
-
-export const LANGS = [
-    { name: 'en-GB', label: 'English' },
-    { name: 'fi-FI', label: 'Suomi' },
-];
+import { LANGS } from './langs';
 
 interface Props {
     model?: TeachableLLM;
@@ -95,7 +91,8 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         height="48"
                     />
                     <h1>
-                        <div className={style.little}>Little</div>Language Machine
+                        <div className={style.little}>{t('app.little')}</div>
+                        {t('app.languageMachine')}
                     </h1>
                 </Link>
                 <div className={style.buttonBar}>
