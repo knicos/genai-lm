@@ -9,6 +9,7 @@ import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
 import { DataCardItem } from '../../components/DataCard/type';
 import DataCard from '../../components/DataCard/DataCard';
+import { Spinner } from '@genai-fi/base';
 
 interface DataSetManifest {
     dataSets: DataCardItem[];
@@ -40,7 +41,7 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
     const [dataRows, setDataRows] = useState<RowSet<DataCardItem>[]>([]);
 
     useEffect(() => {
-        fetch('/dataManifest.json')
+        fetch('https://store.gen-ai.fi/llm/dataManifest.json')
             .then((res) => res.json())
             .then((data: DataSetManifest) => {
                 //setManifest(data);
@@ -87,6 +88,7 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                         <CloseIcon fontSize="large" />
                     </IconButton>
                 </div>
+                {dataRows.length === 0 && <Spinner />}
                 <CardView<DataCardItem, Downloader>
                     CardComponent={DataCard}
                     data={dataRows}

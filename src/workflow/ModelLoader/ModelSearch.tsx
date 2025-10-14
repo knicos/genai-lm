@@ -10,6 +10,7 @@ import { RowSet } from '../../components/CardRow/CardRow';
 import { ModelCardItem } from '../../components/ModelCard/type';
 import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
+import { Spinner } from '@genai-fi/base';
 
 interface ModelManifest {
     models: ModelCardItem[];
@@ -42,7 +43,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
     const [download, setDownload] = useState<Downloader | null>(null);
 
     useEffect(() => {
-        fetch('/modelManifest.json')
+        fetch('https://store.gen-ai.fi/llm/modelManifest.json')
             .then((res) => res.json())
             .then((data: ModelManifest) => {
                 setDataRows(groupByCategory(lang, data));
@@ -118,6 +119,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                         <CloseIcon fontSize="large" />
                     </IconButton>
                 </div>
+                {dataRows.length === 0 && <Spinner />}
                 <CardView
                     data={dataRows}
                     onSelect={handleSelect}
