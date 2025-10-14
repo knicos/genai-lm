@@ -27,7 +27,7 @@
             "batchSize": "Tekstinäyte-erän koko",
             "learningRate": "Oppimisnopeus",
             "showOutputText": "Näytä mallin kehittyminen",
-            "checkpointing": "Gradienttitarkistuspisteet",
+            "checkpointing": "Poista gradienttitarkistuspisteet käytöstä",
             "showXAI": "Näytä selittävä tekoäly (XAI)",
             "topP": "Top P -otanta",
             "evaluationMetrics": "Evaluation Metrics",

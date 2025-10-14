@@ -27,7 +27,7 @@
             "batchSize": "Batch Size",
             "learningRate": "Learning Rate",
             "showOutputText": "Show Progress Text",
-            "checkpointing": "Gradient Checkpointing",
+            "checkpointing": "Disable Gradient Checkpointing",
             "showXAI": "Show XAI",
             "topP": "Top P (nucleus sampling)",
             "evaluationMetrics": "Evaluation Metrics",

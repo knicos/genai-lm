@@ -11,7 +11,7 @@ import { wait } from '../../utilities/wait';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
     trainerBatchSize,
-    trainerCheckpointing,
+    trainerCheckpointing as trainerDisableCheckpointing,
     trainerLearningRate,
     trainerMaxSteps,
 } from '../../state/trainerSettings';
@@ -22,6 +22,8 @@ import Clock from '../../components/Clock/Clock';
 import Remaining from './Remaining';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
+
+const CHECKPT_THRESHOLD = 5_000_000;
 
 interface Props {
     model?: TeachableLLM;
@@ -46,7 +48,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const status = useModelStatus(model);
     const batchSize = useAtomValue(trainerBatchSize);
     const maxSteps = useAtomValue(trainerMaxSteps);
-    const checkpointing = useAtomValue(trainerCheckpointing);
+    const disableCheckpointing = useAtomValue(trainerDisableCheckpointing);
     const learningRate = useAtomValue(trainerLearningRate);
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
@@ -157,7 +159,17 @@ export default function TextTraining({ model, dataset }: Props) {
                                 setNeedsTraining(false);
                                 // setEpochs(0);
                                 await wait(200);
-                                model.model.checkpointing = checkpointing;
+
+                                const modelSize = model.getNumParams();
+                                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
+
+                                console.log(
+                                    'Estimate memory:',
+                                    (model.estimateTrainingMemoryUsage(batchSize) / (1024 * 1024 * 1024)).toFixed(2),
+                                    'GB'
+                                );
+
+                                model.model.checkpointing = useCheckpointing;
                                 model.enableProfiler = advanced;
                                 trainer
                                     .train(dataset, {
