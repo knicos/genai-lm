@@ -34,7 +34,8 @@
             "qualityMetric": "Quality",
             "perplexityMetric": "Perplexity",
             "lossMetric": "Loss",
-            "advancedMetrics": "Advanced Metrics"
+            "advancedMetrics": "Advanced Metrics",
+            "performProbe": "Check hardware on startup"
         },
         "close": "Close",
         "annotations": {

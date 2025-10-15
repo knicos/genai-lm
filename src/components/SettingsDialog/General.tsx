@@ -1,13 +1,17 @@
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { LangSelect } from '@genai-fi/base';
 import { workflowSteps } from '../../state/workflowSettings';
+import { deviceHasWebGPU, deviceMemory, devicePerformProbe } from '../../state/device';
 
 export default function GeneralSettings() {
     const { t } = useTranslation();
     const [workflow, setWorkflow] = useAtom(workflowSteps);
+    const [performProbe, setPerformProbe] = useAtom(devicePerformProbe);
+    const memory = useAtomValue(deviceMemory);
+    const hasWebGPU = useAtomValue(deviceHasWebGPU);
 
     return (
         <div className={style.column}>
@@ -108,6 +112,21 @@ export default function GeneralSettings() {
                 }
                 label={t('app.settings.showXAI')}
             />
+            <div className={style.spacer} />
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={performProbe}
+                        onChange={(_, checked) => setPerformProbe(checked)}
+                    />
+                }
+                label={t('app.settings.performProbe')}
+            />
+            <div className={style.spacer} />
+            <div>
+                <div>Memory: {(memory || 0) / 1024 / 1024} MB</div>
+                <div>WebGPU: {hasWebGPU ? 'Available' : 'Not Available'}</div>
+            </div>
         </div>
     );
 }

@@ -59,56 +59,68 @@ async function probeGPUMemory(adapterType: 'high-performance' | 'low-power' = 'h
 
         self.postMessage({ type: 'start', chunkSize });
 
-        while (!failed) {
-            // Create storage buffer
-            const buffer = device.createBuffer({
-                size: chunkSize,
-                usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-            });
+        while (!failed && totalAllocated < 8 * 1024 * 1024 * 1024) {
+            try {
+                device.pushErrorScope('out-of-memory');
 
-            // Create bind group
-            const bindGroup = device.createBindGroup({
-                layout: pipeline.getBindGroupLayout(0),
-                entries: [
-                    {
-                        binding: 0,
-                        resource: { buffer },
-                    },
-                ],
-            });
+                // Create storage buffer
+                const buffer = device.createBuffer({
+                    size: chunkSize,
+                    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+                });
 
-            // Submit a compute pass to actually use the memory
-            const commandEncoder = device.createCommandEncoder();
-            const passEncoder = commandEncoder.beginComputePass();
-            passEncoder.setPipeline(pipeline);
-            passEncoder.setBindGroup(0, bindGroup);
-            const workgroups = 32 * 1024;
-            passEncoder.dispatchWorkgroups(workgroups);
-            passEncoder.end();
+                // Create bind group
+                const bindGroup = device.createBindGroup({
+                    layout: pipeline.getBindGroupLayout(0),
+                    entries: [
+                        {
+                            binding: 0,
+                            resource: { buffer },
+                        },
+                    ],
+                });
 
-            device.queue.submit([commandEncoder.finish()]);
+                // Submit a compute pass to actually use the memory
+                const commandEncoder = device.createCommandEncoder();
+                const passEncoder = commandEncoder.beginComputePass();
+                passEncoder.setPipeline(pipeline);
+                passEncoder.setBindGroup(0, bindGroup);
+                const workgroups = 32 * 1024;
+                passEncoder.dispatchWorkgroups(workgroups);
+                passEncoder.end();
 
-            // Wait for GPU operations to complete
-            await device.queue.onSubmittedWorkDone();
+                device.queue.submit([commandEncoder.finish()]);
 
-            // Check for errors after GPU work
-            await new Promise((resolve) => setTimeout(resolve, 10));
+                // Wait for GPU operations to complete
+                await device.queue.onSubmittedWorkDone();
 
-            if (failed) {
-                buffer.destroy();
+                // Check for errors after GPU work
+                await new Promise((resolve) => setTimeout(resolve, 10));
+
+                if (failed) {
+                    buffer.destroy();
+                    break;
+                }
+
+                const error = await device.popErrorScope();
+                if (error) {
+                    buffer.destroy();
+                    break;
+                }
+
+                buffers.push(buffer);
+                totalAllocated += chunkSize;
+
+                self.postMessage({
+                    type: 'progress',
+                    allocated: totalAllocated,
+                });
+
+                // Small delay between allocations
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            } catch {
                 break;
             }
-
-            buffers.push(buffer);
-            totalAllocated += chunkSize;
-
-            self.postMessage({
-                type: 'progress',
-                allocated: totalAllocated,
-            });
-
-            // Small delay between allocations
-            await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
         self.postMessage({
