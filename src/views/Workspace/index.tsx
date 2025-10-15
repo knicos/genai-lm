@@ -8,7 +8,6 @@ import TextData from '../../workflow/TextData/TextData';
 import { IConnection, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
 import Evaluation from '../../workflow/Evaluation/Evaluation';
-import ModelInfo from '../../workflow/ModelInfo/ModelInfo';
 import { useAtomValue } from 'jotai';
 import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
@@ -136,15 +135,6 @@ export function Component() {
                                 setModel(m);
                             }}
                         />
-                    )}
-                    {steps.has('modelInfo') && (
-                        <div
-                            className={style.box}
-                            data-widget="info"
-                            style={{ width: 'unset' }}
-                        >
-                            <ModelInfo model={model} />
-                        </div>
                     )}
                 </div>
                 <div

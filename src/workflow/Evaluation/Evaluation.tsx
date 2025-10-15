@@ -121,7 +121,10 @@ export default function Evaluation({ model }: Props) {
                 >
                     {metric === 'quality' && (
                         <>
-                            <div className={style.value}>
+                            <div
+                                className={style.value}
+                                data-testid="quality-value"
+                            >
                                 {`${Math.round(metricValue * 100)}`}
                                 <span className={style.percentage}>%</span>
                             </div>

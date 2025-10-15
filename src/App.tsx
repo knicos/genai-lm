@@ -35,6 +35,8 @@ function ErrorComponent() {
 
     logger.error(`Router error: ${str}`);
 
+    console.error(error);
+
     return (
         <section className="errorView">
             <h1>Something went wrong</h1>
