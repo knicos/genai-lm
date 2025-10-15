@@ -34,7 +34,7 @@ export default function DataListing({ data, onDelete, selected, setSelected }: P
                         onClick={() => setSelected && setSelected(index)}
                     >
                         <ListItemAvatar className={style.avatar}>
-                            <div className={style.size}>{prettyNumber(entry.size)}</div>
+                            <div className={style.size}>{prettyNumber(entry.size, t)}</div>
                             <div className={style.label}>{t('data.samples')}</div>
                         </ListItemAvatar>
                         <ListItemText primary={entry.name} />

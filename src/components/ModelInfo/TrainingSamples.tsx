@@ -12,7 +12,7 @@ export default function TrainingSamples({ samples }: Props) {
     return (
         <p>
             <DescriptionIcon />
-            {t('model.samples', { samples: prettyNumber(samples) })}
+            {t('model.samples', { samples: prettyNumber(samples, t) })}
         </p>
     );
 }

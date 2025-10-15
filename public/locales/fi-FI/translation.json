@@ -40,7 +40,10 @@
         "annotations": {
             "model": "Malli",
             "data": "Aineisto"
-        }
+        },
+        "billion": "B",
+        "million": "M",
+        "thousand": "k"
     },
     "deviceProbe": {
         "probing": "Tarkastellaan laitteistosi suorituskykyä"

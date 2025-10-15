@@ -40,7 +40,10 @@
         "annotations": {
             "model": "Model",
             "data": "Data"
-        }
+        },
+        "billion": "B",
+        "million": "M",
+        "thousand": "k"
     },
     "deviceProbe": {
         "probing": "Checking your hardware..."

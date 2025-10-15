@@ -56,7 +56,7 @@ export default function SampleViewer({ samples, contextSize, parameters }: Props
             <BoxMenu>
                 <div>
                     <span className={style.bold}>{t('samples.total')}: </span>
-                    {`${prettyNumber(joinedSamples?.length || 0)}`}
+                    {`${prettyNumber(joinedSamples?.length || 0, t)}`}
                 </div>
                 <Tooltip
                     title={t('samples.shuffle')}

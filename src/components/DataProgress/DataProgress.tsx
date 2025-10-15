@@ -2,6 +2,7 @@ import { qualityToColor } from '../../utilities/colours';
 import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
 import StarIcon from '@mui/icons-material/Star';
+import { useTranslation } from 'react-i18next';
 
 const TARGET = 0.4;
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function DataProgress({ samplesProcessed, desiredSamples }: Props) {
+    const { t } = useTranslation();
     const progress = Math.min(100, (samplesProcessed / (desiredSamples + TARGET * desiredSamples)) * 100);
 
     return (
@@ -44,7 +46,7 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
                 className={style.targetLabel}
                 style={{ left: `calc(60% - 10px)` }}
             >
-                {prettyNumber(desiredSamples)}
+                {prettyNumber(desiredSamples, t)}
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 import styleM from './style.module.css';
 import prettyNumber from '../../utilities/prettyNumber';
 import { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     value: number;
@@ -10,12 +11,13 @@ interface Props {
 }
 
 export default function NumberBox({ value, label, style, unit }: Props) {
+    const { t } = useTranslation();
     return (
         <div
             className={styleM.container}
             style={style}
         >
-            <div className={styleM.size}>{unit ? `${value} ${unit}` : prettyNumber(value)}</div>
+            <div className={styleM.size}>{unit ? `${value} ${unit}` : prettyNumber(value, t)}</div>
             <div className={styleM.label}>{label}</div>
         </div>
     );
