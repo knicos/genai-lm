@@ -79,6 +79,12 @@ export function Component() {
         if (token) {
             initializeLogger(token);
         }
+
+        const hf = params.get('hf');
+        if (hf) {
+            const m = TeachableLLM.loadModel(hf);
+            setModel(m);
+        }
     }, [params]);
 
     // Hack to update lines when model changes

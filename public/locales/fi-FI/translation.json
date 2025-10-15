@@ -72,7 +72,7 @@
         "title": "Kielimalli",
         "create": "Luo uusi",
         "upload": "Lataa",
-        "search": "Haku",
+        "search": "Hae",
         "charTokeniser": "{{size}} merkkiä",
         "bpeTokeniser": "{{size}} sanaketta",
         "layers": "{{count}} kerrosta",
