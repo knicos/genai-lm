@@ -56,6 +56,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
         (file: File) => {
             setIsLoading(true);
             const model = TeachableLLM.loadModel(file);
+            model.meta.trained = true;
             onModel(model);
             waitForModel(model).then(() => {
                 setIsLoading(false);

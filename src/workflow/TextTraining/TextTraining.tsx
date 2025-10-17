@@ -91,7 +91,7 @@ export default function TextTraining({ model, dataset }: Props) {
         if (model) {
             const h = () => {
                 setTrainer(model.trainer());
-                setNeedsTraining((old) => old || model.model.log.length === 0);
+                setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
             model.on('loaded', h);
@@ -108,10 +108,74 @@ export default function TextTraining({ model, dataset }: Props) {
     }, [dataset]);
 
     useEffect(() => {
-        if (model && status === 'ready') {
-            setLR((cur) => (cur > 0 ? cur : model.model.log.length > 0 ? learningRate * 0.1 : learningRate));
+        if (model) {
+            setLR(model.meta.trained ? learningRate * 0.1 : learningRate);
         }
-    }, [learningRate, model, status]);
+    }, [learningRate, model]);
+
+    const startTraining = async () => {
+        if (model && dataset && trainer) {
+            if (!model.loaded) {
+                return;
+            }
+            if (!model.tokeniser.trained) {
+                await model.trainTokeniser(dataset);
+                await wait(10);
+            }
+
+            if (training) {
+                trainer.stop();
+                setTraining(false);
+                return;
+            }
+
+            if (!done) {
+                // already training
+                return;
+            }
+
+            setTraining(true);
+            setDone(false);
+            setNeedsTraining(false);
+            // setEpochs(0);
+            await wait(200);
+
+            const modelSize = model.getNumParams();
+            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
+
+            console.log(
+                'Estimate memory:',
+                (model.estimateTrainingMemoryUsage(batchSize) / (1024 * 1024 * 1024)).toFixed(2),
+                'GB'
+            );
+
+            console.log('Using learning rate:', lr > 0 ? lr : learningRate);
+
+            logger.log(
+                `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
+            );
+
+            model.model.checkpointing = useCheckpointing;
+            model.enableProfiler = advanced;
+            trainer
+                .train(dataset, {
+                    batchSize,
+                    maxSteps,
+                    learningRate: lr > 0 ? lr : learningRate,
+                    advancedMetrics: advanced,
+                })
+                .then(() => {
+                    setDone(true);
+                    setTraining(false);
+                    logger.log('Training stopped');
+                })
+                .catch((err) => {
+                    setDone(true);
+                    setTraining(false);
+                    logger.error(`Training error: ${err.message}`);
+                });
+        }
+    };
 
     return (
         <Box
@@ -144,64 +208,7 @@ export default function TextTraining({ model, dataset }: Props) {
                         disabled={!canTrain || (!done && !training)}
                         variant="contained"
                         startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
-                        onClick={async () => {
-                            if (model && dataset && trainer) {
-                                if (!model.tokeniser.trained) {
-                                    await model.trainTokeniser(dataset);
-                                    await wait(10);
-                                }
-
-                                if (training) {
-                                    trainer.stop();
-                                    setTraining(false);
-                                    return;
-                                }
-
-                                if (!done) {
-                                    // already training
-                                    return;
-                                }
-
-                                setTraining(true);
-                                setDone(false);
-                                setNeedsTraining(false);
-                                // setEpochs(0);
-                                await wait(200);
-
-                                const modelSize = model.getNumParams();
-                                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
-
-                                console.log(
-                                    'Estimate memory:',
-                                    (model.estimateTrainingMemoryUsage(batchSize) / (1024 * 1024 * 1024)).toFixed(2),
-                                    'GB'
-                                );
-
-                                logger.log(
-                                    `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
-                                );
-
-                                model.model.checkpointing = useCheckpointing;
-                                model.enableProfiler = advanced;
-                                trainer
-                                    .train(dataset, {
-                                        batchSize,
-                                        maxSteps,
-                                        learningRate: lr > 0 ? lr : learningRate,
-                                        advancedMetrics: advanced,
-                                    })
-                                    .then(() => {
-                                        setDone(true);
-                                        setTraining(false);
-                                        logger.log('Training stopped');
-                                    })
-                                    .catch((err) => {
-                                        setDone(true);
-                                        setTraining(false);
-                                        logger.error(`Training error: ${err.message}`);
-                                    });
-                            }
-                        }}
+                        onClick={startTraining}
                     >
                         {done ? t('training.start') : t('training.stop')}
                     </Button>

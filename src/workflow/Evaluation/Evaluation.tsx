@@ -2,13 +2,13 @@ import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import style from './style.module.css';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useEffect, useState } from 'react';
-import useModelStatus from '../../utilities/useModelStatus';
 import { useTranslation } from 'react-i18next';
 import Circle from '../../components/Clock/Circle';
 import { qualityToColor } from '../../utilities/colours';
 import { useAtomValue } from 'jotai';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
 import Box from '../../components/BoxTitle/Box';
+import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface TrainingProgress {
     duration: number;
@@ -64,7 +64,7 @@ export default function Evaluation({ model }: Props) {
     const { t } = useTranslation();
     const [metricValue, setMetricValue] = useState<number>(0);
     const [metricPercentage, setMetricPercentage] = useState<number>(0);
-    const status = useModelStatus(model);
+    const ready = useModelLoaded(model);
     const metric = useAtomValue(evaluatorMetrics);
     const advanced = useAtomValue(evaluatorAdvanced);
     const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
@@ -92,7 +92,7 @@ export default function Evaluation({ model }: Props) {
     }, [model, metric, advanced]);
 
     useEffect(() => {
-        if (model && status === 'ready' && model.model.log) {
+        if (model && ready && model.model.log) {
             const log = model.model.log;
             const lastLog = log[log.length - 1];
             if (lastLog) {
@@ -104,7 +104,7 @@ export default function Evaluation({ model }: Props) {
                 setMetricPercentage(0);
             }
         }
-    }, [model, status, metric]);
+    }, [model, ready, metric]);
 
     return (
         <Box widget="evaluation">

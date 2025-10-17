@@ -69,6 +69,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                     const newModel = TeachableLLM.loadModel(file);
                     newModel.meta.id = card.id;
                     newModel.meta.name = card.name;
+                    newModel.meta.trained = card.trained || true;
                     onModel(newModel);
                     setDownload(null);
                 });
@@ -76,6 +77,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                 const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
                 newModel.meta.id = card.id;
                 newModel.meta.name = card.name;
+                newModel.meta.trained = false;
                 onModel(newModel);
             }
         },

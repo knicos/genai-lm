@@ -28,6 +28,7 @@ describe('TextTraining', () => {
             model: {
                 log: [],
             },
+            meta: {},
             getNumParams: () => 123456,
         } as unknown as TeachableLLM;
         render(
@@ -51,6 +52,8 @@ describe('TextTraining', () => {
             on: ee.on.bind(ee),
             off: ee.off.bind(ee),
             status: 'ready',
+            loaded: true,
+            ready: true,
             config: {
                 nLayers: 4,
                 nHeads: 4,
@@ -69,6 +72,7 @@ describe('TextTraining', () => {
             model: {
                 log: [],
             },
+            meta: {},
             getNumParams: () => 123456,
             estimateTrainingMemoryUsage: () => 2000000000,
         } as unknown as TeachableLLM;

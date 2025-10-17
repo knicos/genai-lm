@@ -17,6 +17,9 @@ describe('ModelLoader', () => {
             on: () => {},
             off: () => {},
             status: 'ready',
+            ready: true,
+            loaded: true,
+            busy: false,
             config: {
                 nLayers: 4,
                 nHeads: 4,

@@ -11,12 +11,12 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 import InfoPanel from './InfoPanel';
 import DataProgress from '../../components/DataProgress/DataProgress';
 import TextSearch from './TextSearch';
-import useModelStatus from '../../utilities/useModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
 import Downloader from '../../utilities/downloader';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
+import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
     model?: TeachableLLM;
@@ -59,7 +59,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [showInput, setShowInput] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
     const [showDropError, setShowDropError] = useState(false);
-    const status = useModelStatus(model);
+    const ready = useModelLoaded(model);
     const [selected, setSelected] = useState<number>(-1);
     const [downloads, setDownloads] = useState<Downloader[]>([]);
     const [selectedSet, setSelectedSet] = useState<Set<string>>();
@@ -228,7 +228,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     )}
                     {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
                 </div>
-                {status !== 'loading' && (
+                {ready && (
                     <DataProgress
                         samplesProcessed={totalSamples}
                         desiredSamples={(model?.getNumParams() || 0) * 2}
