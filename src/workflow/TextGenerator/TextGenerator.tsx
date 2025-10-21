@@ -312,6 +312,7 @@ export default function TextGenerator({ model }: Props) {
                                         attentionScores: enableAttention,
                                         includeProbabilities: enableProbabilities,
                                         topP: topP > 0 ? topP : undefined,
+                                        noCache: false,
                                     })
                                     .then(() => {
                                         setText(textRef.current);

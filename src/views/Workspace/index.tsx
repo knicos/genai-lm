@@ -14,7 +14,7 @@ import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import Annotation from './Annotation';
 import XAIBox from '../../workflow/XAI/XAI';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
-import { deviceMemory, devicePerformProbe } from '../../state/device';
+import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
 
@@ -69,7 +69,7 @@ export function Component() {
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
-    const memory = useAtomValue(deviceMemory);
+    const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const [params] = useSearchParams();
 
@@ -103,7 +103,7 @@ export function Component() {
         setConn([...CONNECTIONS]);
     }, [textDataset]);
 
-    return performProbe && memory === null ? (
+    return performProbe && !detected ? (
         <DeviceProbe />
     ) : (
         <>

@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { LangSelect } from '@genai-fi/base';
 import { workflowSteps } from '../../state/workflowSettings';
-import { deviceHasWebGPU, deviceMemory, devicePerformProbe } from '../../state/device';
+import { deviceHasWebGPU, deviceHasWebGL, devicePerformProbe } from '../../state/device';
 
 export default function GeneralSettings() {
     const { t } = useTranslation();
     const [workflow, setWorkflow] = useAtom(workflowSteps);
     const [performProbe, setPerformProbe] = useAtom(devicePerformProbe);
-    const memory = useAtomValue(deviceMemory);
     const hasWebGPU = useAtomValue(deviceHasWebGPU);
+    const hasWebGL = useAtomValue(deviceHasWebGL);
 
     return (
         <div className={style.column}>
@@ -124,7 +124,7 @@ export default function GeneralSettings() {
             />
             <div className={style.spacer} />
             <div>
-                <div>Memory: {(memory || 0) / 1024 / 1024} MB</div>
+                <div>WebGL: {hasWebGL ? 'Available' : 'Not Available'}</div>
                 <div>WebGPU: {hasWebGPU ? 'Available' : 'Not Available'}</div>
             </div>
         </div>

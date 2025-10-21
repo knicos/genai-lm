@@ -30,8 +30,15 @@ export default function ModelLoader({ onModel, model }: Props) {
                 setDone(true);
             };
             model.on('loaded', h);
+
+            const eh = (error: unknown) => {
+                console.error('Error loading model:', error);
+            };
+            model.on('error', eh);
+
             return () => {
                 model.off('loaded', h);
+                model.off('error', eh);
             };
         }
     }, [model]);

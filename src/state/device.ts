@@ -1,8 +1,8 @@
+import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-export const deviceMemory = atomWithStorage<number | null>('deviceMemory', null);
-export const deviceHasWebGPU = atomWithStorage<boolean>('deviceHasWebGPU', false);
-export const deviceName = atomWithStorage<string | null>('deviceName', null);
-export const deviceDedicated = atomWithStorage<boolean | null>('deviceDedicated', null);
+export const deviceDetected = atom<boolean>(false);
+export const deviceHasWebGPU = atom<boolean>(false);
+export const deviceHasWebGL = atom<boolean>(false);
 
 export const devicePerformProbe = atomWithStorage<boolean>('devicePerformProbe', false);
