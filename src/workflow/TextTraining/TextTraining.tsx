@@ -19,7 +19,6 @@ import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
-import Remaining from './Remaining';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
@@ -193,13 +192,17 @@ export default function TextTraining({ model, dataset }: Props) {
                     <Clock
                         duration={trainingProgress?.duration || 0}
                         totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
+                        remaining={trainingProgress?.remaining || 0}
                     />
                     <div className={style.stats}>
                         <NumberBox
                             value={(epochs || 0) * batchSize}
                             label={t('training.samples')}
                         />
-                        <Remaining remaining={trainingProgress?.remaining || 0} />
+                        <NumberBox
+                            value={totalSamples - (epochs || 0) * batchSize}
+                            label={t('training.remaining')}
+                        />
                     </div>
                 </div>
                 <div className={style.buttonBox}>

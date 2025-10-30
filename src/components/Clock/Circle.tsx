@@ -23,7 +23,7 @@ export default function Circle({ radius, children, progress, color }: Props) {
                 <circle
                     stroke="rgba(0, 130, 151, 0.1)"
                     fill="rgba(0, 130, 151, 0.06)"
-                    strokeWidth={stroke / 2}
+                    strokeWidth={stroke}
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}

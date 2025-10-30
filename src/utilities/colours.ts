@@ -7,5 +7,5 @@ export function qualityToColor(quality: number): string {
     const g = Math.round(gray.g + (brand.g - gray.g) * quality);
     const b = Math.round(gray.b + (brand.b - gray.b) * quality);
 
-    return `rgb(${r}, ${g}, ${b})`;
+    return `rgba(${r}, ${g}, ${b}, 0.6)`;
 }

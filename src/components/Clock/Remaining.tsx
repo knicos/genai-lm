@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import NumberBox from '../../components/NumberBox/NumberBox';
+import NumberBox from '../NumberBox/NumberBox';
 import splitTime from '../../utilities/splitTime';
 
 interface Props {
@@ -17,6 +17,7 @@ export default function Remaining({ remaining }: Props) {
                 value={hours}
                 unit={t('training.hours')}
                 label={t('training.remaining')}
+                flip
             />
         );
     }
@@ -26,6 +27,7 @@ export default function Remaining({ remaining }: Props) {
                 value={minutes}
                 unit={t('training.minutes')}
                 label={t('training.remaining')}
+                flip
             />
         );
     }
@@ -35,6 +37,7 @@ export default function Remaining({ remaining }: Props) {
             value={seconds}
             unit={t('training.seconds')}
             label={t('training.remaining')}
+            flip
         />
     );
 }

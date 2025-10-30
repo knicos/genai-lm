@@ -90,13 +90,13 @@
     },
     "training": {
         "title": "Opettaminen",
-        "samples": "näytettä",
+        "samples": "Näytettä",
         "start": "Opeta malli",
         "stop": "Pysäytä",
         "hours": "t",
         "minutes": "m",
         "seconds": "s",
-        "remaining": "jäljellä"
+        "remaining": "Jäljellä"
     },
     "generator": {
         "title": "Tekstin luominen",

@@ -91,13 +91,13 @@
     },
     "training": {
         "title": "Training",
-        "samples": "samples",
+        "samples": "Samples",
         "start": "Train",
         "stop": "Pause",
         "hours": "Hr",
         "minutes": "Min",
         "seconds": "Sec",
-        "remaining": "remaining"
+        "remaining": "Remaining"
     },
     "generator": {
         "title": "Generation",

@@ -8,6 +8,7 @@ describe('Clock', () => {
             <Clock
                 duration={30 * 60 * 1000}
                 totalDuration={1 * 60 * 60 * 1000}
+                remaining={0}
             />
         );
         expect(screen.getByText('30')).toBeInTheDocument();

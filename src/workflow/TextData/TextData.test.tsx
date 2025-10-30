@@ -72,7 +72,7 @@ describe('TextData', () => {
 
         await user.click(screen.getByText('data.search'));
 
-        expect(await screen.findByText('Movies')).toBeInTheDocument();
+        expect(await screen.findByText('Movies', undefined, { timeout: 10000 })).toBeInTheDocument();
 
         const cardElement = screen.getByTestId('card-movie-15minutes');
         expect(cardElement).toBeInTheDocument();

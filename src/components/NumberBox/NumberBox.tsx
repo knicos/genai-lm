@@ -8,17 +8,19 @@ interface Props {
     label: string;
     style?: CSSProperties;
     unit?: string;
+    flip?: boolean;
 }
 
-export default function NumberBox({ value, label, style, unit }: Props) {
+export default function NumberBox({ value, label, style, unit, flip }: Props) {
     const { t } = useTranslation();
     return (
         <div
             className={styleM.container}
             style={style}
         >
+            {flip && <div className={styleM.label}>{label}</div>}
             <div className={styleM.size}>{unit ? `${value} ${unit}` : prettyNumber(value, t)}</div>
-            <div className={styleM.label}>{label}</div>
+            {!flip && <div className={styleM.label}>{label}</div>}
         </div>
     );
 }

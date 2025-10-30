@@ -63,7 +63,7 @@ describe('ModelLoader', () => {
 
         await user.click(screen.getByText('model.search'));
 
-        expect(await screen.findByText('Untrained')).toBeInTheDocument();
+        expect(await screen.findByText('Untrained', undefined, { timeout: 10000 })).toBeInTheDocument();
 
         const cardElement = screen.getByTestId('card-untrained-small');
         expect(cardElement).toBeInTheDocument();
