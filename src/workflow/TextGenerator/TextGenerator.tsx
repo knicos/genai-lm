@@ -247,8 +247,6 @@ export default function TextGenerator({ model }: Props) {
                 <BoxTitle
                     title={t('generator.title')}
                     status={!model ? 'disabled' : generate ? 'busy' : ready && !generate ? 'done' : 'waiting'}
-                    style={{ backgroundColor: '#444', color: 'white' }}
-                    dark={true}
                 />
                 <div className={style.xaiRow}>
                     <TextHighlighter

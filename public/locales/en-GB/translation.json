@@ -87,7 +87,8 @@
         "durationSeconds": "{{count}} seconds",
         "samples": "{{samples}} samples",
         "embeddingSize": "Hidden size of {{size}}",
-        "modelHint": "Select or upload a model."
+        "modelHint": "Select or upload a model.",
+        "languageModel": "Language Model"
     },
     "training": {
         "title": "Training",
