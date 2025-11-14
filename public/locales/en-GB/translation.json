@@ -35,7 +35,8 @@
             "perplexityMetric": "Perplexity",
             "lossMetric": "Loss",
             "advancedMetrics": "Advanced Metrics",
-            "performProbe": "Check hardware on startup"
+            "performProbe": "Check hardware on startup",
+            "showVisualisation": "Show Model Visualisation"
         },
         "close": "Close",
         "annotations": {
@@ -88,7 +89,10 @@
         "samples": "{{samples}} samples",
         "embeddingSize": "Hidden size of {{size}}",
         "modelHint": "Select or upload a model.",
-        "languageModel": "Language Model"
+        "languageModel": "Language Model",
+        "visualisation": {
+            "next": "Next"
+        }
     },
     "training": {
         "title": "Training",
@@ -108,7 +112,10 @@
         "pause": "Pause",
         "editPlaceholder": "Type an optional prompt here...",
         "reset": "Reset",
-        "copy": "Copy to Clipboard"
+        "copy": "Copy to Clipboard",
+        "autoGenerateAriaLabel": "Toggle auto-generate",
+        "autoGenerate": "Auto-generate",
+        "step": "Next"
     },
     "evaluation": {
         "title": "Evaluation",

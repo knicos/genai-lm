@@ -5,11 +5,13 @@ import { Checkbox, FormControlLabel } from '@mui/material';
 import { LangSelect } from '@genai-fi/base';
 import { workflowSteps } from '../../state/workflowSettings';
 import { deviceHasWebGPU, deviceHasWebGL, devicePerformProbe } from '../../state/device';
+import { uiShowVisualisation } from '../../state/uiState';
 
 export default function GeneralSettings() {
     const { t } = useTranslation();
     const [workflow, setWorkflow] = useAtom(workflowSteps);
     const [performProbe, setPerformProbe] = useAtom(devicePerformProbe);
+    const [vis, showVis] = useAtom(uiShowVisualisation);
     const hasWebGPU = useAtomValue(deviceHasWebGPU);
     const hasWebGL = useAtomValue(deviceHasWebGL);
 
@@ -111,6 +113,15 @@ export default function GeneralSettings() {
                     />
                 }
                 label={t('app.settings.showXAI')}
+            />
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={vis}
+                        onChange={(_, checked) => showVis(checked)}
+                    />
+                }
+                label={t('app.settings.showVisualisation')}
             />
             <div className={style.spacer} />
             <FormControlLabel

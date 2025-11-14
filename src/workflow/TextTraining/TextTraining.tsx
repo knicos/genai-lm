@@ -22,6 +22,8 @@ import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
+import { uiShowVisualisation } from '../../state/uiState';
+import { useEvent } from '../../globalEvents';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -54,6 +56,8 @@ export default function TextTraining({ model, dataset }: Props) {
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
+    const [stepPromise, setStepPromise] = useState<(() => void) | null>(null);
+    const shouldStep = useAtomValue(uiShowVisualisation);
 
     useWakeLock(training);
 
@@ -67,7 +71,7 @@ export default function TextTraining({ model, dataset }: Props) {
 
     useEffect(() => {
         if (trainer) {
-            const h = (log: TrainingLogEntry, progress: TrainingProgress) => {
+            const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
                 //model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
@@ -78,13 +82,19 @@ export default function TextTraining({ model, dataset }: Props) {
                         )}, rate: ${progress.samplesPerSecond.toFixed(1)} samples/sec`
                     );
                 }
+                if (shouldStep) {
+                    const p = new Promise<void>((resolve) => {
+                        setStepPromise(resolve);
+                    });
+                    await p;
+                }
             };
             trainer.on('log', h);
             return () => {
                 trainer.off('log', h);
             };
         }
-    }, [trainer, totalSamples, batchSize, model]);
+    }, [trainer, totalSamples, batchSize, model, shouldStep]);
 
     useEffect(() => {
         if (model) {
@@ -112,7 +122,18 @@ export default function TextTraining({ model, dataset }: Props) {
         }
     }, [learningRate, model]);
 
-    const startTraining = async () => {
+    useEvent(
+        'step',
+        () => {
+            if (stepPromise) {
+                stepPromise();
+                setStepPromise(null);
+            }
+        },
+        [stepPromise]
+    );
+
+    const startTraining = async (maxSteps: number) => {
         if (model && dataset && trainer) {
             if (!model.loaded) {
                 return;
@@ -156,13 +177,15 @@ export default function TextTraining({ model, dataset }: Props) {
 
             model.model.checkpointing = useCheckpointing;
             model.enableProfiler = advanced;
+            const trainingOptions = {
+                batchSize,
+                maxSteps,
+                learningRate: lr > 0 ? lr : learningRate,
+                advancedMetrics: advanced,
+            };
+            trainer.prepare(dataset, trainingOptions);
             trainer
-                .train(dataset, {
-                    batchSize,
-                    maxSteps,
-                    learningRate: lr > 0 ? lr : learningRate,
-                    advancedMetrics: advanced,
-                })
+                .train(trainingOptions)
                 .then(() => {
                     setDone(true);
                     setTraining(false);
@@ -211,7 +234,7 @@ export default function TextTraining({ model, dataset }: Props) {
                         disabled={!canTrain || (!done && !training)}
                         variant="contained"
                         startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
-                        onClick={startTraining}
+                        onClick={() => startTraining(maxSteps)}
                     >
                         {done ? t('training.start') : t('training.stop')}
                     </Button>

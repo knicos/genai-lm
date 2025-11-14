@@ -1,14 +1,11 @@
 import style from './style.module.css';
-import { IconButton, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
 import TextHighlighter, { ProbabilityItem } from '../../components/TextHighlighter/TextHighlighter';
-import { Button } from '@genai-fi/base';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import XAIView from './XAIView';
-import TuneIcon from '@mui/icons-material/Tune';
 import GeneratorSettings from './GeneratorSettings';
 import { wait } from '../../utilities/wait';
 import { useAtomValue } from 'jotai';
@@ -17,18 +14,14 @@ import {
     generatorMaxLength,
     generatorShowAttention,
     generatorShowProbabilities,
-    generatorShowPrompt,
     generatorShowSettings,
     generatorTemperature,
     generatorTopP,
 } from '../../state/generatorSettings';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import { trainerOutputText } from '../../state/trainerSettings';
+import Controls from './Controls';
 
 interface Props {
     model?: TeachableLLM;
@@ -136,12 +129,12 @@ export default function TextGenerator({ model }: Props) {
     const enableAttention = useAtomValue(generatorShowAttention);
     const attentionBlock = useAtomValue(generatorAttentionBlock);
     const enableProbabilities = useAtomValue(generatorShowProbabilities);
-    const enablePrompt = useAtomValue(generatorShowPrompt);
     const temperature = useAtomValue(generatorTemperature);
     const topP = useAtomValue(generatorTopP);
     const maxLength = useAtomValue(generatorMaxLength);
     const outputText = useAtomValue(trainerOutputText);
     const [showStatus, setShowStatus] = useState<boolean>(false);
+    const [autoMode, setAutoMode] = useState<boolean>(true);
 
     const attentionRef = useRef<number[][][][][]>([]);
     const probRef = useRef<number[][]>([]);
@@ -149,13 +142,6 @@ export default function TextGenerator({ model }: Props) {
     const busyRef = useRef<boolean>(false);
 
     const disable = status === 'training';
-
-    /*useEffect(() => {
-        if (status === 'ready') {
-            setReady(true);
-        }
-    }, [status]);*/
-
     const ready = status !== 'loading';
 
     useEffect(() => {
@@ -191,6 +177,7 @@ export default function TextGenerator({ model }: Props) {
                     textRef.current = '';
                     setGenerate(true);
                     setHasGenerated(true);
+                    generator.reset();
                     const finalText = await generator.generate(undefined, {
                         maxLength: 200,
                         temperature: 1,
@@ -200,7 +187,7 @@ export default function TextGenerator({ model }: Props) {
                     setGenerate(false);
                     setText(finalText);
                     textRef.current = finalText;
-                    await wait(40);
+                    await wait(10);
                 };
                 model.on('trainStep', h);
                 return () => {
@@ -213,11 +200,8 @@ export default function TextGenerator({ model }: Props) {
     useEffect(() => {
         if (generator) {
             const h = (_: number[], newText: string, attention?: number[][][][], probabilities?: number[][]) => {
-                //setText((prevText) => prevText + newText);
                 textRef.current += newText;
-                //if (textRef.current.length % 5 === 0) {
                 setText(textRef.current);
-                //}
 
                 if (attention) {
                     attentionRef.current = [...attentionRef.current, attention];
@@ -230,9 +214,46 @@ export default function TextGenerator({ model }: Props) {
             generator.on('tokens', h);
             return () => {
                 generator.off('tokens', h);
+                generator.dispose();
             };
         }
     }, [generator]);
+
+    const doGenerate = (maxLength: number) => {
+        if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+            setShowStatus(true);
+            return;
+        }
+        if (busyRef.current) {
+            generator.stop();
+            return;
+        }
+        busyRef.current = true;
+        if (maxLength > 1) setGenerate(true);
+        setHasGenerated(true);
+
+        generator
+            .generate(textRef.current.length > 0 ? textRef.current : undefined, {
+                maxLength,
+                temperature,
+                attentionScores: enableAttention,
+                includeProbabilities: enableProbabilities,
+                topP: topP > 0 ? topP : undefined,
+                noCache: false,
+            })
+            .then(() => {
+                setText(textRef.current);
+
+                if (attentionRef.current.length > 0) {
+                    setAttentionData(attentionRef.current);
+                }
+                if (probRef.current.length > 0) {
+                    setProbabilities(probRef.current);
+                }
+                setGenerate(false);
+                busyRef.current = false;
+            });
+    };
 
     return (
         <Box
@@ -277,115 +298,30 @@ export default function TextGenerator({ model }: Props) {
                         onClose={() => setShowStatus(false)}
                     />
                 </div>
-                {enablePrompt && (
-                    <div className={style.titleRow}>
-                        <Button
-                            size="large"
-                            variant="contained"
-                            disabled={disable}
-                            startIcon={generate ? <PauseIcon /> : <PlayArrowIcon />}
-                            onClick={() => {
-                                if (
-                                    !generator ||
-                                    (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')
-                                ) {
-                                    setShowStatus(true);
-                                    return;
-                                }
-                                if (busyRef.current) {
-                                    generator.stop();
-                                    return;
-                                }
-                                busyRef.current = true;
-                                //setText(''); // Clear previous text
-                                //setAttentionData([]); // Clear previous attention data
-                                //setProbabilities([]); // Clear previous probabilities
-                                setGenerate(true);
-                                setHasGenerated(true);
-                                //textRef.current = '';
-                                generator
-                                    .generate(textRef.current.length > 0 ? textRef.current : undefined, {
-                                        maxLength,
-                                        temperature,
-                                        attentionScores: enableAttention,
-                                        includeProbabilities: enableProbabilities,
-                                        topP: topP > 0 ? topP : undefined,
-                                        noCache: false,
-                                    })
-                                    .then(() => {
-                                        setText(textRef.current);
-                                        //textRef.current = '';
-                                        if (attentionRef.current.length > 0) {
-                                            setAttentionData(attentionRef.current);
-                                            //attentionRef.current = [];
-                                        }
-                                        if (probRef.current.length > 0) {
-                                            setProbabilities(probRef.current);
-                                            //probRef.current = [];
-                                        }
-                                        setGenerate(false);
-                                        busyRef.current = false;
-                                    });
-                            }}
-                        >
-                            {generate ? t('generator.pause') : t('generator.generate')}
-                        </Button>
-                        <div className={style.iconButtons}>
-                            <Tooltip
-                                title={t('generator.reset')}
-                                arrow
-                            >
-                                <IconButton
-                                    color="inherit"
-                                    disabled={disable}
-                                    onClick={() => {
-                                        if (generate && generator) {
-                                            generator.stop();
-                                        }
-                                        setHasGenerated(false);
-                                        setText('');
-                                        textRef.current = '';
-                                        setAttentionData([]);
-                                        attentionRef.current = [];
-                                        setProbabilities([]);
-                                        probRef.current = [];
-                                        setSelected(-1);
-                                    }}
-                                >
-                                    <RefreshIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                                title={t('generator.copy')}
-                                arrow
-                            >
-                                <IconButton
-                                    color="inherit"
-                                    disabled={disable}
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(textRef.current);
-                                    }}
-                                >
-                                    <ContentCopyIcon />
-                                </IconButton>
-                            </Tooltip>
-                            {enableSettings && (
-                                <Tooltip
-                                    title={t('generator.settingsTooltip')}
-                                    arrow
-                                >
-                                    <IconButton
-                                        color="inherit"
-                                        disabled={disable}
-                                        onClick={() => setShowSettings(true)}
-                                    >
-                                        <TuneIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                        </div>
-                    </div>
-                )}
+                <Controls
+                    onGenerate={() => doGenerate(autoMode ? maxLength : 1)}
+                    disable={disable}
+                    generate={generate}
+                    onCopy={() => navigator.clipboard.writeText(textRef.current)}
+                    onReset={() => {
+                        if (generate && generator) {
+                            generator.stop();
+                        }
+                        generator?.reset();
+                        setHasGenerated(false);
+                        setText('');
+                        textRef.current = '';
+                        setAttentionData([]);
+                        attentionRef.current = [];
+                        setProbabilities([]);
+                        probRef.current = [];
+                        setSelected(-1);
+                    }}
+                    onShowSettings={() => setShowSettings(true)}
+                    enableSettings={enableSettings}
+                    autoMode={autoMode}
+                    onAutoModeChange={setAutoMode}
+                />
             </div>
         </Box>
     );

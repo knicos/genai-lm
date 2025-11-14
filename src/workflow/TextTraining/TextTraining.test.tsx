@@ -64,6 +64,7 @@ describe('TextTraining', () => {
             trainer: vi.fn(() => ({
                 on: trainOnEvent,
                 off: trainOffEvent,
+                prepare: async () => {},
                 train: trainFunc,
             })),
             tokeniser: {

@@ -1,0 +1,20 @@
+.modelThread {
+    width: 100%;
+    border-radius: 10px;
+    background: #444;
+    color: white;
+    padding: 0.5rem;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.modelThread h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}

@@ -16,7 +16,7 @@ import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
-import { useTranslation } from 'react-i18next';
+import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -47,7 +47,6 @@ const CONNECTIONS: IConnection[] = [
 ];
 
 export function Component() {
-    const { t } = useTranslation();
     const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
@@ -136,12 +135,7 @@ export function Component() {
                     className={style.modelRow}
                     data-widget="container"
                 >
-                    <div
-                        className={style.modelThread}
-                        data-widget="thread"
-                    >
-                        <h1>{t('model.languageModel')}</h1>
-                    </div>
+                    <LanguageModel model={model} />
                 </div>
             </WorkflowLayout>
             <SettingsDialog />
