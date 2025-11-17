@@ -22,8 +22,6 @@ import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
-import { uiShowVisualisation } from '../../state/uiState';
-import { useEvent } from '../../globalEvents';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -56,8 +54,6 @@ export default function TextTraining({ model, dataset }: Props) {
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
-    const [stepPromise, setStepPromise] = useState<(() => void) | null>(null);
-    const shouldStep = useAtomValue(uiShowVisualisation);
 
     useWakeLock(training);
 
@@ -82,19 +78,13 @@ export default function TextTraining({ model, dataset }: Props) {
                         )}, rate: ${progress.samplesPerSecond.toFixed(1)} samples/sec`
                     );
                 }
-                if (shouldStep) {
-                    const p = new Promise<void>((resolve) => {
-                        setStepPromise(resolve);
-                    });
-                    await p;
-                }
             };
             trainer.on('log', h);
             return () => {
                 trainer.off('log', h);
             };
         }
-    }, [trainer, totalSamples, batchSize, model, shouldStep]);
+    }, [trainer, totalSamples, batchSize, model]);
 
     useEffect(() => {
         if (model) {
@@ -121,17 +111,6 @@ export default function TextTraining({ model, dataset }: Props) {
             setLR(model.meta.trained ? learningRate * 0.1 : learningRate);
         }
     }, [learningRate, model]);
-
-    useEvent(
-        'step',
-        () => {
-            if (stepPromise) {
-                stepPromise();
-                setStepPromise(null);
-            }
-        },
-        [stepPromise]
-    );
 
     const startTraining = async (maxSteps: number) => {
         if (model && dataset && trainer) {
@@ -183,18 +162,20 @@ export default function TextTraining({ model, dataset }: Props) {
                 learningRate: lr > 0 ? lr : learningRate,
                 advancedMetrics: advanced,
             };
-            trainer.prepare(dataset, trainingOptions);
+            await trainer.prepare(dataset, trainingOptions);
             trainer
                 .train(trainingOptions)
                 .then(() => {
                     setDone(true);
                     setTraining(false);
                     logger.log('Training stopped');
+                    console.log('Training stopped');
                 })
                 .catch((err) => {
                     setDone(true);
                     setTraining(false);
                     logger.error(`Training error: ${err.message}`);
+                    console.error('Training error:', err);
                 });
         }
     };
