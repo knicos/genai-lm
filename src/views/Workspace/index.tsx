@@ -3,7 +3,6 @@ import style from './style.module.css';
 import TextTrainer from '../../workflow/TextTraining/TextTraining';
 import TextGenerator from '../../workflow/TextGenerator/TextGenerator';
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import ModelLoader from '../../workflow/ModelLoader/ModelLoader';
 import TextData from '../../workflow/TextData/TextData';
 import { IConnection, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
@@ -17,15 +16,9 @@ import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
 import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
+import { useTranslation } from 'react-i18next';
 
 const CONNECTIONS: IConnection[] = [
-    {
-        start: 'model',
-        end: 'thread',
-        startPoint: 'bottom',
-        endPoint: 'top',
-        endOffset: -0.6,
-    },
     { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
     {
         start: 'textData',
@@ -35,18 +28,19 @@ const CONNECTIONS: IConnection[] = [
     },
     { start: 'textData', end: 'textBrowser', startPoint: 'bottom', endPoint: 'top' },
     { start: 'trainer', end: 'evaluation', startPoint: 'right', endPoint: 'left' },
-    { start: 'trainer', end: 'thread', startPoint: 'bottom', endPoint: 'top' },
+    { start: 'thread', end: 'trainer', startPoint: 'bottom', endPoint: 'top' },
     {
-        start: 'generator',
-        end: 'thread',
+        start: 'thread',
+        end: 'generator',
         startPoint: 'bottom',
         endPoint: 'top',
-        endOffset: 0.6,
+        startOffset: 0.6,
     },
     { start: 'generator', end: 'xai', startPoint: 'right', endPoint: 'left' },
 ];
 
 export function Component() {
+    const { t } = useTranslation();
     const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
@@ -95,48 +89,37 @@ export function Component() {
             />
             <WorkflowLayout connections={conn}>
                 <div
-                    className={style.verticalBox}
-                    data-widget="container"
-                    style={{ maxWidth: '390px' }}
-                >
-                    {steps.has('model') && (
-                        <ModelLoader
-                            model={model}
-                            onModel={(m: TeachableLLM) => {
-                                setModel(m);
-                            }}
-                        />
-                    )}
-                </div>
-                <div
-                    className={style.verticalBox}
-                    data-widget="container"
-                    style={{ width: '350px', maxWidth: '100%' }}
-                >
-                    <TextData
-                        model={model}
-                        dataset={textDataset}
-                        onDatasetChange={setTextDataset}
-                    />
-                </div>
-                <div
-                    className={style.verticalBox}
-                    data-widget="container"
-                >
-                    <TextTrainer
-                        model={model}
-                        dataset={textDataset}
-                    />
-                </div>
-                {steps.has('evaluation') && <Evaluation model={model} />}
-                <TextGenerator model={model} />
-                {steps.has('xai') && <XAIBox model={model} />}
-                <div
                     className={style.modelRow}
                     data-widget="container"
                 >
-                    <LanguageModel model={model} />
+                    <LanguageModel
+                        model={model}
+                        onModel={setModel}
+                    />
                 </div>
+                <section
+                    className={style.trainingGroup}
+                    data-widget="container"
+                >
+                    <h1>{t('model.preTraining')}</h1>
+                    <div
+                        data-widget="container"
+                        className={style.widgetRow}
+                    >
+                        <TextData
+                            model={model}
+                            dataset={textDataset}
+                            onDatasetChange={setTextDataset}
+                        />
+                        <TextTrainer
+                            model={model}
+                            dataset={textDataset}
+                        />
+                        {steps.has('evaluation') && <Evaluation model={model} />}
+                    </div>
+                </section>
+                <TextGenerator model={model} />
+                {steps.has('xai') && <XAIBox model={model} />}
             </WorkflowLayout>
             <SettingsDialog />
         </>

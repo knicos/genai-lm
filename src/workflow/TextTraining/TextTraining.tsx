@@ -203,6 +203,7 @@ export default function TextTraining({ model, dataset }: Props) {
         <Box
             widget="trainer"
             active={!!model || (!!dataset && dataset.length > 0)}
+            style={{ minWidth: '260px' }}
         >
             <div className={style.container}>
                 <BoxTitle

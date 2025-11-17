@@ -18,3 +18,30 @@
     display: flex;
     flex-direction: column;
 }
+
+.modelMenu {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.headerBar {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 0 2rem;
+}
+
+.spacer {
+    width: 1rem;
+}
+
+@media (max-width: 600px) {
+    .modelMenu {
+        flex-wrap: wrap;
+        padding: 1rem 0;
+    }
+    .spacer {
+        display: none;
+    }
+}

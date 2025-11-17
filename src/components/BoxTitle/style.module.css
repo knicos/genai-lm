@@ -7,6 +7,7 @@
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     overflow: hidden;
+    justify-content: space-between;
 }
 
 .infoTitle {

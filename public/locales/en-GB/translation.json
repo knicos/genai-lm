@@ -77,6 +77,9 @@
         "title": "Model",
         "create": "Create",
         "upload": "Upload",
+        "openBox": "Inspect",
+        "share": "Share",
+        "download": "Download",
         "search": "Search",
         "charTokeniser": "{{size}} characters",
         "bpeTokeniser": "{{size}} tokens",
@@ -92,7 +95,8 @@
         "languageModel": "Language Model",
         "visualisation": {
             "next": "Next"
-        }
+        },
+        "preTraining": "Pre-Training"
     },
     "training": {
         "title": "Training",

@@ -120,7 +120,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     return (
         <Box
             widget="textData"
-            style={{ maxWidth: '390px', marginBottom: '5rem' }}
+            style={{ minWidth: '350px' }}
             active={data.length > 0}
             disabled={status === 'training'}
         >

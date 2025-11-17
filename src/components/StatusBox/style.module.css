@@ -2,9 +2,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 3.5rem;
+    min-height: 3.5rem;
     width: 3.5rem;
-    margin-left: auto;
+    margin-left: 1rem;
     background: rgba(0, 0, 0, 0.05);
     border-left: 2px solid rgba(0, 0, 0, 0.06);
+    height: 100%;
 }
