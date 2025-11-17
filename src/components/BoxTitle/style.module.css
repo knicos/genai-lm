@@ -1,3 +1,5 @@
+@value primary from "@genai-fi/base/css/colours.module.css";
+
 .title {
     display: flex;
     align-items: center;
@@ -20,6 +22,25 @@
     margin: 0;
     margin-left: 1rem;
     font-size: 1.2rem;
+}
+
+.title input {
+    padding: 0.2rem;
+    height: initial;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.title input:focus {
+    border: 2px solid primary;
+    border-radius: 5px;
+    cursor: initial;
+}
+
+.title fieldset {
+    border: none;
 }
 
 .menu {

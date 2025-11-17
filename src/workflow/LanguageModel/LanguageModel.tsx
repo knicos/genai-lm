@@ -27,6 +27,7 @@ export default function LanguageModel({ model, onModel }: Props) {
     const [saving, setSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
+    const [title, setTitle] = useState(model?.meta.name || '');
     // const ready = useModelLoaded(model);
 
     const doSave = useCallback(
@@ -73,12 +74,24 @@ export default function LanguageModel({ model, onModel }: Props) {
             };
             model.on('error', eh);
 
+            setTitle(model.meta.name || '');
+
             return () => {
                 model.off('loaded', h);
                 model.off('error', eh);
             };
         }
     }, [model]);
+
+    const updateModelTitle = useCallback(
+        (title: string) => {
+            if (model) {
+                model.meta.name = title;
+            }
+            setTitle(title);
+        },
+        [model]
+    );
 
     return (
         <Box
@@ -109,9 +122,11 @@ export default function LanguageModel({ model, onModel }: Props) {
             )}
             <div className={style.container}>
                 <BoxTitle
-                    title={t('model.languageModel')}
+                    title={title}
                     status={isLoading ? 'busy' : model ? 'done' : 'disabled'}
                     style={{ height: '5rem' }}
+                    setTitle={updateModelTitle}
+                    placeholder={t('model.languageModel')}
                     button={
                         <ModelMenu
                             disableInspect={!model}
