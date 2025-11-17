@@ -17,6 +17,7 @@ import Downloader from '../../utilities/downloader';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
 import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelStatus from '../../utilities/useModelStatus';
 
 interface Props {
     model?: TeachableLLM;
@@ -63,8 +64,11 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [selected, setSelected] = useState<number>(-1);
     const [downloads, setDownloads] = useState<Downloader[]>([]);
     const [selectedSet, setSelectedSet] = useState<Set<string>>();
+    const status = useModelStatus(model);
 
     const done = data.length > 0;
+
+    const disable = status === 'training' || status === 'busy';
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
@@ -122,7 +126,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
             widget="textData"
             style={{ minWidth: '350px' }}
             active={data.length > 0}
-            disabled={status === 'training'}
+            disabled={disable}
         >
             <div className={style.container}>
                 <BoxTitle
