@@ -5,6 +5,8 @@ import TextTraining from './TextTraining';
 import { type TeachableLLM } from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
 
+vi.mock('react-router-dom');
+
 describe('TextTraining', () => {
     it('renders without a model or data', async ({ expect }) => {
         render(<TextTraining />);

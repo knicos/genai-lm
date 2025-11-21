@@ -5,6 +5,8 @@ import TextGenerator from './TextGenerator';
 import type { TeachableLLM } from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
 
+vi.mock('react-router-dom');
+
 describe('TextGenerator', () => {
     it('renders without a model', async ({ expect }) => {
         render(<TextGenerator />);

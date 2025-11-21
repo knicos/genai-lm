@@ -96,9 +96,9 @@ export default function LanguageModel({ model, onModel }: Props) {
     return (
         <Box
             widget="thread"
-            style={{ maxWidth: '80%' }}
             active={done}
             disabled={busy}
+            className={style.modelThread}
         >
             <input
                 type="file"
@@ -127,6 +127,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                     style={{ height: '5rem' }}
                     setTitle={updateModelTitle}
                     placeholder={t('model.languageModel')}
+                    dark
                     button={
                         <ModelMenu
                             disableInspect={!model}

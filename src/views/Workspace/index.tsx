@@ -7,16 +7,18 @@ import TextData from '../../workflow/TextData/TextData';
 import { IConnection, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
 import Evaluation from '../../workflow/Evaluation/Evaluation';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import XAIBox from '../../workflow/XAI/XAI';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
-import { useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useOutlet, useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
 import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 import { useTranslation } from 'react-i18next';
+import SidePanel from '../../components/SidePanel/SidePanel';
+import { uiShowSidePanel } from '../../state/uiState';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
@@ -48,6 +50,21 @@ export function Component() {
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const [params] = useSearchParams();
+    const [sidePanelOpen, setSidePanelOpen] = useAtom(uiShowSidePanel);
+    const location = useLocation();
+    const outlet = useOutlet();
+    const navigate = useNavigate();
+
+    const hasOutlet = !!outlet;
+
+    useEffect(() => {
+        if (hasOutlet) {
+            console.log('Opening side panel for route:');
+            setSidePanelOpen(true);
+        } else {
+            setSidePanelOpen(false);
+        }
+    }, [location.key, hasOutlet, setSidePanelOpen]);
 
     useEffect(() => {
         const token = params.get('t');
@@ -87,40 +104,59 @@ export function Component() {
                 onModel={setModel}
                 model={model}
             />
-            <WorkflowLayout connections={conn}>
-                <div
-                    className={style.modelRow}
-                    data-widget="container"
-                >
-                    <LanguageModel
-                        model={model}
-                        onModel={setModel}
-                    />
+            <div className={style.mainContainer}>
+                <div className={style.workspaceContainer}>
+                    <WorkflowLayout connections={conn}>
+                        <div
+                            className={style.modelRow}
+                            data-widget="container"
+                        >
+                            <LanguageModel
+                                model={model}
+                                onModel={setModel}
+                            />
+                        </div>
+                        <section
+                            className={style.trainingGroup}
+                            data-widget="container"
+                        >
+                            <h1>{t('model.preTraining')}</h1>
+                            <div
+                                data-widget="container"
+                                className={style.widgetRow}
+                            >
+                                <TextData
+                                    model={model}
+                                    dataset={textDataset}
+                                    onDatasetChange={setTextDataset}
+                                />
+                                <TextTrainer
+                                    model={model}
+                                    dataset={textDataset}
+                                />
+                                {steps.has('evaluation') && <Evaluation model={model} />}
+                            </div>
+                        </section>
+                        <TextGenerator model={model} />
+                        {steps.has('xai') && <XAIBox model={model} />}
+                    </WorkflowLayout>
                 </div>
-                <section
-                    className={style.trainingGroup}
-                    data-widget="container"
+                <SidePanel
+                    open={sidePanelOpen}
+                    position="right"
+                    onClose={() => {
+                        const segments = location.pathname.split('/').filter(Boolean);
+                        if (segments.length > 0) {
+                            segments.pop(); // Remove last segment
+                            const newPath = '/' + segments.join('/');
+                            navigate(newPath, { replace: true });
+                        }
+                    }}
+                    onOpen={() => setSidePanelOpen(true)}
                 >
-                    <h1>{t('model.preTraining')}</h1>
-                    <div
-                        data-widget="container"
-                        className={style.widgetRow}
-                    >
-                        <TextData
-                            model={model}
-                            dataset={textDataset}
-                            onDatasetChange={setTextDataset}
-                        />
-                        <TextTrainer
-                            model={model}
-                            dataset={textDataset}
-                        />
-                        {steps.has('evaluation') && <Evaluation model={model} />}
-                    </div>
-                </section>
-                <TextGenerator model={model} />
-                {steps.has('xai') && <XAIBox model={model} />}
-            </WorkflowLayout>
+                    <Outlet />
+                </SidePanel>
+            </div>
             <SettingsDialog />
         </>
     );

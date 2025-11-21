@@ -94,6 +94,7 @@ export default function BoxTitle({ title, button, status, style, dark, setTitle,
                             aria-label={t('widget.aria.editTitle')}
                             size="small"
                             onClick={doStartEdit}
+                            color="inherit"
                         >
                             <EditIcon fontSize="small" />
                         </IconButton>

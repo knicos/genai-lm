@@ -10,7 +10,7 @@ import {
 } from '../../state/trainerSettings';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
 
-export default function TrainingSettings() {
+export function Component() {
     const { t } = useTranslation();
     const [batchSize, setBatchSize] = useAtom(trainerBatchSize);
     const [learningRate, setLearningRate] = useAtom(trainerLearningRate);
@@ -21,6 +21,7 @@ export default function TrainingSettings() {
 
     return (
         <div className={style.column}>
+            <h2>{t('app.settings.training')}</h2>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <div
                     id="batch-label"

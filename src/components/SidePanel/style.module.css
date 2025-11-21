@@ -1,0 +1,134 @@
+@value primary from "@genai-fi/base/css/colours.module.css";
+
+.sidePanel {
+    background: white;
+
+    /*box-shadow: 0 0 10px #bbb; */
+    display: flex;
+    z-index: 2;
+    flex-shrink: 0;
+    position: relative;
+    transition: opacity 0.3s ease-in;
+}
+
+.sidePanel.closed {
+    opacity: 0;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out;
+}
+
+.sidePanel.opening {
+    opacity: 1;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in;
+}
+
+.sidePanel.open {
+    opacity: 1;
+}
+
+.resizer {
+    width: 10px;
+    cursor: ew-resize;
+    background-color: transparent;
+    box-sizing: border-box;
+    position: relative;
+    left: -5px;
+    opacity: 1;
+}
+
+.noSelect {
+    user-select: none;
+}
+
+.resizerBar {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 2px;
+    height: 100%;
+    background-color: #ddd;
+    touch-action: none;
+}
+
+.resizer:hover .resizerBar {
+    background-color: #75a4e288;
+}
+
+.resizer.resizing .resizerBar {
+    background-color: #75a4e2;
+}
+
+.resizerHandle {
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 10px;
+    height: 60px;
+    transform: translateY(-50%);
+    background-color: white;
+    border-radius: 3px;
+    border: 2px solid #ddd;
+    box-shadow: 0 0 4px #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+}
+
+.resizerHandle.minimised {
+    left: -18px;
+    width: 20px;
+}
+
+.resizerHandle:focus {
+    outline: 2px solid #75a4e2;
+    outline-offset: 2px;
+}
+
+.resizerHandle::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 20px;
+    background: radial-gradient(circle, #bbb 1.5px, transparent 1.5px) 0 2px,
+        radial-gradient(circle, #bbb 1.5px, transparent 1.5px) 0 8px,
+        radial-gradient(circle, #bbb 1.5px, transparent 1.5px) 0 14px;
+    background-repeat: no-repeat;
+    background-size: 4px 4px;
+}
+
+.resizer:hover .resizerHandle {
+    border-color: #75a4e2;
+}
+
+.resizer.resizing .resizerHandle {
+    border-color: #75a4e2;
+}
+
+.expand {
+    position: absolute;
+    top: 2rem;
+    right: 0px;
+    height: 40px;
+    width: 30px;
+    background-color: white;
+    border-radius: 3px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    /* box-shadow: 0 0 3px #bbb; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    flex-grow: 1;
+    overflow: auto;
+    min-width: 300px !important;
+    position: relative;
+}
+
+.closeButton {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}

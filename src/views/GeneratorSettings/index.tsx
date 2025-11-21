@@ -11,7 +11,7 @@ import {
     generatorTopP,
 } from '../../state/generatorSettings';
 
-export default function GeneratorSettings() {
+export function Component() {
     const { t } = useTranslation();
     const [temperature, setTemperature] = useAtom(generatorTemperature);
     const [maxLength, setMaxLength] = useAtom(generatorMaxLength);
@@ -22,6 +22,7 @@ export default function GeneratorSettings() {
 
     return (
         <div className={style.column}>
+            <h2>{t('app.settings.generator')}</h2>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <div
                     id="temperature-label"
@@ -68,8 +69,8 @@ export default function GeneratorSettings() {
                     value={maxLength}
                     onChange={(_, value) => setMaxLength(value as number)}
                     min={10}
-                    max={1024}
-                    step={10}
+                    max={64000}
+                    step={1000}
                     valueLabelDisplay="auto"
                 />
             </FormControl>

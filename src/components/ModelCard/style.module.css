@@ -36,9 +36,9 @@
         linear-gradient(135deg, #ccceec 0%, #c3baec 50%, #a197dd 100%);
 }
 
-.disabledBG {
+/*.disabledBG {
     border: 2px solid secondary;
-}
+}*/
 
 .sampleText {
     overflow: hidden;

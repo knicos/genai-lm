@@ -25,12 +25,12 @@
 }
 
 .title input {
-    padding: 0.2rem;
+    padding: 0.4rem 1rem;
     height: initial;
     box-sizing: border-box;
     border: 2px solid transparent;
     cursor: pointer;
-    margin-right: 1rem;
+    font-size: 1.2rem;
 }
 
 .title input:focus {
@@ -41,6 +41,10 @@
 
 .title fieldset {
     border: none;
+}
+
+.title button {
+    margin-left: 0.5rem;
 }
 
 .menu {
@@ -57,7 +61,7 @@
 .box {
     border-radius: 6px;
     background: white;
-    box-shadow: 2px 2px 4px #bbb;
+    box-shadow: 2px 2px 4px #a4acbb;
     overflow: hidden;
     animation: fadein 0.5s 1;
     width: 100%;

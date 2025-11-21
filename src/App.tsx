@@ -66,15 +66,24 @@ export const routes = createRoutesFromElements(
             element={
                 <Navigate
                     replace
-                    to="/workspace"
+                    to="/workspace/pretrain"
                 />
             }
         />
 
         <Route
-            path="workspace"
+            path="workspace/:flow"
             lazy={() => import('./views/Workspace')}
-        />
+        >
+            <Route
+                path="generator-settings"
+                lazy={() => import('./views/GeneratorSettings')}
+            />
+            <Route
+                path="training-settings"
+                lazy={() => import('./views/TrainingSettings')}
+            />
+        </Route>
     </Route>
 );
 const defaultRouter = createBrowserRouter(routes);

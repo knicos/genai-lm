@@ -22,6 +22,9 @@ import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
+import { IconButton, Tooltip } from '@mui/material';
+import TuneIcon from '@mui/icons-material/Tune';
+import { useNavigate } from 'react-router-dom';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -54,6 +57,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
+    const navigate = useNavigate();
 
     useWakeLock(training);
 
@@ -220,6 +224,20 @@ export default function TextTraining({ model, dataset }: Props) {
                     >
                         {done ? t('training.start') : t('training.stop')}
                     </Button>
+                    <Tooltip
+                        title={t('training.settingsTooltip')}
+                        arrow
+                    >
+                        <IconButton
+                            color="inherit"
+                            disabled={!canTrain || (!done && !training)}
+                            onClick={() => {
+                                navigate('training-settings');
+                            }}
+                        >
+                            <TuneIcon />
+                        </IconButton>
+                    </Tooltip>
                 </div>
             </div>
         </Box>

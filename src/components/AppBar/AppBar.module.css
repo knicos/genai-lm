@@ -8,7 +8,7 @@
 }
 
 .appbar {
-    z-index: 2;
+    z-index: 4;
     position: static;
     box-shadow: none;
     background: #444;

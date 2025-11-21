@@ -10,6 +10,22 @@
     max-width: 80%;
 }
 
+.mainContainer {
+    flex-grow: 1;
+    display: flex;
+}
+
+.workspaceContainer {
+    overflow-x: scroll;
+    overflow-y: auto;
+    flex-shrink: 1;
+    width: 100%;
+}
+
+.workspaceContainer > div {
+    overflow: initial;
+}
+
 .verticalBox {
     display: flex;
     flex-direction: column;

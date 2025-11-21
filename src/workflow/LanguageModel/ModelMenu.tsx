@@ -26,8 +26,8 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, di
         <div className={style.modelMenu}>
             <VerticalButton
                 disabled={!onCreate}
-                color="primary"
-                variant="outlined"
+                color="inherit"
+                variant="text"
                 onClick={onCreate}
                 startIcon={<AddIcon color="inherit" />}
             >
@@ -35,8 +35,8 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, di
             </VerticalButton>
             <VerticalButton
                 disabled={!onUpload}
-                color="primary"
-                variant="outlined"
+                color="inherit"
+                variant="text"
                 onClick={onUpload}
                 startIcon={<UploadFileIcon color="inherit" />}
             >
@@ -44,8 +44,8 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, di
             </VerticalButton>
             <VerticalButton
                 disabled={!onSearch}
-                color="primary"
-                variant="outlined"
+                color="inherit"
+                variant="text"
                 onClick={onSearch}
                 startIcon={<SearchIcon color="inherit" />}
             >
@@ -55,24 +55,27 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, di
             <VerticalButton
                 disabled={!onDownload}
                 startIcon={<DownloadIcon color="inherit" />}
-                variant="outlined"
+                variant="text"
                 onClick={onDownload}
+                color="inherit"
             >
                 {t('model.download')}
             </VerticalButton>
             <VerticalButton
                 disabled={true}
                 startIcon={<QrCode2Icon color="inherit" />}
-                variant="outlined"
+                variant="text"
+                color="inherit"
             >
                 {t('model.share')}
             </VerticalButton>
             <div className={style.spacer} />
             <VerticalButton
                 startIcon={<ExpandCircleDownIcon color="inherit" />}
-                variant="outlined"
+                variant="text"
                 onClick={() => setShowVis((old) => !old)}
                 disabled={disableInspect}
+                color="inherit"
             >
                 {t('model.openBox')}
             </VerticalButton>

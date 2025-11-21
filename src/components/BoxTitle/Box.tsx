@@ -6,12 +6,13 @@ interface Props extends PropsWithChildren {
     widget?: string;
     active?: boolean;
     disabled?: boolean;
+    className?: string;
 }
 
-export default function Box({ style, widget, active = true, disabled = false, children }: Props) {
+export default function Box({ style, widget, active = true, disabled = false, className, children }: Props) {
     return (
         <div
-            className={boxstyle.box}
+            className={`${boxstyle.box} ${className || ''}`}
             data-widget={widget}
             data-active={active ? 'true' : 'false'}
             style={style}

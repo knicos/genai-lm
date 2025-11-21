@@ -6,7 +6,6 @@ import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import XAIView from './XAIView';
-import GeneratorSettings from './GeneratorSettings';
 import { wait } from '../../utilities/wait';
 import { useAtomValue } from 'jotai';
 import {
@@ -22,6 +21,7 @@ import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import { trainerOutputText } from '../../state/trainerSettings';
 import Controls from './Controls';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     model?: TeachableLLM;
@@ -114,6 +114,7 @@ function createTopKTokens(
 
 export default function TextGenerator({ model }: Props) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [generator, setGenerator] = useState<ReturnType<TeachableLLM['generator']> | undefined>();
     const [text, setText] = useState<string>('');
     const [attentionData, setAttentionData] = useState<number[][][][][]>([]);
@@ -124,7 +125,6 @@ export default function TextGenerator({ model }: Props) {
     //const [ready, setReady] = useState(false);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
-    const [showSettings, setShowSettings] = useState<boolean>(false);
     const enableSettings = useAtomValue(generatorShowSettings);
     const enableAttention = useAtomValue(generatorShowAttention);
     const attentionBlock = useAtomValue(generatorAttentionBlock);
@@ -288,10 +288,6 @@ export default function TextGenerator({ model }: Props) {
                         }}
                     />
                     <XAIView probabilities={topKTokens} />
-                    <GeneratorSettings
-                        open={showSettings}
-                        onClose={() => setShowSettings(false)}
-                    />
                     <ModelStatus
                         model={model}
                         show={showStatus}
@@ -317,7 +313,9 @@ export default function TextGenerator({ model }: Props) {
                         probRef.current = [];
                         setSelected(-1);
                     }}
-                    onShowSettings={() => setShowSettings(true)}
+                    onShowSettings={() => {
+                        navigate('generator-settings');
+                    }}
                     enableSettings={enableSettings}
                     autoMode={autoMode}
                     onAutoModeChange={setAutoMode}

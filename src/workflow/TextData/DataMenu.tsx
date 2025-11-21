@@ -22,7 +22,7 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch, totalS
             <VerticalButton
                 disabled={disabled}
                 color="primary"
-                variant="outlined"
+                variant="text"
                 onClick={onWrite}
                 startIcon={<AddIcon color="inherit" />}
             >
@@ -31,7 +31,7 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch, totalS
             <VerticalButton
                 disabled={disabled}
                 color="primary"
-                variant="outlined"
+                variant="text"
                 onClick={onUpload}
                 startIcon={<UploadFileIcon color="inherit" />}
             >
@@ -40,7 +40,7 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch, totalS
             <VerticalButton
                 disabled={disabled}
                 color="primary"
-                variant="outlined"
+                variant="text"
                 onClick={onSearch}
                 startIcon={<SearchIcon color="inherit" />}
             >

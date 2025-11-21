@@ -1,17 +1,17 @@
 .modelThread {
-    width: 100%;
-    border-radius: 10px;
-    background: #444;
+    max-width: 80%;
+    background: #945fbf;
     color: white;
-    padding: 0.5rem;
-    text-align: center;
-    box-sizing: border-box;
 }
 
 .modelThread h1 {
     margin: 0;
     font-size: 1.2rem;
     color: white;
+}
+
+.modelThread h2 {
+    margin-left: 2rem;
 }
 
 .container {
