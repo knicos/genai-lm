@@ -31,7 +31,7 @@ function lossToQuality(loss: number, vocabSize: number): number {
 
 function createMetric(
     metric: EvaluationMetric,
-    log: TrainingLogEntry,
+    log: { valLoss?: number; loss: number },
     vocabSize: number
 ): { value: number; percentage: number } {
     const maxLoss = Math.log(vocabSize);
@@ -92,17 +92,14 @@ export default function Evaluation({ model }: Props) {
     }, [model, metric, advanced]);
 
     useEffect(() => {
-        if (model && ready && model.model.log) {
-            const log = model.model.log;
-            const lastLog = log[log.length - 1];
-            if (lastLog) {
-                const { value, percentage } = createMetric(metric, lastLog, model.config.vocabSize);
-                setMetricValue(value);
-                setMetricPercentage(percentage);
-            } else {
-                setMetricValue(0);
-                setMetricPercentage(0);
-            }
+        if (model && ready && model.model.trainingState) {
+            const lastLog = model.model.trainingState;
+            const { value, percentage } = createMetric(metric, lastLog, model.config.vocabSize);
+            setMetricValue(value);
+            setMetricPercentage(percentage);
+        } else {
+            setMetricValue(0);
+            setMetricPercentage(0);
         }
     }, [model, ready, metric]);
 

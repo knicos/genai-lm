@@ -9,6 +9,8 @@
     flex-shrink: 0;
     position: relative;
     transition: opacity 0.3s ease-in;
+
+    opacity: 0;
 }
 
 .sidePanel.closed {

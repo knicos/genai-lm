@@ -2,23 +2,13 @@ import { Checkbox, FormControl, FormControlLabel, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
-import {
-    generatorMaxLength,
-    generatorShowProbabilities,
-    generatorShowPrompt,
-    generatorShowSettings,
-    generatorTemperature,
-    generatorTopP,
-} from '../../state/generatorSettings';
+import { generatorSettings } from '../../state/generator';
 
 export function Component() {
     const { t } = useTranslation();
-    const [temperature, setTemperature] = useAtom(generatorTemperature);
-    const [maxLength, setMaxLength] = useAtom(generatorMaxLength);
-    const [probability, setProbability] = useAtom(generatorShowProbabilities);
-    const [prompt, setPrompt] = useAtom(generatorShowPrompt);
-    const [showSettings, setShowSettings] = useAtom(generatorShowSettings);
-    const [topP, setTopP] = useAtom(generatorTopP);
+
+    const [settings, setSettings] = useAtom(generatorSettings);
+    const { temperature, topP, maxLength, showProbabilities: probability, showSettings } = settings;
 
     return (
         <div className={style.column}>
@@ -33,7 +23,7 @@ export function Component() {
                 <Slider
                     aria-labelledby="temperature-label"
                     value={temperature}
-                    onChange={(_, value) => setTemperature(value as number)}
+                    onChange={(_, value) => setSettings({ ...settings, temperature: value as number })}
                     min={0.5}
                     max={1.5}
                     step={0.1}
@@ -50,7 +40,7 @@ export function Component() {
                 <Slider
                     aria-labelledby="topp-label"
                     value={topP}
-                    onChange={(_, value) => setTopP(value as number)}
+                    onChange={(_, value) => setSettings({ ...settings, topP: value as number })}
                     min={0}
                     max={1}
                     step={0.01}
@@ -67,7 +57,7 @@ export function Component() {
                 <Slider
                     aria-labelledby="maxlength-label"
                     value={maxLength}
-                    onChange={(_, value) => setMaxLength(value as number)}
+                    onChange={(_, value) => setSettings({ ...settings, maxLength: value as number })}
                     min={10}
                     max={64000}
                     step={1000}
@@ -80,7 +70,7 @@ export function Component() {
                     control={
                         <Checkbox
                             checked={probability}
-                            onChange={(_, checked) => setProbability(checked)}
+                            onChange={(_, checked) => setSettings({ ...settings, showProbabilities: checked })}
                         />
                     }
                     label={t('app.settings.showProbabilities')}
@@ -90,19 +80,8 @@ export function Component() {
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={prompt}
-                            onChange={(_, checked) => setPrompt(checked)}
-                        />
-                    }
-                    label={t('app.settings.showPrompt')}
-                />
-            </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
                             checked={showSettings}
-                            onChange={(_, checked) => setShowSettings(checked)}
+                            onChange={(_, checked) => setSettings({ ...settings, showSettings: checked })}
                         />
                     }
                     label={t('app.settings.showSettings')}

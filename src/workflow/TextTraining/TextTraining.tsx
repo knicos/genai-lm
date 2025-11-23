@@ -8,13 +8,8 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
-import { useAtomValue, useSetAtom } from 'jotai';
-import {
-    trainerBatchSize,
-    trainerCheckpointing as trainerDisableCheckpointing,
-    trainerLearningRate,
-    trainerMaxSteps,
-} from '../../state/trainerSettings';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { trainerAtom, trainerSettings } from '../../state/trainer';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
@@ -43,16 +38,17 @@ interface TrainingProgress {
 
 export default function TextTraining({ model, dataset }: Props) {
     const { t } = useTranslation();
-    const [trainer, setTrainer] = useState<ReturnType<TeachableLLM['trainer']> | undefined>();
+    const [trainer, setTrainer] = useAtom(trainerAtom);
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
     const status = useModelStatus(model);
-    const batchSize = useAtomValue(trainerBatchSize);
-    const maxSteps = useAtomValue(trainerMaxSteps);
-    const disableCheckpointing = useAtomValue(trainerDisableCheckpointing);
-    const learningRate = useAtomValue(trainerLearningRate);
+    const settings = useAtomValue(trainerSettings);
+    const batchSize = settings.batchSize;
+    const maxSteps = settings.maxSteps;
+    const disableCheckpointing = settings.disableCheckpointing;
+    const learningRate = settings.learningRate;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
@@ -102,7 +98,7 @@ export default function TextTraining({ model, dataset }: Props) {
                 model.off('loaded', h);
             };
         }
-    }, [model]);
+    }, [model, setTrainer]);
 
     useEffect(() => {
         if (dataset && dataset.length > 0) {
@@ -158,13 +154,13 @@ export default function TextTraining({ model, dataset }: Props) {
                 `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
             );
 
-            model.model.checkpointing = useCheckpointing;
             model.enableProfiler = advanced;
             const trainingOptions = {
                 batchSize,
                 maxSteps,
                 learningRate: lr > 0 ? lr : learningRate,
                 advancedMetrics: advanced,
+                gradientCheckpointing: useCheckpointing,
             };
             await trainer.prepare(dataset, trainingOptions);
             trainer
@@ -230,7 +226,7 @@ export default function TextTraining({ model, dataset }: Props) {
                     >
                         <IconButton
                             color="inherit"
-                            disabled={!canTrain || (!done && !training)}
+                            disabled={!done && !training}
                             onClick={() => {
                                 navigate('training-settings');
                             }}

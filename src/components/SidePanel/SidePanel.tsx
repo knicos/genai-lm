@@ -38,7 +38,6 @@ export default function SidePanel({ children, open, onClose, onOpen, position = 
 
             return () => clearTimeout(timer);
         } else {
-            setWidth(lastWidthRef.current || DEFAULT_WIDTH);
             setIsOpening(true);
             setIsClosed(false);
         }
@@ -48,6 +47,7 @@ export default function SidePanel({ children, open, onClose, onOpen, position = 
     // Needed to prevent width animation on resize
     useEffect(() => {
         if (isOpening) {
+            setWidth(lastWidthRef.current || DEFAULT_WIDTH);
             const timer = setTimeout(() => {
                 setIsOpening(false);
             }, 300); // Match the CSS transition duration
@@ -129,10 +129,8 @@ export default function SidePanel({ children, open, onClose, onOpen, position = 
 
     return (
         <section
-            className={`${style.sidePanel} ${style[position]} ${open ? style.open : style.closed} ${
-                isOpening ? style.opening : ''
-            }`}
-            style={{ width: isMinimised ? 0 : width, display: isClosed ? 'none' : undefined }}
+            className={`${style.sidePanel} ${open ? style.open : style.closed} ${isOpening ? style.opening : ''}`}
+            style={{ width: isMinimised ? 0 : width, visibility: isClosed ? 'hidden' : undefined }}
             ref={barRef}
             aria-hidden={!open}
         >

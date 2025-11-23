@@ -19,6 +19,7 @@ import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 import { useTranslation } from 'react-i18next';
 import SidePanel from '../../components/SidePanel/SidePanel';
 import { uiShowSidePanel } from '../../state/uiState';
+import { modelAtom } from '../../state/model';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
@@ -43,7 +44,7 @@ const CONNECTIONS: IConnection[] = [
 
 export function Component() {
     const { t } = useTranslation();
-    const [model, setModel] = useState<TeachableLLM | undefined>(undefined);
+    const [model, setModel] = useAtom(modelAtom);
     const [textDataset, setTextDataset] = useState<string[]>([]);
     const steps = useAtomValue(workflowSteps);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
@@ -77,7 +78,7 @@ export function Component() {
             const m = TeachableLLM.loadModel(hf);
             setModel(m);
         }
-    }, [params]);
+    }, [params, setModel]);
 
     // Hack to update lines when model changes
     useEffect(() => {
@@ -102,7 +103,7 @@ export function Component() {
         <>
             <AppBar
                 onModel={setModel}
-                model={model}
+                model={model ?? undefined}
             />
             <div className={style.mainContainer}>
                 <div className={style.workspaceContainer}>
@@ -112,7 +113,7 @@ export function Component() {
                             data-widget="container"
                         >
                             <LanguageModel
-                                model={model}
+                                model={model ?? undefined}
                                 onModel={setModel}
                             />
                         </div>
@@ -126,19 +127,19 @@ export function Component() {
                                 className={style.widgetRow}
                             >
                                 <TextData
-                                    model={model}
+                                    model={model ?? undefined}
                                     dataset={textDataset}
                                     onDatasetChange={setTextDataset}
                                 />
                                 <TextTrainer
-                                    model={model}
+                                    model={model ?? undefined}
                                     dataset={textDataset}
                                 />
-                                {steps.has('evaluation') && <Evaluation model={model} />}
+                                {steps.has('evaluation') && <Evaluation model={model ?? undefined} />}
                             </div>
                         </section>
-                        <TextGenerator model={model} />
-                        {steps.has('xai') && <XAIBox model={model} />}
+                        <TextGenerator model={model ?? undefined} />
+                        {steps.has('xai') && <XAIBox model={model ?? undefined} />}
                     </WorkflowLayout>
                 </div>
                 <SidePanel

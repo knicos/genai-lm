@@ -40,7 +40,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
         (name: string) => {
             setSaving(true);
             model
-                ?.saveModel({ includeLog: false, name })
+                ?.saveModel({ name })
                 .then((blob) => {
                     setSaving(false);
                     saveAs(blob, `${name}.zip`);

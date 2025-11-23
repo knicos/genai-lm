@@ -4,7 +4,7 @@ import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
-import { generatorAttentionBlock, generatorShowAttention } from '../../state/generatorSettings';
+import { generatorSettings } from '../../state/generator';
 import { List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import Box from '../../components/BoxTitle/Box';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
@@ -17,8 +17,9 @@ interface Props {
 export default function XAIBox({ model }: Props) {
     const { t } = useTranslation();
     const status = useModelStatus(model);
-    const [showAttention, setShowAttention] = useAtom(generatorShowAttention);
-    const [attentionLayer, setAttentionLayer] = useAtom(generatorAttentionBlock);
+
+    const [settings, setSettings] = useAtom(generatorSettings);
+    const { showAttention, attentionBlock: attentionLayer } = settings;
 
     return (
         <Box
@@ -32,7 +33,7 @@ export default function XAIBox({ model }: Props) {
                 />
                 <Switch
                     value={showAttention}
-                    onChange={(e) => setShowAttention(e.target.checked)}
+                    onChange={(e) => setSettings({ ...settings, showAttention: e.target.checked })}
                 />
                 <List style={{ maxHeight: '250px', overflowY: 'auto', width: '100%' }}>
                     {status !== 'loading' &&
@@ -40,7 +41,7 @@ export default function XAIBox({ model }: Props) {
                             <ListItemButton
                                 key={layer}
                                 className={`${style.button} ${attentionLayer === layer ? style.selected : ''}`}
-                                onClick={() => setAttentionLayer(layer)}
+                                onClick={() => setSettings({ ...settings, attentionBlock: layer })}
                             >
                                 <ListItemIcon>
                                     {layer === attentionLayer ? (
