@@ -155,6 +155,8 @@
     "tools": {
         "Settings": "Settings",
         "generatorSettings": "Generator Settings",
-        "trainingSettings": "Training Settings"
+        "trainingSettings": "Training Settings",
+        "checks": "Operator Tests",
+        "advanced": "Advanced Tools"
     }
 }

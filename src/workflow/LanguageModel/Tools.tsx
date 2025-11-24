@@ -26,6 +26,17 @@ const TOOLS: { title: string; cards: ToolCardItem[] }[] = [
             },
         ],
     },
+    {
+        title: 'tools.advanced',
+        cards: [
+            {
+                id: 'checks',
+                name: 'tools.checks',
+                url: 'checks',
+                icon: 'settings',
+            },
+        ],
+    },
 ];
 
 interface Props {
