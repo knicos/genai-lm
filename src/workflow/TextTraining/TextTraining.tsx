@@ -135,6 +135,9 @@ export default function TextTraining({ model, dataset }: Props) {
 
             setTraining(true);
             setDone(false);
+
+            const shouldPrepare = needsTraining;
+
             setNeedsTraining(false);
             // setEpochs(0);
             await wait(200);
@@ -162,7 +165,9 @@ export default function TextTraining({ model, dataset }: Props) {
                 advancedMetrics: advanced,
                 gradientCheckpointing: useCheckpointing,
             };
-            await trainer.prepare(dataset, trainingOptions);
+            if (shouldPrepare) {
+                await trainer.prepare(dataset, trainingOptions);
+            }
             trainer
                 .train(trainingOptions)
                 .then(() => {

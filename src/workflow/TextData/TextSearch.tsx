@@ -39,6 +39,16 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
     //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
     const [dataRows, setDataRows] = useState<RowSet<DataCardItem>[]>([]);
+    const [open, setOpen] = useState(true);
+
+    useEffect(() => {
+        if (!open) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [open, onClose]);
 
     useEffect(() => {
         fetch('https://store.gen-ai.fi/llm/dataManifest.json')
@@ -53,8 +63,8 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
 
     return (
         <Dialog
-            open
-            onClose={onClose}
+            open={open}
+            onClose={() => setOpen(false)}
             maxWidth="lg"
             fullWidth
             sx={{ '& .MuiPaper-root': { margin: '0', borderRadius: '0' } }}
@@ -82,7 +92,7 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                     <div style={{ flexGrow: 1 }} />
                     <DownloadProgress downloads={downloads} />
                     <IconButton
-                        onClick={onClose}
+                        onClick={() => setOpen(false)}
                         aria-label={t('data.close')}
                     >
                         <CloseIcon fontSize="large" />

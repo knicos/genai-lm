@@ -3,12 +3,10 @@ import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SearchIcon from '@mui/icons-material/Search';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
+import BuildIcon from '@mui/icons-material/Build';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import DownloadIcon from '@mui/icons-material/Download';
 import style from './style.module.css';
-import { useSetAtom } from 'jotai';
-import { uiShowVisualisation } from '../../state/uiState';
 
 interface Props {
     disableInspect?: boolean;
@@ -16,11 +14,11 @@ interface Props {
     onUpload?: () => void;
     onSearch?: () => void;
     onDownload?: () => void;
+    onTools?: () => void;
 }
 
-export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, disableInspect }: Props) {
+export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, onTools, disableInspect }: Props) {
     const { t } = useTranslation();
-    const setShowVis = useSetAtom(uiShowVisualisation);
 
     return (
         <div className={style.modelMenu}>
@@ -71,13 +69,13 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, di
             </VerticalButton>
             <div className={style.spacer} />
             <VerticalButton
-                startIcon={<ExpandCircleDownIcon color="inherit" />}
+                startIcon={<BuildIcon color="inherit" />}
                 variant="text"
-                onClick={() => setShowVis((old) => !old)}
+                onClick={onTools}
                 disabled={disableInspect}
                 color="inherit"
             >
-                {t('model.openBox')}
+                {t('model.tools')}
             </VerticalButton>
         </div>
     );

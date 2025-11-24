@@ -77,7 +77,7 @@
         "title": "Model",
         "create": "Create",
         "upload": "Upload",
-        "openBox": "Inspect",
+        "tools": "Tools",
         "share": "Share",
         "download": "Download",
         "search": "Search",
@@ -151,5 +151,10 @@
     },
     "xai": {
         "title": "Explain"
+    },
+    "tools": {
+        "Settings": "Settings",
+        "generatorSettings": "Generator Settings",
+        "trainingSettings": "Training Settings"
     }
 }

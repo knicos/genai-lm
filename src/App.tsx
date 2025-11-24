@@ -72,6 +72,16 @@ export const routes = createRoutesFromElements(
         />
 
         <Route
+            path="workspace"
+            element={
+                <Navigate
+                    replace
+                    to="/workspace/pretrain"
+                />
+            }
+        />
+
+        <Route
             path="workspace/:flow"
             lazy={() => import('./views/Workspace')}
         >

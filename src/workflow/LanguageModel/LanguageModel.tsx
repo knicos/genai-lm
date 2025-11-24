@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import ModelSearch from './ModelSearch';
 import useModelBusy from '../../utilities/useModelBusy';
 import { saveAs } from 'file-saver';
+import Tools from './Tools';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -22,6 +23,7 @@ export default function LanguageModel({ model, onModel }: Props) {
     const { t } = useTranslation();
     const showVisualisation = useAtomValue(uiShowVisualisation);
     const [showSearch, setShowSearch] = useState(false);
+    const [showTools, setShowTools] = useState(false);
     const [done, setDone] = useState(false);
     const busy = useModelBusy(model);
     const [saving, setSaving] = useState(false);
@@ -120,6 +122,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                     selectedSet={model && model.meta.id ? new Set([model.meta.id]) : undefined}
                 />
             )}
+            {showTools && <Tools onClose={() => setShowTools(false)} />}
             <div className={style.container}>
                 <BoxTitle
                     title={title}
@@ -134,6 +137,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                             onUpload={modelBusy ? undefined : () => fileRef.current?.click()}
                             onSearch={modelBusy ? undefined : () => setShowSearch(true)}
                             onDownload={!modelBusy && model ? () => doSave(model?.meta.name || 'model') : undefined}
+                            onTools={modelBusy ? undefined : () => setShowTools(true)}
                         />
                     }
                 />

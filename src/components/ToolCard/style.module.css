@@ -1,0 +1,45 @@
+@value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
+
+.sampleBox {
+    padding: 2rem;
+    background-color: #e996e9;
+    position: relative;
+    border-radius: 8px;
+    height: 100px;
+    font-size: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #44444440;
+}
+
+.untrained {
+    background: repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 2px,
+            transparent 2px,
+            transparent 8px
+        ),
+        linear-gradient(135deg, #c7ebcd 0%, #b6e0ac 50%, #8cda7d 100%);
+}
+
+.expandedSampleBox {
+    background-color: #f9f9f9;
+    flex-grow: 1;
+    cursor: pointer;
+    height: 190px;
+    position: relative;
+    font-size: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #44444440;
+}
+
+.buttonRow {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 2rem;
+    align-items: center;
+}

@@ -13,6 +13,8 @@
 .mainContainer {
     flex-grow: 1;
     display: flex;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .workspaceContainer {
