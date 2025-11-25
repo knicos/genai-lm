@@ -4,8 +4,8 @@ import { modelAtom } from '../../state/model';
 import { checks, TeachableLLM, TensorStatistics } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
 import { useState } from 'react';
-import { squeezeArray } from '../../utilities/arrays';
 import useModelLoaded from '../../utilities/useModelLoaded';
+import { squeezeArray } from '../../utilities/arrays';
 
 async function debugModel(model: TeachableLLM) {
     // Generate text with logits output
@@ -15,18 +15,27 @@ async function debugModel(model: TeachableLLM) {
         maxLength: 50,
     });
 
-    const logitsData = squeezeArray(generator.getEmbeddingsData()[0]) as number[][];
+    const logitsData = generator.getEmbeddingsData()[0];
 
     // Create stats on logits
-    const statsPromise = logitsData.map((stepLogits: number[]) => checks.createWeightStatistics(stepLogits));
+    const statsPromise = logitsData.map((stepLogits: { name: string; tensor: number[][] }) =>
+        checks.createWeightStatistics(squeezeArray(stepLogits.tensor) as number[])
+    );
     const stats = await Promise.all(statsPromise);
-    return stats;
+    return stats.map((stat, index) => ({
+        name: logitsData[index].name,
+        ...stat,
+    }));
+}
+
+interface NamedTensorStatistics extends TensorStatistics {
+    name: string;
 }
 
 export function Component() {
     const model = useAtomValue(modelAtom);
     const [running, setRunning] = useState(false);
-    const [stats, setStats] = useState<TensorStatistics[]>([]);
+    const [stats, setStats] = useState<NamedTensorStatistics[]>([]);
     const ready = useModelLoaded(model ?? undefined);
 
     return (
@@ -50,7 +59,7 @@ export function Component() {
             <ul>
                 {stats.map((stat, index) => (
                     <li key={index}>
-                        <strong>Step {index + 1}:</strong> <pre>{JSON.stringify(stat, null, 2)}</pre>
+                        <strong>Step {stat.name}:</strong> <pre>{JSON.stringify(stat, null, 2)}</pre>
                     </li>
                 ))}
             </ul>
