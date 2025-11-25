@@ -32,6 +32,8 @@ export function Component() {
         setResults((prev) => [...prev, { results: result, name: 'Append Cache' }]);
         result = await checks.runCheck(checks.attentionMask, EPSILON);
         setResults((prev) => [...prev, { results: result, name: 'Attention Mask' }]);
+        result = await checks.runCheck(checks.matMulGelu, EPSILON);
+        setResults((prev) => [...prev, { results: result, name: 'MatMul Gelu' }]);
         setRunning(false);
     };
 
