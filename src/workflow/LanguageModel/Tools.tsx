@@ -35,6 +35,12 @@ const TOOLS: { title: string; cards: ToolCardItem[] }[] = [
                 url: 'checks',
                 icon: 'settings',
             },
+            {
+                id: 'debug-model',
+                name: 'tools.debugModel',
+                url: 'debug-model',
+                icon: 'settings',
+            },
         ],
     },
 ];

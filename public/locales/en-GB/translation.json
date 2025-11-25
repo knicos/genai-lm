@@ -157,6 +157,7 @@
         "generatorSettings": "Generator Settings",
         "trainingSettings": "Training Settings",
         "checks": "Operator Tests",
-        "advanced": "Advanced Tools"
+        "advanced": "Advanced Tools",
+        "debugModel": "Debug Model"
     }
 }
