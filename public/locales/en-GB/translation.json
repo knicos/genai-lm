@@ -36,7 +36,7 @@
             "lossMetric": "Loss",
             "advancedMetrics": "Advanced Metrics",
             "performProbe": "Check hardware on startup",
-            "showVisualisation": "Show Model Visualisation"
+            "developerMode": "Developer Mode"
         },
         "close": "Close",
         "annotations": {
@@ -106,7 +106,8 @@
         "hours": "Hr",
         "minutes": "Min",
         "seconds": "Sec",
-        "remaining": "Remaining"
+        "remaining": "Remaining",
+        "settingsTooltip": "Training Settings"
     },
     "generator": {
         "title": "Generation",
@@ -154,10 +155,19 @@
     },
     "tools": {
         "Settings": "Settings",
+        "Visualizations": "Visualisations",
         "generatorSettings": "Generator Settings",
         "trainingSettings": "Training Settings",
         "checks": "Operator Tests",
         "advanced": "Advanced Tools",
-        "debugModel": "Debug Model"
+        "debugModel": "Debug Model",
+        "nextSample": "Next",
+        "trainingProcess": "Training Process",
+        "loss": "Loss",
+        "model": "Model",
+        "modelMissingHint": "Please load a model and training data to view the training process.",
+        "play": "Play",
+        "pause": "Pause",
+        "step": "Step"
     }
 }

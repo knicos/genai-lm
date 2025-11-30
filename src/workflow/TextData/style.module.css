@@ -25,8 +25,8 @@
 .content {
     width: 100%;
     position: relative;
-    min-height: 300px;
-    max-height: 400px;
+    min-height: 260px;
+    max-height: 350px;
     overflow: hidden;
     border-top: 1px solid #eee;
 }

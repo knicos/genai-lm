@@ -6,11 +6,17 @@ import { IconButton } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useTranslation } from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
+import InsightsIcon from '@mui/icons-material/Insights';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 
 function makeIcon(icon: string) {
     switch (icon) {
         case 'settings':
             return <SettingsIcon fontSize="inherit" />;
+        case 'insights':
+            return <InsightsIcon fontSize="inherit" />;
+        case 'developer':
+            return <DeveloperModeIcon fontSize="inherit" />;
         default:
             return null;
     }

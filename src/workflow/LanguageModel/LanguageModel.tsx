@@ -127,13 +127,12 @@ export default function LanguageModel({ model, onModel }: Props) {
                 <BoxTitle
                     title={title}
                     status={isLoading ? 'busy' : model ? 'done' : 'disabled'}
-                    style={{ height: '5rem' }}
+                    style={{ height: '60px', borderBottom: 'none' }}
                     setTitle={updateModelTitle}
                     placeholder={t('model.languageModel')}
                     dark
                     button={
                         <ModelMenu
-                            disableInspect={!model}
                             onUpload={modelBusy ? undefined : () => fileRef.current?.click()}
                             onSearch={modelBusy ? undefined : () => setShowSearch(true)}
                             onDownload={!modelBusy && model ? () => doSave(model?.meta.name || 'model') : undefined}

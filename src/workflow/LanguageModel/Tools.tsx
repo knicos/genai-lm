@@ -7,8 +7,21 @@ import CardView from '../../components/CardView/CardView';
 import ToolCard from '../../components/ToolCard/ToolCard';
 import { ToolCardItem } from '../../components/ToolCard/type';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { uiDeveloperMode } from '../../state/uiState';
 
-const TOOLS: { title: string; cards: ToolCardItem[] }[] = [
+const TOOLS: { title: string; cards: ToolCardItem[]; developer?: boolean }[] = [
+    {
+        title: 'tools.Visualizations',
+        cards: [
+            {
+                id: 'training-process',
+                name: 'tools.trainingProcess',
+                url: 'training-process',
+                icon: 'insights',
+            },
+        ],
+    },
     {
         title: 'tools.Settings',
         cards: [
@@ -28,18 +41,19 @@ const TOOLS: { title: string; cards: ToolCardItem[] }[] = [
     },
     {
         title: 'tools.advanced',
+        developer: true,
         cards: [
             {
                 id: 'checks',
                 name: 'tools.checks',
                 url: 'checks',
-                icon: 'settings',
+                icon: 'developer',
             },
             {
                 id: 'debug-model',
                 name: 'tools.debugModel',
                 url: 'debug-model',
-                icon: 'settings',
+                icon: 'developer',
             },
         ],
     },
@@ -54,6 +68,7 @@ export default function Tools({ onClose }: Props) {
     const navigate = useNavigate();
     const location = useLocation();
     const [open, setOpen] = useState(true);
+    const developerMode = useAtomValue(uiDeveloperMode);
 
     useEffect(() => {
         if (!open) {
@@ -77,7 +92,7 @@ export default function Tools({ onClose }: Props) {
         [navigate]
     );
 
-    const langTools = TOOLS.map((group) => ({
+    const langTools = TOOLS.filter((group) => !group.developer || developerMode).map((group) => ({
         ...group,
         title: t(group.title),
     }));

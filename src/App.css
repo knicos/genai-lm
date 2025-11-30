@@ -2,3 +2,10 @@
     background: white;
     border-radius: 10px;
 }
+
+.sidePanel {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 3rem;
+    flex-grow: 1;
+}

@@ -29,7 +29,7 @@ function lossToQuality(loss: number, vocabSize: number): number {
     return Math.max(0, Math.min(1, quality));
 }
 
-function createMetric(
+export function createMetric(
     metric: EvaluationMetric,
     log: { valLoss?: number; loss: number },
     vocabSize: number

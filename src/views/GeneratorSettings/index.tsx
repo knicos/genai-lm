@@ -11,7 +11,7 @@ export function Component() {
     const { temperature, topP, maxLength, showProbabilities: probability, showSettings } = settings;
 
     return (
-        <div className={style.column}>
+        <div className="sidePanel">
             <h2>{t('app.settings.generator')}</h2>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <div

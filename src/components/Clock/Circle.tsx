@@ -6,9 +6,10 @@ interface Props extends PropsWithChildren {
     radius: number;
     progress: number;
     color?: string;
+    animated?: boolean;
 }
 
-export default function Circle({ radius, children, progress, color }: Props) {
+export default function Circle({ radius, children, progress, color, animated }: Props) {
     const stroke = 8;
     const normalizedRadius = radius - stroke / 2;
     const circumference = 2 * Math.PI * normalizedRadius;
@@ -38,7 +39,11 @@ export default function Circle({ radius, children, progress, color }: Props) {
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}
-                    style={{ transform: `rotate(90deg)`, transformOrigin: '50% 50%' }}
+                    style={{
+                        transform: `rotate(90deg)`,
+                        transformOrigin: '50% 50%',
+                        transition: animated ? 'stroke-dashoffset 0.3s ease-out' : 'none',
+                    }}
                     data-testid="circle-progress"
                 />
             </svg>

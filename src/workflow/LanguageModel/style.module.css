@@ -1,5 +1,5 @@
 .modelThread {
-    max-width: 80%;
+    max-width: max-content;
     background: #945fbf;
     color: white;
 }
@@ -11,11 +11,7 @@
 }
 
 .modelThread h2 {
-    margin-left: 2rem;
-}
-
-.modelThread :global .MuiInputBase-root {
-    background-color: #f8f0ff;
+    margin-left: 1rem;
 }
 
 .container {

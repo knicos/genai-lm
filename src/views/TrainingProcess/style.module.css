@@ -1,0 +1,20 @@
+.block {
+    margin-top: 2rem;
+    position: relative;
+}
+
+.lossBlock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    align-self: flex-end;
+    gap: 1rem;
+}
+
+.modelBlock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    align-self: flex-start;
+    gap: 1rem;
+}

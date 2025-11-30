@@ -27,7 +27,7 @@ interface Props {
     tokeniser?: typeof TeachableLLM.prototype.tokeniser;
 }
 
-const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
+export const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
 
 export default function TextHighlighter({
     text,

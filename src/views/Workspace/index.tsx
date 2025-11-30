@@ -4,7 +4,7 @@ import TextTrainer from '../../workflow/TextTraining/TextTraining';
 import TextGenerator from '../../workflow/TextGenerator/TextGenerator';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import TextData from '../../workflow/TextData/TextData';
-import { IConnection, WorkflowLayout } from '@genai-fi/base';
+import { IConnection, SidePanel, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
 import Evaluation from '../../workflow/Evaluation/Evaluation';
 import { useAtom, useAtomValue } from 'jotai';
@@ -17,9 +17,9 @@ import { Outlet, useLocation, useNavigate, useOutlet, useSearchParams } from 're
 import logger, { initializeLogger } from '../../utilities/logger';
 import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 import { useTranslation } from 'react-i18next';
-import SidePanel from '../../components/SidePanel/SidePanel';
 import { uiShowSidePanel } from '../../state/uiState';
 import { modelAtom } from '../../state/model';
+import { datasetAtom } from '../../state/data';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
@@ -45,7 +45,7 @@ const CONNECTIONS: IConnection[] = [
 export function Component() {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
-    const [textDataset, setTextDataset] = useState<string[]>([]);
+    const [textDataset, setTextDataset] = useAtom(datasetAtom);
     const steps = useAtomValue(workflowSteps);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
     const detected = useAtomValue(deviceDetected);

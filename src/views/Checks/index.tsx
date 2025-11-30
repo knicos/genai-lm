@@ -38,7 +38,7 @@ export function Component() {
     };
 
     return (
-        <div className={style.column}>
+        <div className="sidePanel">
             <h2>Automated Tests</h2>
             <BusyButton
                 busy={running}

@@ -136,7 +136,7 @@ export default function TextTraining({ model, dataset }: Props) {
             setTraining(true);
             setDone(false);
 
-            const shouldPrepare = needsTraining;
+            const shouldPrepare = needsTraining || !trainer.isPrepared();
 
             setNeedsTraining(false);
             // setEpochs(0);

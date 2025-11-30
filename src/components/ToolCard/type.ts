@@ -2,5 +2,5 @@ export interface ToolCardItem {
     id: string;
     url?: string;
     name: string;
-    icon: 'settings';
+    icon: 'settings' | 'insights' | 'developer' | 'stats';
 }

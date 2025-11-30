@@ -1,5 +1,4 @@
 import { useAtomValue } from 'jotai';
-import style from './style.module.css';
 import { modelAtom } from '../../state/model';
 import { checks, TeachableLLM, TensorStatistics } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
@@ -11,7 +10,7 @@ async function debugModel(model: TeachableLLM) {
     // Generate text with logits output
     const generator = model.generator();
     await generator.generate(undefined, {
-        embeddings: true,
+        embeddings: 'all',
         maxLength: 50,
     });
 
@@ -39,7 +38,7 @@ export function Component() {
     const ready = useModelLoaded(model ?? undefined);
 
     return (
-        <div className={style.column}>
+        <div className="sidePanel">
             <h2>Model Debugger</h2>
             <BusyButton
                 disabled={!model || !ready}

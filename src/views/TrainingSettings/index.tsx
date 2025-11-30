@@ -12,7 +12,7 @@ export function Component() {
     const [advanced, setAdvanced] = useAtom(evaluatorAdvanced);
 
     return (
-        <div className={style.column}>
+        <div className="sidePanel">
             <h2>{t('app.settings.training')}</h2>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <div
