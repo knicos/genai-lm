@@ -96,7 +96,8 @@
         "visualisation": {
             "next": "Next"
         },
-        "preTraining": "Pre-Training"
+        "preTraining": "Pre-Training",
+        "defaultName": "Your Model"
     },
     "training": {
         "title": "Training",

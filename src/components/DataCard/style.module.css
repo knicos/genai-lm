@@ -1,10 +1,11 @@
 @value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
 
 .sampleBox {
-    padding: 2rem;
     background-color: #f9f9f9;
     position: relative;
     border-radius: 8px;
+    cursor: pointer;
+    height: 150px;
 }
 
 .simple {
@@ -43,20 +44,23 @@
 .sampleText {
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 100px;
+    height: calc(150px - 2rem);
     font-size: 1.2rem;
     font-style: italic;
+    margin: 1rem;
+    box-sizing: border-box;
 }
 
 .sampleTextExpanded {
-    max-height: 190px;
+    max-height: 150px;
     overflow: auto;
     font-size: 1.2rem;
     font-style: italic;
-    padding: 1.5rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column-reverse;
     box-sizing: border-box;
+    scrollbar-width: none;
 }
 
 .expandedSampleBox {
@@ -69,8 +73,9 @@
 .buttonRow {
     display: flex;
     gap: 1rem;
-    padding: 0.5rem 2rem;
+    padding: 0 0.5rem;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .sizeText {
@@ -87,4 +92,11 @@
     align-items: center;
     justify-content: center;
     transform: translateY(50%);
+    overflow: hidden;
+}
+
+.sizeIcon {
+    composes: sizeText;
+    background: white;
+    box-shadow: 2px 2px 4px #a4acbb;
 }

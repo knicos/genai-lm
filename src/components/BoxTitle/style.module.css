@@ -22,6 +22,8 @@
     margin: 0;
     margin-left: 1rem;
     font-size: 1.2rem;
+    text-wrap: nowrap;
+    display: flex;
 }
 
 .title input {

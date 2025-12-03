@@ -44,19 +44,20 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
             onClick={handleDownload}
             expandedContent={
                 <>
-                    <div className={`${style.expandedSampleBox} ${style[card.complexity]}`}>
+                    <div className={`${style.sampleBox} ${style[card.complexity]}`}>
                         <SampleWriter sample={sample} />
+                        <div className={style.sizeIcon}>
+                            <IconButton
+                                color="secondary"
+                                disabled={downloader !== null}
+                                onClick={handleDownload}
+                            >
+                                {done || used ? <CheckIcon fontSize="inherit" /> : <DownloadIcon fontSize="inherit" />}
+                            </IconButton>
+                        </div>
                     </div>
                     <div className={style.buttonRow}>
                         <h2>{card.title}</h2>
-                        <div style={{ flexGrow: 1 }} />
-                        <IconButton
-                            color="secondary"
-                            disabled={downloader !== null}
-                            onClick={handleDownload}
-                        >
-                            {done ? <CheckIcon fontSize="large" /> : <DownloadIcon fontSize="large" />}
-                        </IconButton>
                     </div>
                 </>
             }
@@ -66,12 +67,18 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
                         <div className={style.sampleText}>{sample}</div>
                         <div
                             className={style.sizeText}
-                            style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
+                            style={{
+                                fontSize: `${fontSize}rem`,
+                                width: `${fontSize * 2}rem`,
+                                height: `${fontSize * 2}rem`,
+                            }}
                         >
                             {size >= 1 ? `${size}M` : `${size * 1000}K`}
                         </div>
                     </div>
-                    <h2>{title}</h2>
+                    <div className={style.buttonRow}>
+                        <h2>{title}</h2>
+                    </div>
                 </>
             }
         />

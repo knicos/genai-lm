@@ -40,21 +40,14 @@ export default function CardRow<T extends CardItem, S = void>({
     const [offset, setOffset] = useState(0);
 
     useEffect(() => {
-        const observer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                setWidth(entry.contentRect.width);
-            }
-        });
         if (listRef.current) {
-            observer.observe(listRef.current);
             setWidth(listRef.current.getBoundingClientRect().width);
         }
-        return () => observer.disconnect();
     }, []);
 
     const numVisible = Math.floor((width + 20) / 320);
-    const hasLeftArrow = offset > 0;
-    const hasRightArrow = offset + numVisible < cards.length;
+    const hasLeftArrow = numVisible > 1 && offset > 0;
+    const hasRightArrow = numVisible > 1 && offset + numVisible < cards.length;
 
     const handleOffsetChange = (newOffset: number) => {
         setOffset((o) => Math.max(0, Math.min(cards.length - numVisible, o + newOffset)));
@@ -78,13 +71,13 @@ export default function CardRow<T extends CardItem, S = void>({
     return (
         <div className={style.dataCardRow}>
             <h1>{title}</h1>
-            <div className={style.container}>
+            <div className={numVisible > 1 ? style.container : style.columnContainer}>
                 <ul ref={listRef}>
                     {cards.map((card, ix) => (
                         <li key={card.id}>
                             <CardComponent
                                 card={card}
-                                disabled={ix < offset || ix >= offset + numVisible}
+                                disabled={numVisible > 1 ? ix < offset || ix >= offset + numVisible : false}
                                 used={selectedSet ? selectedSet.has(card.id) : false}
                                 onSelect={onSelect}
                                 onHighlight={handleHighlight}

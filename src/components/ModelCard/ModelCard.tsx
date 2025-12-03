@@ -53,8 +53,20 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
             onClick={handleCreateModel}
             expandedContent={
                 <>
-                    <div className={`${style.expandedSampleBox} ${card.trained ? style.trained : style.untrained}`}>
+                    <div className={`${style.sampleBox} ${card.trained ? style.trained : style.untrained}`}>
                         {card.example && <SampleWriter sample={card.example} />}
+                        <div className={style.sizeIcon}>
+                            <IconButton
+                                color="secondary"
+                                disabled={downloader !== null}
+                                onClick={(e: MouseEvent) => {
+                                    e.stopPropagation();
+                                    handleCreateModel();
+                                }}
+                            >
+                                {done ? <CheckIcon fontSize="medium" /> : <DownloadIcon fontSize="medium" />}
+                            </IconButton>
+                        </div>
                         <div className={style.infoContainer}>
                             <ModelInfo
                                 config={card.config || {}}
@@ -62,7 +74,6 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                 showTokens={!hasTrainingStats}
                                 showLayers={!hasTrainingStats}
                                 showContextSize={!hasTrainingStats}
-                                showEmbeddingSize={!hasTrainingStats && !card.trained}
                                 trainingStats={hasTrainingStats ? card.trainingStats : undefined}
                                 showDuration={hasTrainingStats}
                                 showSamples={hasTrainingStats}
@@ -71,17 +82,6 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                     </div>
                     <div className={style.buttonRow}>
                         <h2>{card.name}</h2>
-                        <div style={{ flexGrow: 1 }} />
-                        <IconButton
-                            color="secondary"
-                            disabled={downloader !== null}
-                            onClick={(e: MouseEvent) => {
-                                e.stopPropagation();
-                                handleCreateModel();
-                            }}
-                        >
-                            {done ? <CheckIcon fontSize="large" /> : <DownloadIcon fontSize="large" />}
-                        </IconButton>
                     </div>
                 </>
             }
@@ -108,10 +108,12 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                             className={style.sizeText}
                             style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
                         >
-                            {parameters >= 1 ? `${parameters}M` : `${parameters * 1000}K`}
+                            {parameters >= 1 ? `${Math.round(parameters)}M` : `${parameters * 1000}K`}
                         </div>
                     </div>
-                    <h2>{name}</h2>
+                    <div className={style.buttonRow}>
+                        <h2>{name}</h2>
+                    </div>
                 </>
             }
         />

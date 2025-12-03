@@ -1,11 +1,8 @@
 import { PointerEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
-import { Portal } from '@mui/material';
-import ExpandedCard from './ExpandedCard';
 import { CardItem } from '../CardRow/CardRow';
 
-const EXPANDSIZE = 40;
-const EXPAND_DELAY = 800;
+const EXPAND_DELAY = 100;
 
 interface Props<T extends CardItem = CardItem, S = void> {
     onSelect: (card: T, extra?: S) => void;
@@ -30,8 +27,6 @@ export default function Card<T extends CardItem, S = void>({
     card,
 }: Props<T, S>) {
     const [toClose, setToClose] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
-    const [coords, setCoords] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
     const [expanded, setExpanded] = useState(highlighted || false);
     const touchRef = useRef(false);
     const usedRef = useRef(used);
@@ -52,15 +47,6 @@ export default function Card<T extends CardItem, S = void>({
             const timeout = setTimeout(
                 () => {
                     if (usedRef.current) return;
-                    if (cardRef.current) {
-                        const rect = cardRef.current.getBoundingClientRect();
-                        setCoords({
-                            top: rect.top - EXPANDSIZE,
-                            left: rect.left - EXPANDSIZE,
-                            width: rect.width + EXPANDSIZE * 2,
-                            height: rect.height + EXPANDSIZE * 2,
-                        });
-                    }
                     setToClose(false);
                     setExpanded(true);
                 },
@@ -77,7 +63,7 @@ export default function Card<T extends CardItem, S = void>({
             const timeout = setTimeout(() => {
                 setToClose(false);
                 setExpanded(false);
-            }, 400);
+            }, 100);
             return () => clearTimeout(timeout);
         }
     }, [toClose]);
@@ -120,24 +106,11 @@ export default function Card<T extends CardItem, S = void>({
                         : undefined
                 }
                 onMouseEnter={!disabled && !used ? handleExpand : undefined}
-                onMouseLeave={!disabled && !used && !expanded ? handleClose : undefined}
-                ref={cardRef}
+                onMouseLeave={!disabled && !used ? handleClose : undefined}
                 data-testid={`card-${card.id}`}
             >
-                {content}
+                {expanded ? expandedContent : content}
             </div>
-            {expanded && (
-                <Portal container={() => document.getElementById('root') || document.body}>
-                    <ExpandedCard
-                        coords={coords}
-                        toClose={toClose}
-                        handleClose={handleClose}
-                        card={card}
-                        content={expandedContent}
-                        onClick={onClick}
-                    />
-                </Portal>
-            )}
         </>
     );
 }

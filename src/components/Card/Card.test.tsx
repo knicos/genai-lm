@@ -87,8 +87,7 @@ describe('Card', () => {
             />
         );
 
-        await user.click(screen.getByTestId('expanded-card-1'));
+        await user.click(screen.getByTestId('card-1'));
         expect(handleClick).toHaveBeenCalled();
-        expect(handleHighlight).toHaveBeenCalledWith('1', true);
     });
 });
