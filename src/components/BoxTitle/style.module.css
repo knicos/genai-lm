@@ -32,7 +32,7 @@
     box-sizing: border-box;
     border: 2px solid transparent;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .title input:focus {

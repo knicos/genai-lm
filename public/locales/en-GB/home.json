@@ -1,0 +1,24 @@
+{
+    "title": "Generation AI",
+    "llmTitle": "Little Language Machine",
+    "llmDescription": "Create tiny language models in your browser to learn about the process, mechanisms and challenges of language modeling. This application uses the same underlying \"transformer\" technology as large language models, but on a much smaller scale that can run on your local machine.",
+    "activity": "Choose an activity to get started:",
+    "howItWorksTitle": "How it works...",
+    "howItWorksContent": "This application runs entirely in your web browser using JavaScript and WebGL or WebGPU for hardware acceleration. No data is sent to any server; everything runs locally on your machine. It is based around NanoGPT by Andrej Karpathy, a minimal implementation of the GPT (Generative Pre-trained Transformer) architecture. The implementation has been optimised and adapted for the browser environment but some devices may still struggle with performance depending on the size of the model and dataset used.",
+    "whoMadeItTitle": "Who made it...",
+    "whoMadeItContent": "This application has been created by Nicolas Pope as a part of the Generation AI research project in Finland. The project is publically funded to support AI literacy in schools in Finland.",
+    "activities": {
+        "pretrain": {
+            "title": "Pre-training a raw Language Model",
+            "description": "Train a language model from scratch with your own dataset. Learn about the training process and the mechanisms involved in producing language."
+        },
+        "classifier": {
+            "title": "Fine-tuning a Language Model as a Classifier",
+            "description": "Take a pre-trained language model and adapt it to perform text classification before sharing as an application. Learn how to label and structure data for supervised learning."
+        },
+        "chatbot": {
+            "title": "Fine-tuning a Language Model as a Chatbot",
+            "description": "Adapt a pre-trained language model into a ChatBot application. Learn how to structure conversational data for interactive dialogues."
+        }
+    }
+}

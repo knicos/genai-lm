@@ -14,6 +14,7 @@ import { theme } from '@genai-fi/base';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import logger from './utilities/logger';
+import { Component as Home } from './views/Home';
 
 interface RouterError {
     status: number;
@@ -63,12 +64,7 @@ export const routes = createRoutesFromElements(
     >
         <Route
             index
-            element={
-                <Navigate
-                    replace
-                    to="/workspace/pretrain"
-                />
-            }
+            element={<Home />}
         />
 
         <Route
