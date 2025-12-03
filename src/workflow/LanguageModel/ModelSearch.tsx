@@ -12,7 +12,9 @@ import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
 import { Spinner } from '@genai-fi/base';
 
-interface ModelManifest {
+export const MANIFEST_URL = 'https://store.gen-ai.fi/llm/modelManifest.json';
+
+export interface ModelManifest {
     models: ModelCardItem[];
     categories: Record<string, { name: string; modelIds: string[] }[]>;
     languages: Record<string, string>;
@@ -53,7 +55,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
     }, [open, onClose]);
 
     useEffect(() => {
-        fetch('https://store.gen-ai.fi/llm/modelManifest.json')
+        fetch(MANIFEST_URL)
             .then((res) => res.json())
             .then((data: ModelManifest) => {
                 setDataRows(groupByCategory(lang, data));

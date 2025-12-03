@@ -8,10 +8,11 @@ import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import ModelSearch from './ModelSearch';
+import ModelSearch, { MANIFEST_URL, ModelManifest } from './ModelSearch';
 import useModelBusy from '../../utilities/useModelBusy';
 import { saveAs } from 'file-saver';
 import Tools from './Tools';
+import { useParams, useSearchParams } from 'react-router-dom';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -30,6 +31,8 @@ export default function LanguageModel({ model, onModel }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [title, setTitle] = useState(model?.meta.name || '');
+    const [searchParams] = useSearchParams();
+    const routerParams = useParams();
     // const ready = useModelLoaded(model);
 
     const doSave = useCallback(
@@ -94,6 +97,59 @@ export default function LanguageModel({ model, onModel }: Props) {
         },
         [model]
     );
+
+    const loadModelById = useCallback(
+        (id: string) => {
+            setIsLoading(true);
+            fetch(MANIFEST_URL)
+                .then((res) => res.json())
+                .then((data: ModelManifest) => {
+                    const card = data.models.find((m) => m.id === id);
+                    if (!card) {
+                        console.error('Model not found in manifest:', id);
+                        setIsLoading(false);
+                        return;
+                    }
+
+                    if (!card.url) {
+                        const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
+                        newModel.meta.id = card.id;
+                        newModel.meta.name = t('model.defaultName');
+                        newModel.meta.trained = false;
+                        onModel(newModel);
+                        waitForModel(newModel).then(() => {
+                            setIsLoading(false);
+                        });
+                    } else {
+                        fetch(card.url)
+                            .then((res) => res.blob())
+                            .then((blob) => {
+                                const file = new File([blob], `${card.id}.zip`, { type: 'application/zip' });
+                                const newModel = TeachableLLM.loadModel(file);
+                                newModel.meta.id = card.id;
+                                newModel.meta.name = card.name;
+                                newModel.meta.trained = card.trained || true;
+                                onModel(newModel);
+                                waitForModel(newModel).then(() => {
+                                    setIsLoading(false);
+                                });
+                            });
+                    }
+                });
+        },
+        [onModel, t]
+    );
+
+    useEffect(() => {
+        const modelParam = searchParams.get('model');
+        // Use provided model id from URL params
+        if (modelParam && !model) {
+            loadModelById(modelParam);
+            // Load untrained model for pretrain workflow
+        } else if (routerParams.flow === 'pretrain' && !model) {
+            loadModelById('untrained-medium');
+        }
+    }, [searchParams, model, onModel, loadModelById, routerParams.flow]);
 
     return (
         <Box

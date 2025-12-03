@@ -10,6 +10,6 @@ export type WorkflowSteps =
     | 'generator'
     | 'xai';
 
-const DEFAULT_STEPS: WorkflowSteps[] = ['model', 'data', 'trainer', 'evaluation', 'generator'];
+const DEFAULT_STEPS: WorkflowSteps[] = ['model', 'data', 'trainer', 'generator'];
 
 export const workflowSteps = atom<Set<WorkflowSteps>>(new Set<WorkflowSteps>(DEFAULT_STEPS));
