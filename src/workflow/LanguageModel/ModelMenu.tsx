@@ -4,9 +4,10 @@ import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SearchIcon from '@mui/icons-material/Search';
 import BuildIcon from '@mui/icons-material/Build';
-import QrCode2Icon from '@mui/icons-material/QrCode2';
 import DownloadIcon from '@mui/icons-material/Download';
 import style from './style.module.css';
+import { useAtomValue } from 'jotai';
+import { uiDeveloperMode } from '../../state/uiState';
 
 interface Props {
     disableInspect?: boolean;
@@ -19,6 +20,7 @@ interface Props {
 
 export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, onTools, disableInspect }: Props) {
     const { t } = useTranslation();
+    const developerMode = useAtomValue(uiDeveloperMode);
 
     return (
         <div className={style.modelMenu}>
@@ -59,24 +61,18 @@ export default function ModelMenu({ onCreate, onUpload, onSearch, onDownload, on
             >
                 {t('model.download')}
             </VerticalButton>
-            <VerticalButton
-                disabled={true}
-                startIcon={<QrCode2Icon color="inherit" />}
-                variant="text"
-                color="inherit"
-            >
-                {t('model.share')}
-            </VerticalButton>
             <div className={style.spacer} />
-            <VerticalButton
-                startIcon={<BuildIcon color="inherit" />}
-                variant="text"
-                onClick={onTools}
-                disabled={disableInspect}
-                color="inherit"
-            >
-                {t('model.tools')}
-            </VerticalButton>
+            {developerMode && (
+                <VerticalButton
+                    startIcon={<BuildIcon color="inherit" />}
+                    variant="text"
+                    onClick={onTools}
+                    disabled={disableInspect}
+                    color="inherit"
+                >
+                    {t('model.tools')}
+                </VerticalButton>
+            )}
         </div>
     );
 }

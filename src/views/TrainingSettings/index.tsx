@@ -46,17 +46,6 @@ export function Component() {
                 />
             </FormControl>
             <div className={style.spacer} />
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={settings.outputText}
-                            onChange={(_, checked) => setSettings({ ...settings, outputText: checked })}
-                        />
-                    }
-                    label={t('app.settings.showOutputText')}
-                />
-            </FormControl>
             <FormControl>
                 <FormControlLabel
                     control={

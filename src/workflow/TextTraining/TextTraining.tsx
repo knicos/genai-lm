@@ -17,9 +17,9 @@ import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
-import { IconButton, Tooltip } from '@mui/material';
-import TuneIcon from '@mui/icons-material/Tune';
 import { useNavigate } from 'react-router-dom';
+import TrainingMenu from './TrainingMenu';
+import { Switch, Tooltip } from '@mui/material';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -44,7 +44,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
     const status = useModelStatus(model);
-    const settings = useAtomValue(trainerSettings);
+    const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
     const maxSteps = settings.maxSteps;
     const disableCheckpointing = settings.disableCheckpointing;
@@ -145,14 +145,6 @@ export default function TextTraining({ model, dataset }: Props) {
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
 
-            console.log(
-                'Estimate memory:',
-                (model.estimateTrainingMemoryUsage(batchSize) / (1024 * 1024 * 1024)).toFixed(2),
-                'GB'
-            );
-
-            console.log('Using learning rate:', lr > 0 ? lr : learningRate);
-
             logger.log(
                 `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
             );
@@ -198,7 +190,13 @@ export default function TextTraining({ model, dataset }: Props) {
                         !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
                     }
                 />
-                <div>
+                <TrainingMenu
+                    training={training}
+                    onShowSettings={() => navigate('training-settings')}
+                    onMonitor={() => navigate('training-log')}
+                    onVisualize={() => navigate('training-process')}
+                />
+                <div className={style.clockContainer}>
                     <Clock
                         duration={trainingProgress?.duration || 0}
                         totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
@@ -208,6 +206,7 @@ export default function TextTraining({ model, dataset }: Props) {
                         <NumberBox
                             value={(epochs || 0) * batchSize}
                             label={t('training.samples')}
+                            flip
                         />
                         <NumberBox
                             value={totalSamples - (epochs || 0) * batchSize}
@@ -217,7 +216,6 @@ export default function TextTraining({ model, dataset }: Props) {
                 </div>
                 <div className={style.buttonBox}>
                     <Button
-                        fullWidth
                         disabled={!canTrain || (!done && !training)}
                         variant="contained"
                         startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
@@ -226,18 +224,17 @@ export default function TextTraining({ model, dataset }: Props) {
                         {done ? t('training.start') : t('training.stop')}
                     </Button>
                     <Tooltip
-                        title={t('training.settingsTooltip')}
+                        title={t('training.autoOutput')}
                         arrow
                     >
-                        <IconButton
-                            color="inherit"
-                            disabled={!done && !training}
-                            onClick={() => {
-                                navigate('training-settings');
-                            }}
-                        >
-                            <TuneIcon />
-                        </IconButton>
+                        <Switch
+                            disabled={training}
+                            checked={settings.outputText}
+                            onChange={(e) => setSettings({ ...settings, outputText: e.target.checked })}
+                            data-testid="auto-output-switch"
+                            aria-label={t('training.autoOutput')}
+                            color="success"
+                        />
                     </Tooltip>
                 </div>
             </div>

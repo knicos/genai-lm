@@ -28,7 +28,6 @@
     min-height: 260px;
     max-height: 350px;
     overflow: hidden;
-    border-top: 1px solid #eee;
 }
 
 .textInputContainer {

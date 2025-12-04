@@ -1,6 +1,5 @@
 .container {
     display: flex;
-    gap: 1rem;
     align-items: center;
     /*justify-content: space-between;*/
     color: #333;
@@ -26,12 +25,20 @@
     width: 100%;
     padding: 0 1rem;
     box-sizing: border-box;
+    justify-content: space-between;
 }
 
 .stats {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0.2rem 1rem;
     box-sizing: border-box;
+    position: relative;
+    left: -1rem;
+    flex-direction: column;
+}
+
+.clockContainer {
+    margin: 1rem 0rem 1rem 2rem;
+    display: flex;
 }

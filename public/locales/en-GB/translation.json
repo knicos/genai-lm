@@ -108,11 +108,14 @@
         "minutes": "Min",
         "seconds": "Sec",
         "remaining": "Remaining",
-        "settingsTooltip": "Training Settings",
+        "settings": "Settings",
         "loss": "Loss",
         "valLoss": "Validation Loss",
         "steps": "Steps",
-        "noData": "No training data available"
+        "noData": "No training data available",
+        "monitor": "Monitor",
+        "visualize": "Visualise",
+        "autoOutput": "Show Progress Text"
     },
     "generator": {
         "title": "Generation",

@@ -70,7 +70,7 @@ export function Component() {
                 const vocab = model.tokeniser.getVocab();
                 const largestToken = Math.max(1, vocab[vocab.length - 1].length);
                 const totalDatasetLength = dataset.reduce((sum, item) => sum + item.length, 0);
-                const sliceSize = (model.config.blockSize + 1) * largestToken;
+                const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
                 const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
                 const sampleText = extractData(dataset, randomStart, sliceSize + randomStart);
 
