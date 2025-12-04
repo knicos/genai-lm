@@ -3,7 +3,7 @@ import style from './style.module.css';
 import { ToolCardItem } from './type';
 import Card from '../Card/Card';
 import { IconButton } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import { useTranslation } from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InsightsIcon from '@mui/icons-material/Insights';
@@ -47,19 +47,22 @@ export default function ToolCard({ onSelect, onHighlight, used, card, highlighte
             onClick={() => onSelect(card)}
             expandedContent={
                 <>
-                    <div className={`${style.expandedSampleBox} ${style.untrained}`}>{makeIcon(card.icon)}</div>
+                    <div className={`${style.sampleBox} ${style.untrained}`}>
+                        {makeIcon(card.icon)}
+                        <div className={style.sizeIcon}>
+                            <IconButton
+                                color="secondary"
+                                onClick={(e: MouseEvent) => {
+                                    e.stopPropagation();
+                                    onSelect(card);
+                                }}
+                            >
+                                <ViewSidebarIcon fontSize="medium" />
+                            </IconButton>
+                        </div>
+                    </div>
                     <div className={style.buttonRow}>
                         <h2>{t(card.name)}</h2>
-                        <div style={{ flexGrow: 1 }} />
-                        <IconButton
-                            color="secondary"
-                            onClick={(e: MouseEvent) => {
-                                e.stopPropagation();
-                                onSelect(card);
-                            }}
-                        >
-                            <DownloadIcon fontSize="large" />
-                        </IconButton>
                     </div>
                 </>
             }
@@ -68,7 +71,9 @@ export default function ToolCard({ onSelect, onHighlight, used, card, highlighte
                     <div className={`${style.sampleBox} ${used ? style.disabledBG : style.untrained}`}>
                         {makeIcon(card.icon)}
                     </div>
-                    <h2>{t(name)}</h2>
+                    <div className={style.buttonRow}>
+                        <h2>{t(name)}</h2>
+                    </div>
                 </>
             }
         />

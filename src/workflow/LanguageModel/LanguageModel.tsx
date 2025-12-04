@@ -33,7 +33,10 @@ export default function LanguageModel({ model, onModel }: Props) {
     const [title, setTitle] = useState(model?.meta.name || '');
     const [searchParams] = useSearchParams();
     const routerParams = useParams();
-    // const ready = useModelLoaded(model);
+
+    // Prevent double loading issues
+    const modelRef = useRef<TeachableLLM | undefined>(model);
+    modelRef.current = model;
 
     const doSave = useCallback(
         (name: string) => {
@@ -112,29 +115,57 @@ export default function LanguageModel({ model, onModel }: Props) {
                     }
 
                     if (!card.url) {
+                        if (modelRef.current) {
+                            //modelRef.current.dispose();
+                            return;
+                        }
                         const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
+                        modelRef.current = newModel;
                         newModel.meta.id = card.id;
                         newModel.meta.name = t('model.defaultName');
                         newModel.meta.trained = false;
                         onModel(newModel);
-                        waitForModel(newModel).then(() => {
-                            setIsLoading(false);
-                        });
+                        waitForModel(newModel)
+                            .then(() => {
+                                setIsLoading(false);
+                            })
+                            .catch((e) => {
+                                setIsLoading(false);
+                                console.error('Failed to wait for model', e);
+                            });
                     } else {
                         fetch(card.url)
                             .then((res) => res.blob())
                             .then((blob) => {
+                                if (modelRef.current) {
+                                    //modelRef.current.dispose();
+                                    return;
+                                }
                                 const file = new File([blob], `${card.id}.zip`, { type: 'application/zip' });
                                 const newModel = TeachableLLM.loadModel(file);
+                                modelRef.current = newModel;
                                 newModel.meta.id = card.id;
                                 newModel.meta.name = card.name;
                                 newModel.meta.trained = card.trained || true;
                                 onModel(newModel);
-                                waitForModel(newModel).then(() => {
-                                    setIsLoading(false);
-                                });
+                                waitForModel(newModel)
+                                    .then(() => {
+                                        setIsLoading(false);
+                                    })
+                                    .catch((e) => {
+                                        setIsLoading(false);
+                                        console.error('Failed to wait for model', e);
+                                    });
+                            })
+                            .catch((e) => {
+                                setIsLoading(false);
+                                console.error('Failed to fetch model file', e);
                             });
                     }
+                })
+                .catch((e) => {
+                    setIsLoading(false);
+                    console.error('Failed to load model manifest', e);
                 });
         },
         [onModel, t]

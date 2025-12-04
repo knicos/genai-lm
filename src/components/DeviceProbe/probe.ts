@@ -1,13 +1,33 @@
-async function hasWebGPU(): Promise<boolean> {
+import { DeviceCapabilities } from '../../state/device';
+
+async function hasWebGPU(): Promise<DeviceCapabilities | null> {
     try {
         if (!navigator.gpu) {
-            return false;
+            return null;
         }
 
         const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
-        return adapter !== null;
+        if (!adapter) {
+            return null;
+        }
+
+        const features = adapter.features;
+        const hasFloat16 = features.has('shader-f16');
+        const hasSubgroups = features.has('subgroups');
+        let subgroupSize = 0;
+
+        if (hasSubgroups) {
+            subgroupSize = adapter.info.subgroupMaxSize ?? 0;
+        }
+
+        return {
+            backend: 'webgpu',
+            subgroups: hasSubgroups,
+            subgroupSize: subgroupSize,
+            float16: hasFloat16,
+        };
     } catch {
-        return false;
+        return null;
     }
 }
 
@@ -31,7 +51,22 @@ async function hasWebGL1(): Promise<boolean> {
     }
 }
 
-export async function getDeviceInfo(): Promise<{ hasWebGPU: boolean; hasWebGL2: boolean; hasWebGL1: boolean }> {
+export async function getDeviceInfo(): Promise<{
+    hasWebGPU: boolean;
+    hasWebGL2: boolean;
+    hasWebGL1: boolean;
+    deviceCapabilities: DeviceCapabilities;
+}> {
     const [gpu, gl2, gl1] = await Promise.all([hasWebGPU(), hasWebGL2(), hasWebGL1()]);
-    return { hasWebGPU: gpu, hasWebGL2: gl2, hasWebGL1: gl1 };
+    return {
+        hasWebGPU: !!gpu,
+        hasWebGL2: gl2,
+        hasWebGL1: gl1,
+        deviceCapabilities: gpu ?? {
+            backend: gl2 ? 'webgl' : gl1 ? 'webgl' : 'cpu',
+            subgroups: false,
+            subgroupSize: 0,
+            float16: gl2,
+        },
+    };
 }

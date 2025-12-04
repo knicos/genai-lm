@@ -12,7 +12,7 @@
         "settings": {
             "title": "Settings",
             "general": "General",
-            "training": "Training",
+            "training": "Training Parameters",
             "generator": "Generator",
             "showModelSelect": "Show Models",
             "showEvaluation": "Show Evaluation",
@@ -108,7 +108,11 @@
         "minutes": "Min",
         "seconds": "Sec",
         "remaining": "Remaining",
-        "settingsTooltip": "Training Settings"
+        "settingsTooltip": "Training Settings",
+        "loss": "Loss",
+        "valLoss": "Validation Loss",
+        "steps": "Steps",
+        "noData": "No training data available"
     },
     "generator": {
         "title": "Generation",
@@ -169,6 +173,12 @@
         "modelMissingHint": "Please load a model and training data to view the training process.",
         "play": "Play",
         "pause": "Pause",
-        "step": "Step"
+        "step": "Step",
+        "training": {
+            "title": "Training Log",
+            "validation": "Validation",
+            "history": "History",
+            "performance": "Performance"
+        }
     }
 }

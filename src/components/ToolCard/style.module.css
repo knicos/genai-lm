@@ -40,6 +40,30 @@
 .buttonRow {
     display: flex;
     gap: 1rem;
-    padding: 0.5rem 2rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    box-sizing: border-box;
     align-items: center;
+}
+
+.sizeText {
+    position: absolute;
+    bottom: 0.8rem;
+    right: 1rem;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    background: #444;
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(50%);
+}
+
+.sizeIcon {
+    composes: sizeText;
+    background: white;
+    box-shadow: 2px 2px 4px #a4acbb;
 }

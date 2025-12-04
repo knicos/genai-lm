@@ -5,30 +5,17 @@
     overflow: hidden;
     color: white;
     max-width: calc(300px - 16px);
-    border-radius: 16px;
+    border-radius: 8px;
     background: white;
     margin: 8px;
     box-sizing: border-box;
-}
-
-.verticalCard {
-    box-shadow: 2px 2px 4px var(--dropShadow);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    color: white;
-    width: calc(100% - 16px);
-    border-radius: 16px;
-    background: white;
-    align-items: flex-start;
-    margin: 8px;
 }
 
 .toolContent {
     padding: 1rem;
     color: var(--textLight);
     background-color: var(--primary);
-    border-radius: 16px;
+    border-radius: 8px;
     gap: 8px;
     /*background: white;*/
     flex-grow: 1;
@@ -44,27 +31,14 @@
     flex-direction: column;
 }
 
-.verticalCard .toolContent {
-    width: 100%;
-    flex-direction: row;
-}
-
 .toolContentTitle {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     color: white;
     font-weight: bold;
     margin: 0 0 0.5rem 0;
 }
 
 .card .thumbContainer {
-    /*box-shadow: 0 0 4px var(--primary);*/
-    overflow: hidden;
-    /*padding: 1.5rem;
-  max-width: 250px; 
-  background: var(--purpleBorder);*/
-}
-
-.verticalCard .thumbContainer {
     /*box-shadow: 0 0 4px var(--primary);*/
     overflow: hidden;
     /*padding: 1.5rem;
@@ -92,23 +66,14 @@
     flex-direction: column;
 }
 
-.verticalCard .buttonContainer {
-    flex-direction: row;
-    width: 100%;
-    justify-content: flex-end;
-}
-
 .textBox {
     display: flex;
     flex-direction: column;
+    font-size: 0.9rem;
 }
 
 .card .textBox {
     padding: 0 0.5rem;
-}
-
-.verticalCard .textBox {
-    padding: 1rem;
 }
 
 .aloneHeader {

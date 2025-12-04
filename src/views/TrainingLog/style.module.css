@@ -1,0 +1,60 @@
+.validationBox {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.subtitle {
+    width: 100%;
+    border-bottom: 2px solid #eee;
+    margin-top: 2rem;
+}
+
+.advanced {
+    margin: 1rem;
+}
+
+.advancedItem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.value {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.6rem;
+    color: #333;
+}
+
+.label {
+    color: #005d6b;
+    font-size: 0.9rem;
+}
+
+.percentage {
+    font-size: 0.9rem;
+}
+
+.chartContainer :global .MuiChartsAxis-line {
+    stroke: #ccc;
+}
+
+.chartContainer :global .MuiChartsAxis-tick {
+    stroke: #ccc;
+}
+
+.chartContainer :global .MuiChartsAxis-tickLabel {
+    fill: #005d6b;
+}
+
+.chartContainer :global .MuiChartsAxis-label text {
+    fill: #005d6b;
+    font-weight: bold !important;
+}
+
+.chartContainer :global .MuiLineElement-series-loss {
+    stroke-dasharray: 5 5;
+}

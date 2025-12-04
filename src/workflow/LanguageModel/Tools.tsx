@@ -20,6 +20,12 @@ const TOOLS: { title: string; cards: ToolCardItem[]; developer?: boolean }[] = [
                 url: 'training-process',
                 icon: 'insights',
             },
+            {
+                id: 'training-log',
+                name: 'tools.training.title',
+                url: 'training-log',
+                icon: 'insights',
+            },
         ],
     },
     {

@@ -1,7 +1,7 @@
 import { Spinner } from '@genai-fi/base';
 import style from './style.module.css';
 import { useEffect, useState } from 'react';
-import { deviceHasWebGPU, deviceHasWebGL, deviceDetected } from '../../state/device';
+import { deviceHasWebGPU, deviceHasWebGL, deviceDetected, deviceCapabilities } from '../../state/device';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { selectBackend } from '@genai-fi/nanogpt';
@@ -12,19 +12,21 @@ export default function DeviceProbe() {
     const setHasWebGPU = useSetAtom(deviceHasWebGPU);
     const setHasWebGL = useSetAtom(deviceHasWebGL);
     const setDetected = useSetAtom(deviceDetected);
+    const setCapabilities = useSetAtom(deviceCapabilities);
     const [done, setDone] = useState(false);
 
     useEffect(() => {
-        getDeviceInfo().then(async ({ hasWebGPU, hasWebGL1, hasWebGL2 }) => {
+        getDeviceInfo().then(async ({ hasWebGPU, hasWebGL1, hasWebGL2, deviceCapabilities: devCap }) => {
             if (hasWebGPU) {
                 await selectBackend('webgpu');
             }
             setHasWebGPU(hasWebGPU);
             setHasWebGL(hasWebGL2 || hasWebGL1);
             setDetected(true);
+            setCapabilities(devCap);
             setDone(true);
         });
-    }, [setHasWebGL, setHasWebGPU, setDetected]);
+    }, [setHasWebGL, setHasWebGPU, setDetected, setCapabilities]);
 
     if (done) {
         return null;

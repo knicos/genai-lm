@@ -17,10 +17,11 @@ import { LANGS } from './langs';
 
 interface Props {
     model?: TeachableLLM;
-    onModel: (model: TeachableLLM) => void;
+    onModel?: (model: TeachableLLM) => void;
+    noSettings?: boolean;
 }
 
-export default function ApplicationBar({ model, onModel }: Props) {
+export default function ApplicationBar({ model, onModel, noSettings }: Props) {
     const { t, i18n } = useTranslation();
     const [saving, setSaving] = useState(false);
     const [isloading, setIsLoading] = useState(false);
@@ -54,6 +55,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
 
     const openFile = useCallback(
         (file: File) => {
+            if (!onModel) return;
             setIsLoading(true);
             const model = TeachableLLM.loadModel(file);
             model.meta.trained = true;
@@ -99,7 +101,7 @@ export default function ApplicationBar({ model, onModel }: Props) {
                 <div className={style.buttonBar}>
                     <BusyButton
                         busy={isloading}
-                        disabled={istraining}
+                        disabled={istraining || !onModel}
                         data-testid="open-project"
                         color="inherit"
                         variant="outlined"
@@ -139,19 +141,21 @@ export default function ApplicationBar({ model, onModel }: Props) {
                         ))}
                     </NativeSelect>
                 </div>
-                <Tooltip
-                    title={t('app.settings.title')}
-                    arrow
-                >
-                    <IconButton
-                        color="inherit"
-                        size="large"
-                        onClick={() => showSettings(true)}
-                        disabled={istraining}
+                {!noSettings && (
+                    <Tooltip
+                        title={t('app.settings.title')}
+                        arrow
                     >
-                        <SettingsIcon fontSize="large" />
-                    </IconButton>
-                </Tooltip>
+                        <IconButton
+                            color="inherit"
+                            size="large"
+                            onClick={() => showSettings(true)}
+                            disabled={istraining}
+                        >
+                            <SettingsIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </div>
             <SaveDialog
                 open={showSaveDialog}
