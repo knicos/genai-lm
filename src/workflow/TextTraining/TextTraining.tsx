@@ -232,7 +232,7 @@ export default function TextTraining({ model, dataset }: Props) {
                     <Clock
                         duration={trainingProgress?.duration || 0}
                         totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
-                        remaining={trainingProgress?.remaining || 0}
+                        remaining={Math.max(0, trainingProgress?.remaining || 0)}
                     />
                     <div className={style.stats}>
                         <NumberBox
@@ -241,7 +241,7 @@ export default function TextTraining({ model, dataset }: Props) {
                             flip
                         />
                         <NumberBox
-                            value={totalSamples - (epochs || 0) * batchSize}
+                            value={Math.max(0, totalSamples - (epochs || 0) * batchSize)}
                             label={t('training.remaining')}
                         />
                     </div>
