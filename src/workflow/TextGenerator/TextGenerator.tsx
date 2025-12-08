@@ -15,6 +15,7 @@ import { trainerSettings } from '../../state/trainer';
 import Controls from './Controls';
 import { useNavigate } from 'react-router-dom';
 import { createProbabilities, createTopKTokens } from './utilities';
+import logger from '../../utilities/logger';
 
 interface Props {
     model?: TeachableLLM;
@@ -84,6 +85,9 @@ export default function TextGenerator({ model }: Props) {
                     });
                     setGenerate(false);
                     setText(finalText);
+
+                    logger.log({ action: 'auto_generated_text', text: finalText });
+
                     await wait(10);
                 };
                 model.on('trainStep', h);
@@ -133,6 +137,7 @@ export default function TextGenerator({ model }: Props) {
             })
             .then(() => {
                 setText(generator.getText());
+                logger.log({ action: 'generated_text', text: generator.getText() });
                 // HACK: Wrong type from library
                 setAttentionData(generator.getAttentionData() as unknown as number[][][][][]);
                 setProbabilities(generator.getProbabilitiesData()[0] || []);

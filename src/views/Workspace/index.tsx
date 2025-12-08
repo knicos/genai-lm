@@ -62,12 +62,13 @@ export function Component() {
 
     useEffect(() => {
         if (hasOutlet) {
-            console.log('Opening side panel for route:');
+            logger.log({ action: 'side_panel_opened', url: location.pathname });
             setSidePanelOpen(true);
         } else {
+            logger.log({ action: 'side_panel_closed' });
             setSidePanelOpen(false);
         }
-    }, [location.key, hasOutlet, setSidePanelOpen]);
+    }, [location.key, hasOutlet, setSidePanelOpen, location.pathname]);
 
     useEffect(() => {
         const token = params.get('t');

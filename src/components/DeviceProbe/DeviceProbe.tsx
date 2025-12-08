@@ -6,6 +6,7 @@ import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { selectBackend } from '@genai-fi/nanogpt';
 import { getDeviceInfo } from './probe';
+import logger from '../../utilities/logger';
 
 export default function DeviceProbe() {
     const { t } = useTranslation();
@@ -24,6 +25,13 @@ export default function DeviceProbe() {
             setHasWebGL(hasWebGL2 || hasWebGL1);
             setDetected(true);
             setCapabilities(devCap);
+            logger.log({
+                action: 'device_probed',
+                hasWebGPU,
+                hasWebGL1,
+                hasWebGL2,
+                deviceCapabilities: devCap,
+            });
             setDone(true);
         });
     }, [setHasWebGL, setHasWebGPU, setDetected, setCapabilities]);

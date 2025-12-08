@@ -72,11 +72,13 @@ export default function TextTraining({ model, dataset }: Props) {
                 //model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
                 if (log.step % 100 === 0) {
-                    logger.log(
-                        `Training step ${log.step}, loss: ${log.loss.toFixed(
-                            4
-                        )}, rate: ${progress.samplesPerSecond.toFixed(1)} samples/sec`
-                    );
+                    logger.log({
+                        action: 'training_step',
+                        step: log.step,
+                        loss: log.loss,
+                        samplesPerSecond: progress.samplesPerSecond,
+                        validationLoss: log.valLoss,
+                    });
                 }
             };
             trainer.on('log', h);
@@ -145,9 +147,7 @@ export default function TextTraining({ model, dataset }: Props) {
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
 
-            logger.log(
-                `Start training: ${modelSize} params, ${totalSamples} samples, batch size ${batchSize}, checkpointing: ${useCheckpointing}`
-            );
+            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize, useCheckpointing });
 
             model.enableProfiler = advanced;
             const trainingOptions = {
@@ -165,14 +165,12 @@ export default function TextTraining({ model, dataset }: Props) {
                 .then(() => {
                     setDone(true);
                     setTraining(false);
-                    logger.log('Training stopped');
-                    console.log('Training stopped');
+                    logger.log({ action: 'training_stopped' });
                 })
                 .catch((err) => {
                     setDone(true);
                     setTraining(false);
-                    logger.error(`Training error: ${err.message}`);
-                    console.error('Training error:', err);
+                    logger.error({ action: 'training_error', message: err.message });
                 });
         }
     };

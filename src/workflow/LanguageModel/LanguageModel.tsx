@@ -13,6 +13,7 @@ import useModelBusy from '../../utilities/useModelBusy';
 import { saveAs } from 'file-saver';
 import Tools from './Tools';
 import { useParams, useSearchParams } from 'react-router-dom';
+import logger from '../../utilities/logger';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -73,12 +74,14 @@ export default function LanguageModel({ model, onModel }: Props) {
         if (model) {
             setDone(false);
             const h = () => {
+                logger.log({ action: 'model_loaded', model: model.meta });
                 setDone(true);
             };
             model.on('loaded', h);
 
             const eh = (error: unknown) => {
                 console.error('Error loading model:', error);
+                logger.error({ errorString: String(error), userAgent: navigator.userAgent });
             };
             model.on('error', eh);
 

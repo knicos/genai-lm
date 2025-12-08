@@ -82,21 +82,21 @@ export default function TextData({ model, onDatasetChange }: Props) {
             async drop(items: DragObject) {
                 setBusy(true);
                 if (items.files) {
-                    logger.log(`Loading ${items.files.length} dropped file(s)`);
+                    logger.log({ action: 'dropped_files', count: items.files.length });
                     try {
                         for (const file of items.files) {
                             const text = await loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                         }
                     } catch (error) {
-                        console.error('Error loading files:', error);
+                        logger.error({ errorString: JSON.stringify(error) });
                         setShowDropError(true);
                     }
                 } else if (items.text) {
-                    logger.log('Loading dropped text');
+                    logger.log({ action: 'dropped_text' });
                     await handleTextLoad(uuid(), t('data.untitled'), [items.text], 'input', setData);
                 } else if (items.html) {
-                    logger.log('Loading dropped HTML content');
+                    logger.log({ action: 'dropped_html' });
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
                     await handleTextLoad(uuid(), t('data.untitled'), [element.textContent], 'input', setData);
@@ -198,7 +198,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                                         )
                                     );
                                 } else {
-                                    logger.log('Creating new text input');
+                                    logger.log({ action: 'added_input_text', size: text.length });
                                     setData((prev) => [
                                         ...prev,
                                         {
@@ -222,7 +222,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             onDownload={(downloader) => {
                                 setDownloads((prev) => [...prev, downloader]);
                                 downloader.on('end', async (file) => {
-                                    logger.log(`Loading searched file: ${file.name}`);
+                                    logger.log({ action: 'download_completed', name: file.name });
                                     const text = loadTextData(file, { maxSize: 200000000 });
                                     await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
                                     setDownloads((prev) => prev.filter((d) => d !== downloader));
@@ -248,7 +248,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         if (e.target.files && e.target.files.length > 0) {
                             const file = e.target.files[0];
                             setBusy(true);
-                            logger.log('Loading opened file');
+                            logger.log({ action: 'file_input_selected', name: file.name });
                             const text = await loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                             setBusy(false);

@@ -34,7 +34,11 @@ function ErrorComponent() {
     const json = JSON.stringify(error);
     const str = json === '{}' && 'toString' in (error as Error) ? (error as Error).toString() : 'Unknown';
 
-    logger.error(`Router error: ${str}`);
+    logger.error({
+        errorString: str,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+    });
 
     console.error(error);
 
