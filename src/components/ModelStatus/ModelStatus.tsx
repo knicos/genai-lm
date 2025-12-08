@@ -1,7 +1,7 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import style from './style.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import BoxNotice from '../BoxTitle/BoxNotice';
 
 interface Props {
     show: boolean;
@@ -38,8 +38,6 @@ export default function ModelStatus({ model, show, onClose }: Props) {
     }, [status]);
 
     return status === 'ready' || status === 'busy' || !show ? null : (
-        <div className={style.container}>
-            {model ? <p>{t(`modelStatus.${status}`)}</p> : <p>{t('modelStatus.none')}</p>}
-        </div>
+        <BoxNotice notice={{ notice: model ? t(`modelStatus.${status}`) : t('modelStatus.none'), level: 'info' }} />
     );
 }

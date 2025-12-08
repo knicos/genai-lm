@@ -19,7 +19,7 @@ describe('TextGenerator', () => {
 
         await user.click(screen.getByText('generator.generate'));
 
-        expect(screen.getByText('modelStatus.none')).toBeInTheDocument();
+        expect(screen.getByText('generator.errors.modelNotReady')).toBeInTheDocument();
     });
 
     it('can generate text', async ({ expect }) => {
@@ -39,7 +39,9 @@ describe('TextGenerator', () => {
             generator: vi.fn(() => ({
                 on: genOnEvent,
                 off: genOffEvent,
-                generate: async function () {},
+                generate: async function () {
+                    return 'TEST';
+                },
                 dispose: () => {},
                 getText: () => '',
                 getAttentionData: () => [],

@@ -18,6 +18,7 @@ import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
 import useModelLoaded from '../../utilities/useModelLoaded';
 import useModelStatus from '../../utilities/useModelStatus';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 interface Props {
     model?: TeachableLLM;
@@ -59,12 +60,12 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [data, setData] = useState<DataEntry[]>([]);
     const [showInput, setShowInput] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
-    const [showDropError, setShowDropError] = useState(false);
     const ready = useModelLoaded(model);
     const [selected, setSelected] = useState<number>(-1);
     const [downloads, setDownloads] = useState<Downloader[]>([]);
     const [selectedSet, setSelectedSet] = useState<Set<string>>();
     const status = useModelStatus(model);
+    const [message, setMessage] = useState<Notice | null>(null);
 
     const done = data.length > 0;
 
@@ -90,7 +91,10 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         }
                     } catch (error) {
                         logger.error({ errorString: JSON.stringify(error) });
-                        setShowDropError(true);
+                        setMessage({
+                            level: 'warning',
+                            notice: t('data.errors.fileLoadError'),
+                        });
                     }
                 } else if (items.text) {
                     logger.log({ action: 'dropped_text' });
@@ -166,12 +170,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         severity="info"
                         message={t('data.dataHint')}
                     />
-                    <InfoPanel
-                        show={showDropError}
-                        severity="error"
-                        message={t('data.dropError')}
-                        onClose={() => setShowDropError(false)}
-                    />
                     {selectedItem?.source === 'file' || selectedItem?.source === 'search' ? (
                         <DataRows
                             data={selectedItem}
@@ -221,11 +219,24 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             downloads={downloads}
                             onDownload={(downloader) => {
                                 setDownloads((prev) => [...prev, downloader]);
+                                downloader.on('error', () => {
+                                    setMessage({
+                                        level: 'error',
+                                        notice: t('data.errors.downloadLoadError'),
+                                    });
+                                });
                                 downloader.on('end', async (file) => {
                                     logger.log({ action: 'download_completed', name: file.name });
-                                    const text = loadTextData(file, { maxSize: 200000000 });
-                                    await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
-                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                                    try {
+                                        const text = loadTextData(file, { maxSize: 200000000 });
+                                        await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
+                                        setDownloads((prev) => prev.filter((d) => d !== downloader));
+                                    } catch {
+                                        setMessage({
+                                            level: 'error',
+                                            notice: t('data.errors.downloadLoadError'),
+                                        });
+                                    }
                                 });
                             }}
                         />
@@ -255,6 +266,12 @@ export default function TextData({ model, onDatasetChange }: Props) {
                         }
                     }}
                 />
+                {message && (
+                    <BoxNotice
+                        notice={message}
+                        onClose={() => setMessage(null)}
+                    />
+                )}
             </div>
         </Box>
     );

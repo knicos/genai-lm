@@ -39,6 +39,7 @@
             "developerMode": "Developer Mode"
         },
         "close": "Close",
+        "ok": "OK",
         "annotations": {
             "model": "Model",
             "data": "Data"
@@ -65,11 +66,14 @@
         "close": "Close",
         "textPlaceholder": "Write or paste your own text here...",
         "dropHint": "Drop files here...",
-        "dropError": "You can only drop files with text (txt, csv, pdf, docx).",
         "ok": "OK",
         "samples": "Samples",
         "search": "Search",
-        "downloading": "Downloading {{count}} file(s)"
+        "downloading": "Downloading {{count}} file(s)",
+        "errors": {
+            "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx).",
+            "downloadLoadError": "There was an unknown error loading the downloaded file."
+        }
     },
     "model": {
         "parameters": "Parameters",
@@ -115,7 +119,13 @@
         "noData": "No training data available",
         "monitor": "Monitor",
         "visualize": "Visualise",
-        "autoOutput": "Show Progress Text"
+        "autoOutput": "Show Progress Text",
+        "errors": {
+            "preparation": "More training data is needed, at least a few thousand samples.",
+            "noModel": "Please load a model before training.",
+            "notReady": "Model or data is not ready for training.",
+            "noData": "Add training data first."
+        }
     },
     "generator": {
         "title": "Generation",
@@ -128,7 +138,11 @@
         "copy": "Copy to Clipboard",
         "autoGenerateAriaLabel": "Toggle auto-generate",
         "autoGenerate": "Auto-generate",
-        "step": "Next"
+        "step": "Next",
+        "errors": {
+            "modelNotReady": "Model is not ready for generation, try again in a moment.",
+            "generationError": "An unknown error occurred during text generation."
+        }
     },
     "evaluation": {
         "title": "Evaluation",

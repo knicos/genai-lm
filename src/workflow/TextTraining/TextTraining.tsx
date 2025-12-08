@@ -4,7 +4,7 @@ import style from './style.module.css';
 import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
@@ -20,6 +20,7 @@ import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import TrainingMenu from './TrainingMenu';
 import { Switch, Tooltip } from '@mui/material';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 const CHECKPT_THRESHOLD = 5_000_000;
 
@@ -54,6 +55,7 @@ export default function TextTraining({ model, dataset }: Props) {
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
+    const [message, setMessage] = useState<Notice | null>(null);
 
     useWakeLock(training);
 
@@ -90,6 +92,7 @@ export default function TextTraining({ model, dataset }: Props) {
 
     useEffect(() => {
         if (model) {
+            setMessage(null);
             const h = () => {
                 setTrainer(model.trainer());
                 setNeedsTraining(!model.meta.trained);
@@ -105,6 +108,7 @@ export default function TextTraining({ model, dataset }: Props) {
     useEffect(() => {
         if (dataset && dataset.length > 0) {
             setNeedsTraining(true);
+            setMessage(null);
         }
     }, [dataset]);
 
@@ -115,8 +119,26 @@ export default function TextTraining({ model, dataset }: Props) {
     }, [learningRate, model]);
 
     const startTraining = async (maxSteps: number) => {
+        if (!model) {
+            setMessage({
+                notice: t('training.errors.noModel'),
+                level: 'warning',
+            });
+            return;
+        }
+        if (!dataset || dataset.length === 0) {
+            setMessage({
+                notice: t('training.errors.noData'),
+                level: 'warning',
+            });
+            return;
+        }
         if (model && dataset && trainer) {
             if (!model.loaded) {
+                setMessage({
+                    notice: t('training.errors.notReady'),
+                    level: 'warning',
+                });
                 return;
             }
             if (!model.tokeniser.trained) {
@@ -140,7 +162,6 @@ export default function TextTraining({ model, dataset }: Props) {
 
             const shouldPrepare = needsTraining || !trainer.isPrepared();
 
-            setNeedsTraining(false);
             // setEpochs(0);
             await wait(200);
 
@@ -158,8 +179,21 @@ export default function TextTraining({ model, dataset }: Props) {
                 gradientCheckpointing: useCheckpointing,
             };
             if (shouldPrepare) {
-                await trainer.prepare(dataset, trainingOptions);
+                try {
+                    await trainer.prepare(dataset, trainingOptions);
+                } catch {
+                    setMessage({
+                        notice: t('training.errors.preparation'),
+                        level: 'warning',
+                    });
+                    setTraining(false);
+                    setDone(true);
+                    return;
+                }
             }
+
+            setNeedsTraining(false);
+
             trainer
                 .train(trainingOptions)
                 .then(() => {
@@ -214,9 +248,9 @@ export default function TextTraining({ model, dataset }: Props) {
                 </div>
                 <div className={style.buttonBox}>
                     <Button
-                        disabled={!canTrain || (!done && !training)}
+                        disabled={!done && !training}
                         variant="contained"
-                        startIcon={done ? <PlayArrowIcon /> : <PauseIcon />}
+                        startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
                         onClick={() => startTraining(maxSteps)}
                     >
                         {done ? t('training.start') : t('training.stop')}
@@ -235,6 +269,12 @@ export default function TextTraining({ model, dataset }: Props) {
                         />
                     </Tooltip>
                 </div>
+                {message && (
+                    <BoxNotice
+                        notice={message}
+                        onClose={() => setMessage(null)}
+                    />
+                )}
             </div>
         </Box>
     );

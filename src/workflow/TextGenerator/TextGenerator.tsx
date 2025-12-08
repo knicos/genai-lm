@@ -9,13 +9,13 @@ import XAIView from './XAIView';
 import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue } from 'jotai';
 import { generatorAtom, generatorSettings } from '../../state/generator';
-import ModelStatus from '../../components/ModelStatus/ModelStatus';
 import Box from '../../components/BoxTitle/Box';
 import { trainerSettings } from '../../state/trainer';
 import Controls from './Controls';
 import { useNavigate } from 'react-router-dom';
 import { createProbabilities, createTopKTokens } from './utilities';
 import logger from '../../utilities/logger';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 interface Props {
     model?: TeachableLLM;
@@ -31,7 +31,6 @@ export default function TextGenerator({ model }: Props) {
     const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
     const [selected, setSelected] = useState<number>(0);
     const status = useModelStatus(model);
-    //const [ready, setReady] = useState(false);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
 
@@ -39,8 +38,8 @@ export default function TextGenerator({ model }: Props) {
         useAtomValue(generatorSettings);
 
     const outputText = useAtomValue(trainerSettings).outputText;
-    const [showStatus, setShowStatus] = useState<boolean>(false);
     const [autoMode, setAutoMode] = useState<boolean>(true);
+    const [messages, setMessage] = useState<Notice | null>(null);
 
     const busyRef = useRef<boolean>(false);
 
@@ -77,16 +76,23 @@ export default function TextGenerator({ model }: Props) {
                     setGenerate(true);
                     setHasGenerated(true);
                     generator.reset();
-                    const finalText = await generator.generate(undefined, {
-                        maxLength: 200,
-                        temperature: 1,
-                        includeProbabilities: false,
-                        topP: topP > 0 ? topP : undefined,
-                    });
-                    setGenerate(false);
-                    setText(finalText);
-
-                    logger.log({ action: 'auto_generated_text', text: finalText });
+                    try {
+                        const finalText = await generator.generate(undefined, {
+                            maxLength: 200,
+                            temperature: 1,
+                            includeProbabilities: false,
+                            topP: topP > 0 ? topP : undefined,
+                        });
+                        setGenerate(false);
+                        setText(finalText);
+                        logger.log({ action: 'auto_generated_text', text: finalText });
+                    } catch {
+                        setGenerate(false);
+                        setMessage({
+                            level: 'error',
+                            notice: t('generator.errors.generationError'),
+                        });
+                    }
 
                     await wait(10);
                 };
@@ -96,7 +102,7 @@ export default function TextGenerator({ model }: Props) {
                 };
             }
         }
-    }, [model, ready, outputText, topP, setGenerator]);
+    }, [model, ready, outputText, topP, setGenerator, t]);
 
     useEffect(() => {
         if (generator) {
@@ -113,7 +119,10 @@ export default function TextGenerator({ model }: Props) {
 
     const doGenerate = (maxLength: number) => {
         if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
-            setShowStatus(true);
+            setMessage({
+                level: 'warning',
+                notice: t('generator.errors.modelNotReady'),
+            });
             return;
         }
         if (busyRef.current) {
@@ -141,6 +150,14 @@ export default function TextGenerator({ model }: Props) {
                 // HACK: Wrong type from library
                 setAttentionData(generator.getAttentionData() as unknown as number[][][][][]);
                 setProbabilities(generator.getProbabilitiesData()[0] || []);
+                setGenerate(false);
+                busyRef.current = false;
+            })
+            .catch(() => {
+                setMessage({
+                    level: 'error',
+                    notice: t('generator.errors.generationError'),
+                });
                 setGenerate(false);
                 busyRef.current = false;
             });
@@ -178,11 +195,6 @@ export default function TextGenerator({ model }: Props) {
                         }}
                     />
                     <XAIView probabilities={topKTokens} />
-                    <ModelStatus
-                        model={model}
-                        show={showStatus}
-                        onClose={() => setShowStatus(false)}
-                    />
                 </div>
                 <Controls
                     onGenerate={() => doGenerate(autoMode ? maxLength : 1)}
@@ -207,6 +219,12 @@ export default function TextGenerator({ model }: Props) {
                     autoMode={autoMode}
                     onAutoModeChange={setAutoMode}
                 />
+                {messages && (
+                    <BoxNotice
+                        notice={messages}
+                        onClose={() => setMessage(null)}
+                    />
+                )}
             </div>
         </Box>
     );

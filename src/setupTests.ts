@@ -13,10 +13,12 @@ Element.prototype.scrollIntoView = () => {};
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
+const MOCK_T = (str: string) => str;
+
 vi.mock('react-i18next', () => ({
     useTranslation: () => {
         return {
-            t: (str: string) => str,
+            t: MOCK_T,
             i18n: {
                 changeLanguage: () => new Promise(() => {}),
                 language: 'en-GB',

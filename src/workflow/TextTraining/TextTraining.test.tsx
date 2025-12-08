@@ -11,7 +11,7 @@ describe('TextTraining', () => {
     it('renders without a model or data', async ({ expect }) => {
         render(<TextTraining />);
         expect(screen.getByText('training.title')).toBeInTheDocument();
-        expect(screen.getByText('training.start')).toBeDisabled();
+        expect(screen.getByText('training.start')).toBeEnabled();
     });
 
     it('renders with a model and data', async ({ expect }) => {
