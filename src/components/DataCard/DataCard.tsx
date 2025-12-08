@@ -4,7 +4,7 @@ import Downloader from '../../utilities/downloader';
 import { DataCardItem } from './type';
 import Card from '../Card/Card';
 import SampleWriter from './SampleWriter';
-import { IconButton } from '@mui/material';
+import { CircularProgress, IconButton } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckIcon from '@mui/icons-material/Check';
 
@@ -49,10 +49,19 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
                         <div className={style.sizeIcon}>
                             <IconButton
                                 color="secondary"
-                                disabled={downloader !== null}
+                                disabled={downloader !== null || done || used}
                                 onClick={handleDownload}
                             >
-                                {done || used ? <CheckIcon fontSize="inherit" /> : <DownloadIcon fontSize="inherit" />}
+                                {downloader && !done ? (
+                                    <CircularProgress />
+                                ) : done || used ? (
+                                    <CheckIcon
+                                        fontSize="inherit"
+                                        color="success"
+                                    />
+                                ) : (
+                                    <DownloadIcon fontSize="inherit" />
+                                )}
                             </IconButton>
                         </div>
                     </div>

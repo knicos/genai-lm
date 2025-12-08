@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { uiShowSidePanel } from '../../state/uiState';
 import { modelAtom } from '../../state/model';
 import { datasetAtom } from '../../state/data';
+import useOrientation from '../../utilities/useOrientation';
 
 const CONNECTIONS: IConnection[] = [
     { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
@@ -55,6 +56,7 @@ export function Component() {
     const location = useLocation();
     const outlet = useOutlet();
     const navigate = useNavigate();
+    const orientation = useOrientation();
 
     const hasOutlet = !!outlet;
 
@@ -105,13 +107,20 @@ export function Component() {
                 onModel={setModel}
                 model={model ?? undefined}
             />
-            <div className={style.mainContainer}>
+            <div
+                className={style.mainContainer}
+                style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
+            >
                 <div className={style.workspaceContainer}>
-                    <WorkflowLayout connections={conn}>
+                    <WorkflowLayout
+                        connections={conn}
+                        ignoredColumns={1}
+                    >
                         <div
                             className={style.modelRow}
                             data-widget="container"
                         >
+                            <h1>{t('model.languageModel')}</h1>
                             <LanguageModel
                                 model={model ?? undefined}
                                 onModel={setModel}
@@ -144,7 +153,7 @@ export function Component() {
                 </div>
                 <SidePanel
                     open={sidePanelOpen}
-                    position="right"
+                    position={orientation === 'portrait' ? 'bottom' : 'right'}
                     onClose={() => {
                         const segments = location.pathname.split('/').filter(Boolean);
                         if (segments.length > 0) {

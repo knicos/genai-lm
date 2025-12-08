@@ -91,7 +91,7 @@ export default function Card<T extends CardItem, S = void>({
     return (
         <>
             <div
-                className={`${style.dataCard} ${disabled ? style.disabled : ''}`}
+                className={`${style.dataCard} ${disabled ? style.disabled : ''} ${expanded ? style.expanded : ''}`}
                 role="button"
                 onPointerUp={
                     !disabled && !used

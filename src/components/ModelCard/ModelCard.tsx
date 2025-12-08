@@ -2,7 +2,7 @@ import { MouseEvent, useState } from 'react';
 import style from './style.module.css';
 import { ModelCardItem } from './type';
 import Card from '../Card/Card';
-import { IconButton } from '@mui/material';
+import { CircularProgress, IconButton } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckIcon from '@mui/icons-material/Check';
 import ModelInfo from '../ModelInfo/ModelInfo';
@@ -64,7 +64,16 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                     handleCreateModel();
                                 }}
                             >
-                                {done ? <CheckIcon fontSize="medium" /> : <DownloadIcon fontSize="medium" />}
+                                {downloader && !done ? (
+                                    <CircularProgress />
+                                ) : done || used ? (
+                                    <CheckIcon
+                                        fontSize="inherit"
+                                        color="success"
+                                    />
+                                ) : (
+                                    <DownloadIcon fontSize="inherit" />
+                                )}
                             </IconButton>
                         </div>
                         <div className={style.infoContainer}>
