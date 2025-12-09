@@ -55,7 +55,7 @@
         "title": "Training Data",
         "textDialogTitle": "Text Content",
         "addTooltip": "Add new data",
-        "dataHint": "Write text or upload various types of files (txt, csv, pdf, docx) for training data. Any text can be used but there should be a lot of it.",
+        "dataHint": "Drop or upload text data (txt, csv, pdf, docx) for training. Any text can be used but there should be a lot.",
         "modelHint": "Please select a model first.",
         "add": "Write",
         "upload": "Upload",
