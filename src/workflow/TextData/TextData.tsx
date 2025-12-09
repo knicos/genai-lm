@@ -13,12 +13,13 @@ import DataProgress from '../../components/DataProgress/DataProgress';
 import TextSearch from './TextSearch';
 import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
-import Downloader from '../../utilities/downloader';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
 import useModelLoaded from '../../utilities/useModelLoaded';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import { useAtom } from 'jotai';
+import { downloadsAtom } from '../../state/data';
 
 interface Props {
     model?: TeachableLLM;
@@ -62,7 +63,7 @@ export default function TextData({ model, onDatasetChange }: Props) {
     const [showSearch, setShowSearch] = useState(false);
     const ready = useModelLoaded(model);
     const [selected, setSelected] = useState<number>(-1);
-    const [downloads, setDownloads] = useState<Downloader[]>([]);
+    const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [selectedSet, setSelectedSet] = useState<Set<string>>();
     const status = useModelStatus(model);
     const [message, setMessage] = useState<Notice | null>(null);
@@ -220,23 +221,27 @@ export default function TextData({ model, onDatasetChange }: Props) {
                             onDownload={(downloader) => {
                                 setDownloads((prev) => [...prev, downloader]);
                                 downloader.on('error', () => {
+                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
                                     setMessage({
                                         level: 'error',
                                         notice: t('data.errors.downloadLoadError'),
                                     });
+                                });
+                                downloader.on('cancel', () => {
+                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
                                 });
                                 downloader.on('end', async (file) => {
                                     logger.log({ action: 'download_completed', name: file.name });
                                     try {
                                         const text = loadTextData(file, { maxSize: 200000000 });
                                         await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
-                                        setDownloads((prev) => prev.filter((d) => d !== downloader));
                                     } catch {
                                         setMessage({
                                             level: 'error',
                                             notice: t('data.errors.downloadLoadError'),
                                         });
                                     }
+                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
                                 });
                             }}
                         />

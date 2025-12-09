@@ -142,3 +142,10 @@
     max-height: 80vh;
     overflow-y: auto;
 }
+
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}

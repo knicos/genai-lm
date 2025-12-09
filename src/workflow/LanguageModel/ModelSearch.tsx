@@ -11,6 +11,8 @@ import { ModelCardItem } from '../../components/ModelCard/type';
 import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
 import { Spinner } from '@genai-fi/base';
+import { useAtom } from 'jotai';
+import { downloadsAtom } from '../../state/data';
 
 export const MANIFEST_URL = 'https://store.gen-ai.fi/llm/modelManifest.json';
 
@@ -42,7 +44,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
     //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
     const [dataRows, setDataRows] = useState<RowSet<ModelCardItem>[]>([]);
-    const [download, setDownload] = useState<Downloader | null>(null);
+    const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [open, setOpen] = useState(true);
 
     useEffect(() => {
@@ -76,14 +78,21 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                 }
             }
             if (downloader) {
-                setDownload(downloader);
+                setDownloads((prev) => [...prev, downloader]);
                 downloader.on('end', (file: File) => {
                     const newModel = TeachableLLM.loadModel(file);
                     newModel.meta.id = card.id;
                     newModel.meta.name = card.name;
                     newModel.meta.trained = card.trained || true;
                     onModel(newModel);
-                    setDownload(null);
+                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                });
+                downloader.on('error', (error) => {
+                    console.error('Download error:', error);
+                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                });
+                downloader.on('cancel', () => {
+                    setDownloads((prev) => prev.filter((d) => d !== downloader));
                 });
             } else if (!card.url) {
                 const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
@@ -93,7 +102,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                 onModel(newModel);
             }
         },
-        [model, onModel]
+        [model, onModel, setDownloads]
     );
 
     return (
@@ -106,7 +115,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
         >
             <DialogContent sx={{ padding: '0' }}>
                 <div className={style.headerBar}>
-                    {langs.length > 0 && (
+                    {langs.length > 0 && downloads.length === 0 && (
                         <FormControl size="small">
                             <Select
                                 aria-label={t('data.language')}
@@ -124,8 +133,8 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                             </Select>
                         </FormControl>
                     )}
+                    <DownloadProgress downloads={downloads} />
                     <div style={{ flexGrow: 1 }} />
-                    <DownloadProgress downloads={download ? [download] : []} />
                     <IconButton
                         onClick={() => setOpen(false)}
                         aria-label={t('data.close')}
@@ -133,7 +142,11 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                         <CloseIcon fontSize="large" />
                     </IconButton>
                 </div>
-                {dataRows.length === 0 && <Spinner />}
+                {dataRows.length === 0 && (
+                    <div className={style.spinner}>
+                        <Spinner />
+                    </div>
+                )}
                 <CardView
                     data={dataRows}
                     onSelect={handleSelect}

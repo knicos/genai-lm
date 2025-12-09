@@ -71,7 +71,7 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
         >
             <DialogContent sx={{ padding: '0' }}>
                 <div className={style.headerBar}>
-                    {langs.length > 0 && (
+                    {langs.length > 0 && downloads.length === 0 && (
                         <FormControl size="small">
                             <Select
                                 aria-label={t('data.language')}
@@ -89,8 +89,8 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                             </Select>
                         </FormControl>
                     )}
-                    <div style={{ flexGrow: 1 }} />
                     <DownloadProgress downloads={downloads} />
+                    <div style={{ flexGrow: 1 }} />
                     <IconButton
                         onClick={() => setOpen(false)}
                         aria-label={t('data.close')}
@@ -98,7 +98,11 @@ export default function TextSearch({ onDownload, downloads, onClose, selectedSet
                         <CloseIcon fontSize="large" />
                     </IconButton>
                 </div>
-                {dataRows.length === 0 && <Spinner />}
+                {dataRows.length === 0 && (
+                    <div className={style.spinner}>
+                        <Spinner />
+                    </div>
+                )}
                 <CardView<DataCardItem, Downloader>
                     CardComponent={DataCard}
                     data={dataRows}

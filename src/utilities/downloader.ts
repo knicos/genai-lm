@@ -1,6 +1,6 @@
 import EE from 'eventemitter3';
 
-export type DownloadEvents = 'start' | 'progress' | 'end' | 'error';
+export type DownloadEvents = 'start' | 'progress' | 'end' | 'error' | 'cancel';
 
 export default class Downloader {
     protected ee = new EE<DownloadEvents>();
@@ -11,6 +11,8 @@ export default class Downloader {
     private file?: File;
     protected _total = 0;
     protected _loaded = 0;
+    protected _cancelled = false;
+    private controller = new AbortController();
 
     get loaded() {
         return this._loaded;
@@ -28,9 +30,11 @@ export default class Downloader {
     }
 
     private async start() {
+        this._cancelled = false;
+
         this.ee.emit('start');
         try {
-            const response = await fetch(this.url);
+            const response = await fetch(this.url, { signal: this.controller.signal });
 
             if (!response.ok || !response.body) {
                 throw new Error(`Failed to download file: ${response.statusText}`);
@@ -44,9 +48,10 @@ export default class Downloader {
             const reader = response.body.getReader();
             const chunks: BlobPart[] = [];
 
-            while (true) {
+            while (!this._cancelled) {
                 const { done, value } = await reader.read();
                 if (done) break;
+                if (this._cancelled) break;
                 if (value) {
                     chunks.push(value);
                     loaded += value.length;
@@ -55,10 +60,21 @@ export default class Downloader {
                 }
             }
 
+            if (this._cancelled) {
+                this.ee.emit('cancel');
+                return;
+            }
+
             const file = new File(chunks, this.name, { type: this.type });
             this.file = file;
             this.ee.emit('end', file);
         } catch (error) {
+            if (error instanceof Error) {
+                if (error.name === 'AbortError') {
+                    this.ee.emit('cancel');
+                    return;
+                }
+            }
             this.ee.emit('error', error);
         }
     }
@@ -67,10 +83,16 @@ export default class Downloader {
         return this.file;
     }
 
+    public cancel() {
+        this._cancelled = true;
+        this.controller.abort();
+    }
+
     on(event: 'start', listener: () => void): void;
     on(event: 'progress', listener: (loaded: number, total: number) => void): void;
     on(event: 'end', listener: (file: File) => void): void;
     on(event: 'error', listener: (error: unknown) => void): void;
+    on(event: 'cancel', listener: () => void): void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public on(event: DownloadEvents, listener: (...args: any[]) => void) {
         if (event === 'end' && this.file) {
@@ -84,6 +106,7 @@ export default class Downloader {
     off(event: 'progress', listener: (loaded: number, total: number) => void): void;
     off(event: 'end', listener: (file: File) => void): void;
     off(event: 'error', listener: (error: unknown) => void): void;
+    off(event: 'cancel', listener: () => void): void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public off(event: DownloadEvents, listener: (...args: any[]) => void) {
         this.ee.off(event, listener);

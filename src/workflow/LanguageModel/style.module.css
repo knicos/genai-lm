@@ -36,6 +36,13 @@
     width: 1rem;
 }
 
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
 @media (max-width: 600px) {
     .modelMenu {
         flex-wrap: wrap;

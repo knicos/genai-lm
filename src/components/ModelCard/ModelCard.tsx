@@ -35,6 +35,12 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                 setDone(true);
                 setDownloader(null);
             });
+            newDownload.on('error', () => {
+                setDownloader(null);
+            });
+            newDownload.on('cancel', () => {
+                setDownloader(null);
+            });
             onSelect(card, newDownload);
         } else {
             onSelect(card);
