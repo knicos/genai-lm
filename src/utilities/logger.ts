@@ -1,11 +1,37 @@
 import { v4 as uuidv4 } from 'uuid';
+import EE from 'eventemitter3';
 
 class Logger {
     private id: string;
+    private idNumber: number = 0;
     public token: string | null = null;
+    private emitter = new EE<'id'>();
 
     constructor() {
         this.id = uuidv4();
+    }
+
+    setToken(token: string): void {
+        this.token = token;
+        this.idNumber = Math.floor(Math.random() * 999);
+        this.log({ action: 'logger_initialized', userAgent: navigator.userAgent, idNumber: this.idNumber });
+        this.emitter.emit('id', this.id, this.idNumber);
+    }
+
+    onId(listener: (id: string, idNumber: number) => void): void {
+        if (this.token) {
+            listener(this.id, this.idNumber);
+            return;
+        }
+        this.emitter.on('id', listener);
+    }
+
+    offId(listener: (id: string, idNumber: number) => void): void {
+        this.emitter.off('id', listener);
+    }
+
+    hasToken(): boolean {
+        return this.token !== null;
     }
 
     log(message: unknown): void {
@@ -39,8 +65,7 @@ const logger = new Logger();
 
 export function initializeLogger(token: string): void {
     if (!logger.token) {
-        logger.token = token;
-        logger.log({ action: 'logger_initialized', userAgent: navigator.userAgent });
+        logger.setToken(token);
     }
 }
 

@@ -6,6 +6,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import style from './style.module.css';
 import { useAtomValue } from 'jotai';
 import { uiDeveloperMode } from '../../state/uiState';
+import UploadIcon from '@mui/icons-material/Upload';
 
 interface Props {
     disableInspect?: boolean;
@@ -16,12 +17,21 @@ interface Props {
     onTools?: () => void;
 }
 
-export default function ModelMenu({ onSearch, onDownload, onTools, disableInspect }: Props) {
+export default function ModelMenu({ onSearch, onDownload, onTools, onUpload, disableInspect }: Props) {
     const { t } = useTranslation();
     const developerMode = useAtomValue(uiDeveloperMode);
 
     return (
         <div className={style.modelMenu}>
+            <VerticalButton
+                disabled={!onUpload}
+                color="inherit"
+                variant="text"
+                onClick={onUpload}
+                startIcon={<UploadIcon color="inherit" />}
+            >
+                {t('model.upload')}
+            </VerticalButton>
             <VerticalButton
                 disabled={!onSearch}
                 color="inherit"

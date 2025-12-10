@@ -1,34 +1,24 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './AppBar.module.css';
 import { IconButton, NativeSelect, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
-import { BusyButton } from '@genai-fi/base';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import FileOpenIcon from '@mui/icons-material/FileOpen';
-import { saveAs } from 'file-saver';
-import SaveDialog from './SaveDialog';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { uiShowSettings } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
+import logger from '../../utilities/logger';
 
 interface Props {
-    model?: TeachableLLM;
-    onModel?: (model: TeachableLLM) => void;
     noSettings?: boolean;
 }
 
-export default function ApplicationBar({ model, onModel, noSettings }: Props) {
+export default function ApplicationBar({ noSettings }: Props) {
     const { t, i18n } = useTranslation();
-    const [saving, setSaving] = useState(false);
-    const [isloading, setIsLoading] = useState(false);
-    const fileRef = useRef<HTMLInputElement>(null);
-    const [showSaveDialog, setShowSaveDialog] = useState(false);
     const showSettings = useSetAtom(uiShowSettings);
     const istraining = useAtomValue(trainingAnimation);
+    const [logId, setLogId] = useState<string | null>(null);
 
     const doChangeLanguage = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -37,23 +27,7 @@ export default function ApplicationBar({ model, onModel, noSettings }: Props) {
         [i18n]
     );
 
-    const doSave = useCallback(
-        (name: string) => {
-            setSaving(true);
-            model
-                ?.saveModel({ name })
-                .then((blob) => {
-                    setSaving(false);
-                    saveAs(blob, `${name}.zip`);
-                })
-                .catch((e) => {
-                    console.error('Error saving model:', e);
-                });
-        },
-        [model]
-    );
-
-    const openFile = useCallback(
+    /*const openFile = useCallback(
         (file: File) => {
             if (!onModel) return;
             setIsLoading(true);
@@ -65,22 +39,20 @@ export default function ApplicationBar({ model, onModel, noSettings }: Props) {
             });
         },
         [onModel]
-    );
+    );*/
+
+    useEffect(() => {
+        const h = (_: string, idNumber: number) => {
+            setLogId(String(idNumber));
+        };
+        logger.onId(h);
+        return () => {
+            logger.offId(h);
+        };
+    });
 
     return (
         <nav className={style.appbar}>
-            <input
-                type="file"
-                accept=".zip"
-                ref={fileRef}
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                    if (e.target.files && e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        openFile(file);
-                    }
-                }}
-            />
             <div className={style.toolbar}>
                 <Link
                     to="/about"
@@ -98,30 +70,7 @@ export default function ApplicationBar({ model, onModel, noSettings }: Props) {
                         {t('app.languageMachine')}
                     </h1>
                 </Link>
-                <div className={style.buttonBar}>
-                    <BusyButton
-                        busy={isloading}
-                        disabled={istraining || !onModel}
-                        data-testid="open-project"
-                        color="inherit"
-                        variant="outlined"
-                        startIcon={<FileOpenIcon />}
-                        onClick={() => fileRef.current?.click()}
-                    >
-                        {t('app.load')}
-                    </BusyButton>
-                    <BusyButton
-                        busy={!!saving}
-                        disabled={!model || istraining}
-                        data-testid="save-project"
-                        color="inherit"
-                        variant="outlined"
-                        startIcon={<SaveAltIcon />}
-                        onClick={() => setShowSaveDialog(true)}
-                    >
-                        {t('app.save')}
-                    </BusyButton>
-                </div>
+                <div className={style.buttonBar}>{logId}</div>
                 <div className={style.langBar}>
                     <NativeSelect
                         value={i18n.language}
@@ -157,14 +106,6 @@ export default function ApplicationBar({ model, onModel, noSettings }: Props) {
                     </Tooltip>
                 )}
             </div>
-            <SaveDialog
-                open={showSaveDialog}
-                onClose={() => setShowSaveDialog(false)}
-                onSave={(props) => {
-                    doSave(props.name);
-                    setShowSaveDialog(false);
-                }}
-            />
         </nav>
     );
 }

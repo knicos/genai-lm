@@ -109,10 +109,7 @@ export function Component() {
         <DeviceProbe />
     ) : (
         <>
-            <AppBar
-                onModel={setModel}
-                model={model ?? undefined}
-            />
+            <AppBar />
             <div
                 className={style.mainContainer}
                 style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
