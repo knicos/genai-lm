@@ -14,4 +14,6 @@ export interface DeviceCapabilities {
 
 export const deviceCapabilities = atom<DeviceCapabilities | null>(null);
 
-export const devicePerformProbe = atomWithStorage<boolean>('devicePerformProbe', false);
+export const devicePerformProbe = atomWithStorage<boolean>('devicePerformProbe', false, undefined, {
+    getOnInit: true,
+});

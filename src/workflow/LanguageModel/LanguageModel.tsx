@@ -106,6 +106,7 @@ export default function LanguageModel({ model, onModel }: Props) {
 
     const loadModelById = useCallback(
         (id: string) => {
+            console.log('Loading model by id:', id);
             setIsLoading(true);
             fetch(MANIFEST_URL)
                 .then((res) => res.json())
@@ -120,6 +121,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                     if (!card.url) {
                         if (modelRef.current) {
                             //modelRef.current.dispose();
+                            setIsLoading(false);
                             return;
                         }
                         const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
@@ -142,6 +144,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                             .then((blob) => {
                                 if (modelRef.current) {
                                     //modelRef.current.dispose();
+                                    setIsLoading(false);
                                     return;
                                 }
                                 const file = new File([blob], `${card.id}.zip`, { type: 'application/zip' });
@@ -174,16 +177,17 @@ export default function LanguageModel({ model, onModel }: Props) {
         [onModel, t]
     );
 
+    const modelParam = searchParams.get('model');
+
     useEffect(() => {
-        const modelParam = searchParams.get('model');
         // Use provided model id from URL params
-        if (modelParam && !model) {
+        if (modelParam) {
             loadModelById(modelParam);
             // Load untrained model for pretrain workflow
-        } else if (routerParams.flow === 'pretrain' && !model) {
+        } else if (routerParams.flow === 'pretrain') {
             loadModelById('untrained-medium');
         }
-    }, [searchParams, model, onModel, loadModelById, routerParams.flow]);
+    }, [modelParam, loadModelById, routerParams.flow]);
 
     return (
         <Box

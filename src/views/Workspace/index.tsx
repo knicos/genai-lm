@@ -88,7 +88,12 @@ export function Component() {
         if (model) {
             const h = () => {
                 setConn([...CONNECTIONS]);
-                logger.log(`Model loaded: ${model.meta.name} (${model.getNumParams()} parameters)`);
+                logger.log({
+                    action: 'model_loaded',
+                    name: model.meta.name,
+                    id: model.meta.id,
+                    params: model.getNumParams(),
+                });
             };
             model.on('loaded', h);
             return () => {
