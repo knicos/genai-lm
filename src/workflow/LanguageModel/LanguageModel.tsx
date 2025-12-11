@@ -1,4 +1,4 @@
-import { TeachableLLM, waitForModel } from '@genai-fi/nanogpt';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 import ModelVisualisation from '../../components/ModelVisualisation/ModelVisualisation';
 import { useTranslation } from 'react-i18next';
 import { uiShowVisualisation } from '../../state/uiState';
@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
 import Tools from './Tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import logger from '../../utilities/logger';
+import waitModelLoaded from '../../utilities/waitModelLoaded';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -61,7 +62,7 @@ export default function LanguageModel({ model, onModel }: Props) {
             const model = TeachableLLM.loadModel(file);
             model.meta.trained = true;
             onModel(model);
-            waitForModel(model).then(() => {
+            waitModelLoaded(model).then(() => {
                 setIsLoading(false);
             });
         },
@@ -130,7 +131,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                         newModel.meta.name = t('model.defaultName');
                         newModel.meta.trained = false;
                         onModel(newModel);
-                        waitForModel(newModel)
+                        waitModelLoaded(newModel)
                             .then(() => {
                                 setIsLoading(false);
                             })
@@ -154,7 +155,7 @@ export default function LanguageModel({ model, onModel }: Props) {
                                 newModel.meta.name = card.name;
                                 newModel.meta.trained = card.trained || true;
                                 onModel(newModel);
-                                waitForModel(newModel)
+                                waitModelLoaded(newModel)
                                     .then(() => {
                                         setIsLoading(false);
                                     })
