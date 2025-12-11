@@ -14,6 +14,7 @@ interface ILine {
     x2: number;
     y2: number;
     flip: boolean;
+    id: number;
 }
 
 interface Props {
@@ -77,6 +78,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 x2: width,
                                 y2: padding + i * lineSpacing + lineSpacing / 2,
                                 flip: false,
+                                id: -1,
                             });
                         }
 
@@ -87,6 +89,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 x2: mainRect.width - 40,
                                 y2: height,
                                 flip: true,
+                                id: i,
                             });
                         }
                     }
@@ -124,7 +127,13 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 line.x2
                             } ${line.y2}`}
                             fill="none"
-                            stroke="#e8f0fe"
+                            stroke={
+                                line.id === -1 || !finished
+                                    ? '#e8f0fe'
+                                    : paddedPredictions[line.id].token === target && finished
+                                    ? '#e2ecd9'
+                                    : '#f3ddd5'
+                            }
                             strokeWidth="5"
                         />
                     );

@@ -196,6 +196,11 @@
             "validation": "Validation",
             "history": "History",
             "performance": "Performance"
-        }
+        },
+        "modelPredicting": "Predicting...",
+        "modelUpdating": "Updating parameters...",
+        "modelComplete": "Training step complete",
+        "modelIdle": "Waiting...",
+        "nlayers": "{{N}} layers"
     }
 }

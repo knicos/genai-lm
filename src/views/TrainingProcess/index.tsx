@@ -58,6 +58,8 @@ export function Component() {
     const [step, setStep] = useState<number>(0);
     const [attention, setAttention] = useState<number[][]>([]);
     const [warn, setWarn] = useState<boolean>(false);
+    const [updating, setUpdating] = useState<boolean>(false);
+    const [done, setDone] = useState<boolean>(false);
 
     useEffect(() => {
         if (model && loaded && dataset.length > 0) {
@@ -83,6 +85,8 @@ export function Component() {
                 setText(decodedText);
                 setTokens(newTokens);
                 setStep(0);
+                setDone(false);
+                setUpdating(false);
             };
             h();
         }
@@ -133,6 +137,19 @@ export function Component() {
     const currentAttention = step === 0 ? null : attention[step - 1] || null;
     const ready = model && loaded && dataset.length > 0;
 
+    console.log('State', done, finished, updating);
+
+    useEffect(() => {
+        if (finished && !done) {
+            setUpdating(true);
+            const timeout = setTimeout(() => {
+                setDone(true);
+                setUpdating(false);
+            }, 2000);
+            return () => clearTimeout(timeout);
+        }
+    }, [finished, done]);
+
     return (
         <div className="sidePanel">
             <h2>{t('tools.trainingProcess')}</h2>
@@ -166,6 +183,8 @@ export function Component() {
                 <ModelBox
                     layers={layers}
                     step={step}
+                    done={done}
+                    spinning={updating}
                 />
             )}
             {ready && (
@@ -181,6 +200,7 @@ export function Component() {
                 <LossBox
                     loss={finished ? loss ?? undefined : undefined}
                     model={model}
+                    updating={updating}
                 />
             )}
         </div>

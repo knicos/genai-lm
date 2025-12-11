@@ -7,9 +7,11 @@ interface Props extends PropsWithChildren {
     color?: string;
     step: number;
     totalSteps: number;
+    done?: boolean;
+    spin?: boolean;
 }
 
-export default function CircularProgress({ radius, children, step, totalSteps }: Props) {
+export default function CircularProgress({ radius, children, step, totalSteps, done, spin }: Props) {
     const stroke = 8;
     const normalizedRadius = radius - stroke / 2;
 
@@ -63,8 +65,8 @@ export default function CircularProgress({ radius, children, step, totalSteps }:
                             key={i}
                             d={pathData}
                             fill={
-                                i < step
-                                    ? step !== totalSteps
+                                (i < step && !spin) || i === step
+                                    ? !done
                                         ? '#5165c9'
                                         : theme.light.success
                                     : 'rgba(0, 130, 151, 0.1)'

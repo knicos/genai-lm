@@ -18,3 +18,12 @@
     align-self: flex-start;
     gap: 1rem;
 }
+
+.modelLabel {
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.modelLabel h3 {
+    margin: 0;
+}
