@@ -13,7 +13,7 @@ interface TrainingSettings {
 export const trainerSettings = atomWithStorage<TrainingSettings>(
     'trainerSettings',
     {
-        batchSize: 32,
+        batchSize: 16,
         maxSteps: 3000000,
         learningRate: 1e-3,
         outputText: true,

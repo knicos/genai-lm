@@ -22,7 +22,7 @@ import TrainingMenu from './TrainingMenu';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
-const CHECKPT_THRESHOLD = 5_000_000;
+const CHECKPT_THRESHOLD = 3_000_000;
 
 interface Props {
     model?: TeachableLLM;

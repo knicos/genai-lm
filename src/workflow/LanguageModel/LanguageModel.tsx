@@ -186,7 +186,7 @@ export default function LanguageModel({ model, onModel }: Props) {
             loadModelById(modelParam);
             // Load untrained model for pretrain workflow
         } else if (routerParams.flow === 'pretrain') {
-            loadModelById('untrained-medium');
+            loadModelById('untrained-small');
         }
     }, [modelParam, loadModelById, routerParams.flow]);
 
