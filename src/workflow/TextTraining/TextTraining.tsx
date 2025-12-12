@@ -205,6 +205,12 @@ export default function TextTraining({ model, dataset }: Props) {
                     setDone(true);
                     setTraining(false);
                     logger.error({ action: 'training_error', message: err.message });
+                    trainer.stop();
+                    trainer.reset();
+                    setMessage({
+                        notice: t('training.errors.trainingFailed'),
+                        level: 'error',
+                    });
                 });
         }
     };

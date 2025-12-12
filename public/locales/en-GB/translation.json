@@ -124,7 +124,8 @@
             "preparation": "More training data is needed, at least a few thousand samples.",
             "noModel": "Please load a model before training.",
             "notReady": "Model or data is not ready for training.",
-            "noData": "Add training data first."
+            "noData": "Add training data first.",
+            "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
         }
     },
     "generator": {
