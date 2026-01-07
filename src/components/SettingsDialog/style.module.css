@@ -6,6 +6,12 @@
     padding: 1rem;
 }
 
+.columns {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
 .label {
     margin-top: 1rem;
 }

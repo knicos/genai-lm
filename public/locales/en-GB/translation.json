@@ -36,7 +36,10 @@
             "lossMetric": "Loss",
             "advancedMetrics": "Advanced Metrics",
             "performProbe": "Check hardware on startup",
-            "developerMode": "Developer Mode"
+            "developerMode": "Developer Mode",
+            "mixedPrecision": "Use Mixed Precision",
+            "lowPowerMode": "Low Power Mode",
+            "disableSubgroups": "Disable Subgrouping"
         },
         "close": "Close",
         "ok": "OK",
@@ -202,6 +205,7 @@
         "modelUpdating": "Updating parameters...",
         "modelComplete": "Training step complete",
         "modelIdle": "Waiting...",
-        "nlayers": "{{N}} layers"
+        "nlayers": "{{N}} layers",
+        "gradients": "Gradients"
     }
 }

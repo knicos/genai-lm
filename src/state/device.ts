@@ -11,10 +11,19 @@ export interface DeviceCapabilities {
     subgroups: boolean;
     subgroupSize: number;
     float16: boolean;
+    vendor: string;
 }
 
 export const deviceCapabilities = atom<DeviceCapabilities | null>(null);
 
 export const devicePerformProbe = atomWithStorage<boolean>('devicePerformProbe', true, storage, {
+    getOnInit: true,
+});
+
+export const deviceLowPower = atomWithStorage<boolean>('deviceLowPower', false, storage, {
+    getOnInit: true,
+});
+
+export const deviceDisableSubgroups = atomWithStorage<boolean>('deviceDisableSubgroups', false, storage, {
     getOnInit: true,
 });

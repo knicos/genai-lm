@@ -9,6 +9,8 @@ interface TrainingSettings {
     learningRate: number;
     outputText: boolean;
     disableCheckpointing: boolean;
+    gradientMetrics: boolean;
+    mixedPrecision: boolean;
 }
 export const trainerSettings = atomWithStorage<TrainingSettings>(
     'trainerSettings',
@@ -18,6 +20,8 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         learningRate: 1e-3,
         outputText: true,
         disableCheckpointing: false,
+        gradientMetrics: false,
+        mixedPrecision: false,
     },
     storage
 );

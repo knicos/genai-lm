@@ -53,7 +53,6 @@ export function createMetric(
 interface AdvancedStats {
     samplesPerSecond: number;
     memory: number;
-    gradientNorm: number;
 }
 
 interface Props {
@@ -80,7 +79,6 @@ export default function Evaluation({ model }: Props) {
                     setAdvancedStats({
                         samplesPerSecond: progress.samplesPerSecond,
                         memory: progress.memory ?? 0,
-                        gradientNorm: log.gradientNorm ?? 0,
                     });
                 }
             };
@@ -152,10 +150,6 @@ export default function Evaluation({ model }: Props) {
                             <div className={style.advancedValue}>
                                 {(advancedStats.memory / 1024 / 1024 / 1024).toFixed(2)} GB
                             </div>
-                        </div>
-                        <div className={style.advancedItem}>
-                            <div className={style.advancedLabel}>{t('evaluation.gradientNorm')}</div>
-                            <div className={style.advancedValue}>{advancedStats.gradientNorm.toFixed(2)}</div>
                         </div>
                     </div>
                 )}

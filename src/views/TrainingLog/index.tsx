@@ -19,7 +19,6 @@ import { deviceCapabilities } from '../../state/device';
 interface AdvancedStats {
     samplesPerSecond: number;
     memory: number;
-    gradientNorm: number;
 }
 
 export function Component() {
@@ -51,7 +50,6 @@ export function Component() {
                 setAdvancedStats({
                     samplesPerSecond: progress.samplesPerSecond,
                     memory: progress.memory ?? 0,
-                    gradientNorm: log.gradientNorm ?? 0,
                 });
             };
             model.on('trainStep', h);

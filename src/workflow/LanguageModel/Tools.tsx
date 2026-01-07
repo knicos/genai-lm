@@ -61,6 +61,12 @@ const TOOLS: { title: string; cards: ToolCardItem[]; developer?: boolean }[] = [
                 url: 'debug-model',
                 icon: 'developer',
             },
+            {
+                id: 'gradients',
+                name: 'tools.gradients',
+                url: 'gradients',
+                icon: 'developer',
+            },
         ],
     },
 ];

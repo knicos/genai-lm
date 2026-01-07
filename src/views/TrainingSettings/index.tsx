@@ -1,12 +1,14 @@
 import { Checkbox, FormControl, FormControlLabel, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { trainerSettings } from '../../state/trainer';
+import { uiDeveloperMode } from '../../state/uiState';
 
 export function Component() {
     const { t } = useTranslation();
     const [settings, setSettings] = useAtom(trainerSettings);
+    const devMode = useAtomValue(uiDeveloperMode);
 
     return (
         <div className="sidePanel">
@@ -45,18 +47,35 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <div className={style.spacer} />
-            <FormControl>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={settings.disableCheckpointing}
-                            onChange={(_, checked) => setSettings({ ...settings, disableCheckpointing: checked })}
+            {devMode && (
+                <>
+                    <div className={style.spacer} />
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={settings.disableCheckpointing}
+                                    onChange={(_, checked) =>
+                                        setSettings({ ...settings, disableCheckpointing: checked })
+                                    }
+                                />
+                            }
+                            label={t('app.settings.checkpointing')}
                         />
-                    }
-                    label={t('app.settings.checkpointing')}
-                />
-            </FormControl>
+                    </FormControl>
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={settings.mixedPrecision}
+                                    onChange={(_, checked) => setSettings({ ...settings, mixedPrecision: checked })}
+                                />
+                            }
+                            label={t('app.settings.mixedPrecision')}
+                        />
+                    </FormControl>
+                </>
+            )}
         </div>
     );
 }

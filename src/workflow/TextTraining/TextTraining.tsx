@@ -177,6 +177,8 @@ export default function TextTraining({ model, dataset }: Props) {
                 learningRate: lr > 0 ? lr : learningRate,
                 advancedMetrics: advanced,
                 gradientCheckpointing: useCheckpointing,
+                gradientMetrics: settings.gradientMetrics,
+                mixedPrecision: settings.mixedPrecision,
             };
             if (shouldPrepare) {
                 try {
