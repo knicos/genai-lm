@@ -21,7 +21,7 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         outputText: true,
         disableCheckpointing: false,
         gradientMetrics: false,
-        mixedPrecision: false,
+        mixedPrecision: true,
     },
     storage
 );
