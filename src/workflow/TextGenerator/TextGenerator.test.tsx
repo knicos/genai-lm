@@ -78,7 +78,7 @@ describe('TextGenerator', () => {
                 off: ee.off.bind(ee),
                 generate: async function () {},
                 dispose: () => {},
-                getText: () => 'abcde',
+                getConversation: () => [{ role: 'assistant', content: 'abcde' }],
                 getAttentionData: () => [],
                 getProbabilitiesData: () => [],
             })),

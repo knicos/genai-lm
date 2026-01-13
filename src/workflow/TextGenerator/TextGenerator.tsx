@@ -1,7 +1,6 @@
 import style from './style.module.css';
 import { useEffect, useRef, useState } from 'react';
-import { CharTokeniser, TeachableLLM } from '@genai-fi/nanogpt';
-import TextHighlighter from '../../components/TextHighlighter/TextHighlighter';
+import { CharTokeniser, Conversation, TeachableLLM } from '@genai-fi/nanogpt';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +12,11 @@ import Box from '../../components/BoxTitle/Box';
 import { trainerSettings } from '../../state/trainer';
 import Controls from './Controls';
 import { useNavigate } from 'react-router-dom';
-import { createProbabilities, createTopKTokens } from './utilities';
+import { createTopKTokens } from './utilities';
 import logger from '../../utilities/logger';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import { flattenConversation } from '../../utilities/conversation';
+import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 
 interface Props {
     model?: TeachableLLM;
@@ -25,16 +26,16 @@ export default function TextGenerator({ model }: Props) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [generator, setGenerator] = useAtom(generatorAtom);
-    const [text, setText] = useState<string>('');
-    const [attentionData, setAttentionData] = useState<number[][][][][]>([]);
+    const [text, setText] = useState<Conversation[]>([]);
+    const [, setAttentionData] = useState<number[][][][][]>([]);
     const [probabilities, setProbabilities] = useState<number[][]>([]);
     const [topKTokens, setTopKTokens] = useState<{ token: string; probability: number }[]>([]);
     const [selected, setSelected] = useState<number>(0);
     const status = useModelStatus(model);
     const [generate, setGenerate] = useState(false);
-    const [hasGenerated, setHasGenerated] = useState(false);
+    const [, setHasGenerated] = useState(false);
 
-    const { temperature, topP, maxLength, showAttention, attentionBlock, showProbabilities, showSettings } =
+    const { temperature, topP, maxLength, showAttention, showProbabilities, showSettings, showPrompt } =
         useAtomValue(generatorSettings);
 
     const outputText = useAtomValue(trainerSettings).outputText;
@@ -58,7 +59,7 @@ export default function TextGenerator({ model }: Props) {
             setGenerator(generator);
 
             setHasGenerated(false);
-            setText('');
+            setText([]);
             setAttentionData([]);
             setProbabilities([]);
             setSelected(-1);
@@ -71,20 +72,20 @@ export default function TextGenerator({ model }: Props) {
                 const h = async () => {
                     state.count++;
                     if (state.count % 2 !== 0) return;
-                    setText(''); // Clear previous text
-                    setAttentionData([]); // Clear previous attention data
+                    //setText([]); // Clear previous text
+                    //setAttentionData([]); // Clear previous attention data
                     setGenerate(true);
                     setHasGenerated(true);
-                    generator.reset();
+                    //generator.reset();
                     try {
-                        const finalText = await generator.generate(undefined, {
+                        const finalText = await generator.generate({
                             maxLength: 200,
                             temperature: 1,
                             includeProbabilities: false,
                             topP: topP > 0 ? topP : undefined,
                         });
                         setGenerate(false);
-                        setText(finalText);
+                        setText([...finalText]);
                         logger.log({ action: 'auto_generated_text', text: finalText });
                     } catch {
                         setGenerate(false);
@@ -107,7 +108,8 @@ export default function TextGenerator({ model }: Props) {
     useEffect(() => {
         if (generator) {
             const h = () => {
-                setText(generator.getText());
+                const convo = generator.getConversation().slice();
+                setText(convo);
             };
             generator.on('tokens', h);
             return () => {
@@ -117,7 +119,7 @@ export default function TextGenerator({ model }: Props) {
         }
     }, [generator]);
 
-    const doGenerate = (maxLength: number) => {
+    const doGenerate = async (maxLength: number, prompt?: string) => {
         if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
             setMessage({
                 level: 'warning',
@@ -133,34 +135,43 @@ export default function TextGenerator({ model }: Props) {
         if (maxLength > 1) setGenerate(true);
         setHasGenerated(true);
 
-        const currentText = generator.getText();
+        //const currentText = generator.getConversation();
 
-        generator
-            .generate(currentText.length > 0 ? currentText : undefined, {
-                maxLength,
-                temperature,
-                attentionScores: showAttention,
-                includeProbabilities: showProbabilities,
-                topP: topP > 0 ? topP : undefined,
-                noCache: false,
-            })
-            .then(() => {
-                setText(generator.getText());
-                logger.log({ action: 'generated_text', text: generator.getText() });
-                // HACK: Wrong type from library
-                setAttentionData(generator.getAttentionData() as unknown as number[][][][][]);
-                setProbabilities(generator.getProbabilitiesData()[0] || []);
-                setGenerate(false);
-                busyRef.current = false;
-            })
-            .catch(() => {
-                setMessage({
-                    level: 'error',
-                    notice: t('generator.errors.generationError'),
-                });
-                setGenerate(false);
-                busyRef.current = false;
+        if (prompt && prompt.length > 0) {
+            text.push({ role: 'user', content: prompt });
+            setText([...text]);
+        }
+
+        const options = {
+            maxLength,
+            temperature,
+            attentionScores: showAttention,
+            includeProbabilities: showProbabilities,
+            topP: topP > 0 ? topP : undefined,
+            noCache: false,
+        };
+
+        try {
+            if (text.length === 0) {
+                await generator.generate(options);
+            } else {
+                await generator.generate(text, options);
+            }
+            setText([...generator.getConversation()]);
+            logger.log({ action: 'generated_text', text: generator.getConversation() });
+            // HACK: Wrong type from library
+            setAttentionData(generator.getAttentionData() as unknown as number[][][][][]);
+            setProbabilities(generator.getProbabilitiesData()[0] || []);
+            setGenerate(false);
+            busyRef.current = false;
+        } catch {
+            setMessage({
+                level: 'error',
+                notice: t('generator.errors.generationError'),
             });
+            setGenerate(false);
+            busyRef.current = false;
+        }
     };
 
     return (
@@ -178,36 +189,24 @@ export default function TextGenerator({ model }: Props) {
                     status={!model ? 'disabled' : generate ? 'busy' : ready && !generate ? 'done' : 'waiting'}
                 />
                 <div className={style.xaiRow}>
-                    <TextHighlighter
-                        text={text}
-                        mode={!hasGenerated ? 'edit' : showAttention && !generate ? 'probability' : 'plain'}
-                        onSelectToken={(_, index) => setSelected(index)}
-                        selected={selected}
-                        probabilities={
-                            showAttention && !generate && hasGenerated
-                                ? createProbabilities(attentionData, 1, selected, attentionBlock)
-                                : undefined
-                        }
-                        tokeniser={status !== 'loading' ? model?.tokeniser : undefined}
-                        active={generate}
-                        onChange={(newText) => {
-                            setText(newText);
-                        }}
-                    />
+                    <ConversationDisplay conversation={text} />
                     <XAIView probabilities={topKTokens} />
                 </div>
                 <Controls
-                    onGenerate={() => doGenerate(autoMode ? maxLength : 1)}
+                    prompt={showPrompt}
+                    onGenerate={(prompt) => doGenerate(autoMode ? maxLength : 1, prompt)}
                     disable={disable}
                     generate={generate}
-                    onCopy={() => navigator.clipboard.writeText(generator?.getText() || '')}
+                    onCopy={() =>
+                        navigator.clipboard.writeText(flattenConversation(generator?.getConversation() || []))
+                    }
                     onReset={() => {
                         if (generate && generator) {
                             generator.stop();
                         }
                         generator?.reset();
                         setHasGenerated(false);
-                        setText('');
+                        setText([]);
                         setAttentionData([]);
                         setProbabilities([]);
                         setSelected(-1);

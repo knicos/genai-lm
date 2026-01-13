@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import TrainingMenu from './TrainingMenu';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import { sequencesToConversation } from '../../utilities/conversation';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -182,7 +183,7 @@ export default function TextTraining({ model, dataset }: Props) {
             };
             if (shouldPrepare) {
                 try {
-                    await trainer.prepare(dataset, trainingOptions);
+                    await trainer.prepare(sequencesToConversation(dataset, 'fsau'), trainingOptions);
                 } catch {
                     setMessage({
                         notice: t('training.errors.preparation'),

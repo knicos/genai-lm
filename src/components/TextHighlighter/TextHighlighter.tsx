@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { Conversation, TeachableLLM } from '@genai-fi/nanogpt';
+import { flattenConversation } from '../../utilities/conversation';
 
 interface TokenItem {
     text: string;
@@ -16,8 +17,8 @@ export interface ProbabilityItem {
 }
 
 interface Props {
-    text: string;
-    onChange?: (text: string) => void;
+    text: Conversation[];
+    onChange?: (text: Conversation[]) => void;
     mode?: 'edit' | 'plain' | 'tokens' | 'probability';
     initialText?: string;
     probabilities?: ProbabilityItem[];
@@ -50,37 +51,42 @@ export default function TextHighlighter({
             return;
         }
 
-        tokeniser.tokenise([text], false).then((tokenArray) => {
-            const tokenized = tokenArray[0] as string[];
-            //console.log('Tokenized:', tokenized);
-            const tokens = tokenized.map((token, ix) => {
-                let color = '#ffffff00'; // Default color
-                let opacity = 1;
-                let className: string | undefined = undefined;
-                if (selected === ix) {
-                    //color = '#9b8c07ff';
-                    className = style.selected;
-                } else if (mode === 'tokens') {
-                    color = COLORS[ix % COLORS.length];
-                } else if (mode === 'probability') {
-                    const probability = probabilities ? probabilities[ix] : { index: -1, probability: 0 };
+        tokeniser
+            .tokenise(
+                text.map((part) => part.content),
+                false
+            )
+            .then((tokenArray) => {
+                const tokenized = tokenArray[0] as string[];
+                //console.log('Tokenized:', tokenized);
+                const tokens = tokenized.map((token, ix) => {
+                    let color = '#ffffff00'; // Default color
+                    let opacity = 1;
+                    let className: string | undefined = undefined;
+                    if (selected === ix) {
+                        //color = '#9b8c07ff';
+                        className = style.selected;
+                    } else if (mode === 'tokens') {
+                        color = COLORS[ix % COLORS.length];
+                    } else if (mode === 'probability') {
+                        const probability = probabilities ? probabilities[ix] : { index: -1, probability: 0 };
 
-                    if (!probability) {
-                        return { text: token, color, opacity };
-                    }
+                        if (!probability) {
+                            return { text: token, color, opacity };
+                        }
 
-                    const adjusted = probability?.probability || 0;
-                    //color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
-                    if (adjusted > 0.2) {
-                        color = COLORS[probability.index % COLORS.length];
+                        const adjusted = probability?.probability || 0;
+                        //color = `rgba(156, 39, 176, ${adjusted.toFixed(2)})`;
+                        if (adjusted > 0.2) {
+                            color = COLORS[probability.index % COLORS.length];
+                        }
+                        opacity = Math.max(0.2, adjusted);
                     }
-                    opacity = Math.max(0.2, adjusted);
-                }
-                return { text: token, color, opacity, className };
+                    return { text: token, color, opacity, className };
+                });
+
+                setTokens(tokens);
             });
-
-            setTokens(tokens);
-        });
     }, [text, mode, probabilities, selected, tokeniser]);
 
     useEffect(() => {
@@ -124,7 +130,7 @@ export default function TextHighlighter({
                                 {t.text}
                             </span>
                         ))}
-                    {mode === 'plain' && text}
+                    {mode === 'plain' && flattenConversation(text)}
                     {mode === 'edit' && (
                         <textarea
                             ref={textRef}
@@ -135,7 +141,7 @@ export default function TextHighlighter({
                             autoComplete="off"
                             onInput={(e) => {
                                 const target = e.target as HTMLTextAreaElement;
-                                if (onChange) onChange(target.value);
+                                if (onChange) onChange([{ role: 'user', content: target.value }]);
                                 target.style.height = 'auto';
                                 target.style.height = target.scrollHeight + 'px';
                             }}

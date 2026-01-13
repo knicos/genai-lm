@@ -9,7 +9,7 @@ import { squeezeArray } from '../../utilities/arrays';
 async function debugModel(model: TeachableLLM) {
     // Generate text with logits output
     const generator = model.generator();
-    await generator.generate(undefined, {
+    await generator.generate({
         embeddings: 'all',
         maxLength: 50,
     });

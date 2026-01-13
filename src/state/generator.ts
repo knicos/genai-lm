@@ -13,6 +13,7 @@ export interface GeneratorSettings {
     attentionHead: number;
     showProbabilities: boolean;
     showSettings: boolean;
+    showPrompt: boolean;
 }
 
 export const generatorSettings = atomWithStorage<GeneratorSettings>(
@@ -27,6 +28,7 @@ export const generatorSettings = atomWithStorage<GeneratorSettings>(
         attentionHead: 0,
         showProbabilities: false,
         showSettings: true,
+        showPrompt: false,
     },
     storage
 );

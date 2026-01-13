@@ -8,7 +8,7 @@ export function Component() {
     const { t } = useTranslation();
 
     const [settings, setSettings] = useAtom(generatorSettings);
-    const { temperature, topP, maxLength, showProbabilities: probability, showSettings } = settings;
+    const { temperature, topP, maxLength, showProbabilities: probability, showSettings, showPrompt } = settings;
 
     return (
         <div className="sidePanel">
@@ -85,6 +85,17 @@ export function Component() {
                         />
                     }
                     label={t('app.settings.showSettings')}
+                />
+            </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={showPrompt}
+                            onChange={(_, checked) => setSettings({ ...settings, showPrompt: checked })}
+                        />
+                    }
+                    label={t('app.settings.showPrompt')}
                 />
             </FormControl>
         </div>

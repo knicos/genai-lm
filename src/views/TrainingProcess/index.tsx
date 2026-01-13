@@ -5,7 +5,7 @@ import { modelAtom } from '../../state/model';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import extractData from './extractData';
 import useModelLoaded from '../../utilities/useModelLoaded';
-import { topP } from '@genai-fi/nanogpt';
+import { Conversation, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
 import { trainerAtom } from '../../state/trainer';
@@ -48,7 +48,7 @@ export function Component() {
     const dataset = useAtomValue(datasetAtom);
     const model = useAtomValue(modelAtom);
     const loaded = useModelLoaded(model ?? undefined);
-    const [text, setText] = useState<string>('');
+    const [text, setText] = useState<Conversation[]>([]);
     const [tokens, setTokens] = useState<number[]>([]);
     const [predictions, setPredictions] = useState<number[][]>([]);
     const [trigger, doNext] = useReducer((x) => x + 1, 0);
@@ -82,7 +82,7 @@ export function Component() {
                 const actualNextToken = newTokens[slicedTokens.length] || 0;
 
                 nextToken.current = actualNextToken;
-                setText(decodedText);
+                setText([{ role: 'assistant', content: decodedText }]);
                 setTokens(newTokens);
                 setStep(0);
                 setDone(false);

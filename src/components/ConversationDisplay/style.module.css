@@ -1,0 +1,62 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
+.userItem {
+    border-radius: 20px;
+    border-top-right-radius: 4px;
+    background-color: rgba(0, 130, 151, 0.1);
+    padding: 1rem;
+    align-self: flex-end;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0.5rem;
+}
+.userItem.injected {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.assistantItem {
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 6rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.conversationList {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.conversationList p {
+    margin: 0.5rem 0;
+}
+
+.container {
+    height: 350px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.cursor {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin-left: 0.8rem;
+    background-color: #444;
+    border-radius: 50%;
+    vertical-align: middle;
+    opacity: 0.8;
+    /*animation: pulse 1.5s infinite;*/
+}
+
+.cursor.active {
+    background-color: secondary;
+    animation: unset;
+}

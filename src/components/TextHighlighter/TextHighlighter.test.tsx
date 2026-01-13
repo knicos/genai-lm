@@ -8,7 +8,7 @@ describe('TextHighlighter', () => {
         render(
             <TextHighlighter
                 mode="plain"
-                text="test text string"
+                text={[{ role: 'assistant', content: 'test text string' }]}
             />
         );
 
@@ -23,7 +23,7 @@ describe('TextHighlighter', () => {
         render(
             <TextHighlighter
                 mode="edit"
-                text="test string"
+                text={[{ role: 'assistant', content: 'test string' }]}
                 onChange={onChange}
             />
         );
@@ -31,6 +31,6 @@ describe('TextHighlighter', () => {
         await user.click(screen.getByTestId('input-box'));
         await user.keyboard('hello');
 
-        expect(onChange).toHaveBeenCalledWith('hello');
+        expect(onChange).toHaveBeenCalledWith([{ role: 'user', content: 'hello' }]);
     });
 });
