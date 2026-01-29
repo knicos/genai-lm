@@ -1,31 +1,24 @@
-import { Dispatch, RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
-import { loadTextData, TeachableLLM } from '@genai-fi/nanogpt';
+import { loadTextData } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
-import DataListing, { DataEntry } from './DataListing';
+import DataListing from './DataListing';
 import DataMenu from './DataMenu';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import InfoPanel from './InfoPanel';
-import DataProgress from '../../components/DataProgress/DataProgress';
 import TextSearch from './TextSearch';
 import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
-import useModelLoaded from '../../utilities/useModelLoaded';
 import useModelStatus from '../../utilities/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { useAtom } from 'jotai';
-import { downloadsAtom } from '../../state/data';
-
-interface Props {
-    model?: TeachableLLM;
-    dataset?: string[];
-    onDatasetChange: (dataset: string[]) => void;
-}
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { dataEntries, DataEntry, dataReady, datasetAtom, downloadsAtom } from '../../state/data';
+import { modelAtom } from '../../state/model';
 
 interface DragObject {
     files?: File[];
@@ -54,29 +47,29 @@ async function handleTextLoad(
     ]);
 }
 
-export default function TextData({ model, onDatasetChange }: Props) {
+export default function TextData() {
     const { t } = useTranslation();
     const [busy, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
-    const [data, setData] = useState<DataEntry[]>([]);
+    const [data, setData] = useAtom(dataEntries);
+    const setDataset = useSetAtom(datasetAtom);
     const [showInput, setShowInput] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
-    const ready = useModelLoaded(model);
+    const model = useAtomValue(modelAtom);
     const [selected, setSelected] = useState<number>(-1);
     const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [selectedSet, setSelectedSet] = useState<Set<string>>();
-    const status = useModelStatus(model);
+    const status = useModelStatus(model ?? undefined);
     const [message, setMessage] = useState<Notice | null>(null);
-
-    const done = data.length > 0;
+    const done = useAtomValue(dataReady);
 
     const disable = status === 'training' || status === 'busy';
 
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
         setSelectedSet(new Set(data.map((entry) => entry.id)));
-        onDatasetChange(newDataset);
-    }, [data, onDatasetChange]);
+        setDataset(newDataset);
+    }, [data, setDataset]);
 
     const [dropProps, drop] = useDrop(
         {
@@ -119,19 +112,15 @@ export default function TextData({ model, onDatasetChange }: Props) {
         [model]
     );
 
-    const totalSamples = useMemo(
-        () => data.reduce((acc, entry) => acc + entry.content.reduce((acc, curr) => acc + curr.length, 0), 0),
-        [data]
-    );
-
     const selectedItem = selected >= 0 && selected < data.length ? data[selected] : null;
 
     return (
         <Box
             widget="textData"
             style={{ minWidth: '350px' }}
-            active={data.length > 0}
+            active={done}
             disabled={disable}
+            fullWidth
         >
             <div className={style.container}>
                 <BoxTitle
@@ -146,7 +135,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     }}
                     onSearch={() => setShowSearch(true)}
                     onUpload={() => fileRef.current?.click()}
-                    totalSamples={totalSamples}
                 />
                 <div
                     className={style.content}
@@ -248,12 +236,6 @@ export default function TextData({ model, onDatasetChange }: Props) {
                     )}
                     {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
                 </div>
-                {ready && (
-                    <DataProgress
-                        samplesProcessed={totalSamples}
-                        desiredSamples={(model?.getNumParams() || 0) * 2}
-                    />
-                )}
 
                 <input
                     type="file"

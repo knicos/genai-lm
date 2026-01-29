@@ -7,9 +7,10 @@ interface Props {
     duration: number;
     totalDuration: number;
     remaining: number;
+    message?: string;
 }
 
-export default function Clock({ duration, totalDuration, remaining }: Props) {
+export default function Clock({ duration, totalDuration, remaining, message }: Props) {
     const { t } = useTranslation();
     const progress = totalDuration > 0 ? Math.min(duration / totalDuration, 1) : 0;
 
@@ -25,27 +26,32 @@ export default function Clock({ duration, totalDuration, remaining }: Props) {
             progress={progress}
             color="rgba(76, 175, 80, 0.6)"
         >
-            <div className={style.timeRow}>
-                {hours > 0 ? (
-                    <div>
-                        <div className={style.time}>{`${hours}:`}</div>
-                        <div className={style.timeLabel}>{t('training.hours')}</div>
+            {!message && (
+                <>
+                    <div className={style.timeRow}>
+                        {hours > 0 ? (
+                            <div>
+                                <div className={style.time}>{`${hours}:`}</div>
+                                <div className={style.timeLabel}>{t('training.hours')}</div>
+                            </div>
+                        ) : null}
+                        <div>
+                            <div className={style.time}>{`${minutes < 10 ? '0' : ''}${minutes}`}</div>
+                            <div className={style.timeLabel}>{t('training.minutes')}</div>
+                        </div>
+                        {hours === 0 ? (
+                            <div>
+                                <div className={style.time}>{`:${seconds < 10 ? '0' : ''}${seconds}`}</div>
+                                <div className={style.timeLabel}>{t('training.seconds')}</div>
+                            </div>
+                        ) : null}
                     </div>
-                ) : null}
-                <div>
-                    <div className={style.time}>{`${minutes < 10 ? '0' : ''}${minutes}`}</div>
-                    <div className={style.timeLabel}>{t('training.minutes')}</div>
-                </div>
-                {hours === 0 ? (
-                    <div>
-                        <div className={style.time}>{`:${seconds < 10 ? '0' : ''}${seconds}`}</div>
-                        <div className={style.timeLabel}>{t('training.seconds')}</div>
+                    <div className={style.remainingTime}>
+                        <Remaining remaining={remaining} />
                     </div>
-                ) : null}
-            </div>
-            <div className={style.remainingTime}>
-                <Remaining remaining={remaining} />
-            </div>
+                </>
+            )}
+            {message ? <div className={style.message}>{message}</div> : null}
         </Circle>
     );
 }

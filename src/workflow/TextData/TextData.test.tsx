@@ -5,12 +5,17 @@ import TextData from './TextData';
 import type { TeachableLLM } from '@genai-fi/nanogpt';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { createStore } from 'jotai';
+import { modelAtom } from '../../state/model';
+import TestWrapper from '../../utilities/TestWrapper';
+import JotaiObserver from '../../utilities/Observer';
+import { datasetAtom } from '../../state/data';
 
 describe('TextData', () => {
     it('renders without a model', async ({ expect }) => {
         render(
             <DndProvider backend={HTML5Backend}>
-                <TextData onDatasetChange={() => {}} />
+                <TextData />
             </DndProvider>
         );
         expect(screen.getByText('data.title')).toBeInTheDocument();
@@ -36,13 +41,17 @@ describe('TextData', () => {
             tokeniser: null,
             getNumParams: () => 123456,
         } as unknown as TeachableLLM;
+
+        const store = createStore();
+
+        store.set(modelAtom, mockModel);
+
         render(
-            <DndProvider backend={HTML5Backend}>
-                <TextData
-                    onDatasetChange={() => {}}
-                    model={mockModel}
-                />
-            </DndProvider>
+            <TestWrapper initializeState={store}>
+                <DndProvider backend={HTML5Backend}>
+                    <TextData />
+                </DndProvider>
+            </TestWrapper>
         );
 
         expect(screen.getByText('data.title')).toBeInTheDocument();
@@ -66,7 +75,11 @@ describe('TextData', () => {
 
         render(
             <DndProvider backend={HTML5Backend}>
-                <TextData onDatasetChange={dataCB} />
+                <JotaiObserver
+                    node={datasetAtom}
+                    onChange={dataCB}
+                />
+                <TextData />
             </DndProvider>
         );
 

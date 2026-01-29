@@ -1,9 +1,9 @@
-import { Conversation } from '@genai-fi/nanogpt';
 import style from './style.module.css';
 import { useEffect, useRef } from 'react';
+import { ExtendedConversation } from './extended';
 
 interface Props {
-    item: Conversation;
+    item: ExtendedConversation;
     active?: boolean;
     busy?: boolean;
 }

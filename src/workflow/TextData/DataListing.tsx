@@ -4,14 +4,7 @@ import prettyNumber from '../../utilities/prettyNumber';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { MouseEvent } from 'react';
-
-export interface DataEntry {
-    id: string;
-    name: string;
-    content: string[];
-    size: number;
-    source: 'file' | 'input' | 'search';
-}
+import { DataEntry } from '../../state/data';
 
 interface Props {
     data: DataEntry[];

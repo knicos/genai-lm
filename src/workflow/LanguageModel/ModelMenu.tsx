@@ -1,12 +1,7 @@
 import { VerticalButton } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
-import BuildIcon from '@mui/icons-material/Build';
-import DownloadIcon from '@mui/icons-material/Download';
-import style from './style.module.css';
-import { useAtomValue } from 'jotai';
-import { uiDeveloperMode } from '../../state/uiState';
-import UploadIcon from '@mui/icons-material/Upload';
+import BoxMenu from '../../components/BoxTitle/BoxMenu';
 
 interface Props {
     disableInspect?: boolean;
@@ -17,52 +12,21 @@ interface Props {
     onTools?: () => void;
 }
 
-export default function ModelMenu({ onSearch, onDownload, onTools, onUpload, disableInspect }: Props) {
+export default function ModelMenu({ onSearch }: Props) {
     const { t } = useTranslation();
-    const developerMode = useAtomValue(uiDeveloperMode);
 
     return (
-        <div className={style.modelMenu}>
-            <VerticalButton
-                disabled={!onUpload}
-                color="inherit"
-                variant="text"
-                onClick={onUpload}
-                startIcon={<UploadIcon color="inherit" />}
-            >
-                {t('model.upload')}
-            </VerticalButton>
-            <VerticalButton
-                disabled={!onSearch}
-                color="inherit"
-                variant="text"
-                onClick={onSearch}
-                startIcon={<SearchIcon color="inherit" />}
-            >
-                {t('model.search')}
-            </VerticalButton>
-            <div className={style.spacer} />
-            <VerticalButton
-                disabled={!onDownload}
-                startIcon={<DownloadIcon color="inherit" />}
-                variant="text"
-                onClick={onDownload}
-                color="inherit"
-            >
-                {t('model.download')}
-            </VerticalButton>
-            <div className={style.spacer} />
-            {developerMode && (
+        <BoxMenu>
+            {onSearch && (
                 <VerticalButton
-                    startIcon={<BuildIcon color="inherit" />}
+                    disabled={!onSearch}
                     variant="text"
-                    onClick={onTools}
-                    disabled={disableInspect}
-                    color="inherit"
+                    onClick={onSearch}
+                    startIcon={<SearchIcon color="inherit" />}
                 >
-                    {t('model.tools')}
+                    {t('model.search')}
                 </VerticalButton>
             )}
-        </div>
+        </BoxMenu>
     );
 }

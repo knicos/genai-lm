@@ -7,7 +7,10 @@ export function Component() {
     const { t } = useTranslation('home');
     return (
         <>
-            <AppBar noSettings />
+            <AppBar
+                noSettings
+                hideWorkflow
+            />
             <div className={style.mainContainer}>
                 <div className={style.workspaceContainer}>
                     <section

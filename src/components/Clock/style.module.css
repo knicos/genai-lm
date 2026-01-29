@@ -42,3 +42,8 @@
     padding: 0.2rem 0.5rem;
     color: #005d6b;
 }
+
+.message {
+    color: #005d6b;
+    font-weight: bold;
+}

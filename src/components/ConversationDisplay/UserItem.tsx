@@ -6,5 +6,5 @@ interface Props {
 }
 
 export default function UserItem({ item }: Props) {
-    return <div className={`${style.userItem} ${item.injected ? style.injected : ''}`}>{item.content}</div>;
+    return <div className={`${style.userItem} ${item.role === 'auto_user' ? style.injected : ''}`}>{item.content}</div>;
 }

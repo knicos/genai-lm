@@ -1,4 +1,3 @@
-import { Conversation } from '@genai-fi/nanogpt';
 import UserItem from './UserItem';
 import AssistantItem from './AssistantItem';
 import style from './style.module.css';
@@ -6,7 +5,7 @@ import { useRef } from 'react';
 import { ExtendedConversation } from './extended';
 
 interface Props {
-    conversation: Conversation[];
+    conversation: ExtendedConversation[];
 }
 
 export default function ConversationDisplay({ conversation }: Props) {
@@ -14,7 +13,6 @@ export default function ConversationDisplay({ conversation }: Props) {
     const lastLength = useRef<number>(0);
 
     if (conversation.length !== lastLength.current) {
-        console.log('Updating extended conversation', conversation);
         lastLength.current = conversation.length;
         // Inject artificial user messages between consecutive assistant messages
         // Adjust a user message if it is empty
@@ -26,29 +24,23 @@ export default function ConversationDisplay({ conversation }: Props) {
                 if (lastPart.role === 'assistant') {
                     // Inject artificial user message
                     extended.push({
-                        role: 'user',
+                        role: 'auto_user',
                         content: 'Write something...',
-                        originalIndex: -1,
-                        injected: true,
                     });
                 }
             }
             if (index === 0 && part.role === 'assistant') {
                 // Inject artificial user message at the start if first message is from assistant
                 extended.push({
-                    role: 'user',
+                    role: 'auto_user',
                     content: 'Write something...',
-                    originalIndex: -1,
-                    injected: true,
                 });
             }
             // Adjust empty user messages
             if (part.role === 'user' && part.content === '') {
                 extended.push({
-                    role: 'user',
+                    role: 'auto_user',
                     content: 'Write something...',
-                    originalIndex: index,
-                    injected: true,
                 });
             } else {
                 extended.push(part);
@@ -58,24 +50,22 @@ export default function ConversationDisplay({ conversation }: Props) {
     }
 
     return (
-        <div className={style.container}>
-            <div className={style.conversationList}>
-                {extendedConversation.current.map((part, index) =>
-                    part.role === 'user' ? (
-                        <UserItem
-                            key={index}
-                            item={part}
-                        />
-                    ) : (
-                        <AssistantItem
-                            key={index}
-                            item={part}
-                            active={index === extendedConversation.current.length - 1}
-                            busy={!part._completed}
-                        />
-                    )
-                )}
-            </div>
+        <div className={style.conversationList}>
+            {extendedConversation.current.map((part, index) =>
+                part.role === 'user' || part.role === 'auto_user' ? (
+                    <UserItem
+                        key={index}
+                        item={part}
+                    />
+                ) : (
+                    <AssistantItem
+                        key={index}
+                        item={part}
+                        active={index === extendedConversation.current.length - 1}
+                        busy={!part._completed}
+                    />
+                )
+            )}
         </div>
     );
 }

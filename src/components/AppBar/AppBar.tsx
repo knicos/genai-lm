@@ -9,12 +9,15 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
 import logger from '../../utilities/logger';
+import WorkflowBar from '../WorkflowBar/WorkflowBar';
 
 interface Props {
     noSettings?: boolean;
+    hideTitle?: boolean;
+    hideWorkflow?: boolean;
 }
 
-export default function ApplicationBar({ noSettings }: Props) {
+export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: Props) {
     const { t, i18n } = useTranslation();
     const showSettings = useSetAtom(uiShowSettings);
     const istraining = useAtomValue(trainingAnimation);
@@ -26,20 +29,6 @@ export default function ApplicationBar({ noSettings }: Props) {
         },
         [i18n]
     );
-
-    /*const openFile = useCallback(
-        (file: File) => {
-            if (!onModel) return;
-            setIsLoading(true);
-            const model = TeachableLLM.loadModel(file);
-            model.meta.trained = true;
-            onModel(model);
-            waitForModel(model).then(() => {
-                setIsLoading(false);
-            });
-        },
-        [onModel]
-    );*/
 
     useEffect(() => {
         const h = (_: string, idNumber: number) => {
@@ -65,12 +54,27 @@ export default function ApplicationBar({ noSettings }: Props) {
                         width="48"
                         height="48"
                     />
-                    <h1>
-                        <div className={style.little}>{t('app.little')}</div>
-                        {t('app.languageMachine')}
-                    </h1>
+                    {!hideTitle && (
+                        <h1>
+                            <div className={style.little}>{t('app.little')}</div>
+                            {t('app.languageMachine')}
+                        </h1>
+                    )}
                 </Link>
-                <div className={style.buttonBar}>{logId}</div>
+                {logId && <div className={style.buttonBar}>{logId}</div>}
+                {!hideWorkflow && (
+                    <WorkflowBar
+                        items={[
+                            { id: 'model' },
+                            { id: 'pretraindata' },
+                            { id: 'pretrain' },
+                            { id: 'finetunedata' },
+                            { id: 'finetune' },
+                            { id: 'deployment' },
+                        ]}
+                    />
+                )}
+                {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
                 <div className={style.langBar}>
                     <NativeSelect
                         value={i18n.language}

@@ -18,8 +18,7 @@
 }
 
 .workspaceContainer {
-    overflow-x: scroll;
-    overflow-y: auto;
+    overflow-x: auto;
     flex-shrink: 1;
     flex-grow: 1;
     width: 100%;
@@ -27,6 +26,11 @@
 
 .workspaceContainer > div {
     overflow: initial;
+}
+
+.workspaceContainer > div > div {
+    padding: 0;
+    height: 100%;
 }
 
 .verticalBox {
@@ -87,6 +91,64 @@
     font-size: 1.4rem;
 }
 
+.chatGroup {
+    background: white;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /*gap: 2rem;*/
+    align-self: stretch;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    /*position: relative;*/
+    width: 40rem;
+    height: 100%;
+    justify-content: flex-end;
+    margin-right: 2rem;
+}
+
+.inputGroup {
+    composes: chatGroup;
+    margin-right: 0;
+    margin-left: 2rem;
+}
+
+.processGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+    justify-content: center;
+    height: 100%;
+    margin-left: 2rem;
+    max-height: 1000px;
+    align-self: flex-start;
+}
+
+.promptGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /*gap: 2rem;*/
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0px, rgba(255, 255, 255, 1) 60px);
+    width: 100%;
+}
+
+.chatOutputContainer {
+    flex-grow: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+.inputContainer {
+    flex-grow: 1;
+    width: 100%;
+    min-height: 0;
+}
+
 .trainingGroup {
     display: flex;
     flex-direction: column;
@@ -113,5 +175,11 @@
 @media (max-width: 600px) {
     .widgetRow {
         flex-wrap: wrap;
+    }
+}
+
+@media (max-height: 1000px) {
+    .processGroup {
+        gap: 2rem;
     }
 }

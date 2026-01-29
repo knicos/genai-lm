@@ -1,7 +1,8 @@
 import { ITokeniser } from '@genai-fi/nanogpt';
 import { useEffect, useRef, useState } from 'react';
 import style from './sample.module.css';
-import { COLORS } from '../../components/TextHighlighter/TextHighlighter';
+
+export const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
 
 interface Props {
     sampleTokens: number[];

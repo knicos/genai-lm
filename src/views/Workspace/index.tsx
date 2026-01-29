@@ -1,57 +1,90 @@
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import TextTrainer from '../../workflow/TextTraining/TextTraining';
-import TextGenerator from '../../workflow/TextGenerator/TextGenerator';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import TextData from '../../workflow/TextData/TextData';
 import { IConnection, SidePanel, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
-import Evaluation from '../../workflow/Evaluation/Evaluation';
 import { useAtom, useAtomValue } from 'jotai';
-import { workflowSteps } from '../../state/workflowSettings';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
-import XAIBox from '../../workflow/XAI/XAI';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
-import { Outlet, useLocation, useNavigate, useOutlet, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useOutlet, useParams, useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
 import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
-import { useTranslation } from 'react-i18next';
 import { uiShowSidePanel } from '../../state/uiState';
 import { modelAtom } from '../../state/model';
 import { datasetAtom } from '../../state/data';
 import useOrientation from '../../utilities/useOrientation';
+import ChatOutput from '../../workflow/ChatOutput/ChatOutput';
+import Prompt from '../../workflow/Prompt/Prompt';
+import TrainerLink from './linkboxes/TrainerLink';
+import ProcessDataLink from './linkboxes/ProcessDataLink';
+import Tokeniser from '../../workflow/Tokeniser/Tokeniser';
+import ArchitectureLink from './linkboxes/Architecture';
+import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
+import Initialiser from './Initialiser';
+import CheckModel from '../../workflow/CheckModel/CheckModel';
+import TextDataLink from './linkboxes/TextDataLink';
 
 const CONNECTIONS: IConnection[] = [
-    { start: 'info', end: 'trainer', startPoint: 'right', endPoint: 'left' },
+    {
+        start: 'tokeniser',
+        end: 'trainer',
+        startPoint: 'bottom',
+        endPoint: 'top',
+        startOffset: 0.2,
+        endOffset: -0.2,
+    },
+    {
+        start: 'architecture',
+        end: 'tokeniser',
+        startPoint: 'bottom',
+        endPoint: 'top',
+        startOffset: 0.2,
+        endOffset: -0.2,
+    },
     {
         start: 'textData',
-        end: 'trainer',
+        end: 'tokeniser',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: -0.5,
+        startOffset: -0.5,
+    },
+    {
+        start: 'thread',
+        end: 'checkmodel',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: -0.5,
+        startOffset: -0.5,
+    },
+    {
+        start: 'thread',
+        end: 'textData',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: -0.5,
+        startOffset: -0.2,
+    },
+    { start: 'trainer', end: 'pretrained', startPoint: 'bottom', endPoint: 'top', startOffset: 0.2, endOffset: -0.2 },
+    {
+        start: 'pretrained',
+        end: 'prompt',
         startPoint: 'right',
         endPoint: 'left',
     },
-    { start: 'textData', end: 'textBrowser', startPoint: 'bottom', endPoint: 'top' },
-    { start: 'trainer', end: 'evaluation', startPoint: 'right', endPoint: 'left' },
-    { start: 'thread', end: 'trainer', startPoint: 'bottom', endPoint: 'top' },
-    {
-        start: 'thread',
-        end: 'generator',
-        startPoint: 'bottom',
-        endPoint: 'top',
-        startOffset: 0.6,
-    },
-    { start: 'generator', end: 'xai', startPoint: 'right', endPoint: 'left' },
 ];
 
 export function Component() {
-    const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
-    const [textDataset, setTextDataset] = useAtom(datasetAtom);
-    const steps = useAtomValue(workflowSteps);
+    const textDataset = useAtomValue(datasetAtom);
     const [conn, setConn] = useState<IConnection[]>(CONNECTIONS);
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const [params] = useSearchParams();
+    const { flow } = useParams();
     const [sidePanelOpen, setSidePanelOpen] = useAtom(uiShowSidePanel);
     const location = useLocation();
     const outlet = useOutlet();
@@ -100,58 +133,85 @@ export function Component() {
                 model.off('loaded', h);
             };
         }
-    }, [model, textDataset]);
+    }, [model]);
+
     useEffect(() => {
         setConn([...CONNECTIONS]);
-    }, [textDataset]);
+    }, [textDataset, flow]);
+
+    const isInputStage = flow === 'model' || flow === 'pretraindata';
+    const isOutputStage = !isInputStage;
 
     return performProbe && !detected ? (
         <DeviceProbe />
     ) : (
         <>
-            <AppBar />
+            <Initialiser />
+            <AppBar hideTitle />
             <div
                 className={style.mainContainer}
                 style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
             >
                 <div className={style.workspaceContainer}>
-                    <WorkflowLayout
-                        connections={conn}
-                        ignoredColumns={1}
-                    >
-                        <div
-                            className={style.modelRow}
-                            data-widget="container"
-                        >
-                            <h1>{t('model.languageModel')}</h1>
-                            <LanguageModel
-                                model={model ?? undefined}
-                                onModel={setModel}
-                            />
-                        </div>
-                        <section
-                            className={style.trainingGroup}
-                            data-widget="container"
-                        >
-                            <h1>{t('model.preTraining')}</h1>
-                            <div
+                    <WorkflowLayout connections={conn}>
+                        {isInputStage && (
+                            <section
+                                className={style.inputGroup}
                                 data-widget="container"
-                                className={style.widgetRow}
                             >
-                                <TextData
-                                    model={model ?? undefined}
-                                    dataset={textDataset}
-                                    onDatasetChange={setTextDataset}
-                                />
-                                <TextTrainer
-                                    model={model ?? undefined}
-                                    dataset={textDataset}
-                                />
-                                {steps.has('evaluation') && <Evaluation model={model ?? undefined} />}
-                            </div>
+                                <div
+                                    className={style.inputContainer}
+                                    data-widget="container"
+                                >
+                                    {flow === 'pretraindata' && <TextData />}
+                                    {flow === 'model' && <LanguageModel />}
+                                </div>
+                            </section>
+                        )}
+                        <section
+                            className={style.processGroup}
+                            data-widget="container"
+                        >
+                            {flow === 'model' && (
+                                <>
+                                    <CheckModel />
+                                    <TextDataLink />
+                                </>
+                            )}
+                            {flow === 'pretraindata' && (
+                                <>
+                                    <ArchitectureLink />
+                                    <Tokeniser />
+                                    <TrainerLink />
+                                </>
+                            )}
+                            {flow === 'pretrain' && (
+                                <>
+                                    <ProcessDataLink />
+                                    <TextTrainer />
+                                </>
+                            )}
+                            {flow === 'pretrain' && <PreTrainedModel />}
                         </section>
-                        <TextGenerator model={model ?? undefined} />
-                        {steps.has('xai') && <XAIBox model={model ?? undefined} />}
+                        {isOutputStage && (
+                            <section
+                                className={style.chatGroup}
+                                data-widget="container"
+                            >
+                                <div
+                                    className={style.chatOutputContainer}
+                                    data-widget="container"
+                                >
+                                    {flow === 'pretrain' && <ChatOutput />}
+                                </div>
+                                <div
+                                    className={style.promptGroup}
+                                    data-widget="container"
+                                >
+                                    {flow === 'pretrain' && <Prompt />}
+                                </div>
+                            </section>
+                        )}
                     </WorkflowLayout>
                 </div>
                 <SidePanel

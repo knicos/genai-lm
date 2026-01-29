@@ -4,17 +4,15 @@ import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SearchIcon from '@mui/icons-material/Search';
-import ProgressBox from './ProgressBox';
 
 interface Props {
     disabled?: boolean;
     onWrite: () => void;
     onUpload: () => void;
     onSearch: () => void;
-    totalSamples: number;
 }
 
-export default function DataMenu({ disabled, onWrite, onUpload, onSearch, totalSamples }: Props) {
+export default function DataMenu({ disabled, onWrite, onUpload, onSearch }: Props) {
     const { t } = useTranslation();
 
     return (
@@ -46,7 +44,6 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch, totalS
             >
                 {t('data.search')}
             </VerticalButton>
-            <ProgressBox totalSamples={totalSamples} />
         </BoxMenu>
     );
 }

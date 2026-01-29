@@ -21,7 +21,6 @@
     box-sizing: border-box;
     white-space: pre-wrap;
     word-break: break-word;
-    min-height: 6rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
 }
@@ -29,19 +28,17 @@
 .conversationList {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 1rem 3rem;
     margin: 0;
     box-sizing: border-box;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    height: 100%;
+    padding-bottom: 6rem;
 }
 
 .conversationList p {
     margin: 0.5rem 0;
-}
-
-.container {
-    height: 350px;
-    overflow-y: auto;
-    flex-grow: 1;
 }
 
 .cursor {

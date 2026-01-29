@@ -24,6 +24,7 @@
     align-items: center;
     color: white;
     min-height: 59px;
+    height: 80px;
 }
 
 .langBar {
@@ -33,6 +34,7 @@
     align-items: center;
     margin-right: 0.5rem;
     color: white;
+    flex-shrink: 0;
 }
 
 .langBar :global .MuiNativeSelect-root::before {
@@ -66,19 +68,27 @@
 
 .logo {
     background: primary;
-    padding-left: 0.5rem;
-    padding-right: 2rem;
+    /*padding-left: 0.5rem;
+    padding-right: 0.5rem;*/
     gap: 0.8rem;
     display: flex;
     align-items: center;
     color: white;
     text-decoration: none;
     align-self: stretch;
+    justify-content: center;
+    /*aspect-ratio: 1/1;*/
+    min-width: 80px;
+}
+
+.logo img {
+    margin-left: 16px;
+    margin-right: 16px;
 }
 
 .logo h1 {
     color: white;
-    margin: 0;
+    margin: 0 1.5rem 0 0;
 }
 
 .little {

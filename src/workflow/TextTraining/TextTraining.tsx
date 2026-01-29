@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TeachableLLM, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -21,14 +21,10 @@ import { useNavigate } from 'react-router-dom';
 import TrainingMenu from './TrainingMenu';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { sequencesToConversation } from '../../utilities/conversation';
+import { modelAtom } from '../../state/model';
+import { dataTokens } from '../../state/data';
 
 const CHECKPT_THRESHOLD = 3_000_000;
-
-interface Props {
-    model?: TeachableLLM;
-    dataset?: string[];
-}
 
 interface TrainingProgress {
     duration: number;
@@ -38,14 +34,16 @@ interface TrainingProgress {
     progress: number;
 }
 
-export default function TextTraining({ model, dataset }: Props) {
+export default function TextTraining() {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(trainerAtom);
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
-    const status = useModelStatus(model);
+    const model = useAtomValue(modelAtom);
+    const status = useModelStatus(model ?? undefined);
+    const dataset = useAtomValue(dataTokens);
     const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
     const maxSteps = settings.maxSteps;
@@ -57,12 +55,12 @@ export default function TextTraining({ model, dataset }: Props) {
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
+    const [totalSamples, setTotalSamples] = useState(0);
+    const [preparing, setPreparing] = useState(false);
 
     useWakeLock(training);
 
     const canTrain = !!model && !!dataset && dataset.length > 0 && status !== 'loading' && status !== 'busy';
-
-    const totalSamples = useMemo(() => (dataset ? dataset.reduce((acc, curr) => acc + curr.length, 0) : 0), [dataset]);
 
     useEffect(() => {
         setTrainingAnimation(training);
@@ -143,8 +141,7 @@ export default function TextTraining({ model, dataset }: Props) {
                 return;
             }
             if (!model.tokeniser.trained) {
-                await model.trainTokeniser(dataset);
-                await wait(10);
+                throw new Error('Model tokeniser is not trained.');
             }
 
             if (training) {
@@ -183,8 +180,13 @@ export default function TextTraining({ model, dataset }: Props) {
             };
             if (shouldPrepare) {
                 try {
-                    await trainer.prepare(sequencesToConversation(dataset, 'fsau'), trainingOptions);
-                } catch {
+                    //const task = new tasks.PretrainingTask(dataset);
+                    setPreparing(true);
+                    await trainer.prepare(dataset, trainingOptions);
+                    setPreparing(false);
+                    setTotalSamples(trainer.getTotalSamples());
+                } catch (err) {
+                    console.error('Error preparing training', err);
                     setMessage({
                         notice: t('training.errors.preparation'),
                         level: 'warning',
@@ -242,6 +244,7 @@ export default function TextTraining({ model, dataset }: Props) {
                         duration={trainingProgress?.duration || 0}
                         totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
                         remaining={Math.max(0, trainingProgress?.remaining || 0)}
+                        message={preparing ? t('training.preparing') : undefined}
                     />
                     <div className={style.stats}>
                         <NumberBox

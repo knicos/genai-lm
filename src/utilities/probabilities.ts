@@ -1,5 +1,9 @@
 import { CharTokeniser } from '@genai-fi/nanogpt';
-import { ProbabilityItem } from '../../components/TextHighlighter/TextHighlighter';
+
+export interface ProbabilityItem {
+    index: number;
+    probability: number;
+}
 
 export function createProbabilitiesForHead(
     attentionData: number[][][][][],

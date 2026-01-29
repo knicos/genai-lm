@@ -1,4 +1,4 @@
-import { DataEntry } from './DataListing';
+import { DataEntry } from '../../state/data';
 import { List, RowComponentProps } from 'react-window';
 import styleModule from './style.module.css';
 import { Button } from '@genai-fi/base';

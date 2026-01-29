@@ -2,9 +2,7 @@ import style from './style.module.css';
 import { IconButton, Switch, TextField, Tooltip } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import PlusOneIcon from '@mui/icons-material/PlusOne';
@@ -23,18 +21,7 @@ interface Props {
     onAutoModeChange?: (value: boolean) => void;
 }
 
-export default function Controls({
-    disable,
-    generate,
-    enableSettings,
-    autoMode,
-    prompt,
-    onShowSettings,
-    onGenerate,
-    onCopy,
-    onReset,
-    onAutoModeChange,
-}: Props) {
+export default function Controls({ disable, generate, autoMode, prompt, onGenerate, onCopy, onAutoModeChange }: Props) {
     const { t } = useTranslation();
     const [promptText, setPromptText] = useState<string>('');
 
@@ -81,18 +68,6 @@ export default function Controls({
                     />
                 </Tooltip>
                 <Tooltip
-                    title={t('generator.reset')}
-                    arrow
-                >
-                    <IconButton
-                        color="inherit"
-                        disabled={disable}
-                        onClick={onReset}
-                    >
-                        <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip
                     title={t('generator.copy')}
                     arrow
                 >
@@ -104,20 +79,6 @@ export default function Controls({
                         <ContentCopyIcon />
                     </IconButton>
                 </Tooltip>
-                {enableSettings && (
-                    <Tooltip
-                        title={t('generator.settingsTooltip')}
-                        arrow
-                    >
-                        <IconButton
-                            color="inherit"
-                            disabled={disable}
-                            onClick={onShowSettings}
-                        >
-                            <TuneIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
             </div>
         </div>
     );

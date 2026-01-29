@@ -1,3 +1,18 @@
+.modelThread {
+    background: #945fbf;
+    color: white;
+}
+
+.modelThread h1 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.modelThread h2 {
+    margin-left: 1rem;
+    color: white;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -8,7 +23,7 @@
     display: flex;
     padding: 0.5rem 1rem;
     box-sizing: border-box;
-    border-bottom: 1px solid #eee;
+    /*border-bottom: 1px solid #eee;*/
     width: 100%;
     justify-content: flex-start;
     gap: 0.5rem;
@@ -34,6 +49,11 @@
 }
 
 @media (max-width: 600px) {
+    .modelMenu {
+        flex-wrap: wrap;
+        padding: 1rem 0;
+        margin-left: 0.5rem;
+    }
     .spacer {
         display: none;
     }

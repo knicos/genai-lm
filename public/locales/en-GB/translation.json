@@ -43,6 +43,7 @@
         },
         "close": "Close",
         "ok": "OK",
+        "editStep": "Move to",
         "annotations": {
             "model": "Model",
             "data": "Data"
@@ -53,6 +54,14 @@
     },
     "deviceProbe": {
         "probing": "Checking your hardware..."
+    },
+    "workflow": {
+        "model": "Architecture",
+        "pretraindata": "Text Data",
+        "pretrain": "Pre-training",
+        "finetunedata": "Tuning Data",
+        "finetune": "Fine-tuning",
+        "deployment": "Deployment"
     },
     "data": {
         "title": "Training Data",
@@ -78,10 +87,15 @@
             "downloadLoadError": "There was an unknown error loading the downloaded file."
         }
     },
+    "checkmodel": {
+        "title": "Check Model",
+        "start": "Check",
+        "stop": "Stop"
+    },
     "model": {
         "parameters": "Parameters",
         "memory": "Memory",
-        "title": "Model",
+        "title": "Model Architecture",
         "create": "Create",
         "upload": "Upload",
         "tools": "Tools",
@@ -123,6 +137,7 @@
         "monitor": "Monitor",
         "visualize": "Visualise",
         "autoOutput": "Show Progress Text",
+        "preparing": "Tokenizing...",
         "errors": {
             "preparation": "More training data is needed, at least a few thousand samples.",
             "noModel": "Please load a model before training.",
@@ -136,9 +151,10 @@
         "generate": "Generate",
         "promptPlaceholder": "Optional prompt...",
         "settingsTooltip": "Generator Settings",
+        "settings": "Settings",
         "pause": "Pause",
         "editPlaceholder": "Type an optional prompt here...",
-        "reset": "Reset",
+        "reset": "New Chat",
         "copy": "Copy to Clipboard",
         "autoGenerateAriaLabel": "Toggle auto-generate",
         "autoGenerate": "Auto-generate",
@@ -207,5 +223,11 @@
         "modelIdle": "Waiting...",
         "nlayers": "{{N}} layers",
         "gradients": "Gradients"
+    },
+    "tokeniser": {
+        "title": "Process Data",
+        "start": "Tokenize",
+        "vocabulary": "Vocabulary",
+        "settings": "Settings"
     }
 }

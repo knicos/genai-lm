@@ -1,0 +1,127 @@
+@value secondaryLight from "@genai-fi/base/css/colours.module.css";
+
+.itemList {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.bgBar {
+    min-width: 20px;
+    height: 2px;
+    background: secondaryLight;
+}
+
+.item {
+    flex-shrink: 0;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    background: #333;
+    padding: 0.5rem;
+    border-radius: 8px;
+    color: white;
+    position: relative;
+    user-select: none;
+    transition:
+        background 0.3s ease,
+        color 0.3s ease;
+}
+
+.item a {
+    color: white;
+    text-decoration: none;
+}
+
+.item.selected {
+    background: white;
+    color: black;
+}
+
+.item.selected a {
+    color: black;
+}
+
+.item::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: -6px;
+    top: calc(50% - 8px);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid secondaryLight;
+    border-radius: 0;
+    background: none;
+}
+
+.item:first-child::before {
+    display: none;
+}
+
+/*.item::after {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    right: -6px;
+    top: calc(50% - 6px);
+    border-radius: 6px;
+    background: secondary;
+}*/
+
+.container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    align-self: stretch;
+    align-items: center;
+    overflow: hidden;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    justify-content: center;
+}
+
+.arrow {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    width: 3rem;
+    height: 100%;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.7;
+    transition:
+        opacity 0.3s ease,
+        background-color 0.3s ease,
+        font-size 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container:hover .arrow {
+    opacity: 1;
+}
+
+.arrow:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 3.5rem;
+}
+
+.arrow.left {
+    left: 0;
+    /*justify-content: flex-end;*/
+}
+
+.arrow.right {
+    right: 0;
+    /*justify-content: flex-start;*/
+}
