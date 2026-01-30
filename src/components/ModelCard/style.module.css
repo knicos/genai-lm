@@ -14,8 +14,21 @@
     left: 1rem;
 }
 
+.noneCard {
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 2px,
+            transparent 2px,
+            transparent 8px
+        ),
+        linear-gradient(135deg, #ebebeb 0%, #dddddd 50%, #cfcfcf 100%);
+}
+
 .untrained {
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.1) 0px,
             rgba(255, 255, 255, 0.1) 2px,
@@ -26,7 +39,8 @@
 }
 
 .trained {
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.1) 0px,
             rgba(255, 255, 255, 0.1) 2px,

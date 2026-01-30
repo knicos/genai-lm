@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { MANIFEST_URL, ModelManifest } from '../../workflow/LanguageModel/ModelSearch';
+import { MANIFEST_URL } from '../../components/ModelSearch/ModelSearch';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useAtom } from 'jotai';
 import { modelAtom } from '../../state/model';
 import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ModelManifest } from '../../components/ModelSearch/manifest';
 
 export default function Initialiser() {
     const { t } = useTranslation();

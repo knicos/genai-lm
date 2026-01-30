@@ -15,22 +15,8 @@
     align-items: center;
 }
 
-.headerBar {
-    display: flex;
-    align-items: center;
-    margin-top: 2rem;
-    padding: 0 2rem;
-}
-
 .spacer {
     width: 1rem;
-}
-
-.spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 50vh;
 }
 
 @media (max-width: 600px) {

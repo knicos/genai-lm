@@ -48,6 +48,8 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
         }
     };
 
+    const isNone = card.id === 'none';
+
     return (
         <Card
             onSelect={onSelect}
@@ -59,40 +61,46 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
             onClick={handleCreateModel}
             expandedContent={
                 <>
-                    <div className={`${style.sampleBox} ${card.trained ? style.trained : style.untrained}`}>
+                    <div
+                        className={`${style.sampleBox} ${isNone ? style.noneCard : card.trained ? style.trained : style.untrained}`}
+                    >
                         {card.example && <SampleWriter sample={card.example} />}
-                        <div className={style.sizeIcon}>
-                            <IconButton
-                                color="secondary"
-                                disabled={downloader !== null}
-                                onClick={(e: MouseEvent) => {
-                                    e.stopPropagation();
-                                    handleCreateModel();
-                                }}
-                            >
-                                {downloader && !done ? (
-                                    <CircularProgress />
-                                ) : done || used ? (
-                                    <CheckIcon
-                                        fontSize="inherit"
-                                        color="success"
-                                    />
-                                ) : (
-                                    <DownloadIcon fontSize="inherit" />
-                                )}
-                            </IconButton>
-                        </div>
+                        {!isNone && (
+                            <div className={style.sizeIcon}>
+                                <IconButton
+                                    color="secondary"
+                                    disabled={downloader !== null}
+                                    onClick={(e: MouseEvent) => {
+                                        e.stopPropagation();
+                                        handleCreateModel();
+                                    }}
+                                >
+                                    {downloader && !done ? (
+                                        <CircularProgress />
+                                    ) : done || used ? (
+                                        <CheckIcon
+                                            fontSize="inherit"
+                                            color="success"
+                                        />
+                                    ) : (
+                                        <DownloadIcon fontSize="inherit" />
+                                    )}
+                                </IconButton>
+                            </div>
+                        )}
                         <div className={style.infoContainer}>
-                            <ModelInfo
-                                config={card.config || {}}
-                                tokeniser={card.tokeniser || 'char'}
-                                showTokens={!hasTrainingStats}
-                                showLayers={!hasTrainingStats}
-                                showContextSize={!hasTrainingStats}
-                                trainingStats={hasTrainingStats ? card.trainingStats : undefined}
-                                showDuration={hasTrainingStats}
-                                showSamples={hasTrainingStats}
-                            />
+                            {!isNone && (
+                                <ModelInfo
+                                    config={card.config || {}}
+                                    tokeniser={card.tokeniser || 'char'}
+                                    showTokens={!hasTrainingStats}
+                                    showLayers={!hasTrainingStats}
+                                    showContextSize={!hasTrainingStats}
+                                    trainingStats={hasTrainingStats ? card.trainingStats : undefined}
+                                    showDuration={hasTrainingStats}
+                                    showSamples={hasTrainingStats}
+                                />
+                            )}
                         </div>
                     </div>
                     <div className={style.buttonRow}>
@@ -104,27 +112,37 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                 <>
                     <div
                         className={`${style.sampleBox} ${
-                            downloader || used ? style.disabledBG : card.trained ? style.trained : style.untrained
+                            isNone
+                                ? style.noneCard
+                                : downloader || used
+                                  ? style.disabledBG
+                                  : card.trained
+                                    ? style.trained
+                                    : style.untrained
                         }`}
                     >
                         {card.example && <div className={style.sampleText}>{card.example}</div>}
                         <div className={style.infoContainer}>
-                            <ModelInfo
-                                config={card.config || {}}
-                                tokeniser={card.tokeniser || 'char'}
-                                trainingStats={hasTrainingStats ? card.trainingStats : undefined}
-                                showDuration={hasTrainingStats}
-                                showLayers={!hasTrainingStats && !card.trained}
-                                showContextSize={!hasTrainingStats && !card.trained}
-                                showTokens={!hasTrainingStats}
-                            />
+                            {!isNone && (
+                                <ModelInfo
+                                    config={card.config || {}}
+                                    tokeniser={card.tokeniser || 'char'}
+                                    trainingStats={hasTrainingStats ? card.trainingStats : undefined}
+                                    showDuration={hasTrainingStats}
+                                    showLayers={!hasTrainingStats && !card.trained}
+                                    showContextSize={!hasTrainingStats && !card.trained}
+                                    showTokens={!hasTrainingStats}
+                                />
+                            )}
                         </div>
-                        <div
-                            className={style.sizeText}
-                            style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
-                        >
-                            {parameters >= 1 ? `${Math.round(parameters)}M` : `${parameters * 1000}K`}
-                        </div>
+                        {!isNone && (
+                            <div
+                                className={style.sizeText}
+                                style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
+                            >
+                                {parameters >= 1 ? `${Math.round(parameters)}M` : `${parameters * 1000}K`}
+                            </div>
+                        )}
                     </div>
                     <div className={style.buttonRow}>
                         <h2>{name}</h2>

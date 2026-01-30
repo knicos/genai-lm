@@ -24,9 +24,9 @@ export function Component() {
                     aria-labelledby="batch-label"
                     value={settings.batchSize}
                     onChange={(_, value) => setSettings({ ...settings, batchSize: value as number })}
-                    min={4}
+                    min={2}
                     max={64}
-                    step={4}
+                    step={2}
                     valueLabelDisplay="auto"
                 />
             </FormControl>

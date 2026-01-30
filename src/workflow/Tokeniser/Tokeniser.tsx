@@ -65,6 +65,7 @@ export default function Tokeniser() {
                                     .then((newTokens) => {
                                         setTokens(newTokens);
                                         setTokenising(false);
+                                        console.log('MODEL', model);
                                     });
                             }
                         }}

@@ -1,0 +1,14 @@
+.headerBar {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 0 2rem;
+    gap: 2rem;
+}
+
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}

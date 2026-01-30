@@ -1,51 +1,84 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dialog, DialogContent, FormControl, IconButton, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+    Checkbox,
+    Dialog,
+    DialogContent,
+    FormControl,
+    FormControlLabel,
+    IconButton,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+} from '@mui/material';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import CardView from '../../components/CardView/CardView';
-import ModelCard from '../../components/ModelCard/ModelCard';
-import { RowSet } from '../../components/CardRow/CardRow';
-import { ModelCardItem } from '../../components/ModelCard/type';
+import CardView from '../CardView/CardView';
+import ModelCard from '../ModelCard/ModelCard';
+import { RowSet } from '../CardRow/CardRow';
+import { ModelCardItem } from '../ModelCard/type';
 import Downloader from '../../utilities/downloader';
-import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
+import DownloadProgress from '../DownloadProgress/DownloadProgress';
 import { Spinner } from '@genai-fi/base';
 import { useAtom } from 'jotai';
 import { downloadsAtom } from '../../state/data';
+import { configMatch } from './manifest';
 
 export const MANIFEST_URL = 'https://store.gen-ai.fi/llm/modelManifest.json';
-
-export interface ModelManifest {
-    models: ModelCardItem[];
-    categories: Record<string, { name: string; modelIds: string[] }[]>;
-    languages: Record<string, string>;
-}
-
-function groupByCategory(lang: string, manifest: ModelManifest | null): RowSet<ModelCardItem>[] {
-    if (!manifest) return [];
-    const itemMap = new Map(manifest.models.map((item) => [item.id, item]));
-    return (manifest.categories[lang] || []).map((cat) => ({
-        title: cat.name,
-        cards: cat.modelIds.map((id) => itemMap.get(id)).filter((item): item is ModelCardItem => item !== undefined),
-    }));
-}
 
 interface Props {
     model?: TeachableLLM;
     onModel(model: TeachableLLM): void;
     onClose: () => void;
-    selectedSet?: Set<string>;
+    dataRows: RowSet<ModelCardItem>[];
+    langs: { code: string; name: string }[];
+    setLang: (lang: string) => void;
+    lang: string;
+    limitToModelArchitecture?: boolean;
 }
 
-export default function ModelSearch({ model, onModel, onClose, selectedSet }: Props) {
-    const { t, i18n } = useTranslation();
-    const [lang, setLang] = useState(i18n.language.split('-')[0]);
-    const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
-    //const [manifest, setManifest] = useState<DataSetManifest | null>(null);
-    const [dataRows, setDataRows] = useState<RowSet<ModelCardItem>[]>([]);
+export default function ModelSearch({
+    model,
+    onModel,
+    onClose,
+    dataRows,
+    langs,
+    setLang,
+    lang,
+    limitToModelArchitecture,
+}: Props) {
+    const { t } = useTranslation();
     const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [open, setOpen] = useState(true);
+    const [includeAll, setIncludeAll] = useState(false);
+
+    const selectedSet = model && model.meta.id ? new Set([model.meta.id]) : undefined;
+
+    const filteredRows = useMemo(
+        () =>
+            includeAll || !limitToModelArchitecture
+                ? dataRows
+                : dataRows.map((row) => {
+                      const newCards = row.cards.filter((card) => {
+                          if (!model || !model.config || !card.config) return true;
+                          return configMatch(card.config, model.config);
+                      });
+                      if (newCards.length === 0) {
+                          newCards.push({
+                              id: 'none',
+                              name: t('model.noModelsFound'),
+                              trained: false,
+                              parameters: 0,
+                          });
+                      }
+                      return {
+                          ...row,
+                          cards: newCards,
+                      };
+                  }),
+        [dataRows, model, includeAll, limitToModelArchitecture, t]
+    );
 
     useEffect(() => {
         if (!open) {
@@ -55,16 +88,6 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
             return () => clearTimeout(timer);
         }
     }, [open, onClose]);
-
-    useEffect(() => {
-        fetch(MANIFEST_URL)
-            .then((res) => res.json())
-            .then((data: ModelManifest) => {
-                setDataRows(groupByCategory(lang, data));
-                setLangs(Object.entries(data.languages).map(([code, name]) => ({ code, name })));
-            })
-            .catch(() => setDataRows([]));
-    }, [lang]);
 
     const handleSelect = useCallback(
         (card: ModelCardItem, downloader?: Downloader) => {
@@ -133,6 +156,18 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                             </Select>
                         </FormControl>
                     )}
+                    {limitToModelArchitecture && (
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={includeAll}
+                                    onChange={(_, checked) => setIncludeAll(checked)}
+                                />
+                            }
+                            label={t('model.includeAll')}
+                        />
+                    )}
+
                     <DownloadProgress downloads={downloads} />
                     <div style={{ flexGrow: 1 }} />
                     <IconButton
@@ -148,7 +183,7 @@ export default function ModelSearch({ model, onModel, onClose, selectedSet }: Pr
                     </div>
                 )}
                 <CardView
-                    data={dataRows}
+                    data={filteredRows}
                     onSelect={handleSelect}
                     selectedSet={selectedSet}
                     CardComponent={ModelCard}

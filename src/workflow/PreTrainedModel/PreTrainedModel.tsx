@@ -6,12 +6,12 @@ import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import ModelSearch from '../LanguageModel/ModelSearch';
 import useModelBusy from '../../utilities/useModelBusy';
 import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
 import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { modelAtom } from '../../state/model';
+import SearchPretrained from './SearchPretrained';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 export default function PreTrainedModel() {
@@ -114,11 +114,10 @@ export default function PreTrainedModel() {
                 }}
             />
             {showSearch && (
-                <ModelSearch
+                <SearchPretrained
                     onClose={() => setShowSearch(false)}
                     onModel={setModel}
                     model={model ?? undefined}
-                    selectedSet={model && model.meta.id ? new Set([model.meta.id]) : undefined}
                 />
             )}
             <div className={style.container}>

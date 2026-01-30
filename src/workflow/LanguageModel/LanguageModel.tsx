@@ -8,13 +8,13 @@ import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import ModelSearch from './ModelSearch';
 import useModelBusy from '../../utilities/useModelBusy';
 import { saveAs } from 'file-saver';
 import Tools from './Tools';
 import logger from '../../utilities/logger';
 import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { modelAtom } from '../../state/model';
+import SearchUntrained from './SearchUntrained';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 export default function LanguageModel() {
@@ -107,11 +107,10 @@ export default function LanguageModel() {
                 }}
             />
             {showSearch && (
-                <ModelSearch
+                <SearchUntrained
                     onClose={() => setShowSearch(false)}
                     onModel={setModel}
                     model={model ?? undefined}
-                    selectedSet={model && model.meta.id ? new Set([model.meta.id]) : undefined}
                 />
             )}
             {showTools && <Tools onClose={() => setShowTools(false)} />}

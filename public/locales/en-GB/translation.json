@@ -118,7 +118,9 @@
             "next": "Next"
         },
         "preTraining": "Pre-Training",
-        "defaultName": "Your Model"
+        "defaultName": "Your Model",
+        "includeAll": "Include different architectures",
+        "noModelsFound": "No models found"
     },
     "training": {
         "title": "Training",
