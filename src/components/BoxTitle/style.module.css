@@ -10,6 +10,7 @@
     border-top-right-radius: 6px;
     overflow: hidden;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 .infoTitle {
@@ -56,7 +57,7 @@
     border-bottom: 1px solid #eee;
     width: 100%;
     justify-content: flex-start;
-    gap: 0.5rem;
+    /*gap: 0.5rem;*/
     align-items: center;
 }
 

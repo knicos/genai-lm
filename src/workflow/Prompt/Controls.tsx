@@ -1,8 +1,7 @@
 import style from './style.module.css';
-import { IconButton, Switch, TextField, Tooltip } from '@mui/material';
+import { Switch, TextField, Tooltip } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import PlusOneIcon from '@mui/icons-material/PlusOne';
@@ -16,12 +15,11 @@ interface Props {
     prompt?: boolean;
     onShowSettings: () => void;
     onGenerate: (prompt?: string) => void;
-    onCopy: () => void;
     onReset: () => void;
     onAutoModeChange?: (value: boolean) => void;
 }
 
-export default function Controls({ disable, generate, autoMode, prompt, onGenerate, onCopy, onAutoModeChange }: Props) {
+export default function Controls({ disable, generate, autoMode, prompt, onGenerate, onAutoModeChange }: Props) {
     const { t } = useTranslation();
     const [promptText, setPromptText] = useState<string>('');
 
@@ -66,18 +64,6 @@ export default function Controls({ disable, generate, autoMode, prompt, onGenera
                         aria-label={t('generator.autoGenerateAriaLabel')}
                         color="success"
                     />
-                </Tooltip>
-                <Tooltip
-                    title={t('generator.copy')}
-                    arrow
-                >
-                    <IconButton
-                        color="inherit"
-                        disabled={disable}
-                        onClick={onCopy}
-                    >
-                        <ContentCopyIcon />
-                    </IconButton>
                 </Tooltip>
             </div>
         </div>

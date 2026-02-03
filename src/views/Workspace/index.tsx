@@ -26,6 +26,8 @@ import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
 import Initialiser from './Initialiser';
 import CheckModel from '../../workflow/CheckModel/CheckModel';
 import TextDataLink from './linkboxes/TextDataLink';
+import InstructData from '../../workflow/InstructData/InstructData';
+import FineTuneLink from './linkboxes/FineTuneLink';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -75,7 +77,21 @@ const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
     },
+    {
+        start: 'trainer',
+        end: 'finetune',
+        startPoint: 'bottom',
+        endPoint: 'top',
+    },
+    {
+        start: 'tuneData',
+        end: 'finetune',
+        startPoint: 'right',
+        endPoint: 'left',
+    },
 ];
+
+type flowType = 'model' | 'pretraindata' | 'pretrain' | 'finetunedata' | 'finetune' | 'deployment';
 
 export function Component() {
     const [model, setModel] = useAtom(modelAtom);
@@ -84,7 +100,7 @@ export function Component() {
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const [params] = useSearchParams();
-    const { flow } = useParams();
+    const { flow } = useParams() as { flow: flowType };
     const [sidePanelOpen, setSidePanelOpen] = useAtom(uiShowSidePanel);
     const location = useLocation();
     const outlet = useOutlet();
@@ -139,7 +155,7 @@ export function Component() {
         setConn([...CONNECTIONS]);
     }, [textDataset, flow]);
 
-    const isInputStage = flow === 'model' || flow === 'pretraindata';
+    const isInputStage = flow === 'model' || flow === 'pretraindata' || flow === 'finetunedata';
     const isOutputStage = !isInputStage;
 
     return performProbe && !detected ? (
@@ -165,6 +181,7 @@ export function Component() {
                                 >
                                     {flow === 'pretraindata' && <TextData />}
                                     {flow === 'model' && <LanguageModel />}
+                                    {flow === 'finetunedata' && <InstructData />}
                                 </div>
                             </section>
                         )}
@@ -192,6 +209,12 @@ export function Component() {
                                 </>
                             )}
                             {flow === 'pretrain' && <PreTrainedModel />}
+                            {flow === 'finetunedata' && (
+                                <>
+                                    <TrainerLink />
+                                    <FineTuneLink />
+                                </>
+                            )}
                         </section>
                         {isOutputStage && (
                             <section

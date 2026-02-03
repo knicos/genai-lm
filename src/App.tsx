@@ -113,6 +113,10 @@ export const routes = createRoutesFromElements(
                 path="gradients"
                 lazy={() => import('./views/Gradients')}
             />
+            <Route
+                path="auto-tune"
+                lazy={() => import('./views/AutoTune')}
+            />
         </Route>
     </Route>
 );

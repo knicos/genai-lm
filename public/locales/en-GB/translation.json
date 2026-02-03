@@ -12,6 +12,8 @@
         "settings": {
             "title": "Settings",
             "general": "General",
+            "developer": "Developer",
+            "llmAPI": "LLM API",
             "training": "Training Parameters",
             "generator": "Generator",
             "showModelSelect": "Show Models",
@@ -39,7 +41,9 @@
             "developerMode": "Developer Mode",
             "mixedPrecision": "Use Mixed Precision",
             "lowPowerMode": "Low Power Mode",
-            "disableSubgroups": "Disable Subgrouping"
+            "disableSubgroups": "Disable Subgrouping",
+            "apiEndpoint": "API Endpoint",
+            "apiKey": "API Key"
         },
         "close": "Close",
         "ok": "OK",
@@ -123,7 +127,7 @@
         "noModelsFound": "No models found"
     },
     "training": {
-        "title": "Training",
+        "title": "Pre-Training",
         "samples": "Samples",
         "start": "Train",
         "stop": "Pause",
@@ -231,5 +235,26 @@
         "start": "Tokenize",
         "vocabulary": "Vocabulary",
         "settings": "Settings"
+    },
+    "instruct": {
+        "title": "Tuning Data",
+        "autoTune": "Auto Tune",
+        "newConversation": "New Data",
+        "conversations": "Conversations ({{count}})",
+        "upload": "Open",
+        "download": "Save",
+        "autoTunePrompt": "Template prompt",
+        "generateTuneData": "Generate Conversations",
+        "deleteAll": "Delete All"
+    },
+    "conversation": {
+        "userPlaceholder": "Write a message...",
+        "botPlaceholder": "AI response...",
+        "save": "Update",
+        "cancel": "Cancel",
+        "addMessage": "Add Message"
+    },
+    "finetune": {
+        "title": "Fine-tuning"
     }
 }

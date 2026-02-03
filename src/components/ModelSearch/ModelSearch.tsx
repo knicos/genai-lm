@@ -61,7 +61,7 @@ export default function ModelSearch({
                 ? dataRows
                 : dataRows.map((row) => {
                       const newCards = row.cards.filter((card) => {
-                          if (!model || !model.config || !card.config) return true;
+                          if (!model || !model.loaded || !card.config) return true;
                           return configMatch(card.config, model.config);
                       });
                       if (newCards.length === 0) {

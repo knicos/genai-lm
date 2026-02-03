@@ -5,7 +5,6 @@ import { generatorAtom, generatorSettings } from '../../state/generator';
 import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
-import { flattenConversation } from '../../utilities/conversation';
 import { useNavigate } from 'react-router-dom';
 import useModelStatus from '../../utilities/useModelStatus';
 import { modelAtom } from '../../state/model';
@@ -46,9 +45,9 @@ export default function Prompt() {
 
         //const currentText = generator.getConversation();
 
-        if (prompt && prompt.length > 0) {
-            text.push({ role: 'user', content: prompt });
-        }
+        //if (prompt && prompt.length > 0) {
+        text.push({ role: 'user', content: prompt ?? '' });
+        //}
 
         const options = {
             maxLength,
@@ -59,11 +58,13 @@ export default function Prompt() {
             noCache: false,
         };
 
+        const filteredText = text.filter((part) => part.content.trim().length > 0);
+
         try {
-            if (text.length === 0) {
+            if (filteredText.length === 0) {
                 await generator.generate(options);
             } else {
-                await generator.generate(text, options);
+                await generator.generate(filteredText, options);
             }
 
             setGenerate(false);
@@ -89,7 +90,6 @@ export default function Prompt() {
                 onGenerate={(prompt) => doGenerate(autoMode ? maxLength : 1, prompt)}
                 disable={disable}
                 generate={generate}
-                onCopy={() => navigator.clipboard.writeText(flattenConversation(generator?.getConversation() || []))}
                 onReset={() => {
                     if (generate && generator) {
                         generator.stop();

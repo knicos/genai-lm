@@ -1,11 +1,46 @@
 @value secondary from "@genai-fi/base/css/colours.module.css";
 
+.userContainer {
+    align-self: flex-end;
+    max-width: 70%;
+    min-width: 40%;
+    display: flex;
+    align-items: flex-start;
+}
+.userContainer.editing {
+    width: 100%;
+    max-width: unset;
+    min-width: unset;
+}
+
+.userActions {
+    margin-top: 0.5rem;
+    display: flex;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.userContainer:hover .userActions {
+    visibility: visible;
+    opacity: 1;
+}
+.userActions.editable {
+    visibility: visible;
+    opacity: 1;
+}
+
+.editActions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
 .userItem {
     border-radius: 20px;
     border-top-right-radius: 4px;
     background-color: rgba(0, 130, 151, 0.1);
     padding: 1rem;
-    align-self: flex-end;
     white-space: pre-wrap;
     word-break: break-word;
     margin: 0.5rem;
@@ -15,13 +50,35 @@
     opacity: 0.8;
 }
 
+.userEditing {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .assistantItem {
     padding: 1rem;
     width: 100%;
     box-sizing: border-box;
     white-space: pre-wrap;
     word-break: break-word;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+.assistantItem.injected {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.assistantEditing {
     margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.assistantActions {
+    margin-top: 0;
+    display: flex;
     margin-bottom: 1rem;
 }
 
@@ -32,13 +89,18 @@
     margin: 0;
     box-sizing: border-box;
     overflow-y: auto;
-    scrollbar-width: thin;
+    /*scrollbar-width: thin;*/
     height: 100%;
     padding-bottom: 6rem;
 }
 
 .conversationList p {
     margin: 0.5rem 0;
+}
+
+.conversationList :global .MuiInputBase-root {
+    line-height: initial;
+    padding: 1rem;
 }
 
 .cursor {
@@ -56,4 +118,10 @@
 .cursor.active {
     background-color: secondary;
     animation: unset;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
 }

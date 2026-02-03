@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import Downloader from '../utilities/downloader';
+import { Conversation } from '@genai-fi/nanogpt';
 
 export interface DataEntry {
     id: string;
@@ -26,3 +27,5 @@ export const dataTokensReady = atom<boolean>((get) => {
     const tokens = get(dataTokens);
     return tokens !== null && tokens.length > 0;
 });
+
+export const conversationDataAtom = atom<Conversation[][]>([]);
