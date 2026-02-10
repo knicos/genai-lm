@@ -1,9 +1,8 @@
 import Box from '../BoxTitle/Box';
 import BoxTitle from '../BoxTitle/BoxTitle';
-import { BoxStatus } from '../StatusBox/StatusBox';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import MultipleStopIcon from '@mui/icons-material/MultipleStop';
+import NextPlanIcon from '@mui/icons-material/NextPlan';
 import { IconButton } from '@mui/material';
 
 interface Props {
@@ -12,10 +11,10 @@ interface Props {
     widget: string;
     active?: boolean;
     disabled?: boolean;
-    status: BoxStatus;
+    flip?: boolean;
 }
 
-export default function BoxLink({ title, link, widget, active, disabled, status }: Props) {
+export default function BoxLink({ title, link, widget, active, disabled, flip }: Props) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -28,7 +27,6 @@ export default function BoxLink({ title, link, widget, active, disabled, status 
         >
             <BoxTitle
                 title={title}
-                status={status}
                 style={{ borderBottom: 'none' }}
                 button={
                     <IconButton
@@ -36,7 +34,11 @@ export default function BoxLink({ title, link, widget, active, disabled, status 
                         onClick={() => navigate(`/workspace/${link}`)}
                         color="primary"
                     >
-                        <MultipleStopIcon color="primary" />
+                        <NextPlanIcon
+                            style={{ transform: flip ? 'scale(-1, 1)' : 'none' }}
+                            fontSize="large"
+                            color="secondary"
+                        />
                     </IconButton>
                 }
             ></BoxTitle>

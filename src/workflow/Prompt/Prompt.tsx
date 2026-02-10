@@ -9,7 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import useModelStatus from '../../utilities/useModelStatus';
 import { modelAtom } from '../../state/model';
 
-export default function Prompt() {
+interface Props {
+    showPromptInput?: boolean;
+}
+
+export default function Prompt({ showPromptInput }: Props) {
     const { t } = useTranslation();
     const generator = useAtomValue(generatorAtom);
     const [generate, setGenerate] = useState(false);
@@ -45,9 +49,9 @@ export default function Prompt() {
 
         //const currentText = generator.getConversation();
 
-        //if (prompt && prompt.length > 0) {
-        text.push({ role: 'user', content: prompt ?? '' });
-        //}
+        if (prompt && prompt.length > 0) {
+            text.push({ role: 'user', content: prompt ?? '' });
+        }
 
         const options = {
             maxLength,
@@ -56,6 +60,7 @@ export default function Prompt() {
             includeProbabilities: showProbabilities,
             topP: topP > 0 ? topP : undefined,
             noCache: false,
+            nonConversational: !showPromptInput && !showPrompt,
         };
 
         const filteredText = text.filter((part) => part.content.trim().length > 0);
@@ -86,7 +91,12 @@ export default function Prompt() {
             data-testid="textgenerator"
         >
             <Controls
-                prompt={showPrompt}
+                prompt={showPrompt || showPromptInput}
+                onStop={() => {
+                    if (busyRef.current && generator) {
+                        generator.stop();
+                    }
+                }}
                 onGenerate={(prompt) => doGenerate(autoMode ? maxLength : 1, prompt)}
                 disable={disable}
                 generate={generate}

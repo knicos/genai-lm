@@ -43,7 +43,15 @@
             "lowPowerMode": "Low Power Mode",
             "disableSubgroups": "Disable Subgrouping",
             "apiEndpoint": "API Endpoint",
-            "apiKey": "API Key"
+            "apiKey": "API Key",
+            "developerOptions": "Developer Options",
+            "loraConfig": "LoRA",
+            "loraRank": "LoRA Rank",
+            "sftModeLora": "Use LoRA for fine-tuning",
+            "sftMode": "Fine-tuning Mode",
+            "sftModeLastLayer": "Fine-tune Last Layer",
+            "sftModeFull": "Fine-tune Full Model",
+            "loraVariables": "Variables"
         },
         "close": "Close",
         "ok": "OK",
@@ -61,9 +69,8 @@
     },
     "workflow": {
         "model": "Architecture",
-        "pretraindata": "Text Data",
+        "pretraindata": "Data",
         "pretrain": "Pre-training",
-        "finetunedata": "Tuning Data",
         "finetune": "Fine-tuning",
         "deployment": "Deployment"
     },
@@ -99,7 +106,7 @@
     "model": {
         "parameters": "Parameters",
         "memory": "Memory",
-        "title": "Model Architecture",
+        "title": "Architecture",
         "create": "Create",
         "upload": "Upload",
         "tools": "Tools",
@@ -255,6 +262,8 @@
         "addMessage": "Add Message"
     },
     "finetune": {
-        "title": "Fine-tuning"
+        "title": "Fine-tuning",
+        "start": "Tune",
+        "stop": "Stop"
     }
 }

@@ -27,14 +27,16 @@ import Initialiser from './Initialiser';
 import CheckModel from '../../workflow/CheckModel/CheckModel';
 import TextDataLink from './linkboxes/TextDataLink';
 import InstructData from '../../workflow/InstructData/InstructData';
+import TuneTraining from '../../workflow/TuneTraining/TuneTraining';
+import DeployLink from './linkboxes/DeployLink';
 import FineTuneLink from './linkboxes/FineTuneLink';
 
 const CONNECTIONS: IConnection[] = [
     {
         start: 'tokeniser',
         end: 'trainer',
-        startPoint: 'bottom',
-        endPoint: 'top',
+        startPoint: 'right',
+        endPoint: 'left',
         startOffset: 0.2,
         endOffset: -0.2,
     },
@@ -78,20 +80,26 @@ const CONNECTIONS: IConnection[] = [
         endPoint: 'left',
     },
     {
-        start: 'trainer',
-        end: 'finetune',
+        start: 'pretrained',
+        end: 'finetuner',
         startPoint: 'bottom',
         endPoint: 'top',
     },
     {
         start: 'tuneData',
-        end: 'finetune',
+        end: 'finetuner',
+        startPoint: 'right',
+        endPoint: 'left',
+    },
+    {
+        start: 'finetuner',
+        end: 'deploy',
         startPoint: 'right',
         endPoint: 'left',
     },
 ];
 
-type flowType = 'model' | 'pretraindata' | 'pretrain' | 'finetunedata' | 'finetune' | 'deployment';
+type flowType = 'model' | 'pretraindata' | 'pretrain' | 'finetune' | 'deployment';
 
 export function Component() {
     const [model, setModel] = useAtom(modelAtom);
@@ -155,7 +163,7 @@ export function Component() {
         setConn([...CONNECTIONS]);
     }, [textDataset, flow]);
 
-    const isInputStage = flow === 'model' || flow === 'pretraindata' || flow === 'finetunedata';
+    const isInputStage = flow === 'model' || flow === 'pretraindata' || flow === 'finetune';
     const isOutputStage = !isInputStage;
 
     return performProbe && !detected ? (
@@ -181,7 +189,7 @@ export function Component() {
                                 >
                                     {flow === 'pretraindata' && <TextData />}
                                     {flow === 'model' && <LanguageModel />}
-                                    {flow === 'finetunedata' && <InstructData />}
+                                    {flow === 'finetune' && <InstructData />}
                                 </div>
                             </section>
                         )}
@@ -197,23 +205,65 @@ export function Component() {
                             )}
                             {flow === 'pretraindata' && (
                                 <>
-                                    <ArchitectureLink />
-                                    <Tokeniser />
-                                    <TrainerLink />
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <ArchitectureLink flip />
+                                        <Tokeniser />
+                                    </div>
+
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <TrainerLink />
+                                    </div>
                                 </>
                             )}
                             {flow === 'pretrain' && (
                                 <>
-                                    <ProcessDataLink />
-                                    <TextTrainer />
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <ProcessDataLink flip />
+                                    </div>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <TextTrainer />
+                                        <PreTrainedModel />
+                                    </div>
                                 </>
                             )}
-                            {flow === 'pretrain' && <PreTrainedModel />}
-                            {flow === 'finetunedata' && (
+                            {flow === 'finetune' && (
                                 <>
-                                    <TrainerLink />
-                                    <FineTuneLink />
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <TrainerLink />
+                                        <PreTrainedModel />
+                                        <TuneTraining />
+                                    </div>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <DeployLink />
+                                    </div>
                                 </>
+                            )}
+                            {flow === 'deployment' && (
+                                <div
+                                    data-widget="container"
+                                    className={style.subgroup}
+                                >
+                                    <FineTuneLink flip />
+                                    <PreTrainedModel />
+                                </div>
                             )}
                         </section>
                         {isOutputStage && (
@@ -225,13 +275,14 @@ export function Component() {
                                     className={style.chatOutputContainer}
                                     data-widget="container"
                                 >
-                                    {flow === 'pretrain' && <ChatOutput />}
+                                    {(flow === 'pretrain' || flow === 'deployment') && <ChatOutput />}
                                 </div>
                                 <div
                                     className={style.promptGroup}
                                     data-widget="container"
                                 >
                                     {flow === 'pretrain' && <Prompt />}
+                                    {flow === 'deployment' && <Prompt showPromptInput />}
                                 </div>
                             </section>
                         )}

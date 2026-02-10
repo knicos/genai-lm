@@ -1,9 +1,9 @@
 import { atomWithStorage } from 'jotai/utils';
 import { storage } from './storage';
 import { atom } from 'jotai';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { ITrainerOptions, TeachableLLM } from '@genai-fi/nanogpt';
 
-interface TrainingSettings {
+interface TrainingSettings extends ITrainerOptions {
     batchSize: number;
     maxSteps: number;
     learningRate: number;
@@ -28,3 +28,25 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
 
 type Trainer = ReturnType<TeachableLLM['trainer']>;
 export const trainerAtom = atom<Trainer | null>(null);
+
+export const tunerSettings = atomWithStorage<TrainingSettings>(
+    'tunerSettings',
+    {
+        batchSize: 2,
+        maxSteps: 3000000,
+        learningRate: 1e-4,
+        outputText: true,
+        disableCheckpointing: false,
+        gradientMetrics: false,
+        mixedPrecision: true,
+        loraConfig: {
+            rank: 4,
+            alpha: 8,
+            variables: ['*'],
+        },
+        sftMode: 'last-layer',
+    },
+    storage
+);
+
+export const tunerAtom = atom<Trainer | null>(null);

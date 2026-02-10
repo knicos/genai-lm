@@ -4,7 +4,11 @@ import { useAtomValue } from 'jotai';
 import useModelLoaded from '../../../utilities/useModelLoaded';
 import { modelAtom } from '../../../state/model';
 
-export default function FineTuneLink() {
+interface Props {
+    flip?: boolean;
+}
+
+export default function FineTuneLink({ flip }: Props) {
     const model = useAtomValue(modelAtom);
     const ready = useModelLoaded(model ?? undefined);
     const { t } = useTranslation();
@@ -13,8 +17,8 @@ export default function FineTuneLink() {
             active={ready}
             link="finetune"
             title={t('finetune.title')}
-            status={ready ? 'waiting' : 'disabled'}
             widget="finetune"
+            flip={flip}
         />
     );
 }

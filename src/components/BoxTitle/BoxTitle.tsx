@@ -20,7 +20,7 @@ interface Props {
     title: string;
     placeholder?: string;
     button?: React.ReactNode;
-    status: BoxStatus;
+    status?: BoxStatus;
     style?: React.CSSProperties;
     dark?: boolean;
     setTitle?: (title: string) => void;
@@ -101,10 +101,12 @@ export default function BoxTitle({ title, button, status, style, dark, setTitle,
                     )}
                 </h2>
                 {!isNarrow && button}
-                <StatusBox
-                    status={status}
-                    dark={dark}
-                />
+                {status !== undefined && (
+                    <StatusBox
+                        status={status}
+                        dark={dark}
+                    />
+                )}
             </div>
             {isNarrow && button}
         </>

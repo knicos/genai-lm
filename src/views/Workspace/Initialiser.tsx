@@ -54,7 +54,7 @@ export default function Initialiser() {
                                     return;
                                 }
                                 const file = new File([blob], `${card.id}.zip`, { type: 'application/zip' });
-                                const newModel = TeachableLLM.loadModel(file);
+                                const newModel = TeachableLLM.loadModel(file, { sourceURL: card.url });
                                 modelRef.current = newModel;
                                 newModel.meta.id = card.id;
                                 newModel.meta.name = card.name;

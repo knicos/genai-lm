@@ -1,6 +1,21 @@
 .modelThread {
     background: #945fbf;
     color: white;
+    border-radius: 20px;
+}
+
+.modelThread :global .MuiOutlinedInput-root {
+    background: transparent;
+    color: white;
+}
+
+.modelThread input {
+    font-size: 1.1rem;
+    padding: 0.1rem 0.5rem;
+}
+
+.modelThread input:focus {
+    border: 2px solid white;
 }
 
 .modelThread h1 {

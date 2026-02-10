@@ -1,14 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import BoxLink from '../../../components/BoxLink/BoxLink';
 
-export default function ProcessDataLink() {
+interface Props {
+    flip?: boolean;
+}
+
+export default function ProcessDataLink({ flip }: Props) {
     const { t } = useTranslation();
     return (
         <BoxLink
             link="pretraindata"
-            title={t('tokeniser.title')}
-            status="waiting"
+            title={t('workflow.pretraindata')}
             widget="tokeniser"
+            flip={flip}
         />
     );
 }

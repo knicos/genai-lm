@@ -68,7 +68,6 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: 
                             { id: 'model' },
                             { id: 'pretraindata' },
                             { id: 'pretrain' },
-                            { id: 'finetunedata' },
                             { id: 'finetune' },
                             { id: 'deployment' },
                         ]}

@@ -11,9 +11,9 @@ import logger from '../../utilities/logger';
 import { Notice } from '../../components/BoxTitle/BoxNotice';
 import { wait } from '../../utilities/wait';
 import { useTranslation } from 'react-i18next';
-import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
+import { conversationDataAtom } from '../../state/data';
 
 export default function ChatOutput() {
     const { t } = useTranslation();
@@ -25,6 +25,7 @@ export default function ChatOutput() {
     const [messages, setMessage] = useState<Notice | null>(null);
     const { topP } = useAtomValue(generatorSettings);
     const navigate = useNavigate();
+    const conversations = useAtomValue(conversationDataAtom);
 
     const ready = status !== 'loading';
 
@@ -43,14 +44,29 @@ export default function ChatOutput() {
                     state.count++;
                     if (state.count % 2 !== 0) return;
                     try {
-                        const finalText = await generator.generate({
-                            maxLength: 200,
-                            temperature: 1,
-                            includeProbabilities: false,
-                            topP: topP > 0 ? topP : undefined,
-                        });
-                        setText([...finalText]);
-                        logger.log({ action: 'auto_generated_text', text: finalText });
+                        if (conversations?.length === 0) {
+                            const finalText = await generator.generate({
+                                maxLength: 200,
+                                temperature: 1,
+                                includeProbabilities: false,
+                                topP: topP > 0 ? topP : undefined,
+                            });
+                            setText([...finalText]);
+                            logger.log({ action: 'auto_generated_text', text: finalText });
+                        } else {
+                            const randomIndex = Math.floor(Math.random() * conversations.length);
+                            const conversation = conversations[randomIndex];
+                            generator.reset();
+                            const finalText = await generator.generate([conversation[0]], {
+                                maxLength: 200,
+                                temperature: 1,
+                                includeProbabilities: false,
+                                topP: topP > 0 ? topP : undefined,
+                            });
+                            console.log('Generated text for conversation:', finalText);
+                            setText([...finalText]);
+                            logger.log({ action: 'auto_generated_text', text: finalText });
+                        }
                     } catch {
                         setMessage({
                             level: 'error',
@@ -66,7 +82,7 @@ export default function ChatOutput() {
                 };
             }
         }
-    }, [model, ready, outputText, topP, setGenerator, t]);
+    }, [model, ready, outputText, topP, setGenerator, t, conversations]);
 
     useEffect(() => {
         if (generator) {
@@ -87,11 +103,8 @@ export default function ChatOutput() {
         <div
             className={style.container}
             data-widget="chat-output"
+            data-testid="chat-output"
         >
-            <BoxTitle
-                title={t('generator.title')}
-                status="done"
-            />
             <ChatMenu
                 onReset={() => {
                     if (generator) {

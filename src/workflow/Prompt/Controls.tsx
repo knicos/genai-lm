@@ -1,10 +1,12 @@
 import style from './style.module.css';
-import { Switch, TextField, Tooltip } from '@mui/material';
+import { IconButton, TextField } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import PlusOneIcon from '@mui/icons-material/PlusOne';
+import SendIcon from '@mui/icons-material/Send';
+import StopIcon from '@mui/icons-material/Stop';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 
 interface Props {
@@ -15,11 +17,12 @@ interface Props {
     prompt?: boolean;
     onShowSettings: () => void;
     onGenerate: (prompt?: string) => void;
+    onStop: () => void;
     onReset: () => void;
     onAutoModeChange?: (value: boolean) => void;
 }
 
-export default function Controls({ disable, generate, autoMode, prompt, onGenerate, onAutoModeChange }: Props) {
+export default function Controls({ disable, generate, autoMode, prompt, onGenerate, onStop }: Props) {
     const { t } = useTranslation();
     const [promptText, setPromptText] = useState<string>('');
 
@@ -38,34 +41,32 @@ export default function Controls({ disable, generate, autoMode, prompt, onGenera
             )}
             {prompt && (
                 <TextField
-                    variant="standard"
+                    variant="outlined"
+                    multiline
+                    fullWidth
                     value={promptText}
+                    maxRows={5}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         setPromptText(e.target.value);
                     }}
                     onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === 'Enter' && !e.shiftKey) {
                             onGenerate(promptText);
                             setPromptText('');
                         }
                     }}
                 />
             )}
-            <div className={style.iconButtons}>
-                <Tooltip
-                    title={t('generator.autoGenerate')}
-                    arrow
-                >
-                    <Switch
-                        disabled={disable}
-                        checked={autoMode}
-                        onChange={(e) => onAutoModeChange && onAutoModeChange(e.target.checked)}
-                        data-testid="auto-generate-switch"
-                        aria-label={t('generator.autoGenerateAriaLabel')}
-                        color="success"
-                    />
-                </Tooltip>
-            </div>
+            {prompt && (
+                <div className={style.iconButtons}>
+                    <IconButton
+                        onClick={generate ? onStop : () => onGenerate(promptText)}
+                        color="primary"
+                    >
+                        {generate ? <StopIcon /> : <SendIcon />}
+                    </IconButton>
+                </div>
+            )}
         </div>
     );
 }

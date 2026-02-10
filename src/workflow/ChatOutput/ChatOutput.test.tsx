@@ -14,7 +14,7 @@ describe('ChatOutput', () => {
                 <ChatOutput />
             </BrowserRouter>
         );
-        expect(screen.getByText('generator.title')).toBeInTheDocument();
+        expect(screen.getByTestId('chat-output')).toBeInTheDocument();
     });
 
     it('displays a generator conversation', async ({ expect }) => {

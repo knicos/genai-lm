@@ -103,7 +103,7 @@ export default function ModelSearch({
             if (downloader) {
                 setDownloads((prev) => [...prev, downloader]);
                 downloader.on('end', (file: File) => {
-                    const newModel = TeachableLLM.loadModel(file);
+                    const newModel = TeachableLLM.loadModel(file, { sourceURL: card.url });
                     newModel.meta.id = card.id;
                     newModel.meta.name = card.name;
                     newModel.meta.trained = card.trained || true;

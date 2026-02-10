@@ -1,0 +1,45 @@
+.container {
+    display: flex;
+    align-items: center;
+    /*justify-content: space-between;*/
+    color: #333;
+    flex-direction: column;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    margin-left: auto;
+    background: #fafafa;
+    border-left: 2px solid #eee;
+}
+
+.buttonBox {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    left: -1rem;
+    flex-direction: column;
+}
+
+.clockContainer {
+    margin: 1rem 0rem 1rem 2rem;
+    display: flex;
+}

@@ -7,15 +7,15 @@ interface Props {
     flip?: boolean;
 }
 
-export default function TrainerLink({ flip }: Props) {
+export default function DeployLink({ flip }: Props) {
     const ready = useAtomValue(dataTokensReady);
     const { t } = useTranslation();
     return (
         <BoxLink
             active={ready}
-            link="pretrain"
-            title={t('training.title')}
-            widget="trainer"
+            link="deployment"
+            title={t('workflow.deployment')}
+            widget="deploy"
             flip={flip}
         />
     );

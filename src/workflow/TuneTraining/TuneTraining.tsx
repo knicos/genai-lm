@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TrainingLogEntry } from '@genai-fi/nanogpt';
+import { ITrainerOptions, tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -9,20 +9,18 @@ import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { trainerAtom, trainerSettings } from '../../state/trainer';
+import { tunerSettings, tunerAtom } from '../../state/trainer';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
-import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../utilities/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import TrainingMenu from './TrainingMenu';
-import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
-import { dataTokens } from '../../state/data';
+import { conversationDataAtom } from '../../state/data';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -34,33 +32,34 @@ interface TrainingProgress {
     progress: number;
 }
 
-export default function TextTraining() {
+export default function TuneTraining() {
     const { t } = useTranslation();
-    const [trainer, setTrainer] = useAtom(trainerAtom);
+    const [trainer, setTrainer] = useAtom(tunerAtom);
     const [epochs, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
     const model = useAtomValue(modelAtom);
     const status = useModelStatus(model ?? undefined);
-    const dataset = useAtomValue(dataTokens);
-    const [settings, setSettings] = useAtom(trainerSettings);
+    const conversations = useAtomValue(conversationDataAtom);
+    const settings = useAtomValue(tunerSettings);
     const batchSize = settings.batchSize;
     const maxSteps = settings.maxSteps;
     const disableCheckpointing = settings.disableCheckpointing;
     const learningRate = settings.learningRate;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [lr, setLR] = useState(0.0);
-    const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
+    //const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [totalSamples, setTotalSamples] = useState(0);
-    const [preparing, setPreparing] = useState(false);
+    //const [preparing, setPreparing] = useState(false);
 
     useWakeLock(training);
 
-    const canTrain = !!model && !!dataset && dataset.length > 0 && status !== 'loading' && status !== 'busy';
+    const canTrain =
+        !!model && !!conversations && conversations.length > 0 && status !== 'loading' && status !== 'busy';
 
     useEffect(() => {
         setTrainingAnimation(training);
@@ -71,7 +70,7 @@ export default function TextTraining() {
             const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
                 //model?.getProfiler()?.printSummary();
-                setTrainingProgress(progress);
+                //setTrainingProgress(progress);
                 if (log.step % 100 === 0) {
                     logger.log({
                         action: 'training_step',
@@ -93,7 +92,7 @@ export default function TextTraining() {
         if (model) {
             setMessage(null);
             const h = () => {
-                setTrainer(model.trainer('pretraining'));
+                setTrainer(model.trainer('sft'));
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
@@ -105,11 +104,11 @@ export default function TextTraining() {
     }, [model, setTrainer]);
 
     useEffect(() => {
-        if (dataset && dataset.length > 0) {
+        if (conversations && conversations.length > 0) {
             setNeedsTraining(true);
             setMessage(null);
         }
-    }, [dataset]);
+    }, [conversations]);
 
     useEffect(() => {
         if (model) {
@@ -125,14 +124,14 @@ export default function TextTraining() {
             });
             return;
         }
-        if (!dataset || dataset.length === 0) {
+        if (!conversations || conversations.length === 0) {
             setMessage({
                 notice: t('training.errors.noData'),
                 level: 'warning',
             });
             return;
         }
-        if (model && dataset && trainer) {
+        if (model && conversations && trainer) {
             if (!model.loaded) {
                 setMessage({
                     notice: t('training.errors.notReady'),
@@ -169,7 +168,7 @@ export default function TextTraining() {
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize, useCheckpointing });
 
             model.enableProfiler = advanced;
-            const trainingOptions = {
+            const trainingOptions: ITrainerOptions = {
                 batchSize,
                 maxSteps,
                 learningRate: lr > 0 ? lr : learningRate,
@@ -177,14 +176,19 @@ export default function TextTraining() {
                 gradientCheckpointing: useCheckpointing,
                 gradientMetrics: settings.gradientMetrics,
                 mixedPrecision: settings.mixedPrecision,
+                loraConfig: {
+                    rank: 4,
+                    alpha: 8,
+                    variables: [`block_${model.model.config.nLayer - 1}*`],
+                },
             };
             if (shouldPrepare) {
                 try {
-                    //const task = new tasks.PretrainingTask(dataset);
-                    setPreparing(true);
-                    await trainer.prepare(dataset, trainingOptions);
-                    setPreparing(false);
-                    setTotalSamples(trainer.getTotalSamples());
+                    const task = new tasks.ConversationTask(conversations);
+                    //setPreparing(true);
+                    await trainer.prepare([task], trainingOptions);
+                    //setPreparing(false);
+                    setTotalSamples(conversations.length);
                 } catch (err) {
                     console.error('Error preparing training', err);
                     setMessage({
@@ -222,39 +226,28 @@ export default function TextTraining() {
 
     return (
         <Box
-            widget="trainer"
-            active={!!model || (!!dataset && dataset.length > 0)}
+            widget="finetuner"
+            active={!!model || (!!conversations && conversations.length > 0)}
             style={{ minWidth: '260px' }}
         >
             <div className={style.container}>
                 <BoxTitle
-                    title={t('training.title')}
+                    title={t('finetune.title')}
                     status={
                         !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
                     }
                 />
                 <TrainingMenu
                     training={training}
-                    onShowSettings={() => navigate('training-settings')}
+                    onShowSettings={() => navigate('tuning-settings')}
                     onMonitor={() => navigate('training-log')}
-                    onVisualize={() => navigate('training-process')}
                 />
                 <div className={style.clockContainer}>
-                    <Clock
-                        duration={trainingProgress?.duration || 0}
-                        totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
-                        remaining={Math.max(0, trainingProgress?.remaining || 0)}
-                        message={preparing ? t('training.preparing') : undefined}
-                    />
                     <div className={style.stats}>
                         <NumberBox
                             value={(epochs || 0) * batchSize}
                             label={t('training.samples')}
                             flip
-                        />
-                        <NumberBox
-                            value={Math.max(0, totalSamples - (epochs || 0) * batchSize)}
-                            label={t('training.remaining')}
                         />
                     </div>
                 </div>
@@ -265,21 +258,8 @@ export default function TextTraining() {
                         startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
                         onClick={() => startTraining(maxSteps)}
                     >
-                        {done ? t('training.start') : t('training.stop')}
+                        {done ? t('finetune.start') : t('finetune.stop')}
                     </Button>
-                    <Tooltip
-                        title={t('training.autoOutput')}
-                        arrow
-                    >
-                        <Switch
-                            disabled={training}
-                            checked={settings.outputText}
-                            onChange={(e) => setSettings({ ...settings, outputText: e.target.checked })}
-                            data-testid="auto-output-switch"
-                            aria-label={t('training.autoOutput')}
-                            color="success"
-                        />
-                    </Tooltip>
                 </div>
                 {message && (
                     <BoxNotice
