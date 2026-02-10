@@ -88,11 +88,10 @@ export default class Downloader {
         this.controller.abort();
     }
 
-    on(event: 'start', listener: () => void): void;
+    on(event: 'start' | 'cancel', listener: () => void): void;
     on(event: 'progress', listener: (loaded: number, total: number) => void): void;
     on(event: 'end', listener: (file: File) => void): void;
     on(event: 'error', listener: (error: unknown) => void): void;
-    on(event: 'cancel', listener: () => void): void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public on(event: DownloadEvents, listener: (...args: any[]) => void) {
         if (event === 'end' && this.file) {
@@ -102,11 +101,10 @@ export default class Downloader {
         this.ee.on(event, listener);
     }
 
-    off(event: 'start', listener: () => void): void;
+    off(event: 'start' | 'cancel', listener: () => void): void;
     off(event: 'progress', listener: (loaded: number, total: number) => void): void;
     off(event: 'end', listener: (file: File) => void): void;
     off(event: 'error', listener: (error: unknown) => void): void;
-    off(event: 'cancel', listener: () => void): void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public off(event: DownloadEvents, listener: (...args: any[]) => void) {
         this.ee.off(event, listener);

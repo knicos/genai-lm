@@ -32,7 +32,8 @@ export default function LossBox({ loss, model, updating }: Props) {
     useEffect(() => {
         if (ref.current) {
             const resize = () => {
-                const bbx = ref.current!.getBoundingClientRect();
+                if (!ref.current) return;
+                const bbx = ref.current.getBoundingClientRect();
                 setLine({
                     x1: 40,
                     y1: 0,

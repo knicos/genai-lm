@@ -15,7 +15,26 @@ pool:
     vmImage: ubuntu-latest
 
 stages:
+    - stage: Static
+      condition: not(contains(variables['build.sourceBranch'], 'refs/tags/'))
+      jobs:
+          - job: ESLint
+            displayName: ESLint
+            steps:
+                - task: Cache@2
+                  inputs:
+                      key: '"npm" | "$(Agent.OS)" | package-lock.json'
+                      restoreKeys: |
+                          npm | "$(Agent.OS)"
+                          npm
+                      path: $(System.DefaultWorkingDirectory)/node_modules
+                  displayName: Cache NPM packages
+                - script: |
+                      npm set cache $(NPM_CACHE_FOLDER)
+                      npm ci --cache $(NPM_CACHE_FOLDER)
+                      npm run lint
     - stage: Build
+      dependsOn: Static
       jobs:
           - job: Ubuntu_x64
             displayName: Build Ubuntu X64

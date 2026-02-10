@@ -68,7 +68,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                     const padding = 20;
 
                     const newLines: ILine[] = [];
-                    const lineSpacing = tableRect!.height / size;
+                    const lineSpacing = tableRect.height / size;
 
                     if (width > 40) {
                         for (let i = 0; i < size; i++) {
@@ -131,8 +131,8 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 line.id === -1 || !finished
                                     ? '#e8f0fe'
                                     : paddedPredictions[line.id].token === target && finished
-                                    ? '#e2ecd9'
-                                    : '#f3ddd5'
+                                      ? '#e2ecd9'
+                                      : '#f3ddd5'
                             }
                             strokeWidth="5"
                         />

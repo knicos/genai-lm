@@ -55,11 +55,7 @@ export default function ModelInfo({
             )}
             {trainingStats && showDuration && <TrainingDuration duration={trainingStats.duration} />}
             {trainingStats && showSamples && <TrainingSamples samples={trainingStats.samples} />}
-            {showEmbeddingSize && (
-                <>
-                    <p>{t('model.embeddingSize', { size: config.nEmbed || 'N/A' })}</p>
-                </>
-            )}
+            {showEmbeddingSize && <p>{t('model.embeddingSize', { size: config.nEmbed || 'N/A' })}</p>}
         </div>
     );
 }

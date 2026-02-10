@@ -65,10 +65,10 @@ export function createProbabilities(
         // Select the maximum head probability for each token
         let maxProb = 0;
         let maxHead = -1;
-        for (let h = 0; h < headresults.length; h++) {
-            if (headresults[h][i] && headresults[h][i].probability > maxProb) {
-                maxProb = headresults[h][i].probability;
-                maxHead = headresults[h][i].index;
+        for (const h of headresults) {
+            if (h[i] && h[i].probability > maxProb) {
+                maxProb = h[i].probability;
+                maxHead = h[i].index;
             }
         }
         result.push({ index: maxHead, probability: maxProb });

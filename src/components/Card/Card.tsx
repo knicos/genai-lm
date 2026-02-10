@@ -89,28 +89,26 @@ export default function Card<T extends CardItem, S = void>({
     }, [expanded, toClose, onHighlight, id]);
 
     return (
-        <>
-            <div
-                className={`${style.dataCard} ${disabled ? style.disabled : ''} ${expanded ? style.expanded : ''}`}
-                role="button"
-                onPointerUp={
-                    !disabled && !used
-                        ? (e: PointerEvent) => {
-                              if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-                                  touchRef.current = true;
-                                  handleExpand();
-                              } else {
-                                  onClick(card);
-                              }
+        <div
+            className={`${style.dataCard} ${disabled ? style.disabled : ''} ${expanded ? style.expanded : ''}`}
+            role="button"
+            onPointerUp={
+                !disabled && !used
+                    ? (e: PointerEvent) => {
+                          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                              touchRef.current = true;
+                              handleExpand();
+                          } else {
+                              onClick(card);
                           }
-                        : undefined
-                }
-                onMouseEnter={!disabled && !used ? handleExpand : undefined}
-                onMouseLeave={!disabled && !used ? handleClose : undefined}
-                data-testid={`card-${card.id}`}
-            >
-                {expanded ? expandedContent : content}
-            </div>
-        </>
+                      }
+                    : undefined
+            }
+            onMouseEnter={!disabled && !used ? handleExpand : undefined}
+            onMouseLeave={!disabled && !used ? handleClose : undefined}
+            data-testid={`card-${card.id}`}
+        >
+            {expanded ? expandedContent : content}
+        </div>
     );
 }

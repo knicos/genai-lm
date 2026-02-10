@@ -3,7 +3,7 @@ import EE from 'eventemitter3';
 
 class Logger {
     private id: string;
-    private idNumber: number = 0;
+    private idNumber = 0;
     public token: string | null = null;
     private emitter = new EE<'id'>();
 

@@ -20,15 +20,14 @@ function reduceAttention(attentionData: number[][][][]): number[][] {
     // layer, head, _, sequence
     // Reduce to layer and sequence by taking the max over heads
     const reduced: number[][] = [];
-    for (let layer = 0; layer < attentionData.length; layer++) {
-        const layerData = attentionData[layer];
+    for (const layerData of attentionData) {
         const seqLength = layerData[0][0].length;
         const sums = new Array(seqLength).fill(0);
         let overallMax = 0;
 
-        for (let head = 0; head < layerData.length; head++) {
+        for (const head of layerData) {
             for (let i = 0; i < seqLength; i++) {
-                const v = layerData[head][0][i];
+                const v = head[0][i];
                 overallMax = Math.max(overallMax, v);
                 sums[i] = Math.max(sums[i], v);
             }
@@ -189,7 +188,7 @@ export function Component() {
             )}
             {ready && (
                 <Predictions
-                    predictions={step > 0 ? predictions[step - 1] ?? [] : []}
+                    predictions={step > 0 ? (predictions[step - 1] ?? []) : []}
                     vocab={model.tokeniser.getVocab()}
                     target={nextToken.current ?? undefined}
                     size={6}
@@ -198,7 +197,7 @@ export function Component() {
             )}
             {ready && (
                 <LossBox
-                    loss={finished ? loss ?? undefined : undefined}
+                    loss={finished ? (loss ?? undefined) : undefined}
                     model={model}
                     updating={updating}
                 />

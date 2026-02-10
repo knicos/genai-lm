@@ -14,7 +14,7 @@ export function sequencesToConversation(sequences: string[], mode: 'assistant' |
             if (parts.length === 0) {
                 return [];
             }
-            const first = parts.shift()!;
+            const first = parts.shift();
             const rest = parts.join('. ');
             const conversation: Conversation[] = [{ role: 'user', content: first + (parts.length > 0 ? '.' : '') }];
             if (rest.length > 0) {

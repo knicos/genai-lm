@@ -16,10 +16,6 @@ vi.mock('../../utilities/downloader', () => ({
 }));
 
 class TestDownloader extends Downloader {
-    constructor(id: string, url: string, name: string, type: string) {
-        super(id, url, name, type);
-    }
-
     setLoaded(l: number) {
         this._loaded = l;
         this.ee.emit('progress');

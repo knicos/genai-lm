@@ -46,7 +46,8 @@ export function Component() {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                    debugModel(model!).then((stats) => {
+                    if (!model) return;
+                    debugModel(model).then((stats) => {
                         setStats(stats);
                         setRunning(false);
                     });

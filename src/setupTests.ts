@@ -13,7 +13,9 @@ Element.prototype.scrollIntoView = () => {};
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-const MOCK_T = (str: string) => str;
+function MOCK_T(str: string) {
+    return str;
+}
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => {
