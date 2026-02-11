@@ -21,6 +21,7 @@ import TrainingMenu from './TrainingMenu';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
+import FineTuneBars from '../../components/FineTuneBars/FineTuneBars';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -171,6 +172,7 @@ export default function TuneTraining() {
             const trainingOptions: ITrainerOptions = {
                 batchSize,
                 maxSteps,
+                logInterval: 10,
                 learningRate: lr > 0 ? lr : learningRate,
                 advancedMetrics: advanced,
                 gradientCheckpointing: useCheckpointing,
@@ -243,13 +245,13 @@ export default function TuneTraining() {
                     onMonitor={() => navigate('training-log')}
                 />
                 <div className={style.clockContainer}>
-                    <div className={style.stats}>
-                        <NumberBox
-                            value={(epochs || 0) * batchSize}
-                            label={t('training.samples')}
-                            flip
+                    {model && trainer && conversations && (
+                        <FineTuneBars
+                            model={model}
+                            trainer={trainer}
+                            conversations={conversations}
                         />
-                    </div>
+                    )}
                 </div>
                 <div className={style.buttonBox}>
                     <Button
@@ -260,6 +262,10 @@ export default function TuneTraining() {
                     >
                         {done ? t('finetune.start') : t('finetune.stop')}
                     </Button>
+                    <NumberBox
+                        value={(epochs || 0) * batchSize}
+                        label={t('training.samples')}
+                    />
                 </div>
                 {message && (
                     <BoxNotice

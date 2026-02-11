@@ -1,0 +1,7 @@
+.fineTuneBars {
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+    justify-content: center;
+    transform: scale(1, -1);
+}
