@@ -25,8 +25,6 @@ import { useAtom } from 'jotai';
 import { downloadsAtom } from '../../state/data';
 import { configMatch } from './manifest';
 
-export const MANIFEST_URL = 'https://store.gen-ai.fi/llm/modelManifest.json';
-
 interface Props {
     model?: TeachableLLM;
     onModel(model: TeachableLLM): void;
@@ -117,7 +115,7 @@ export default function ModelSearch({
                 downloader.on('cancel', () => {
                     setDownloads((prev) => prev.filter((d) => d !== downloader));
                 });
-            } else if (!card.url) {
+            } else if (!card.url && card.config) {
                 const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
                 newModel.meta.id = card.id;
                 newModel.meta.name = card.name;

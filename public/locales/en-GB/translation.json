@@ -51,7 +51,11 @@
             "sftMode": "Fine-tuning Mode",
             "sftModeLastLayer": "Fine-tune Last Layer",
             "sftModeFull": "Fine-tune Full Model",
-            "loraVariables": "Variables"
+            "loraVariables": "Variables",
+            "gradClipping": "Gradient Clipping",
+            "warmupSteps": "Warmup Steps",
+            "decaySteps": "Decay Steps",
+            "weightDecay": "Weight Decay"
         },
         "close": "Close",
         "ok": "OK",

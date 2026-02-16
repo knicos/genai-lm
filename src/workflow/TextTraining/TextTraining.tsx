@@ -46,11 +46,7 @@ export default function TextTraining() {
     const dataset = useAtomValue(dataTokens);
     const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
-    const maxSteps = settings.maxSteps;
-    const disableCheckpointing = settings.disableCheckpointing;
-    const learningRate = settings.learningRate;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    const [lr, setLR] = useState(0.0);
     const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
@@ -93,7 +89,13 @@ export default function TextTraining() {
         if (model) {
             setMessage(null);
             const h = () => {
-                setTrainer(model.trainer('pretraining'));
+                const modelSize = model.getNumParams();
+                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
+                const trainingOptions = {
+                    ...settings,
+                    gradientCheckpointing: useCheckpointing,
+                };
+                setTrainer(model.trainer('pretraining', trainingOptions));
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
@@ -102,7 +104,7 @@ export default function TextTraining() {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer]);
+    }, [model, setTrainer, settings]);
 
     useEffect(() => {
         if (dataset && dataset.length > 0) {
@@ -111,13 +113,7 @@ export default function TextTraining() {
         }
     }, [dataset]);
 
-    useEffect(() => {
-        if (model) {
-            setLR(model.meta.trained ? learningRate * 0.1 : learningRate);
-        }
-    }, [learningRate, model]);
-
-    const startTraining = async (maxSteps: number) => {
+    const startTraining = async () => {
         if (!model) {
             setMessage({
                 notice: t('training.errors.noModel'),
@@ -164,25 +160,16 @@ export default function TextTraining() {
             await wait(200);
 
             const modelSize = model.getNumParams();
-            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
-
-            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize, useCheckpointing });
+            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            const trainingOptions = {
-                batchSize,
-                maxSteps,
-                learningRate: lr > 0 ? lr : learningRate,
-                advancedMetrics: advanced,
-                gradientCheckpointing: useCheckpointing,
-                gradientMetrics: settings.gradientMetrics,
-                mixedPrecision: settings.mixedPrecision,
-            };
+            trainer.options.advancedMetrics = advanced;
+
             if (shouldPrepare) {
                 try {
                     //const task = new tasks.PretrainingTask(dataset);
                     setPreparing(true);
-                    await trainer.prepare(dataset, trainingOptions);
+                    await trainer.prepare(dataset);
                     setPreparing(false);
                     setTotalSamples(trainer.getTotalSamples());
                 } catch (err) {
@@ -200,7 +187,7 @@ export default function TextTraining() {
             setNeedsTraining(false);
 
             trainer
-                .train(trainingOptions)
+                .train()
                 .then(() => {
                     setDone(true);
                     setTraining(false);
@@ -263,7 +250,7 @@ export default function TextTraining() {
                         disabled={!done && !training}
                         variant="contained"
                         startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
-                        onClick={() => startTraining(maxSteps)}
+                        onClick={() => startTraining()}
                     >
                         {done ? t('training.start') : t('training.stop')}
                     </Button>

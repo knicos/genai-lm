@@ -13,7 +13,7 @@ export interface ModelCardItem {
     parameters: number;
     trained: boolean;
     tokeniser?: 'char' | 'bpe';
-    config?: Partial<GPTConfig>;
+    config?: GPTConfig;
     trainingStats?: TrainingStats;
     example?: string;
 }

@@ -1,7 +1,7 @@
 import { GPTConfig } from '@genai-fi/nanogpt';
 import { ModelCardItem } from '../ModelCard/type';
 
-const IGNORE_KEYS = new Set<keyof GPTConfig>(['dropout', 'blockSize']);
+const IGNORE_KEYS = new Set<keyof GPTConfig>(['blockSize']);
 
 export interface ModelManifest {
     models: ModelCardItem[];

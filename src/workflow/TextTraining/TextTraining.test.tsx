@@ -85,6 +85,7 @@ describe('TextTraining', () => {
                 prepare: async () => {},
                 train: trainFunc,
                 getTotalSamples: () => 1000,
+                options: {},
             })),
             tokeniser: {
                 trained: true,

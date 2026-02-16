@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { ITrainerOptions, tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../utilities/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -45,11 +45,7 @@ export default function TuneTraining() {
     const conversations = useAtomValue(conversationDataAtom);
     const settings = useAtomValue(tunerSettings);
     const batchSize = settings.batchSize;
-    const maxSteps = settings.maxSteps;
-    const disableCheckpointing = settings.disableCheckpointing;
-    const learningRate = settings.learningRate;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    const [lr, setLR] = useState(0.0);
     //const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
@@ -93,7 +89,13 @@ export default function TuneTraining() {
         if (model) {
             setMessage(null);
             const h = () => {
-                setTrainer(model.trainer('sft'));
+                const modelSize = model.getNumParams();
+                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
+                const trainingOptions = {
+                    ...settings,
+                    gradientCheckpointing: useCheckpointing,
+                };
+                setTrainer(model.trainer('sft', trainingOptions));
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
@@ -102,7 +104,7 @@ export default function TuneTraining() {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer]);
+    }, [model, setTrainer, settings]);
 
     useEffect(() => {
         if (conversations && conversations.length > 0) {
@@ -111,13 +113,7 @@ export default function TuneTraining() {
         }
     }, [conversations]);
 
-    useEffect(() => {
-        if (model) {
-            setLR(model.meta.trained ? learningRate * 0.1 : learningRate);
-        }
-    }, [learningRate, model]);
-
-    const startTraining = async (maxSteps: number) => {
+    const startTraining = async () => {
         if (!model) {
             setMessage({
                 notice: t('training.errors.noModel'),
@@ -164,31 +160,16 @@ export default function TuneTraining() {
             await wait(200);
 
             const modelSize = model.getNumParams();
-            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !disableCheckpointing;
-
-            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize, useCheckpointing });
+            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            const trainingOptions: ITrainerOptions = {
-                batchSize,
-                maxSteps,
-                logInterval: 10,
-                learningRate: lr > 0 ? lr : learningRate,
-                advancedMetrics: advanced,
-                gradientCheckpointing: useCheckpointing,
-                gradientMetrics: settings.gradientMetrics,
-                mixedPrecision: settings.mixedPrecision,
-                loraConfig: {
-                    rank: 4,
-                    alpha: 8,
-                    variables: [`block_${model.model.config.nLayer - 1}*`],
-                },
-            };
+            trainer.options.advancedMetrics = advanced;
+
             if (shouldPrepare) {
                 try {
                     const task = new tasks.ConversationTask(conversations);
                     //setPreparing(true);
-                    await trainer.prepare([task], trainingOptions);
+                    await trainer.prepare([task]);
                     //setPreparing(false);
                     setTotalSamples(conversations.length);
                 } catch (err) {
@@ -206,7 +187,7 @@ export default function TuneTraining() {
             setNeedsTraining(false);
 
             trainer
-                .train(trainingOptions)
+                .train()
                 .then(() => {
                     setDone(true);
                     setTraining(false);
@@ -258,7 +239,7 @@ export default function TuneTraining() {
                         disabled={!done && !training}
                         variant="contained"
                         startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
-                        onClick={() => startTraining(maxSteps)}
+                        onClick={() => startTraining()}
                     >
                         {done ? t('finetune.start') : t('finetune.stop')}
                     </Button>

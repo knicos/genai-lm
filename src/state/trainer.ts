@@ -22,6 +22,9 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         disableCheckpointing: false,
         gradientMetrics: false,
         mixedPrecision: true,
+        warmupSteps: 100,
+        decaySteps: 20000,
+        weightDecay: 0.01,
     },
     storage
 );
@@ -45,6 +48,9 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
             variables: ['*'],
         },
         sftMode: 'last-layer',
+        warmupSteps: 50,
+        decaySteps: 10000,
+        weightDecay: 0.01,
     },
     storage
 );

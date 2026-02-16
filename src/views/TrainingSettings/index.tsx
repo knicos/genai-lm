@@ -13,7 +13,7 @@ export function Component() {
     return (
         <div className="sidePanel">
             <h2>{t('app.settings.training')}</h2>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <div
                     id="batch-label"
                     className={style.label}
@@ -30,7 +30,7 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <div
                     id="learningRate-label"
                     className={style.label}
@@ -41,15 +41,16 @@ export function Component() {
                     aria-labelledby="learningRate-label"
                     value={settings.learningRate}
                     onChange={(_, value) => setSettings({ ...settings, learningRate: value as number })}
-                    min={0.0001}
-                    max={0.01}
-                    step={0.0001}
+                    min={0.00001}
+                    max={0.001}
+                    step={0.00001}
                     valueLabelDisplay="auto"
                 />
             </FormControl>
             {devMode && (
                 <>
                     <div className={style.spacer} />
+                    <h3>{t('app.settings.developerOptions')}</h3>
                     <FormControl>
                         <FormControlLabel
                             control={
@@ -72,6 +73,70 @@ export function Component() {
                                 />
                             }
                             label={t('app.settings.mixedPrecision')}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={settings.clipNorm !== undefined}
+                                    onChange={(_, checked) =>
+                                        setSettings({ ...settings, clipNorm: checked ? 1 : undefined })
+                                    }
+                                />
+                            }
+                            label={t('app.settings.gradClipping')}
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="warmup-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.warmupSteps')}
+                        </div>
+                        <Slider
+                            aria-labelledby="warmup-label"
+                            value={settings.warmupSteps}
+                            onChange={(_, value) => setSettings({ ...settings, warmupSteps: value as number })}
+                            min={0}
+                            max={1000}
+                            step={10}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="decay-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.decaySteps')}
+                        </div>
+                        <Slider
+                            aria-labelledby="decay-label"
+                            value={settings.decaySteps}
+                            onChange={(_, value) => setSettings({ ...settings, decaySteps: value as number })}
+                            min={1000}
+                            max={100000}
+                            step={100}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="weight-decay-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.weightDecay')}
+                        </div>
+                        <Slider
+                            aria-labelledby="weight-decay-label"
+                            value={settings.weightDecay}
+                            onChange={(_, value) => setSettings({ ...settings, weightDecay: value as number })}
+                            min={0}
+                            max={0.2}
+                            step={0.01}
+                            valueLabelDisplay="auto"
                         />
                     </FormControl>
                 </>
