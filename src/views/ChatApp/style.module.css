@@ -1,0 +1,53 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background: white;
+    align-items: center;
+    position: relative;
+}
+
+.container section {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+.conversationBox {
+    width: 100%;
+    max-width: 49rem;
+    margin: auto;
+    margin-bottom: 2rem;
+}
+
+.prompt {
+    position: absolute;
+    bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+    transition: bottom 0.3s ease;
+    max-width: calc(49rem - 5.5rem);
+    margin: 0 auto;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0px, rgba(255, 255, 255, 1) 30px);
+    padding-bottom: 3rem;
+    padding-top: 30px;
+}
+
+.prompt.start {
+    bottom: 50%;
+}
+
+.prompt h1 {
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.status {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}

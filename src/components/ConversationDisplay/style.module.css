@@ -6,6 +6,7 @@
     min-width: 40%;
     display: flex;
     align-items: flex-start;
+    justify-content: flex-end;
 }
 .userContainer.editing {
     width: 100%;

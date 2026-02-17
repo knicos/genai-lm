@@ -30,6 +30,8 @@ import InstructData from '../../workflow/InstructData/InstructData';
 import TuneTraining from '../../workflow/TuneTraining/TuneTraining';
 import DeployLink from './linkboxes/DeployLink';
 import FineTuneLink from './linkboxes/FineTuneLink';
+import PeerShareWrap from '../../components/PeerShare/PeerShareWrap';
+import Sharing from '../../workflow/Sharing/Sharing';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -94,6 +96,18 @@ const CONNECTIONS: IConnection[] = [
     {
         start: 'finetuner',
         end: 'deploy',
+        startPoint: 'right',
+        endPoint: 'left',
+    },
+    {
+        start: 'sharing',
+        end: 'pretrained',
+        startPoint: 'bottom',
+        endPoint: 'top',
+    },
+    {
+        start: 'finetune',
+        end: 'pretrained',
         startPoint: 'right',
         endPoint: 'left',
     },
@@ -171,6 +185,7 @@ export function Component() {
     ) : (
         <>
             <Initialiser />
+            <PeerShareWrap />
             <AppBar hideTitle />
             <div
                 className={style.mainContainer}
@@ -257,13 +272,21 @@ export function Component() {
                                 </>
                             )}
                             {flow === 'deployment' && (
-                                <div
-                                    data-widget="container"
-                                    className={style.subgroup}
-                                >
-                                    <FineTuneLink flip />
-                                    <PreTrainedModel />
-                                </div>
+                                <>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <FineTuneLink flip />
+                                    </div>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <Sharing />
+                                        <PreTrainedModel />
+                                    </div>
+                                </>
                             )}
                         </section>
                         {isOutputStage && (

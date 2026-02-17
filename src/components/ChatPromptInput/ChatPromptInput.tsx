@@ -37,6 +37,10 @@ export default function ChatPromptInput({
         } else {
             setMultiline(false);
         }
+
+        if (!generating) {
+            textareaRef.current?.focus();
+        }
     }, [text, generating]);
 
     const handleSend = () => {

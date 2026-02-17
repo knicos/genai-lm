@@ -270,5 +270,53 @@
         "title": "Fine-tuning",
         "start": "Tune",
         "stop": "Stop"
+    },
+    "sharing": {
+        "title": "Sharing",
+        "start": "Share",
+        "stop": "Stop Sharing",
+        "settings": "Settings",
+        "users": "Users"
+    },
+    "deploy": {
+        "actions": {
+            "copy": "Copy Link",
+            "close": "Close"
+        },
+        "welcome_message": "Try talking with me!",
+        "placeholder": "Type a message..."
+    },
+    "loader": {
+        "messages": {
+            "connecting": "Trying to connect...",
+            "disconnected": "Disconnected from the other device",
+            "retry": "Retrying...",
+            "ready": "Connected",
+            "starting": "Connecting...",
+            "quality0": "Checking...",
+            "quality1": "Poor Connection",
+            "quality2": "Connected",
+            "quality3": "Connected",
+            "failed": "No Connection"
+        },
+        "errors": {
+            "unknown": "A connection problem occurred",
+            "id-in-use": "Someone is already using this code",
+            "peer-not-found": "The code could not be found",
+            "missing-ice": "Could not connect, you may be offline.",
+            "no-signaling": "Our server isn't responding",
+            "bad-browser": "Your device doesn't support this app",
+            "none": "Ok"
+        },
+        "titles": {
+            "iceConfig": "Configuring",
+            "permission": "Permissions",
+            "connecting": "Connection",
+            "error": "Problem",
+            "networkType": "Information"
+        },
+        "actions": {
+            "close": "Close"
+        }
     }
 }

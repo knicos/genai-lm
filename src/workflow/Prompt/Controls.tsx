@@ -41,6 +41,7 @@ export default function Controls({ disable, generate, autoMode, prompt, onGenera
             )}
             {prompt && (
                 <TextField
+                    disabled={disable}
                     variant="outlined"
                     multiline
                     fullWidth
@@ -62,6 +63,7 @@ export default function Controls({ disable, generate, autoMode, prompt, onGenera
                     <IconButton
                         onClick={generate ? onStop : () => onGenerate(promptText)}
                         color="primary"
+                        disabled={disable || promptText.trim() === ''}
                     >
                         {generate ? <StopIcon /> : <SendIcon />}
                     </IconButton>

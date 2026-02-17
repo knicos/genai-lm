@@ -1,0 +1,11 @@
+.qr {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.qr.disabled {
+    opacity: 0.1;
+    pointer-events: none;
+}

@@ -82,6 +82,11 @@ export const routes = createRoutesFromElements(
         />
 
         <Route
+            path="app/:code"
+            lazy={() => import('./views/ChatApp')}
+        />
+
+        <Route
             path="workspace/:flow"
             lazy={() => import('./views/Workspace')}
         >
