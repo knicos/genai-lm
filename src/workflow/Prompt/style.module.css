@@ -1,9 +1,11 @@
+@value primary from "@genai-fi/base/css/colours.module.css";
+
 .container {
     width: calc(100% - 4rem);
-    background: #f7f9fc;
+    /*background: #f7f9fc;
     border-radius: 20px;
-    box-shadow: 2px 2px 4px #a4acbb;
-    margin: 2rem;
+    box-shadow: 2px 2px 4px #a4acbb;*/
+    margin: 30px;
     position: relative;
 }
 
@@ -24,4 +26,9 @@
     gap: 0.2rem;
     align-items: center;
     color: #444;
+}
+
+.generateButton {
+    border-radius: 24px;
+    font-size: 1rem;
 }

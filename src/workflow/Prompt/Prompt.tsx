@@ -1,13 +1,15 @@
 import { useAtomValue } from 'jotai';
-import Controls from './Controls';
 import style from './style.module.css';
 import { generatorAtom, generatorSettings } from '../../state/generator';
 import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import useModelStatus from '../../utilities/useModelStatus';
 import { modelAtom } from '../../state/model';
+import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import StopIcon from '@mui/icons-material/Stop';
+import { Button } from '@genai-fi/base';
 
 interface Props {
     showPromptInput?: boolean;
@@ -18,11 +20,9 @@ export default function Prompt({ showPromptInput }: Props) {
     const generator = useAtomValue(generatorAtom);
     const [generate, setGenerate] = useState(false);
     const [, setHasGenerated] = useState(false);
-    const { temperature, topP, maxLength, showAttention, showProbabilities, showSettings, showPrompt } =
+    const { temperature, topP, maxLength, showAttention, showProbabilities, showPrompt } =
         useAtomValue(generatorSettings);
-    const [autoMode, setAutoMode] = useState<boolean>(true);
     const [messages, setMessage] = useState<Notice | null>(null);
-    const navigate = useNavigate();
     const busyRef = useRef<boolean>(false);
     const model = useAtomValue(modelAtom);
     const status = useModelStatus(model ?? undefined);
@@ -90,30 +90,27 @@ export default function Prompt({ showPromptInput }: Props) {
             data-widget="prompt"
             data-testid="textgenerator"
         >
-            <Controls
-                prompt={showPrompt || showPromptInput}
-                onStop={() => {
-                    if (busyRef.current && generator) {
-                        generator.stop();
-                    }
-                }}
-                onGenerate={(prompt) => doGenerate(autoMode ? maxLength : 1, prompt)}
-                disable={disable}
-                generate={generate}
-                onReset={() => {
-                    if (generate && generator) {
-                        generator.stop();
-                    }
-                    generator?.reset();
-                    setHasGenerated(false);
-                }}
-                onShowSettings={() => {
-                    navigate('generator-settings');
-                }}
-                enableSettings={showSettings}
-                autoMode={autoMode}
-                onAutoModeChange={setAutoMode}
-            />
+            {showPromptInput && (
+                <ChatPromptInput
+                    onSend={(prompt) => doGenerate(maxLength, prompt)}
+                    disabled={disable}
+                    generating={generate}
+                    onStop={() => generator?.stop()}
+                />
+            )}
+            {!showPromptInput && (
+                <Button
+                    className={style.generateButton}
+                    onClick={() => doGenerate(maxLength)}
+                    startIcon={generate ? <StopIcon /> : <ArrowUpwardIcon />}
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    disabled={disable}
+                >
+                    {generate ? t('generator.stop') : t('generator.generate')}
+                </Button>
+            )}
             {messages && (
                 <BoxNotice
                     notice={messages}

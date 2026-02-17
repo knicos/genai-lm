@@ -1,0 +1,70 @@
+@value primary, primaryLight from "@genai-fi/base/css/colours.module.css";
+
+.shell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid primaryLight;
+    border-radius: 24px;
+    padding: 0.5rem 0.75rem;
+    padding-left: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shell.multiline {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.shell > textarea {
+    font-family: 'Andika', sans-serif;
+    flex-shrink: 0;
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 1rem;
+    line-height: 1.5;
+    background: transparent;
+    color: #111;
+    min-height: auto;
+    display: block;
+}
+
+.input::placeholder {
+    color: #7a7a7a;
+}
+
+.sendButton {
+    border: none;
+    background: primary;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+.sendButton:hover {
+    background: #333;
+}
+
+.sendButton:disabled {
+    background: primaryLight;
+    opacity: 0.35;
+    color: white;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: flex-end;
+}

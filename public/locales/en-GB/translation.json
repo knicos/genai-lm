@@ -170,6 +170,7 @@
         "settingsTooltip": "Generator Settings",
         "settings": "Settings",
         "pause": "Pause",
+        "stop": "Stop",
         "editPlaceholder": "Type an optional prompt here...",
         "reset": "New Chat",
         "copy": "Copy to Clipboard",
