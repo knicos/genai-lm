@@ -116,11 +116,11 @@ describe('TextTraining', () => {
         );
 
         ee.emit('loaded');
-        await waitFor(() => expect(mockModel.trainer).toHaveBeenCalled());
 
         await user.click(screen.getByText('training.start'));
 
-        expect(trainOnEvent).toHaveBeenCalledWith('log', expect.any(Function));
+        await waitFor(() => expect(mockModel.trainer).toHaveBeenCalled());
+        await waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('log', expect.any(Function)));
         await waitFor(() => expect(trainFunc).toHaveBeenCalled());
     });
 });

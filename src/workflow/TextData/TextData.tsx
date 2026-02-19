@@ -239,7 +239,7 @@ export default function TextData() {
 
                 <input
                     type="file"
-                    accept=".txt,.csv,.pdf,.doc,.docx,.parquet"
+                    accept=".txt,.csv,.pdf,.doc,.docx,.parquet,.json,.jsonl"
                     ref={fileRef}
                     style={{ display: 'none' }}
                     onChange={async (e) => {

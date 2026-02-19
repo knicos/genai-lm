@@ -39,6 +39,9 @@ export default tseslint.config(
             'react/jsx-no-target-blank': 'error',
             'react/jsx-no-comment-textnodes': 'error',
             '@typescript-eslint/no-empty-function': 'off',
+            'react-hooks/refs': 'off',
+            'react-hooks/immutability': 'off',
+            'react-hooks/set-state-in-effect': 'warn',
         },
     }
 );

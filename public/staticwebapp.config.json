@@ -3,6 +3,10 @@
         {
             "route": "/workspace*",
             "rewrite": "index.html"
+        },
+        {
+            "route": "/app*",
+            "rewrite": "index.html"
         }
     ]
 }

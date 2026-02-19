@@ -46,12 +46,10 @@ export default function TuneTraining() {
     const settings = useAtomValue(tunerSettings);
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    //const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [totalSamples, setTotalSamples] = useState(0);
-    //const [preparing, setPreparing] = useState(false);
 
     useWakeLock(training);
 
@@ -66,8 +64,7 @@ export default function TuneTraining() {
         if (trainer) {
             const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
-                //model?.getProfiler()?.printSummary();
-                //setTrainingProgress(progress);
+
                 if (log.step % 100 === 0) {
                     logger.log({
                         action: 'training_step',
@@ -83,19 +80,13 @@ export default function TuneTraining() {
                 trainer.off('log', h);
             };
         }
-    }, [trainer, totalSamples, batchSize, model]);
+    }, [trainer]);
 
     useEffect(() => {
         if (model) {
             setMessage(null);
+            setTrainer(null);
             const h = () => {
-                const modelSize = model.getNumParams();
-                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-                const trainingOptions = {
-                    ...settings,
-                    gradientCheckpointing: useCheckpointing,
-                };
-                setTrainer(model.trainer('sft', trainingOptions));
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
@@ -104,7 +95,7 @@ export default function TuneTraining() {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer, settings]);
+    }, [model, setTrainer]);
 
     useEffect(() => {
         if (conversations && conversations.length > 0) {
@@ -112,6 +103,10 @@ export default function TuneTraining() {
             setMessage(null);
         }
     }, [conversations]);
+
+    useEffect(() => {
+        setTrainer(null);
+    }, [settings, setTrainer]);
 
     const startTraining = async () => {
         if (!model) {
@@ -128,7 +123,7 @@ export default function TuneTraining() {
             });
             return;
         }
-        if (model && conversations && trainer) {
+        if (model && conversations) {
             if (!model.loaded) {
                 setMessage({
                     notice: t('training.errors.notReady'),
@@ -140,8 +135,16 @@ export default function TuneTraining() {
                 throw new Error('Model tokeniser is not trained.');
             }
 
+            const modelSize = model.getNumParams();
+            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
+            const trainingOptions = {
+                ...settings,
+                gradientCheckpointing: useCheckpointing,
+            };
+            const currentTrainer = trainer ?? model.trainer('sft', trainingOptions);
+
             if (training) {
-                trainer.stop();
+                currentTrainer.stop();
                 setTraining(false);
                 return;
             }
@@ -154,22 +157,21 @@ export default function TuneTraining() {
             setTraining(true);
             setDone(false);
 
-            const shouldPrepare = needsTraining || !trainer.isPrepared();
+            const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
 
             // setEpochs(0);
             await wait(200);
 
-            const modelSize = model.getNumParams();
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            trainer.options.advancedMetrics = advanced;
+            currentTrainer.options.advancedMetrics = advanced;
 
             if (shouldPrepare) {
                 try {
                     const task = new tasks.ConversationTask(conversations);
                     //setPreparing(true);
-                    await trainer.prepare([task]);
+                    await currentTrainer.prepare([task]);
                     //setPreparing(false);
                     setTotalSamples(conversations.length);
                 } catch (err) {
@@ -186,7 +188,7 @@ export default function TuneTraining() {
 
             setNeedsTraining(false);
 
-            trainer
+            currentTrainer
                 .train()
                 .then(() => {
                     setDone(true);
@@ -197,13 +199,15 @@ export default function TuneTraining() {
                     setDone(true);
                     setTraining(false);
                     logger.error({ action: 'training_error', message: err.message });
-                    trainer.stop();
-                    trainer.reset();
+                    currentTrainer.stop();
+                    currentTrainer.reset();
                     setMessage({
                         notice: t('training.errors.trainingFailed'),
                         level: 'error',
                     });
                 });
+
+            setTrainer(currentTrainer);
         }
     };
 

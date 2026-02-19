@@ -62,11 +62,11 @@ export default function TextTraining() {
         setTrainingAnimation(training);
     }, [training, setTrainingAnimation]);
 
+    // Event to update training progress
     useEffect(() => {
         if (trainer) {
             const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
-                //model?.getProfiler()?.printSummary();
                 setTrainingProgress(progress);
                 if (log.step % 100 === 0) {
                     logger.log({
@@ -83,19 +83,14 @@ export default function TextTraining() {
                 trainer.off('log', h);
             };
         }
-    }, [trainer, totalSamples, batchSize, model]);
+    }, [trainer]);
 
+    // Reset if model changes
     useEffect(() => {
         if (model) {
             setMessage(null);
+            setTrainer(null);
             const h = () => {
-                const modelSize = model.getNumParams();
-                const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-                const trainingOptions = {
-                    ...settings,
-                    gradientCheckpointing: useCheckpointing,
-                };
-                setTrainer(model.trainer('pretraining', trainingOptions));
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
             };
@@ -104,14 +99,19 @@ export default function TextTraining() {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer, settings]);
+    }, [model, setTrainer]);
 
+    // Check if training and validation datasets need updating
     useEffect(() => {
         if (dataset && dataset.length > 0) {
             setNeedsTraining(true);
             setMessage(null);
         }
     }, [dataset]);
+
+    useEffect(() => {
+        setTrainer(null);
+    }, [settings, setTrainer]);
 
     const startTraining = async () => {
         if (!model) {
@@ -128,7 +128,7 @@ export default function TextTraining() {
             });
             return;
         }
-        if (model && dataset && trainer) {
+        if (model && dataset) {
             if (!model.loaded) {
                 setMessage({
                     notice: t('training.errors.notReady'),
@@ -140,8 +140,13 @@ export default function TextTraining() {
                 throw new Error('Model tokeniser is not trained.');
             }
 
+            const modelSize = model.getNumParams();
+            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
+            settings.gradientCheckpointing = useCheckpointing;
+            const currentTrainer = trainer ?? model.trainer('pretraining', settings);
+
             if (training) {
-                trainer.stop();
+                currentTrainer.stop();
                 setTraining(false);
                 return;
             }
@@ -154,24 +159,23 @@ export default function TextTraining() {
             setTraining(true);
             setDone(false);
 
-            const shouldPrepare = needsTraining || !trainer.isPrepared();
+            const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
 
             // setEpochs(0);
             await wait(200);
 
-            const modelSize = model.getNumParams();
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            trainer.options.advancedMetrics = advanced;
+            currentTrainer.options.advancedMetrics = advanced;
 
             if (shouldPrepare) {
                 try {
                     //const task = new tasks.PretrainingTask(dataset);
                     setPreparing(true);
-                    await trainer.prepare(dataset);
+                    await currentTrainer.prepare(dataset);
                     setPreparing(false);
-                    setTotalSamples(trainer.getTotalSamples());
+                    setTotalSamples(currentTrainer.getTotalSamples());
                 } catch (err) {
                     console.error('Error preparing training', err);
                     setMessage({
@@ -186,7 +190,7 @@ export default function TextTraining() {
 
             setNeedsTraining(false);
 
-            trainer
+            currentTrainer
                 .train()
                 .then(() => {
                     setDone(true);
@@ -197,13 +201,15 @@ export default function TextTraining() {
                     setDone(true);
                     setTraining(false);
                     logger.error({ action: 'training_error', message: err.message });
-                    trainer.stop();
-                    trainer.reset();
+                    currentTrainer.stop();
+                    currentTrainer.reset();
                     setMessage({
                         notice: t('training.errors.trainingFailed'),
                         level: 'error',
                     });
                 });
+
+            setTrainer(currentTrainer);
         }
     };
 
