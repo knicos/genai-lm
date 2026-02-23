@@ -119,15 +119,15 @@ export function Component() {
                             id="decay-label"
                             className={style.label}
                         >
-                            {t('app.settings.decaySteps')}
+                            {t('app.settings.decayEpochs')}
                         </div>
                         <Slider
                             aria-labelledby="decay-label"
-                            value={settings.decaySteps}
-                            onChange={(_, value) => setSettings({ ...settings, decaySteps: value as number })}
-                            min={1000}
-                            max={100000}
-                            step={100}
+                            value={settings.decayEpochs}
+                            onChange={(_, value) => setSettings({ ...settings, decayEpochs: value as number })}
+                            min={1}
+                            max={100}
+                            step={1}
                             valueLabelDisplay="auto"
                         />
                     </FormControl>

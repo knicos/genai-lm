@@ -2,19 +2,18 @@ import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import style from './style.module.css';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
-import { useEffect, useState } from 'react';
-import useModelLoaded from '../../utilities/useModelLoaded';
-import { createMetric } from '../../workflow/Evaluation/Evaluation';
-import { TrainingLogEntry, TrainingProgress } from '@genai-fi/nanogpt';
+import { useEffect, useRef, useState } from 'react';
+import { TrainingLogEntry } from '@genai-fi/nanogpt';
 import { modelAtom } from '../../state/model';
 import Circle from '../../components/Clock/Circle';
 import { qualityToColor } from '../../utilities/colours';
 import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { trainerAtom } from '../../state/trainer';
 import { DatasetElementType } from '@mui/x-charts/internals';
 import { theme } from '../../theme';
 import { deviceCapabilities } from '../../state/device';
+import { CollapsedTrainingLog, CollapsedTrainingPoint } from './CollapsedTrainingLog';
+import { createMetric } from '../../utilities/metric';
 
 interface AdvancedStats {
     samplesPerSecond: number;
@@ -26,12 +25,12 @@ export function Component() {
     const [metricValue, setMetricValue] = useState<number>(0);
     const [metricPercentage, setMetricPercentage] = useState<number>(0);
     const model = useAtomValue(modelAtom);
-    const ready = useModelLoaded(model ?? undefined);
     const [metric, setMetric] = useAtom(evaluatorMetrics);
     const setAdvanced = useSetAtom(evaluatorAdvanced);
     const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
-    const trainer = useAtomValue(trainerAtom);
     const shouldAnimate = useAtomValue(deviceCapabilities)?.backend === 'webgpu';
+    const aggregatorRef = useRef(new CollapsedTrainingLog(1));
+    const [history, setHistory] = useState<CollapsedTrainingPoint[]>([]);
 
     useEffect(() => {
         setAdvanced(true);
@@ -42,15 +41,36 @@ export function Component() {
 
     useEffect(() => {
         if (model) {
-            const h = (log: TrainingLogEntry, progress: TrainingProgress) => {
+            const h = (log: TrainingLogEntry) => {
                 const { value, percentage } = createMetric(metric, log, model.config.vocabSize);
                 setMetricValue(value);
                 setMetricPercentage(percentage);
 
                 setAdvancedStats({
-                    samplesPerSecond: progress.samplesPerSecond,
-                    memory: progress.memory ?? 0,
+                    samplesPerSecond: log.samplesPerSecond,
+                    memory: log.memoryUsage ?? 0,
                 });
+
+                aggregatorRef.current.push({
+                    step: log.step,
+                    trainingLoss: log.trainingMetrics.loss,
+                    validationLoss: log.validationMetrics?.loss ?? 0,
+                    trainingPerplexity: log.trainingMetrics.perplexity,
+                    validationPerplexity: log.validationMetrics?.perplexity,
+                    trainingAccuracy: log.trainingMetrics.accuracy,
+                    validationAccuracy: log.validationMetrics?.accuracy,
+                    gradientNorm: log.gradientNorm,
+                    count: 1,
+                });
+
+                const newHistory = aggregatorRef.current.getCollapsed();
+                setHistory(newHistory);
+
+                if (newHistory.length > 100) {
+                    // cap history to 100 points to keep graph responsive.
+                    aggregatorRef.current.setGroupSize(aggregatorRef.current.getGroupSize() * 2);
+                    setHistory(aggregatorRef.current.getCollapsed());
+                }
             };
             model.on('trainStep', h);
 
@@ -61,16 +81,16 @@ export function Component() {
     }, [model, metric]);
 
     useEffect(() => {
-        if (model && ready && model.model.trainingState) {
+        /*if (model && ready && model.model.trainingState) {
             const lastLog = model.model.trainingState;
             const { value, percentage } = createMetric(metric, lastLog, model.config.vocabSize);
             setMetricValue(value);
             setMetricPercentage(percentage);
-        } else {
-            setMetricValue(0);
-            setMetricPercentage(0);
-        }
-    }, [model, ready, metric]);
+        } else {*/
+        setMetricValue(0);
+        setMetricPercentage(0);
+        //}
+    }, [model]);
 
     return (
         <div className="sidePanel">
@@ -83,16 +103,10 @@ export function Component() {
                     color={qualityToColor(metricPercentage)}
                     animated={shouldAnimate}
                 >
-                    {metric === 'quality' && (
+                    {metric === 'gradientNorm' && (
                         <>
-                            <div
-                                className={style.value}
-                                data-testid="quality-value"
-                            >
-                                {`${Math.round(metricValue * 100)}`}
-                                <span className={style.percentage}>%</span>
-                            </div>
-                            <div className={style.label}>{t('evaluation.quality')}</div>
+                            <div className={style.value}>{`${metricValue.toFixed(2)}`}</div>
+                            <div className={style.label}>{t('evaluation.gradientNorm')}</div>
                         </>
                     )}
                     {metric === 'perplexity' && (
@@ -107,6 +121,12 @@ export function Component() {
                             <div className={style.label}>{t('evaluation.loss')}</div>
                         </>
                     )}
+                    {metric === 'accuracy' && (
+                        <>
+                            <div className={style.value}>{`${(metricValue * 100).toFixed(0)}%`}</div>
+                            <div className={style.label}>{t('evaluation.accuracy')}</div>
+                        </>
+                    )}
                 </Circle>
                 <FormControl>
                     <RadioGroup
@@ -114,12 +134,21 @@ export function Component() {
                         defaultValue="image"
                         name="radio-buttons-group"
                         value={metric}
-                        onChange={(_, value) => setMetric(value as EvaluationMetric)}
+                        onChange={(_, value) => {
+                            setMetric(value as EvaluationMetric);
+                            setMetricValue(0);
+                            setMetricPercentage(0);
+                        }}
                     >
                         <FormControlLabel
-                            value="quality"
+                            value="gradientNorm"
                             control={<Radio />}
-                            label={t('app.settings.qualityMetric')}
+                            label={t('app.settings.gradientNormMetric')}
+                        />
+                        <FormControlLabel
+                            value="accuracy"
+                            control={<Radio />}
+                            label={t('app.settings.accuracyMetric')}
                         />
                         <FormControlLabel
                             value="perplexity"
@@ -137,27 +166,87 @@ export function Component() {
             <h3 className={style.subtitle}>{t('tools.training.history')}</h3>
             <div className={style.chartContainer}>
                 <LineChart
-                    skipAnimation={!shouldAnimate}
+                    skipAnimation={true}
                     localeText={{ noData: t('training.noData') }}
-                    dataset={(trainer?.getLog() ?? []) as unknown as DatasetElementType<number>[]}
-                    series={[
+                    dataset={history as unknown as DatasetElementType<number>[]}
+                    series={
+                        metric === 'loss'
+                            ? [
+                                  {
+                                      dataKey: 'validationLoss',
+                                      showMark: false,
+                                      label: t('training.valLoss'),
+                                      color: theme.light.chartColours[4],
+                                      id: 'valLoss',
+                                  },
+                                  {
+                                      dataKey: 'trainingLoss',
+                                      showMark: false,
+                                      label: t('training.loss'),
+                                      color: theme.light.chartColours[1],
+                                      id: 'loss',
+                                  },
+                              ]
+                            : metric === 'perplexity'
+                              ? [
+                                    {
+                                        dataKey: 'validationPerplexity',
+                                        showMark: false,
+                                        label: t('training.valPerplexity'),
+                                        color: theme.light.chartColours[4],
+                                        id: 'valPerplexity',
+                                    },
+                                    {
+                                        dataKey: 'trainingPerplexity',
+                                        showMark: false,
+                                        label: t('training.perplexity'),
+                                        color: theme.light.chartColours[1],
+                                        id: 'perplexity',
+                                    },
+                                ]
+                              : metric === 'gradientNorm'
+                                ? [
+                                      {
+                                          dataKey: 'gradientNorm',
+                                          showMark: false,
+                                          label: t('training.gradientNorm'),
+                                          color: theme.light.chartColours[1],
+                                          id: 'gradientNorm',
+                                      },
+                                  ]
+                                : metric === 'accuracy'
+                                  ? [
+                                        {
+                                            dataKey: 'validationAccuracy',
+                                            showMark: false,
+                                            label: t('training.valAccuracy'),
+                                            color: theme.light.chartColours[4],
+                                            id: 'valAccuracy',
+                                        },
+                                        {
+                                            dataKey: 'trainingAccuracy',
+                                            showMark: false,
+                                            label: t('training.accuracy'),
+                                            color: theme.light.chartColours[1],
+                                            id: 'accuracy',
+                                        },
+                                    ]
+                                  : []
+                    }
+                    height={250}
+                    yAxis={[
                         {
-                            dataKey: 'valLoss',
-                            showMark: false,
-                            label: t('training.valLoss'),
-                            color: theme.light.chartColours[4],
-                            id: 'valLoss',
-                        },
-                        {
-                            dataKey: 'loss',
-                            showMark: false,
-                            label: t('training.loss'),
-                            color: theme.light.chartColours[1],
-                            id: 'loss',
+                            label:
+                                metric === 'loss'
+                                    ? t('training.loss')
+                                    : metric === 'perplexity'
+                                      ? t('training.perplexity')
+                                      : metric === 'accuracy'
+                                        ? t('training.accuracy')
+                                        : t('training.gradientNorm'),
+                            tickNumber: 5,
                         },
                     ]}
-                    height={250}
-                    yAxis={[{ label: t('training.loss') }]}
                     xAxis={[{ label: t('training.steps'), tickNumber: 5, dataKey: 'step' }]}
                 />
             </div>

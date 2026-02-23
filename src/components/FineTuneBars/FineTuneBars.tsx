@@ -72,7 +72,10 @@ export default function FineTuneBars({ model, trainer, conversations }: Props) {
                         // Normalise to 0-1 and invert so higher is better
                         const maxLoss = Math.log1p(Math.log(model.config.vocabSize) / 2);
                         setData(
-                            loses.map((loss) => (isNaN(loss) ? 0 : 1 - Math.min(1, Math.log1p(loss) / maxLoss)) * 100)
+                            loses.map(
+                                (loss) =>
+                                    (isNaN(loss.loss) ? 0 : 1 - Math.min(1, Math.log1p(loss.loss) / maxLoss)) * 100
+                            )
                         );
                     }
                 } catch {

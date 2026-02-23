@@ -27,12 +27,11 @@ import { dataTokens } from '../../state/data';
 const CHECKPT_THRESHOLD = 3_000_000;
 
 interface TrainingProgress {
-    duration: number;
-    totalSamples: number;
-    samplesPerSecond: number;
-    remaining: number;
-    progress: number;
+    progress: number; // Progress as a fraction between 0 and 1
+    remaining: number; // Estimated remaining time in seconds
 }
+
+type ExtendedTrainingLogEntry = TrainingLogEntry & TrainingProgress;
 
 export default function TextTraining() {
     const { t } = useTranslation();
@@ -47,7 +46,7 @@ export default function TextTraining() {
     const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
+    const [trainingProgress, setTrainingProgress] = useState<ExtendedTrainingLogEntry | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
@@ -67,14 +66,14 @@ export default function TextTraining() {
         if (trainer) {
             const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
                 setEpochs(log.step);
-                setTrainingProgress(progress);
+                setTrainingProgress({ ...log, ...progress });
                 if (log.step % 100 === 0) {
                     logger.log({
                         action: 'training_step',
                         step: log.step,
-                        loss: log.loss,
-                        samplesPerSecond: progress.samplesPerSecond,
-                        validationLoss: log.valLoss,
+                        loss: log.trainingMetrics.loss,
+                        samplesPerSecond: log.samplesPerSecond,
+                        validationLoss: log.validationMetrics?.loss,
                     });
                 }
             };
@@ -108,10 +107,6 @@ export default function TextTraining() {
             setMessage(null);
         }
     }, [dataset]);
-
-    useEffect(() => {
-        setTrainer(null);
-    }, [settings, setTrainer]);
 
     const startTraining = async () => {
         if (!model) {
@@ -167,7 +162,7 @@ export default function TextTraining() {
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            currentTrainer.options.advancedMetrics = advanced;
+            //currentTrainer.options.metrics = advanced ? ['gradientNorm', 'accuracy'] : undefined;
 
             if (shouldPrepare) {
                 try {

@@ -10,3 +10,26 @@
 .sliderControl {
     margin-top: 1rem;
 }
+
+.optimizerFieldset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    align-items: center;
+    justify-self: start;
+    margin-top: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.optimizerFieldset legend {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}
+
+.optimizerFieldset .sliderControl {
+    margin: 0;
+    min-width: 150px;
+    flex-grow: 1;
+}

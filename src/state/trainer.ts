@@ -1,30 +1,28 @@
 import { atomWithStorage } from 'jotai/utils';
 import { storage } from './storage';
 import { atom } from 'jotai';
-import { ITrainerOptions, TeachableLLM } from '@genai-fi/nanogpt';
+import { TeachableLLM, TrainingOptions } from '@genai-fi/nanogpt';
 
-interface TrainingSettings extends ITrainerOptions {
-    batchSize: number;
-    maxSteps: number;
-    learningRate: number;
+interface TrainingSettings extends TrainingOptions {
     outputText: boolean;
     disableCheckpointing: boolean;
-    gradientMetrics: boolean;
-    mixedPrecision: boolean;
 }
 export const trainerSettings = atomWithStorage<TrainingSettings>(
     'trainerSettings',
     {
         batchSize: 16,
-        maxSteps: 3000000,
+        maxEpochs: 1000,
         learningRate: 1e-3,
         outputText: true,
         disableCheckpointing: false,
-        gradientMetrics: false,
         mixedPrecision: true,
         warmupSteps: 100,
-        decaySteps: 20000,
+        decayEpochs: 100,
         weightDecay: 0.01,
+        sftMode: 'full',
+        logInterval: 20,
+        metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
+        orthoGrad: false,
     },
     storage
 );
@@ -36,11 +34,10 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',
     {
         batchSize: 2,
-        maxSteps: 3000000,
+        maxEpochs: 1000,
         learningRate: 1e-4,
         outputText: true,
         disableCheckpointing: false,
-        gradientMetrics: false,
         mixedPrecision: true,
         loraConfig: {
             rank: 4,
@@ -49,7 +46,7 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
         },
         sftMode: 'last-layer',
         warmupSteps: 50,
-        decaySteps: 10000,
+        decayEpochs: 100,
         weightDecay: 0.01,
     },
     storage

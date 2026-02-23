@@ -75,70 +75,84 @@ export function Component() {
                             label={t('app.settings.mixedPrecision')}
                         />
                     </FormControl>
-                    <FormControl>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={settings.clipNorm !== undefined}
-                                    onChange={(_, checked) =>
-                                        setSettings({ ...settings, clipNorm: checked ? 1 : undefined })
-                                    }
-                                />
-                            }
-                            label={t('app.settings.gradClipping')}
-                        />
-                    </FormControl>
-                    <FormControl className={style.sliderControl}>
-                        <div
-                            id="warmup-label"
-                            className={style.label}
-                        >
-                            {t('app.settings.warmupSteps')}
-                        </div>
-                        <Slider
-                            aria-labelledby="warmup-label"
-                            value={settings.warmupSteps}
-                            onChange={(_, value) => setSettings({ ...settings, warmupSteps: value as number })}
-                            min={0}
-                            max={1000}
-                            step={10}
-                            valueLabelDisplay="auto"
-                        />
-                    </FormControl>
-                    <FormControl className={style.sliderControl}>
-                        <div
-                            id="decay-label"
-                            className={style.label}
-                        >
-                            {t('app.settings.decaySteps')}
-                        </div>
-                        <Slider
-                            aria-labelledby="decay-label"
-                            value={settings.decaySteps}
-                            onChange={(_, value) => setSettings({ ...settings, decaySteps: value as number })}
-                            min={1000}
-                            max={100000}
-                            step={100}
-                            valueLabelDisplay="auto"
-                        />
-                    </FormControl>
-                    <FormControl className={style.sliderControl}>
-                        <div
-                            id="weight-decay-label"
-                            className={style.label}
-                        >
-                            {t('app.settings.weightDecay')}
-                        </div>
-                        <Slider
-                            aria-labelledby="weight-decay-label"
-                            value={settings.weightDecay}
-                            onChange={(_, value) => setSettings({ ...settings, weightDecay: value as number })}
-                            min={0}
-                            max={0.2}
-                            step={0.01}
-                            valueLabelDisplay="auto"
-                        />
-                    </FormControl>
+                    <fieldset className={style.optimizerFieldset}>
+                        <legend className={style.label}>{t('app.settings.optimizer')}</legend>
+                        <FormControl className={style.sliderControl}>
+                            <div
+                                id="warmup-label"
+                                className={style.label}
+                            >
+                                {t('app.settings.warmupSteps')}
+                            </div>
+                            <Slider
+                                aria-labelledby="warmup-label"
+                                value={settings.warmupSteps}
+                                onChange={(_, value) => setSettings({ ...settings, warmupSteps: value as number })}
+                                min={0}
+                                max={1000}
+                                step={10}
+                                valueLabelDisplay="auto"
+                            />
+                        </FormControl>
+                        <FormControl className={style.sliderControl}>
+                            <div
+                                id="decay-label"
+                                className={style.label}
+                            >
+                                {t('app.settings.decayEpochs')}
+                            </div>
+                            <Slider
+                                aria-labelledby="decay-label"
+                                value={settings.decayEpochs}
+                                onChange={(_, value) => setSettings({ ...settings, decayEpochs: value as number })}
+                                min={1}
+                                max={100}
+                                step={1}
+                                valueLabelDisplay="auto"
+                            />
+                        </FormControl>
+                        <FormControl className={style.sliderControl}>
+                            <div
+                                id="weight-decay-label"
+                                className={style.label}
+                            >
+                                {t('app.settings.weightDecay')}
+                            </div>
+                            <Slider
+                                aria-labelledby="weight-decay-label"
+                                value={settings.weightDecay}
+                                onChange={(_, value) => setSettings({ ...settings, weightDecay: value as number })}
+                                min={0}
+                                max={0.2}
+                                step={0.01}
+                                valueLabelDisplay="auto"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={settings.clipNorm !== undefined}
+                                        onChange={(_, checked) =>
+                                            setSettings({ ...settings, clipNorm: checked ? 1 : undefined })
+                                        }
+                                    />
+                                }
+                                label={t('app.settings.gradClipping')}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={settings.orthoGrad || false}
+                                        onChange={(_, checked) => setSettings({ ...settings, orthoGrad: checked })}
+                                    />
+                                }
+                                label={t('app.settings.orthoGrad')}
+                            />
+                        </FormControl>
+                    </fieldset>
                 </>
             )}
         </div>

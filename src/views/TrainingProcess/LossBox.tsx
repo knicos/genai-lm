@@ -1,11 +1,11 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import Circle from '../../components/Clock/Circle';
 import { lossToColor } from '../../utilities/colours';
-import { createMetric } from '../../workflow/Evaluation/Evaluation';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import { useEffect, useRef, useState } from 'react';
+import { createMetric } from '../../utilities/metric';
 
 const CURVE = 10;
 const ARROW_SIZE = 10;
@@ -27,7 +27,8 @@ export default function LossBox({ loss, model, updating }: Props) {
     const { t } = useTranslation();
     const [line, setLine] = useState<ILine>({ x1: 0, y1: 0, x2: 0, y2: 0 });
     const ref = useRef<SVGSVGElement>(null);
-    const metric = loss === undefined ? null : createMetric('loss', { loss }, model.config.vocabSize ?? 1);
+    const metric =
+        loss === undefined ? null : createMetric('loss', { trainingMetrics: { loss } }, model.config.vocabSize ?? 1);
 
     useEffect(() => {
         if (ref.current) {

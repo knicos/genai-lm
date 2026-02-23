@@ -25,14 +25,6 @@ import FineTuneBars from '../../components/FineTuneBars/FineTuneBars';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
-interface TrainingProgress {
-    duration: number;
-    totalSamples: number;
-    samplesPerSecond: number;
-    remaining: number;
-    progress: number;
-}
-
 export default function TuneTraining() {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(tunerAtom);
@@ -62,16 +54,16 @@ export default function TuneTraining() {
 
     useEffect(() => {
         if (trainer) {
-            const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
+            const h = async (log: TrainingLogEntry) => {
                 setEpochs(log.step);
 
                 if (log.step % 100 === 0) {
                     logger.log({
                         action: 'training_step',
                         step: log.step,
-                        loss: log.loss,
-                        samplesPerSecond: progress.samplesPerSecond,
-                        validationLoss: log.valLoss,
+                        loss: log.trainingMetrics.loss,
+                        samplesPerSecond: log.samplesPerSecond,
+                        validationLoss: log.validationMetrics?.loss,
                     });
                 }
             };
@@ -165,7 +157,6 @@ export default function TuneTraining() {
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
             model.enableProfiler = advanced;
-            currentTrainer.options.advancedMetrics = advanced;
 
             if (shouldPrepare) {
                 try {
