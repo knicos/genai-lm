@@ -1,14 +1,16 @@
 import { usePeerData, usePeerSender } from '@genai-fi/base/hooks/peer';
 import { EventProtocol } from '../../components/PeerShare/events';
 import { Conversation } from '@genai-fi/nanogpt';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface Props {
     conversation: Conversation[];
     onResponse: (response: string, completed: boolean) => void;
+    onIdChange?: (id: string) => void;
 }
 
-export default function ChatClientProtocol({ conversation, onResponse }: Props) {
+export default function ChatClientProtocol({ conversation, onResponse, onIdChange }: Props) {
+    const id = useRef<string | null>(null);
     const send = usePeerSender<EventProtocol>();
 
     useEffect(() => {
@@ -20,6 +22,12 @@ export default function ChatClientProtocol({ conversation, onResponse }: Props) 
     usePeerData(async (data: EventProtocol) => {
         if (data.event === 'response') {
             onResponse(data.output.content, data.completed);
+            if (data.conversation && data.conversation !== id.current) {
+                id.current = data.conversation;
+                if (onIdChange) {
+                    onIdChange(data.conversation);
+                }
+            }
         }
     });
 

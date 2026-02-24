@@ -4,49 +4,54 @@ import { Connection } from '@genai-fi/base';
 import { useAtomValue } from 'jotai';
 import { modelAtom } from '../../state/model';
 import { v4 as uuidv4 } from 'uuid';
+import { useEffect, useState } from 'react';
+import ChatManager from './ChatManager';
 
 export default function ChatProtocol() {
     //const code = useAtomValue(sessionCode);
     const model = useAtomValue(modelAtom);
+    const [manager, setManager] = useState<ChatManager | null>(null);
+
+    useEffect(() => {
+        if (model) {
+            setManager((old) => {
+                if (old) {
+                    old.stopAll();
+                }
+                return new ChatManager(model);
+            });
+        }
+    }, [model]);
 
     usePeerData(async (data: EventProtocol, conn: Connection<EventProtocol>) => {
         if (data.event === 'chat') {
-            if (model && model.loaded) {
-                const generator = model.generator();
+            if (manager) {
                 const conversationId = data.conversation || uuidv4();
-                if (data.stream) {
-                    let step = 0;
-                    generator.on('tokens', () => {
-                        step++;
-                        if (step % 5 !== 0) return;
-                        const convo = generator.getConversation();
-                        const lastMessage = convo[convo.length - 1];
-                        conn.send({
-                            event: 'response',
-                            output: lastMessage,
-                            completed: false,
-                            conversation: conversationId,
-                        });
-                    });
-                }
-                generator
-                    .generate(Array.isArray(data.input) ? data.input : [{ role: 'user', content: data.input }], {
-                        maxLength: 1000,
-                        topP: 0.9,
-                        temperature: 0.8,
-                    })
-                    .then((response) => {
-                        conn.send({
-                            event: 'response',
-                            output: response[response.length - 1],
-                            completed: true,
-                            conversation: conversationId,
-                        });
-                        generator.dispose();
-                    });
+
+                manager.startConversation(
+                    conversationId,
+                    data.input,
+                    (id, message, completed) => {
+                        if (data.stream || completed) {
+                            conn.send({
+                                event: 'response',
+                                output: { role: 'assistant', content: message },
+                                completed,
+                                conversation: id,
+                            });
+                        }
+                    },
+                    (_, error) => {
+                        conn.send({ event: 'error', message: error });
+                    }
+                );
             } else {
                 console.warn('Model not ready, cannot generate response');
                 conn.send({ event: 'error', message: 'Model not ready' });
+            }
+        } else if (data.event === 'stop') {
+            if (manager) {
+                manager.stopConversation(data.conversation);
             }
         }
     });

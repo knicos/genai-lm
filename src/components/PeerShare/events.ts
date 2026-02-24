@@ -18,6 +18,12 @@ export interface ResponseEvent extends PeerEvent {
 export interface ErrorEvent extends PeerEvent {
     event: 'error';
     message: string;
+    conversation?: string;
 }
 
-export type EventProtocol = ChatEvent | ResponseEvent | ErrorEvent;
+export interface StopEvent extends PeerEvent {
+    event: 'stop';
+    conversation: string;
+}
+
+export type EventProtocol = ChatEvent | ResponseEvent | ErrorEvent | StopEvent;
