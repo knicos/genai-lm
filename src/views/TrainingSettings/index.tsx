@@ -75,6 +75,57 @@ export function Component() {
                             label={t('app.settings.mixedPrecision')}
                         />
                     </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="layer-drop-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.layerDrop')}
+                        </div>
+                        <Slider
+                            aria-labelledby="layer-drop-label"
+                            value={settings.layerDrop}
+                            onChange={(_, value) => setSettings({ ...settings, layerDrop: value as number })}
+                            min={0}
+                            max={0.5}
+                            step={0.1}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="drop-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.dropout')}
+                        </div>
+                        <Slider
+                            aria-labelledby="drop-label"
+                            value={settings.dropout}
+                            onChange={(_, value) => setSettings({ ...settings, dropout: value as number })}
+                            min={0}
+                            max={0.2}
+                            step={0.01}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="smoothing-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.labelSmoothing')}
+                        </div>
+                        <Slider
+                            aria-labelledby="smoothing-label"
+                            value={settings.labelSmoothing}
+                            onChange={(_, value) => setSettings({ ...settings, labelSmoothing: value as number })}
+                            min={0}
+                            max={0.2}
+                            step={0.01}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
                     <fieldset className={style.optimizerFieldset}>
                         <legend className={style.label}>{t('app.settings.optimizer')}</legend>
                         <FormControl className={style.sliderControl}>

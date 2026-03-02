@@ -99,6 +99,10 @@ export const routes = createRoutesFromElements(
                 lazy={() => import('./views/TrainingSettings')}
             />
             <Route
+                path="arch-settings"
+                lazy={() => import('./views/ArchSettings')}
+            />
+            <Route
                 path="tuning-settings"
                 lazy={() => import('./views/TuningSettings')}
             />

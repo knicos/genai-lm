@@ -1,6 +1,7 @@
 .container {
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .modelMenu {
@@ -17,6 +18,18 @@
 
 .spacer {
     width: 1rem;
+}
+
+.parameters {
+    text-align: right;
+    font-size: 1rem;
+    padding: 0 2rem;
+    margin-left: auto;
+}
+
+.number {
+    font-size: 1.1rem;
+    font-weight: bold;
 }
 
 @media (max-width: 600px) {

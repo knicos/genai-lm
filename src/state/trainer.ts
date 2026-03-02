@@ -23,6 +23,9 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         logInterval: 20,
         metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
         orthoGrad: false,
+        dropout: 0.0,
+        layerDrop: 0.0,
+        labelSmoothing: 0.0,
     },
     storage
 );
@@ -33,7 +36,7 @@ export const trainerAtom = atom<Trainer | null>(null);
 export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',
     {
-        batchSize: 2,
+        batchSize: 16,
         maxEpochs: 1000,
         learningRate: 1e-4,
         outputText: true,
@@ -44,10 +47,13 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
             alpha: 8,
             variables: ['*'],
         },
-        sftMode: 'last-layer',
-        warmupSteps: 50,
-        decayEpochs: 100,
-        weightDecay: 0.01,
+        sftMode: 'full',
+        warmupSteps: 10,
+        decayEpochs: 1,
+        weightDecay: 0.0,
+        logInterval: 20,
+        metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
+        orthoGrad: false,
     },
     storage
 );

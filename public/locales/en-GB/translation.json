@@ -59,7 +59,13 @@
             "gradClipping": "Gradient Clipping",
             "warmupSteps": "Warmup Steps",
             "decayEpochs": "Decay Epochs",
-            "weightDecay": "Weight Decay"
+            "weightDecay": "Weight Decay",
+            "labelSmoothing": "Label Smoothing",
+            "layerDrop": "Stochastic Depth",
+            "dropout": "Dropout",
+            "blockSize": "Context Length",
+            "mlpFactor": "MLP Factor",
+            "arch": "Architecture Settings"
         },
         "close": "Close",
         "ok": "OK",
@@ -107,9 +113,11 @@
         }
     },
     "checkmodel": {
-        "title": "Check Model",
-        "start": "Check",
-        "stop": "Stop"
+        "title": "Build Model",
+        "start": "Build",
+        "stop": "Stop",
+        "outdated": "The model needs to be rebuilt",
+        "upToDate": "Model is ready to use."
     },
     "model": {
         "parameters": "Parameters",
@@ -139,7 +147,10 @@
         "preTraining": "Pre-Training",
         "defaultName": "Your Model",
         "includeAll": "Include different architectures",
-        "noModelsFound": "No models found"
+        "noModelsFound": "No models found",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "examples": "Examples"
     },
     "training": {
         "title": "Pre-Training",

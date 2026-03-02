@@ -34,7 +34,7 @@ export function Component() {
                     value={settings.batchSize}
                     onChange={(_, value) => setSettings({ ...settings, batchSize: value as number })}
                     min={1}
-                    max={8}
+                    max={32}
                     step={1}
                     valueLabelDisplay="auto"
                 />

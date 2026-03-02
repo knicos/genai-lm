@@ -71,6 +71,13 @@ const CONNECTIONS: IConnection[] = [
         end: 'textData',
         startPoint: 'right',
         endPoint: 'left',
+        startOffset: -0.5,
+    },
+    {
+        start: 'checkmodel',
+        end: 'untrainedmodel',
+        startPoint: 'bottom',
+        endPoint: 'top',
         endOffset: -0.5,
         startOffset: -0.2,
     },
@@ -213,10 +220,17 @@ export function Component() {
                             data-widget="container"
                         >
                             {flow === 'model' && (
-                                <>
-                                    <CheckModel />
+                                <div
+                                    data-widget="container"
+                                    className={style.subgroup}
+                                >
                                     <TextDataLink />
-                                </>
+                                    <CheckModel />
+                                    <PreTrainedModel
+                                        hideMenu
+                                        widget="untrainedmodel"
+                                    />
+                                </div>
                             )}
                             {flow === 'pretraindata' && (
                                 <>

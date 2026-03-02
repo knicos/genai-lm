@@ -14,7 +14,12 @@ import { modelAtom } from '../../state/model';
 import SearchPretrained from './SearchPretrained';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
-export default function PreTrainedModel() {
+interface Props {
+    widget?: string;
+    hideMenu?: boolean;
+}
+
+export default function PreTrainedModel({ widget, hideMenu }: Props) {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
     const [showSearch, setShowSearch] = useState(false);
@@ -48,11 +53,16 @@ export default function PreTrainedModel() {
     const openFile = useCallback(
         (file: File) => {
             setIsLoading(true);
-            const model = TeachableLLM.loadModel(file);
-            model.meta.trained = true;
-            setModel(model);
-            waitModelLoaded(model).then(() => {
-                setIsLoading(false);
+            setModel((old) => {
+                if (old) {
+                    old.dispose();
+                }
+                const model = TeachableLLM.loadModel(file);
+                model.meta.trained = true;
+                waitModelLoaded(model).then(() => {
+                    setIsLoading(false);
+                });
+                return model;
             });
         },
         [setModel]
@@ -96,7 +106,7 @@ export default function PreTrainedModel() {
 
     return (
         <Box
-            widget="pretrained"
+            widget={widget ?? 'pretrained'}
             active={done}
             disabled={busy}
             className={style.modelThread}
@@ -129,12 +139,14 @@ export default function PreTrainedModel() {
                     placeholder={t('model.languageModel')}
                     dark
                 />
-                <ModelMenu
-                    disabled={modelBusy}
-                    onUpload={() => fileRef.current?.click()}
-                    onSearch={() => setShowSearch(true)}
-                    onDownload={model ? () => doSave(model?.meta.name || 'model') : undefined}
-                />
+                {!hideMenu && (
+                    <ModelMenu
+                        disabled={modelBusy}
+                        onUpload={() => fileRef.current?.click()}
+                        onSearch={() => setShowSearch(true)}
+                        onDownload={model ? () => doSave(model?.meta.name || 'model') : undefined}
+                    />
+                )}
             </div>
         </Box>
     );

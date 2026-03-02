@@ -1,20 +1,35 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { modelAtom } from '../../state/model';
+import { modelAtom, modelConfigAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
-import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
-import { useState } from 'react';
+import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../utilities/useModelLoaded';
+import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
+import { Alert } from '@mui/material';
+
+function isConfigEqual(a: GPTConfig, b: GPTConfig) {
+    return (
+        a.vocabSize === b.vocabSize &&
+        a.nEmbed === b.nEmbed &&
+        a.nHead === b.nHead &&
+        a.nLayer === b.nLayer &&
+        a.mlpFactor === b.mlpFactor &&
+        a.modelType === b.modelType &&
+        a.blockSize === b.blockSize
+    );
+}
 
 export default function CheckModel() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const [model, setModel] = useAtom(modelAtom);
     //const status = useModelStatus(model ?? undefined);
     const ready = useModelLoaded(model ?? undefined);
-    const [analysing, setAnalysing] = useState(false);
+    const architecture = useAtomValue(modelConfigAtom);
+
+    const isUpToDate = !model || !ready || isConfigEqual(model.config, architecture);
 
     return (
         <Box
@@ -27,18 +42,45 @@ export default function CheckModel() {
                     title={t('checkmodel.title')}
                     status={ready ? 'done' : 'waiting'}
                 />
+                {!isUpToDate && (
+                    <Alert
+                        sx={{ marginTop: '1rem' }}
+                        severity="warning"
+                    >
+                        {t('checkmodel.outdated')}
+                    </Alert>
+                )}
+                {isUpToDate && (
+                    <Alert
+                        sx={{ marginTop: '1rem' }}
+                        severity="info"
+                    >
+                        {t('checkmodel.upToDate')}
+                    </Alert>
+                )}
                 <div className={style.buttonBox}>
                     <Button
-                        disabled={!model || analysing}
+                        disabled={isUpToDate}
                         variant="contained"
-                        startIcon={<ModelTrainingIcon />}
+                        startIcon={<ConstructionIcon />}
+                        fullWidth
                         onClick={() => {
-                            if (model) {
-                                setAnalysing(true);
-                            }
+                            setModel((old) => {
+                                if (old) {
+                                    old.dispose();
+                                }
+                                const newModel = TeachableLLM.create(
+                                    architecture.vocabSize <= 256 ? 'char' : 'bpe',
+                                    architecture
+                                );
+                                if (old) {
+                                    newModel.meta.name = old.meta.name;
+                                }
+                                return newModel;
+                            });
                         }}
                     >
-                        {analysing ? t('checkmodel.stop') : t('checkmodel.start')}
+                        {t('checkmodel.start')}
                     </Button>
                 </div>
             </div>

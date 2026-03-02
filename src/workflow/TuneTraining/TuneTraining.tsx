@@ -96,11 +96,13 @@ export default function TuneTraining() {
         }
     }, [conversations]);
 
-    useEffect(() => {
-        setTrainer(null);
-    }, [settings, setTrainer]);
-
     const startTraining = async () => {
+        if (training) {
+            trainer?.stop();
+            setTraining(false);
+            return;
+        }
+
         if (!model) {
             setMessage({
                 notice: t('training.errors.noModel'),
@@ -133,13 +135,7 @@ export default function TuneTraining() {
                 ...settings,
                 gradientCheckpointing: useCheckpointing,
             };
-            const currentTrainer = trainer ?? model.trainer('sft', trainingOptions);
-
-            if (training) {
-                currentTrainer.stop();
-                setTraining(false);
-                return;
-            }
+            const currentTrainer = model.trainer('sft', trainingOptions);
 
             if (!done) {
                 // already training
@@ -179,6 +175,7 @@ export default function TuneTraining() {
 
             setNeedsTraining(false);
 
+            setTrainer(currentTrainer);
             currentTrainer
                 .train()
                 .then(() => {
@@ -197,8 +194,6 @@ export default function TuneTraining() {
                         level: 'error',
                     });
                 });
-
-            setTrainer(currentTrainer);
         }
     };
 

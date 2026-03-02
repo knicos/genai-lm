@@ -11,7 +11,7 @@ export const MANIFEST_URL = 'https://store.gen-ai.fi/llm/pretrainedManifest.json
 
 interface Props {
     model?: TeachableLLM;
-    onModel(model: TeachableLLM): void;
+    onModel(model: TeachableLLM | ((old: TeachableLLM | null) => TeachableLLM)): void;
     onClose: () => void;
 }
 

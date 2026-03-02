@@ -123,6 +123,12 @@ export default function TextTraining() {
             });
             return;
         }
+
+        if (training && trainer) {
+            trainer.stop();
+            return;
+        }
+
         if (model && dataset) {
             if (!model.loaded) {
                 setMessage({
@@ -138,7 +144,7 @@ export default function TextTraining() {
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
             settings.gradientCheckpointing = useCheckpointing;
-            const currentTrainer = trainer ?? model.trainer('pretraining', settings);
+            const currentTrainer = model.trainer('pretraining', settings);
 
             if (training) {
                 currentTrainer.stop();
@@ -185,6 +191,7 @@ export default function TextTraining() {
 
             setNeedsTraining(false);
 
+            setTrainer(currentTrainer);
             currentTrainer
                 .train()
                 .then(() => {
@@ -203,8 +210,6 @@ export default function TextTraining() {
                         level: 'error',
                     });
                 });
-
-            setTrainer(currentTrainer);
         }
     };
 

@@ -24,10 +24,13 @@ import { Spinner } from '@genai-fi/base';
 import { useAtom } from 'jotai';
 import { downloadsAtom } from '../../state/data';
 import { configMatch } from './manifest';
+import { ExtendedConfig } from '../../state/model';
 
 interface Props {
     model?: TeachableLLM;
-    onModel(model: TeachableLLM): void;
+    onModel?: (updater: (old: TeachableLLM | null) => TeachableLLM) => void;
+    config?: ExtendedConfig;
+    onConfig?: (config: ExtendedConfig) => void;
     onClose: () => void;
     dataRows: RowSet<ModelCardItem>[];
     langs: { code: string; name: string }[];
@@ -39,9 +42,11 @@ interface Props {
 export default function ModelSearch({
     model,
     onModel,
+    onConfig,
     onClose,
     dataRows,
     langs,
+    config,
     setLang,
     lang,
     limitToModelArchitecture,
@@ -51,7 +56,8 @@ export default function ModelSearch({
     const [open, setOpen] = useState(true);
     const [includeAll, setIncludeAll] = useState(false);
 
-    const selectedSet = model && model.meta.id ? new Set([model.meta.id]) : undefined;
+    const selectedSet =
+        model && model.meta.id ? new Set([model.meta.id]) : config && config.id ? new Set([config.id]) : undefined;
 
     const filteredRows = useMemo(
         () =>
@@ -99,13 +105,19 @@ export default function ModelSearch({
                 }
             }
             if (downloader) {
+                if (!onModel) return;
                 setDownloads((prev) => [...prev, downloader]);
                 downloader.on('end', (file: File) => {
                     const newModel = TeachableLLM.loadModel(file, { sourceURL: card.url });
                     newModel.meta.id = card.id;
                     newModel.meta.name = card.name;
                     newModel.meta.trained = card.trained || true;
-                    onModel(newModel);
+                    onModel((old) => {
+                        if (old) {
+                            old.dispose();
+                        }
+                        return newModel;
+                    });
                     setDownloads((prev) => prev.filter((d) => d !== downloader));
                 });
                 downloader.on('error', (error) => {
@@ -116,14 +128,23 @@ export default function ModelSearch({
                     setDownloads((prev) => prev.filter((d) => d !== downloader));
                 });
             } else if (!card.url && card.config) {
-                const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
-                newModel.meta.id = card.id;
-                newModel.meta.name = card.name;
-                newModel.meta.trained = false;
-                onModel(newModel);
+                if (onModel) {
+                    const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
+                    newModel.meta.id = card.id;
+                    newModel.meta.name = card.name;
+                    newModel.meta.trained = false;
+                    onModel((old) => {
+                        if (old) {
+                            old.dispose();
+                        }
+                        return newModel;
+                    });
+                } else if (onConfig) {
+                    onConfig({ ...card.config, id: card.id });
+                }
             }
         },
-        [model, onModel, setDownloads]
+        [model, onModel, onConfig, setDownloads]
     );
 
     return (

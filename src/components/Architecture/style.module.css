@@ -1,0 +1,80 @@
+.handle {
+    cursor: ew-resize;
+    touch-action: none;
+    fill: white;
+    stroke: #75a4e288;
+    stroke-width: 4px;
+}
+
+.handleBg {
+    fill: white;
+    stroke: none;
+}
+
+.handleBar {
+    cursor: ew-resize;
+    touch-action: none;
+    fill: #75a4e288;
+}
+
+.handleGroup:hover .handle {
+    fill: #75a4e2;
+    stroke: #75a4e2;
+}
+
+.handleGroup:hover .handleBar {
+    fill: #75a4e2;
+}
+
+.svg {
+    touch-action: none;
+    user-select: none;
+}
+
+.addButtonContainer {
+    display: none;
+}
+
+.transformerBox:hover .addButtonContainer {
+    display: initial;
+}
+
+.addButtonContainer button {
+    transform: scale(2) translate(25%, 25%);
+}
+
+.box {
+    fill: #009fb83d;
+    stroke: #009fb8;
+    stroke-width: 4px;
+}
+
+.tableButton {
+    cursor: pointer;
+    touch-action: none;
+}
+
+.tableButton rect {
+    fill: #75a4e220;
+    stroke: none;
+}
+
+.tableButton:hover rect {
+    fill: #75a4e245;
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 3rem;
+    color: #444;
+}
+
+.container {
+    overflow: scroll;
+    width: 100%;
+    background: white;
+}
