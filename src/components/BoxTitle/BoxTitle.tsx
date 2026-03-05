@@ -3,7 +3,7 @@ import useWindowSize from '../../utilities/useWindowSize';
 import StatusBox, { BoxStatus } from '../StatusBox/StatusBox';
 import styleModule from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useRef } from 'react';
+import { CSSProperties, ReactNode, useCallback, useEffect, useRef } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import MTextField from '@mui/material/TextField';
 
@@ -19,14 +19,15 @@ const TextField = styled(MTextField)({
 interface Props {
     title: string;
     placeholder?: string;
-    button?: React.ReactNode;
+    button?: ReactNode;
     status?: BoxStatus;
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     dark?: boolean;
+    startIcon?: ReactNode;
     setTitle?: (title: string) => void;
 }
 
-export default function BoxTitle({ title, button, status, style, dark, setTitle, placeholder }: Props) {
+export default function BoxTitle({ title, button, status, style, dark, setTitle, placeholder, startIcon }: Props) {
     const { t } = useTranslation();
     const { width } = useWindowSize();
     const editRef = useRef<HTMLDivElement>(null);
@@ -73,6 +74,7 @@ export default function BoxTitle({ title, button, status, style, dark, setTitle,
                 className={styleModule.title}
                 style={style}
             >
+                {startIcon}
                 <h2>
                     {!setTitle && title}
                     {setTitle && (

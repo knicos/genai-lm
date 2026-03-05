@@ -47,7 +47,7 @@ export default function InstructData() {
             <div className={style.container}>
                 <input
                     type="file"
-                    accept=".json"
+                    accept=".json,.jsonl"
                     ref={fileRef}
                     style={{ display: 'none' }}
                     onChange={async (e) => {
@@ -55,6 +55,28 @@ export default function InstructData() {
                             const file = e.target.files[0];
                             if (file) {
                                 const text = await file.text();
+
+                                if (file.name.endsWith('.jsonl')) {
+                                    const lines = text.split('\n').filter((line) => line.trim() !== '');
+                                    const data: Conversation[][] = [];
+                                    for (const line of lines) {
+                                        try {
+                                            const convo = JSON.parse(line);
+                                            if (Array.isArray(convo)) {
+                                                data.push(convo);
+                                            }
+                                        } catch {
+                                            // skip invalid lines
+                                        }
+                                    }
+                                    if (data.length > 0) {
+                                        setConversations(data);
+                                        setSelected(0);
+                                    } else {
+                                        alert(t('instruct.uploadError'));
+                                    }
+                                    return;
+                                }
                                 try {
                                     const data = JSON.parse(text);
                                     if (Array.isArray(data)) {

@@ -12,6 +12,7 @@ import logger from '../../utilities/logger';
 import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { modelAtom } from '../../state/model';
 import SearchPretrained from './SearchPretrained';
+import ModelIcon from '../../icons/ModelIcon';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -134,7 +135,11 @@ export default function PreTrainedModel({ widget, hideMenu }: Props) {
                 <BoxTitle
                     title={title}
                     setTitle={updateModelTitle}
-                    status={isLoading ? 'busy' : model ? 'done' : 'disabled'}
+                    startIcon={
+                        <div className={style.icon}>
+                            <ModelIcon />
+                        </div>
+                    }
                     style={{ height: '60px', borderBottom: 'none', backgroundColor: '#945fbf' }}
                     placeholder={t('model.languageModel')}
                     dark

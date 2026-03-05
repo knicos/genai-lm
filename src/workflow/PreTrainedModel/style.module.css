@@ -1,3 +1,10 @@
+.icon {
+    font-size: 2rem;
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+}
+
 .modelThread {
     background: #945fbf;
     color: white;
@@ -18,13 +25,17 @@
     border: 2px solid white;
 }
 
+.modelThread button {
+    margin-right: 0.5rem;
+}
+
 .modelThread h1 {
     margin: 0;
     font-size: 1.2rem;
 }
 
 .modelThread h2 {
-    margin-left: 1rem;
+    margin-left: 0;
     color: white;
 }
 

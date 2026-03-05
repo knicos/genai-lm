@@ -1,0 +1,8 @@
+.icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    user-select: none;
+    flex-shrink: 0;
+    font-size: 2rem;
+}
