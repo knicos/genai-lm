@@ -37,6 +37,7 @@ export default function ResizeableBox({
     const startDrag = (edge: Edge) => (e: React.PointerEvent<SVGElement>) => {
         if (!onWidthChange) return;
         e.preventDefault();
+        e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         dragRef.current = {
             edge,
@@ -47,6 +48,8 @@ export default function ResizeableBox({
 
     const onDrag = (e: React.PointerEvent<SVGElement>) => {
         if (!dragRef.current || !onWidthChange) return;
+        e.preventDefault();
+        e.stopPropagation();
 
         const { edge, startX, startWidth } = dragRef.current;
         const dx = (e.clientX - startX) * scaling * 2;

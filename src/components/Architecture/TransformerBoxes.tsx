@@ -3,9 +3,9 @@ import ResizeableBox from './ResizeableBox';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import style from './style.module.css';
+import { BAR_BUTTON_SIZE, BAR_BUTTON_SPACING } from './sizeUtils';
 
 const WIDTH_SCALING = 2;
-export const BAR_BUTTON_SIZE = 40;
 
 interface Props {
     layers: number;
@@ -15,9 +15,12 @@ interface Props {
     gap: number;
     y: number;
     scaling?: number;
+    showNumbers?: boolean;
     onChangeHiddenSize?: (next: number) => void;
-    onChangeHeads?: (next: number) => void;
     onChangeLayers?: (next: number) => void;
+    onLayerClick?: (index: number, element: SVGGElement | null) => void;
+    onLayerHover?: (index: number, element: SVGGElement | null) => void;
+    onLayerLeave?: (index: number) => void;
 }
 
 export default function TransformerBoxes({
@@ -28,19 +31,22 @@ export default function TransformerBoxes({
     gap,
     y,
     scaling,
+    showNumbers,
     onChangeHiddenSize,
-    onChangeHeads,
     onChangeLayers,
+    onLayerClick,
+    onLayerHover,
+    onLayerLeave,
 }: Props) {
     const width = hiddenSize * WIDTH_SCALING;
 
-    const addLayerButtonY = y + layers * (height + gap) - gap + (BAR_BUTTON_SIZE + 10);
+    const addLayerButtonY = y + layers * (height + gap) - gap + (BAR_BUTTON_SIZE + BAR_BUTTON_SPACING);
 
     return (
         <ResizeableBox
             y={y}
-            width={width + (BAR_BUTTON_SIZE + 10) * 2}
-            height={height * layers + gap * (layers - 1) + (BAR_BUTTON_SIZE + 10) * 2}
+            width={width}
+            height={height * layers + gap * (layers - 1) + (BAR_BUTTON_SIZE + BAR_BUTTON_SPACING) * 2}
             scaling={scaling}
             onWidthChange={(next: number) => onChangeHiddenSize?.(next / WIDTH_SCALING)}
             snapping={32 * heads * WIDTH_SCALING}
@@ -50,38 +56,16 @@ export default function TransformerBoxes({
                 onClick={() => onChangeLayers?.(Math.max(1, layers - 1))}
                 className={style.tableButton}
             >
-                <rect
-                    x={-width / 2}
-                    y={y}
-                    width={width}
-                    height={BAR_BUTTON_SIZE}
+                <circle
+                    cx={0}
+                    cy={y + BAR_BUTTON_SIZE / 2}
+                    r={BAR_BUTTON_SIZE * 0.75}
                 />
                 <foreignObject
                     x={-width / 2}
                     y={y}
                     width={width}
                     height={BAR_BUTTON_SIZE}
-                >
-                    <div className={style.iconContainer}>
-                        <RemoveIcon fontSize="inherit" />
-                    </div>
-                </foreignObject>
-            </g>
-            <g
-                onClick={() => onChangeHeads?.(Math.max(1, heads - 1))}
-                className={style.tableButton}
-            >
-                <rect
-                    x={-width / 2 - 10 - BAR_BUTTON_SIZE}
-                    y={y}
-                    height={addLayerButtonY - y + BAR_BUTTON_SIZE + 10}
-                    width={BAR_BUTTON_SIZE}
-                />
-                <foreignObject
-                    x={-width / 2 - 10 - BAR_BUTTON_SIZE}
-                    y={y}
-                    width={BAR_BUTTON_SIZE}
-                    height={addLayerButtonY - y + BAR_BUTTON_SIZE + 10}
                 >
                     <div className={style.iconContainer}>
                         <RemoveIcon fontSize="inherit" />
@@ -93,48 +77,30 @@ export default function TransformerBoxes({
                 .map((_, i) => (
                     <TransformerBox
                         key={i}
+                        index={i}
                         hiddenSize={hiddenSize}
-                        heads={heads}
-                        y={y + i * (height + gap) + (BAR_BUTTON_SIZE + 10)}
+                        y={y + i * (height + gap) + (BAR_BUTTON_SIZE + BAR_BUTTON_SPACING)}
                         height={height}
+                        showNumbers={showNumbers}
+                        onLayerClick={onLayerClick}
+                        onLayerHover={onLayerHover}
+                        onLayerLeave={onLayerLeave}
                     />
                 ))}
             <g
-                onClick={() => onChangeLayers?.(Math.min(24, layers + 1))}
+                onClick={() => onChangeLayers?.(Math.min(128, layers + 1))}
                 className={style.tableButton}
             >
-                <rect
-                    x={-width / 2}
-                    y={addLayerButtonY + 10}
-                    width={width}
-                    height={BAR_BUTTON_SIZE}
+                <circle
+                    cx={0}
+                    cy={addLayerButtonY + BAR_BUTTON_SPACING + BAR_BUTTON_SIZE / 2}
+                    r={BAR_BUTTON_SIZE * 0.75}
                 />
                 <foreignObject
                     x={-width / 2}
-                    y={addLayerButtonY + 10}
+                    y={addLayerButtonY + BAR_BUTTON_SPACING}
                     width={width}
                     height={BAR_BUTTON_SIZE}
-                >
-                    <div className={style.iconContainer}>
-                        <AddIcon fontSize="inherit" />
-                    </div>
-                </foreignObject>
-            </g>
-            <g
-                onClick={() => onChangeHeads?.(Math.min(16, heads + 1))}
-                className={style.tableButton}
-            >
-                <rect
-                    x={width / 2 + 10}
-                    y={y}
-                    height={addLayerButtonY - y + BAR_BUTTON_SIZE + 10}
-                    width={BAR_BUTTON_SIZE}
-                />
-                <foreignObject
-                    x={width / 2 + 10}
-                    y={y}
-                    width={BAR_BUTTON_SIZE}
-                    height={addLayerButtonY - y + BAR_BUTTON_SIZE + 10}
                 >
                     <div className={style.iconContainer}>
                         <AddIcon fontSize="inherit" />

@@ -47,6 +47,23 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <div
+                    id="heads-label"
+                    className={style.label}
+                >
+                    {t('app.settings.heads')}
+                </div>
+                <Slider
+                    aria-labelledby="heads-label"
+                    value={settings.nHead}
+                    onChange={(_, value) => setSettings({ ...settings, nHead: value as number })}
+                    min={1}
+                    max={32}
+                    step={1}
+                    valueLabelDisplay="auto"
+                />
+            </FormControl>
         </div>
     );
 }

@@ -7,7 +7,7 @@
 }
 
 .handleBg {
-    fill: white;
+    fill: transparent;
     stroke: none;
 }
 
@@ -44,9 +44,15 @@
 }
 
 .box {
-    fill: #009fb83d;
-    stroke: #009fb8;
-    stroke-width: 4px;
+    cursor: pointer;
+}
+
+.transformerBox:hover .box {
+    fill: #00a0b8;
+}
+
+.transformerBox text {
+    cursor: pointer;
 }
 
 .tableButton {
@@ -54,13 +60,12 @@
     touch-action: none;
 }
 
-.tableButton rect {
-    fill: #75a4e220;
-    stroke: none;
+.tableButton circle {
+    fill: transparent;
 }
 
-.tableButton:hover rect {
-    fill: #75a4e245;
+.tableButton:hover circle {
+    fill: #75a4e24b;
 }
 
 .iconContainer {
@@ -74,7 +79,66 @@
 }
 
 .container {
-    overflow: scroll;
+    overflow: hidden;
     width: 100%;
+    height: 100%;
     background: white;
+}
+
+.layerInfo {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+    background: #444; /*#af6414;*/
+    color: white;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #a4acbb;
+    font-family: Andika, sans-serif;
+    margin-left: 5px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.layerInfo::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #444;
+    left: 0;
+    top: calc(50% - 10px);
+}
+
+.layerInfo h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.layerInfo p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.infoClose {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.vocabLabel {
+    font-size: 1.4rem;
+    font-weight: bold;
+    fill: #666;
 }

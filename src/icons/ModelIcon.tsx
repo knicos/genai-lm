@@ -1,6 +1,8 @@
+import { useId } from 'react';
 import style from './icon.module.css';
 
 export default function ModelIcon() {
+    const id = useId();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +14,7 @@ export default function ModelIcon() {
         >
             <defs>
                 <linearGradient
-                    id="gradient1"
+                    id={`gradient-${id}`}
                     x1="0%"
                     y1="0%"
                     x2="100%"
@@ -37,15 +39,15 @@ export default function ModelIcon() {
             <path d="M0 1 L32 1 L32 3 L0 3 Z" />
             <path
                 d="M8 7 L 24 7 L24 11 L8 11 Z"
-                fill="url(#gradient1)"
+                fill={`url(#gradient-${id})`}
             />
             <path
                 d="M8 14 L 24 14 L24 18 L8 18 Z"
-                fill="url(#gradient1)"
+                fill={`url(#gradient-${id})`}
             />
             <path
                 d="M8 21 L 24 21 L24 25 L8 25 Z"
-                fill="url(#gradient1)"
+                fill={`url(#gradient-${id})`}
             />
             <path d="M0 29 L32 29 L32 31 L0 31 Z" />
         </svg>

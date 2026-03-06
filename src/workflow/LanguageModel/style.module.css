@@ -2,6 +2,19 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+}
+
+.zoomControls {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.modelThread {
+    height: 100%;
 }
 
 .modelMenu {

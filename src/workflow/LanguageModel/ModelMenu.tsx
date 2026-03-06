@@ -1,25 +1,23 @@
 import { VerticalButton } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import TuneIcon from '@mui/icons-material/Tune';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
 import { estimateParameterCount } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
 import { modelConfigAtom } from '../../state/model';
+import ModelIcon from '../../icons/ModelIcon';
 
 interface Props {
     disableInspect?: boolean;
     onSearch?: () => void;
-    onZoomIn?: () => void;
-    onZoomOut?: () => void;
     onShowSettings?: () => void;
+    onReset?: () => void;
 }
 
-export default function ModelMenu({ onSearch, onZoomIn, onZoomOut, onShowSettings }: Props) {
+export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) {
     const { t } = useTranslation();
     const arch = useAtomValue(modelConfigAtom);
 
@@ -30,24 +28,16 @@ export default function ModelMenu({ onSearch, onZoomIn, onZoomOut, onShowSetting
                     disabled={!onSearch}
                     variant="text"
                     onClick={onSearch}
-                    startIcon={<AccountBalanceIcon color="inherit" />}
+                    startIcon={<ModelIcon />}
                 >
                     {t('model.examples')}
                 </VerticalButton>
             )}
             <VerticalButton
-                variant="text"
-                startIcon={<ZoomInIcon color="inherit" />}
-                onClick={onZoomIn}
+                startIcon={<RestartAltIcon />}
+                onClick={onReset}
             >
-                {t('model.zoomIn')}
-            </VerticalButton>
-            <VerticalButton
-                variant="text"
-                startIcon={<ZoomOutIcon color="inherit" />}
-                onClick={onZoomOut}
-            >
-                {t('model.zoomOut')}
+                {t('model.reset')}
             </VerticalButton>
             <VerticalButton
                 startIcon={<TuneIcon />}

@@ -65,6 +65,7 @@
             "dropout": "Dropout",
             "blockSize": "Context Length",
             "mlpFactor": "MLP Factor",
+            "heads": "Attention Heads",
             "arch": "Architecture Settings"
         },
         "close": "Close",
@@ -150,7 +151,11 @@
         "noModelsFound": "No models found",
         "zoomIn": "Zoom In",
         "zoomOut": "Zoom Out",
-        "examples": "Examples"
+        "examples": "Examples",
+        "layer": "Layer {{index}}",
+        "width": "Width",
+        "vocabSize": "Vocabulary Size",
+        "reset": "Reset"
     },
     "training": {
         "title": "Pre-Training",

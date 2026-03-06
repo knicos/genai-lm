@@ -24,7 +24,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
 
     const { name, parameters } = card;
 
-    const fontSize = Math.max(0.7, Math.log(parameters) / Math.log(20));
+    const fontSize = Math.max(0.7, Math.log(parameters) / Math.log(40));
     const hasTrainingStats = !!card.trainingStats && card.trained;
 
     const handleCreateModel = () => {
@@ -138,9 +138,13 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                         {!isNone && (
                             <div
                                 className={style.sizeText}
-                                style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2}rem` }}
+                                style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2.3}rem` }}
                             >
-                                {parameters >= 1 ? `${Math.round(parameters)}M` : `${parameters * 1000}K`}
+                                {parameters >= 1000
+                                    ? `${Math.round(parameters / 1000)}B`
+                                    : parameters >= 1
+                                      ? `${Math.round(parameters)}M`
+                                      : `${parameters * 1000}K`}
                             </div>
                         )}
                     </div>

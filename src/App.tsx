@@ -76,7 +76,7 @@ export const routes = createRoutesFromElements(
             element={
                 <Navigate
                     replace
-                    to="/workspace/pretrain"
+                    to="/workspace/model"
                 />
             }
         />
