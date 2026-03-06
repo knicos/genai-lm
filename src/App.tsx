@@ -130,6 +130,10 @@ export const routes = createRoutesFromElements(
                 path="auto-tune"
                 lazy={() => import('./views/AutoTune')}
             />
+            <Route
+                path="vocabulary"
+                lazy={() => import('./views/Vocabulary')}
+            />
         </Route>
     </Route>
 );

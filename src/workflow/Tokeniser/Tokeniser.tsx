@@ -12,6 +12,7 @@ import AbcIcon from '@mui/icons-material/Abc';
 import useModelPhase from '../../utilities/useModelPhase';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import { useNavigate } from 'react-router-dom';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function Tokeniser() {
     const [invalid, setInvalid] = useAtom(tokeniserInvalid);
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
+    const navigate = useNavigate();
 
     const isTrained = model?.loaded && model.tokeniser.trained;
 
@@ -108,7 +110,7 @@ export default function Tokeniser() {
                     </Button>
                     <VerticalButton
                         startIcon={<AbcIcon />}
-                        onClick={() => {}}
+                        onClick={() => navigate('vocabulary')}
                     >
                         {t('tokeniser.vocabulary')}
                     </VerticalButton>
