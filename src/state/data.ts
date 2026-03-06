@@ -12,6 +12,8 @@ export interface DataEntry {
 
 export const dataEntries = atom<DataEntry[]>([]);
 
+export const tokeniserInvalid = atom<boolean>(false);
+
 export const dataReady = atom<boolean>((get) => {
     const entries = get(dataEntries);
     return entries.length > 0;

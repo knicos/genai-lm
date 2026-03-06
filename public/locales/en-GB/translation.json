@@ -269,10 +269,26 @@
         "gradients": "Gradients"
     },
     "tokeniser": {
-        "title": "Process Data",
-        "start": "Tokenize",
-        "vocabulary": "Vocabulary",
-        "settings": "Settings"
+        "title": "Vocabulary",
+        "start": "Build",
+        "vocabulary": "View",
+        "settings": "Settings",
+        "invalidWarning": "The vocabulary was not selected from the current data.",
+        "trainedWarning": "The model is already trained, changing the vocabulary may cause problems.",
+        "notTrained": "No vocabulary.",
+        "trained": "Vocabulary of {{size}} tokens.",
+        "noData": "No data available",
+        "noModel": "No model selected"
+    },
+    "tokeniseData": {
+        "title": "Tokenise Data",
+        "start": "Tokenise",
+        "stop": "Stop",
+        "tokens": "Tokens",
+        "show": "View",
+        "noData": "No data available",
+        "noModel": "No model selected",
+        "notTrained": "No vocabulary."
     },
     "instruct": {
         "title": "Tuning Data",

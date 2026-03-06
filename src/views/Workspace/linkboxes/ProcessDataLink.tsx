@@ -11,7 +11,7 @@ export default function ProcessDataLink({ flip }: Props) {
         <BoxLink
             link="pretraindata"
             title={t('workflow.pretraindata')}
-            widget="tokeniser"
+            widget="tokeniseData"
             flip={flip}
         />
     );

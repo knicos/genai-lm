@@ -18,7 +18,7 @@ describe('TextData', () => {
                 <TextData />
             </DndProvider>
         );
-        expect(screen.getByText('data.title')).toBeInTheDocument();
+        expect(screen.getByText('data.add')).toBeInTheDocument();
         expect(screen.getByText('data.dataHint')).toBeInTheDocument();
         expect(screen.getByText('data.search')).toBeInTheDocument();
     });
@@ -54,7 +54,7 @@ describe('TextData', () => {
             </TestWrapper>
         );
 
-        expect(screen.getByText('data.title')).toBeInTheDocument();
+        expect(screen.getByText('data.add')).toBeInTheDocument();
     });
 
     it('allows data search and select', { timeout: 10000 }, async ({ expect }) => {

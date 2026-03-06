@@ -3,15 +3,16 @@ import NumberBox from '../../components/NumberBox/NumberBox';
 
 interface Props {
     totalSamples: number;
+    label?: string;
 }
 
-export default function ProgressBox({ totalSamples }: Props) {
+export default function ProgressBox({ totalSamples, label }: Props) {
     const { t } = useTranslation();
 
     return (
         <NumberBox
             value={totalSamples}
-            label={t('data.samples')}
+            label={label || t('data.samples')}
             style={{ marginLeft: 'auto' }}
         />
     );

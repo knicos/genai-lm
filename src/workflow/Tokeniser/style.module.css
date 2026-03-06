@@ -6,17 +6,6 @@
     flex-direction: column;
 }
 
-.status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 4rem;
-    width: 4rem;
-    margin-left: auto;
-    background: #fafafa;
-    border-left: 2px solid #eee;
-}
-
 .buttonBox {
     display: flex;
     gap: 1rem;

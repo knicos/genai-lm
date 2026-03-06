@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import Box from '../../components/BoxTitle/Box';
-import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import style from './style.module.css';
 import InstructMenu from './InstructMenu';
 import { useEffect, useRef, useState } from 'react';
@@ -91,10 +90,6 @@ export default function InstructData() {
                             }
                         }
                     }}
-                />
-                <BoxTitle
-                    title={t('instruct.title')}
-                    status={busy ? 'busy' : done ? 'done' : 'waiting'}
                 />
                 <InstructMenu
                     onAutoPrompt={() => navigate('auto-tune')}

@@ -1,9 +1,9 @@
 import style from './style.module.css';
-import CheckIcon from '@mui/icons-material/Check';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BlockIcon from '@mui/icons-material/Block';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { theme } from '../../theme';
 
 export type BoxStatus = 'done' | 'busy' | 'info' | 'disabled' | 'waiting';
@@ -17,13 +17,13 @@ export default function StatusBox({ status, dark = false }: Props) {
     return (
         <div className={style.status}>
             {status === 'done' && (
-                <CheckIcon
+                <TaskAltIcon
                     htmlColor={dark ? theme.dark.success : theme.light.success}
                     fontSize="large"
                 />
             )}
             {status === 'waiting' && (
-                <PriorityHighIcon
+                <ErrorOutlineIcon
                     htmlColor={dark ? theme.dark.info : theme.light.info}
                     fontSize="large"
                 />

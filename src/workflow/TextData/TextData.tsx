@@ -1,7 +1,6 @@
 import { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { loadTextData } from '@genai-fi/nanogpt';
-import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
 import DataListing from './DataListing';
@@ -49,7 +48,7 @@ async function handleTextLoad(
 
 export default function TextData() {
     const { t } = useTranslation();
-    const [busy, setBusy] = useState(false);
+    const [, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [data, setData] = useAtom(dataEntries);
     const setDataset = useSetAtom(datasetAtom);
@@ -117,16 +116,12 @@ export default function TextData() {
     return (
         <Box
             widget="textData"
-            style={{ minWidth: '350px' }}
+            style={{ flexGrow: 1 }}
             active={done}
             disabled={disable}
             fullWidth
         >
             <div className={style.container}>
-                <BoxTitle
-                    title={t('data.title')}
-                    status={busy || downloads.length > 0 ? 'busy' : done ? 'done' : 'waiting'}
-                />
                 <DataMenu
                     disabled={showInput || showSearch}
                     onWrite={() => {

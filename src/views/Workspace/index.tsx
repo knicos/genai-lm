@@ -20,7 +20,7 @@ import ChatOutput from '../../workflow/ChatOutput/ChatOutput';
 import Prompt from '../../workflow/Prompt/Prompt';
 import TrainerLink from './linkboxes/TrainerLink';
 import ProcessDataLink from './linkboxes/ProcessDataLink';
-import Tokeniser from '../../workflow/Tokeniser/Tokeniser';
+import TokeniseData from '../../workflow/TokeniseData/TokeniseData';
 import ArchitectureLink from './linkboxes/Architecture';
 import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
 import Initialiser from './Initialiser';
@@ -32,10 +32,11 @@ import DeployLink from './linkboxes/DeployLink';
 import FineTuneLink from './linkboxes/FineTuneLink';
 import PeerShareWrap from '../../components/PeerShare/PeerShareWrap';
 import Sharing from '../../workflow/Sharing/Sharing';
+import Tokeniser from '../../workflow/Tokeniser/Tokeniser';
 
 const CONNECTIONS: IConnection[] = [
     {
-        start: 'tokeniser',
+        start: 'tokeniseData',
         end: 'trainer',
         startPoint: 'right',
         endPoint: 'left',
@@ -56,7 +57,15 @@ const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
         endOffset: -0.5,
-        startOffset: -0.5,
+        startOffset: -0.1,
+    },
+    {
+        start: 'tokeniser',
+        end: 'tokeniseData',
+        startPoint: 'bottom',
+        endPoint: 'top',
+        endOffset: -0.2,
+        startOffset: 0.2,
     },
     {
         start: 'thread',
@@ -240,6 +249,7 @@ export function Component() {
                                     >
                                         <ArchitectureLink flip />
                                         <Tokeniser />
+                                        <TokeniseData />
                                     </div>
 
                                     <div

@@ -1,78 +1,124 @@
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { datasetAtom, dataTokens, dataTokensReady } from '../../state/data';
+import { datasetAtom, dataTokens, tokeniserInvalid } from '../../state/data';
 import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@genai-fi/base';
-import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
-import { useState } from 'react';
-import { tasks, tokensFromTasks } from '@genai-fi/nanogpt';
-import TokeniserMenu from './TokeniserMenu';
-import DataProgress from '../../components/DataProgress/DataProgress';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import { Button, VerticalButton } from '@genai-fi/base';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import { useEffect, useState } from 'react';
+import AbcIcon from '@mui/icons-material/Abc';
+import useModelPhase from '../../utilities/useModelPhase';
+import { Alert } from '@mui/material';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
     const model = useAtomValue(modelAtom);
     //const status = useModelStatus(model ?? undefined);
-    const ready = useModelLoaded(model ?? undefined);
     const dataset = useAtomValue(datasetAtom);
     const [tokenising, setTokenising] = useState(false);
-    const [tokenCount, setTokenCount] = useState(0);
+    const [done, setDone] = useState(model?.loaded && model.tokeniser.trained);
+    const phase = useModelPhase(model ?? undefined);
+    const [invalid, setInvalid] = useAtom(tokeniserInvalid);
     const setTokens = useSetAtom(dataTokens);
-    const done = useAtomValue(dataTokensReady);
+    const [message, setMessage] = useState<Notice | null>(null);
+
+    const isTrained = model?.loaded && model.tokeniser.trained;
+
+    useEffect(() => {
+        if (dataset && dataset.length > 0) {
+            setInvalid(true);
+        }
+    }, [dataset, setInvalid]);
+
+    useEffect(() => {
+        const h = () => {
+            setDone(model?.loaded && model.tokeniser.trained);
+        };
+        model?.on('status', h);
+        return () => {
+            model?.off('status', h);
+        };
+    }, [model]);
 
     return (
         <Box
             widget="tokeniser"
             active={dataset !== null && dataset.length > 0}
-            style={{ minWidth: '290px' }}
+            style={{ maxWidth: '300px' }}
         >
             <div className={style.container}>
                 <BoxTitle
                     title={t('tokeniser.title')}
                     status={done ? 'done' : 'waiting'}
                 />
-                <TokeniserMenu
-                    tokens={tokenCount}
-                    training={tokenising}
-                    onShowSettings={() => {}}
-                    onVocab={() => {}}
-                />
-                <DataProgress
-                    samplesProcessed={tokenCount}
-                    desiredSamples={ready ? (model?.getNumParams() || 0) * 2 : 0}
-                />
+                {invalid && isTrained && (
+                    <Alert
+                        sx={{ margin: '1rem 1rem 0 1rem' }}
+                        severity="warning"
+                    >
+                        {t(phase === 'untrained' ? 'tokeniser.invalidWarning' : 'tokeniser.trainedWarning')}
+                    </Alert>
+                )}
+                {!isTrained && (
+                    <Alert
+                        sx={{ margin: '1rem 1rem 0 1rem' }}
+                        severity="info"
+                    >
+                        {t('tokeniser.notTrained')}
+                    </Alert>
+                )}
+                {!invalid && isTrained && (
+                    <Alert
+                        sx={{ margin: '1rem 1rem 0 1rem' }}
+                        severity="success"
+                    >
+                        {t('tokeniser.trained', { size: model?.tokeniser.vocabSize || 0 })}
+                    </Alert>
+                )}
                 <div className={style.buttonBox}>
                     <Button
-                        disabled={!model || !dataset || dataset.length === 0 || tokenising}
+                        disabled={tokenising}
                         variant="contained"
-                        startIcon={<ModelTrainingIcon />}
+                        startIcon={<ConstructionIcon />}
                         onClick={() => {
                             if (model && dataset && dataset.length > 0) {
                                 setTokenising(true);
-                                setTokenCount(0);
-                                model?.tokeniser
-                                    .train(dataset)
-                                    .then(() => {
-                                        const task = new tasks.PretrainingTask(dataset);
-                                        return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
-                                            setTokenCount(tokens);
-                                        });
-                                    })
-                                    .then((newTokens) => {
-                                        setTokens(newTokens);
-                                        setTokenising(false);
-                                        console.log('MODEL', model);
-                                    });
+                                model?.tokeniser.train(dataset).then(() => {
+                                    setTokenising(false);
+                                    setInvalid(false);
+                                    setTokens(null);
+                                });
+                            } else if (!model) {
+                                setMessage({
+                                    notice: t('tokeniser.noModel'),
+                                    level: 'error',
+                                });
+                            } else if (!dataset || dataset.length === 0) {
+                                setMessage({
+                                    notice: t('tokeniser.noData'),
+                                    level: 'error',
+                                });
                             }
                         }}
                     >
                         {tokenising ? t('tokeniser.stop') : t('tokeniser.start')}
                     </Button>
+                    <VerticalButton
+                        startIcon={<AbcIcon />}
+                        onClick={() => {}}
+                    >
+                        {t('tokeniser.vocabulary')}
+                    </VerticalButton>
                 </div>
+                {message && (
+                    <BoxNotice
+                        notice={message}
+                        onClose={() => setMessage(null)}
+                    />
+                )}
             </div>
         </Box>
     );
