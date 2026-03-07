@@ -15,6 +15,7 @@ import ProgressBox from '../TextData/ProgressBox';
 import useModelStatus from '../../utilities/useModelStatus';
 import MarginIcon from '@mui/icons-material/Margin';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import { useNavigate } from 'react-router-dom';
 
 export default function TokeniseData() {
     const { t } = useTranslation();
@@ -27,6 +28,7 @@ export default function TokeniseData() {
     const [_tokenCount, setTokenCount] = useState(0);
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
+    const navigate = useNavigate();
 
     const tokenCount = _tokenCount === 0 ? tokens?.length || 0 : _tokenCount;
 
@@ -92,7 +94,7 @@ export default function TokeniseData() {
                     </Button>
                     <VerticalButton
                         startIcon={<MarginIcon />}
-                        onClick={() => {}}
+                        onClick={() => navigate('tokenised-data')}
                     >
                         {t('tokeniseData.show')}
                     </VerticalButton>

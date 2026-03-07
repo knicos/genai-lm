@@ -134,6 +134,10 @@ export const routes = createRoutesFromElements(
                 path="vocabulary"
                 lazy={() => import('./views/Vocabulary')}
             />
+            <Route
+                path="tokenised-data"
+                lazy={() => import('./views/TokenisedData')}
+            />
         </Route>
     </Route>
 );

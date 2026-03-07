@@ -290,13 +290,15 @@
     },
     "tokeniseData": {
         "title": "Tokenise Data",
+        "sideTitle": "Text as Tokens",
         "start": "Tokenise",
         "stop": "Stop",
         "tokens": "Tokens",
         "show": "View",
         "noData": "No data available",
         "noModel": "No model selected",
-        "notTrained": "No vocabulary."
+        "notTrained": "No vocabulary.",
+        "showNumbers": "Show token numbers"
     },
     "instruct": {
         "title": "Tuning Data",

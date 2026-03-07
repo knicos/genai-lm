@@ -1,0 +1,40 @@
+.token {
+    background: rgba(0, 130, 151, 0.1);
+    color: black;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 0;
+    border-bottom: 2px solid rgba(0, 130, 151, 0.4);
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    user-select: none;
+}
+
+.token:hover {
+    background: #0a4bd6;
+    border-bottom: 2px solid rgba(0, 130, 151, 0.6);
+}
+
+.tokenList {
+    padding: 0;
+    border-spacing: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.tokenContainer {
+    max-height: 50vh;
+    overflow: hidden;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.selected {
+    background: #0a4bd6;
+    color: white;
+}
