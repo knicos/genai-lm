@@ -19,7 +19,6 @@ export default function TransformerBox({
     hiddenSize,
     y,
     height,
-    onLayerClick,
     onLayerHover,
     onLayerLeave,
     index,
@@ -48,13 +47,10 @@ export default function TransformerBox({
     return (
         <g
             className={style.transformerBox}
-            onClick={(e: MouseEvent) => {
-                onLayerClick?.(index, e.currentTarget as SVGGElement);
-            }}
-            onPointerEnter={(e: MouseEvent) => {
+            onMouseEnter={(e: MouseEvent) => {
                 onLayerHover?.(index, e.currentTarget as SVGGElement);
             }}
-            onPointerLeave={() => {
+            onMouseLeave={() => {
                 onLayerLeave?.(index);
             }}
         >

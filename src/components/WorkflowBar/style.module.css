@@ -19,6 +19,7 @@
     width: 150px;
     display: flex;
     justify-content: center;
+    align-items: center;
     background: #333;
     padding: 0.5rem;
     border-radius: 8px;
@@ -30,7 +31,15 @@
         color 0.3s ease;
 }
 
-.item a {
+.item:hover {
+    background: #222;
+}
+
+.item svg {
+    margin-left: 0.3rem;
+}
+
+.itemList a {
     color: white;
     text-decoration: none;
 }
@@ -124,4 +133,9 @@
 .arrow.right {
     right: 0;
     /*justify-content: flex-start;*/
+}
+
+.itemText {
+    flex-grow: 1;
+    text-align: center;
 }

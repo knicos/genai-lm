@@ -9,7 +9,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
 import logger from '../../utilities/logger';
-import WorkflowBar from '../WorkflowBar/WorkflowBar';
+import WorkflowStatusBar from './WorkflowStatusBar';
 
 interface Props {
     noSettings?: boolean;
@@ -62,17 +62,7 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: 
                     )}
                 </Link>
                 {logId && <div className={style.buttonBar}>{logId}</div>}
-                {!hideWorkflow && (
-                    <WorkflowBar
-                        items={[
-                            { id: 'model' },
-                            { id: 'pretraindata' },
-                            { id: 'pretrain' },
-                            { id: 'finetune' },
-                            { id: 'deployment' },
-                        ]}
-                    />
-                )}
+                {!hideWorkflow && <WorkflowStatusBar />}
                 {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
                 <div className={style.langBar}>
                     <NativeSelect

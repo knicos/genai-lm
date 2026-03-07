@@ -5,10 +5,10 @@ import style from './style.module.css';
 import TransformerBoxes from './TransformerBoxes';
 import { useAtom } from 'jotai';
 import { modelConfigAtom } from '../../state/model';
-import { Popper } from '@mui/material';
 import LayerInfo from './LayerInfo';
 import Flow from './Flow';
 import { BLOCK_GAP, BLOCK_HEIGHT, endVocabStart, totalHeight, vocabToWidth } from './sizeUtils';
+import InfoPop from '../InfoPop/InfoPop';
 
 // const CAMERA_DURATION = 0.3;
 const MOVE_THRESHOLD = 10;
@@ -122,7 +122,7 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
             className={style.container}
             ref={parentRef}
         >
-            <Popper
+            <InfoPop
                 open={!!anchor}
                 anchorEl={anchor}
                 placement="right"
@@ -146,7 +146,7 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
                     index={selectedLayer}
                     hiddenSize={internalArchitecture?.nEmbed || 0}
                 />
-            </Popper>
+            </InfoPop>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="-500 500 1000 1000"

@@ -2,7 +2,7 @@ import ResizeableBox from './ResizeableBox';
 import style from './style.module.css';
 import { theme } from '../../theme';
 import { vocabToWidth, widthToVocab } from './sizeUtils';
-import { MouseEvent, PointerEvent } from 'react';
+import { MouseEvent } from 'react';
 
 const BOX_INTERVAL = 10;
 
@@ -36,7 +36,6 @@ export default function VocabBox({
     preLabel,
     postLabel,
     layered,
-    onClick,
     onHover,
     onLeave,
 }: Props) {
@@ -100,13 +99,10 @@ export default function VocabBox({
             )}
             <g
                 className={style.transformerBox}
-                onClick={(e: MouseEvent) => {
-                    onClick?.(e.currentTarget as SVGGElement);
-                }}
-                onPointerEnter={(e: PointerEvent) => {
+                onMouseEnter={(e: MouseEvent) => {
                     onHover?.(e.currentTarget as SVGGElement);
                 }}
-                onPointerLeave={() => {
+                onMouseLeave={() => {
                     onLeave?.();
                 }}
             >

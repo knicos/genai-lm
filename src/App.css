@@ -9,3 +9,14 @@
     margin: 1rem 3rem;
     flex-grow: 1;
 }
+
+.MuiTooltip-tooltip {
+    font-size: 1rem;
+    padding: 0.3em 0.8rem;
+    background: #0a4bd6 !important;
+    border-radius: 6px;
+}
+
+.MuiTooltip-arrow {
+    color: #0a4bd6 !important;
+}

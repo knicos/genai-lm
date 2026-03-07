@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { MouseEvent, PointerEvent, useEffect, useMemo, useState } from 'react';
-import { FormControlLabel, Popper, Switch } from '@mui/material';
+import { FormControlLabel, Switch } from '@mui/material';
+import InfoPop from '../../components/InfoPop/InfoPop';
 
 export function Component() {
     const { t } = useTranslation();
@@ -73,14 +74,14 @@ export function Component() {
                     </li>
                 ))}
             </ul>
-            <Popper
+            <InfoPop
                 open={!!anchor}
                 anchorEl={anchor}
                 placement="bottom"
                 sx={{ zIndex: 3 }}
             >
                 <div className={style.popper}>{selectedToken}</div>
-            </Popper>
+            </InfoPop>
         </div>
     );
 }

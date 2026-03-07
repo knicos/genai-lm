@@ -9,6 +9,13 @@
         "saveName": "Model Name",
         "saveSave": "Save",
         "saveCancel": "Cancel",
+        "workflow": {
+            "model_desc": "Choose the size of your mathematical model of language.",
+            "pretraindata_desc": "Add and process text data into numbers for your model to learn from.",
+            "pretrain_desc": "Train your model to learn the structure of language from your data.",
+            "finetune_desc": "Give your model conversational capabilities, personality and style.",
+            "deployment_desc": "Deploy your model and share it with others."
+        },
         "settings": {
             "title": "Settings",
             "general": "General",
