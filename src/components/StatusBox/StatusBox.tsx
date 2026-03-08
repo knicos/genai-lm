@@ -3,7 +3,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BlockIcon from '@mui/icons-material/Block';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { theme } from '../../theme';
 
 export type BoxStatus = 'done' | 'busy' | 'info' | 'disabled' | 'waiting';
@@ -23,7 +23,7 @@ export default function StatusBox({ status, dark = false }: Props) {
                 />
             )}
             {status === 'waiting' && (
-                <ErrorOutlineIcon
+                <RadioButtonUncheckedIcon
                     htmlColor={dark ? theme.dark.info : theme.light.info}
                     fontSize="large"
                 />

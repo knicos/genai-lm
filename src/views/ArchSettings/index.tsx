@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
 import { modelConfigAtom } from '../../state/model';
+import Help from '../../components/Help/Help';
 
 export function Component() {
     const { t } = useTranslation();
@@ -13,13 +14,19 @@ export function Component() {
     return (
         <div className="sidePanel">
             <h2>{t('app.settings.arch')}</h2>
+
             <FormControl sx={{ marginTop: '1rem' }}>
-                <div
-                    id="blockSize-label"
-                    className={style.label}
+                <Help
+                    message={t('app.settings.contextHelp')}
+                    inplace
                 >
-                    {t('app.settings.blockSize')}
-                </div>
+                    <div
+                        id="blockSize-label"
+                        className={style.label}
+                    >
+                        {t('app.settings.blockSize')}
+                    </div>
+                </Help>
                 <Slider
                     aria-labelledby="blockSize-label"
                     value={blockSize}
@@ -31,12 +38,17 @@ export function Component() {
                 />
             </FormControl>
             <FormControl sx={{ marginTop: '1rem' }}>
-                <div
-                    id="mlpFactor-label"
-                    className={style.label}
+                <Help
+                    message={t('app.settings.mlpFactorHelp')}
+                    inplace
                 >
-                    {t('app.settings.mlpFactor')}
-                </div>
+                    <div
+                        id="mlpFactor-label"
+                        className={style.label}
+                    >
+                        {t('app.settings.mlpFactor')}
+                    </div>
+                </Help>
                 <Slider
                     aria-labelledby="mlpFactor-label"
                     value={mlpFactor}
@@ -48,12 +60,17 @@ export function Component() {
                 />
             </FormControl>
             <FormControl sx={{ marginTop: '1rem' }}>
-                <div
-                    id="heads-label"
-                    className={style.label}
+                <Help
+                    message={t('app.settings.headsHelp')}
+                    inplace
                 >
-                    {t('app.settings.heads')}
-                </div>
+                    <div
+                        id="heads-label"
+                        className={style.label}
+                    >
+                        {t('app.settings.heads')}
+                    </div>
+                </Help>
                 <Slider
                     aria-labelledby="heads-label"
                     value={settings.nHead}

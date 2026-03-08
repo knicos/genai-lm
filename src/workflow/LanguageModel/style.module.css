@@ -36,13 +36,15 @@
 .parameters {
     text-align: right;
     font-size: 1rem;
-    padding: 0 2rem;
+    padding-left: 2rem;
     margin-left: auto;
+    user-select: none;
 }
 
 .number {
     font-size: 1.1rem;
     font-weight: bold;
+    margin-right: 0.5rem;
 }
 
 @media (max-width: 600px) {

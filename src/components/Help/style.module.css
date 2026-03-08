@@ -1,0 +1,43 @@
+.helpButton {
+    position: absolute;
+    z-index: 10;
+    left: -3rem;
+    top: 0.5rem;
+    color: #0a4bd6;
+    background: rgba(255, 255, 255, 0.4);
+    transition: opacity 0.3s ease-out;
+    opacity: 0;
+}
+
+.helpButtonInplace {
+    color: #0a4bd6;
+    margin-left: 0.5rem;
+    transition: opacity 0.3s ease-out;
+    opacity: 0.2;
+}
+
+.helpButton:hover {
+    background: white;
+}
+
+.container {
+    position: relative;
+    border-radius: 6px;
+}
+
+.container:hover .helpButton {
+    opacity: 1;
+}
+
+.inplaceContainer {
+    display: flex;
+    align-items: center;
+}
+
+.inplaceContainer:hover .helpButtonInplace {
+    opacity: 1;
+}
+
+.active {
+    box-shadow: 0 0 10px #0a4bd6;
+}

@@ -4,6 +4,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { trainerSettings } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
+import Help from '../../components/Help/Help';
 
 export function Component() {
     const { t } = useTranslation();
@@ -18,7 +19,12 @@ export function Component() {
                     id="batch-label"
                     className={style.label}
                 >
-                    {t('app.settings.batchSize')}
+                    <Help
+                        message={t('app.settings.batchHelp')}
+                        inplace
+                    >
+                        {t('app.settings.batchSize')}
+                    </Help>
                 </div>
                 <Slider
                     aria-labelledby="batch-label"
@@ -35,7 +41,12 @@ export function Component() {
                     id="learningRate-label"
                     className={style.label}
                 >
-                    {t('app.settings.learningRate')}
+                    <Help
+                        message={t('app.settings.lrHelp')}
+                        inplace
+                    >
+                        {t('app.settings.learningRate')}
+                    </Help>
                 </div>
                 <Slider
                     aria-labelledby="learningRate-label"

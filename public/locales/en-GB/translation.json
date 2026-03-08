@@ -72,8 +72,11 @@
             "dropout": "Dropout",
             "blockSize": "Context Length",
             "mlpFactor": "MLP Factor",
+            "mlpFactorHelp": "Change the size of the Multi-Layer Perceptron (MLP) in the transformer blocks. A larger MLP can allow the model to remember more patterns but will increase the number of parameters.",
             "heads": "Attention Heads",
-            "arch": "Architecture Settings"
+            "headsHelp": "Change the number of attention heads in the transformer blocks. More heads can allow the model to focus on different parts of the input simultaneously.",
+            "arch": "Architecture Settings",
+            "contextHelp": "The number of tokens the model can see to make its predictions."
         },
         "close": "Close",
         "ok": "OK",
@@ -125,7 +128,8 @@
         "start": "Build",
         "stop": "Stop",
         "outdated": "The model needs to be rebuilt",
-        "upToDate": "Model is ready to use."
+        "upToDate": "Model is ready to use.",
+        "help": "Building a model will allocate resources and assign random numbers to the parameters."
     },
     "model": {
         "parameters": "Parameters",
@@ -162,7 +166,9 @@
         "layer": "Layer {{index}}",
         "width": "Width",
         "vocabSize": "Vocabulary Size",
-        "reset": "Reset"
+        "reset": "Reset",
+        "parametersHelp": "A mathematical model contains a lot of unknown numbers called parameters. These are tuned up or down when training the model to improve the output predictions.",
+        "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token."
     },
     "training": {
         "title": "Pre-Training",
@@ -193,7 +199,8 @@
             "notReady": "Model or data is not ready for training.",
             "noData": "Add training data first.",
             "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
-        }
+        },
+        "help": "Pre-training slowly adjusts the parameters up or down to make it better at predicting each example."
     },
     "generator": {
         "title": "Generation",
@@ -286,7 +293,8 @@
         "trained": "Vocabulary of {{size}} tokens.",
         "noData": "No data available",
         "noModel": "No model selected",
-        "includeSpecial": "Include special tokens"
+        "includeSpecial": "Include special tokens",
+        "help": "The vocabulary is a set of letters, words or parts of words that are the building blocks of language for the model. These building blocks are called tokens and are assigned a unique number. Building a vocabulary will process your data to find the best tokens."
     },
     "tokeniseData": {
         "title": "Tokenise Data",
@@ -298,7 +306,8 @@
         "noData": "No data available",
         "noModel": "No model selected",
         "notTrained": "No vocabulary.",
-        "showNumbers": "Show token numbers"
+        "showNumbers": "Show token numbers",
+        "help": "Your text data needs to be split into the numeric tokens that the mathematical model can work with. Larger models need more tokens so the progress bar shows how many you may need."
     },
     "instruct": {
         "title": "Tuning Data",

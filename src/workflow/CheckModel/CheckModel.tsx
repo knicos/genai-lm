@@ -9,6 +9,7 @@ import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../utilities/useModelLoaded';
 import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
+import Help from '../../components/Help/Help';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -32,58 +33,60 @@ export default function CheckModel() {
     const isUpToDate = !model || !ready || isConfigEqual(model.config, architecture);
 
     return (
-        <Box
+        <Help
+            message={t('checkmodel.help')}
             widget="checkmodel"
             active={ready}
-            style={{ minWidth: '290px' }}
         >
-            <div className={style.container}>
-                <BoxTitle
-                    title={t('checkmodel.title')}
-                    status={ready ? 'done' : 'waiting'}
-                />
-                {!isUpToDate && (
-                    <Alert
-                        sx={{ marginTop: '1rem' }}
-                        severity="warning"
-                    >
-                        {t('checkmodel.outdated')}
-                    </Alert>
-                )}
-                {isUpToDate && (
-                    <Alert
-                        sx={{ marginTop: '1rem' }}
-                        severity="info"
-                    >
-                        {t('checkmodel.upToDate')}
-                    </Alert>
-                )}
-                <div className={style.buttonBox}>
-                    <Button
-                        disabled={isUpToDate}
-                        variant="contained"
-                        startIcon={<ConstructionIcon />}
-                        fullWidth
-                        onClick={() => {
-                            setModel((old) => {
-                                if (old) {
-                                    old.dispose();
-                                }
-                                const newModel = TeachableLLM.create(
-                                    architecture.vocabSize <= 256 ? 'char' : 'bpe',
-                                    architecture
-                                );
-                                if (old) {
-                                    newModel.meta.name = old.meta.name;
-                                }
-                                return newModel;
-                            });
-                        }}
-                    >
-                        {t('checkmodel.start')}
-                    </Button>
+            <Box style={{ minWidth: '290px' }}>
+                <div className={style.container}>
+                    <BoxTitle
+                        title={t('checkmodel.title')}
+                        status={ready ? 'done' : 'waiting'}
+                    />
+                    {!isUpToDate && (
+                        <Alert
+                            sx={{ marginTop: '1rem' }}
+                            severity="warning"
+                        >
+                            {t('checkmodel.outdated')}
+                        </Alert>
+                    )}
+                    {isUpToDate && (
+                        <Alert
+                            sx={{ marginTop: '1rem' }}
+                            severity="info"
+                        >
+                            {t('checkmodel.upToDate')}
+                        </Alert>
+                    )}
+                    <div className={style.buttonBox}>
+                        <Button
+                            disabled={isUpToDate}
+                            variant="contained"
+                            startIcon={<ConstructionIcon />}
+                            fullWidth
+                            onClick={() => {
+                                setModel((old) => {
+                                    if (old) {
+                                        old.dispose();
+                                    }
+                                    const newModel = TeachableLLM.create(
+                                        architecture.vocabSize <= 256 ? 'char' : 'bpe',
+                                        architecture
+                                    );
+                                    if (old) {
+                                        newModel.meta.name = old.meta.name;
+                                    }
+                                    return newModel;
+                                });
+                            }}
+                        >
+                            {t('checkmodel.start')}
+                        </Button>
+                    </div>
                 </div>
-            </div>
-        </Box>
+            </Box>
+        </Help>
     );
 }

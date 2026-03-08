@@ -88,6 +88,10 @@ export default function WorkflowBar({ items }: Props) {
                                 setAnchorEl(null);
                                 setHoveredItem(null);
                             }}
+                            onClick={() => {
+                                setAnchorEl(null);
+                                setHoveredItem(null);
+                            }}
                             onContextMenu={(e: MouseEvent<HTMLElement>) => {
                                 setAnchorEl(e.currentTarget);
                                 setHoveredItem(item);
@@ -136,6 +140,7 @@ export default function WorkflowBar({ items }: Props) {
                 open={!!anchorEl}
                 anchorEl={anchorEl}
                 offsetY={20}
+                delay={500}
             >
                 {hoveredItem && <div>{t(`app.workflow.${hoveredItem.id}_desc`)}</div>}
             </InfoPop>

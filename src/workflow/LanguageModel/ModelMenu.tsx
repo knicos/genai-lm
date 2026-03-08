@@ -9,6 +9,7 @@ import { estimateParameterCount } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
 import { modelConfigAtom } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
+import Help from '../../components/Help/Help';
 
 interface Props {
     disableInspect?: boolean;
@@ -45,9 +46,15 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
             >
                 {t('training.settings')}
             </VerticalButton>
+
             <div className={style.parameters}>
-                <span className={style.number}>{`${prettyNumber(estimateParameterCount(arch), t)}`}</span>
-                {` ${t('model.parameters')}`}
+                <Help
+                    message={t('model.parametersHelp')}
+                    inplace
+                >
+                    <span className={style.number}>{`${prettyNumber(estimateParameterCount(arch), t)}`}</span>
+                    {`${t('model.parameters')}`}
+                </Help>
             </div>
         </BoxMenu>
     );

@@ -23,6 +23,7 @@ import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { dataTokens } from '../../state/data';
+import Help from '../../components/Help/Help';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -214,73 +215,83 @@ export default function TextTraining() {
     };
 
     return (
-        <Box
+        <Help
+            message={t('training.help')}
             widget="trainer"
             active={!!model || (!!dataset && dataset.length > 0)}
-            style={{ minWidth: '260px' }}
         >
-            <div className={style.container}>
-                <BoxTitle
-                    title={t('training.title')}
-                    status={
-                        !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
-                    }
-                />
-                <TrainingMenu
-                    training={training}
-                    onShowSettings={() => navigate('training-settings')}
-                    onMonitor={() => navigate('training-log')}
-                    onVisualize={() => navigate('training-process')}
-                />
-                <div className={style.clockContainer}>
-                    <Clock
-                        duration={trainingProgress?.duration || 0}
-                        totalDuration={trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0}
-                        remaining={Math.max(0, trainingProgress?.remaining || 0)}
-                        message={preparing ? t('training.preparing') : undefined}
+            <Box style={{ minWidth: '260px' }}>
+                <div className={style.container}>
+                    <BoxTitle
+                        title={t('training.title')}
+                        status={
+                            !done
+                                ? 'busy'
+                                : needsTraining && canTrain
+                                  ? 'waiting'
+                                  : !needsTraining
+                                    ? 'done'
+                                    : 'disabled'
+                        }
                     />
-                    <div className={style.stats}>
-                        <NumberBox
-                            value={(epochs || 0) * batchSize}
-                            label={t('training.samples')}
-                            flip
+                    <TrainingMenu
+                        training={training}
+                        onShowSettings={() => navigate('training-settings')}
+                        onMonitor={() => navigate('training-log')}
+                        onVisualize={() => navigate('training-process')}
+                    />
+                    <div className={style.clockContainer}>
+                        <Clock
+                            duration={trainingProgress?.duration || 0}
+                            totalDuration={
+                                trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0
+                            }
+                            remaining={Math.max(0, trainingProgress?.remaining || 0)}
+                            message={preparing ? t('training.preparing') : undefined}
                         />
-                        <NumberBox
-                            value={Math.max(0, totalSamples - (epochs || 0) * batchSize)}
-                            label={t('training.remaining')}
-                        />
+                        <div className={style.stats}>
+                            <NumberBox
+                                value={(epochs || 0) * batchSize}
+                                label={t('training.samples')}
+                                flip
+                            />
+                            <NumberBox
+                                value={Math.max(0, totalSamples - (epochs || 0) * batchSize)}
+                                label={t('training.remaining')}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className={style.buttonBox}>
-                    <Button
-                        disabled={!done && !training}
-                        variant="contained"
-                        startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
-                        onClick={() => startTraining()}
-                    >
-                        {done ? t('training.start') : t('training.stop')}
-                    </Button>
-                    <Tooltip
-                        title={t('training.autoOutput')}
-                        arrow
-                    >
-                        <Switch
-                            disabled={training}
-                            checked={settings.outputText}
-                            onChange={(e) => setSettings({ ...settings, outputText: e.target.checked })}
-                            data-testid="auto-output-switch"
-                            aria-label={t('training.autoOutput')}
-                            color="success"
+                    <div className={style.buttonBox}>
+                        <Button
+                            disabled={!done && !training}
+                            variant="contained"
+                            startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
+                            onClick={() => startTraining()}
+                        >
+                            {done ? t('training.start') : t('training.stop')}
+                        </Button>
+                        <Tooltip
+                            title={t('training.autoOutput')}
+                            arrow
+                        >
+                            <Switch
+                                disabled={training}
+                                checked={settings.outputText}
+                                onChange={(e) => setSettings({ ...settings, outputText: e.target.checked })}
+                                data-testid="auto-output-switch"
+                                aria-label={t('training.autoOutput')}
+                                color="success"
+                            />
+                        </Tooltip>
+                    </div>
+                    {message && (
+                        <BoxNotice
+                            notice={message}
+                            onClose={() => setMessage(null)}
                         />
-                    </Tooltip>
+                    )}
                 </div>
-                {message && (
-                    <BoxNotice
-                        notice={message}
-                        onClose={() => setMessage(null)}
-                    />
-                )}
-            </div>
-        </Box>
+            </Box>
+        </Help>
     );
 }

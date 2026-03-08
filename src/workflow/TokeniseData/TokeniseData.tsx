@@ -16,6 +16,7 @@ import useModelStatus from '../../utilities/useModelStatus';
 import MarginIcon from '@mui/icons-material/Margin';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useNavigate } from 'react-router-dom';
+import Help from '../../components/Help/Help';
 
 export default function TokeniseData() {
     const { t } = useTranslation();
@@ -33,79 +34,82 @@ export default function TokeniseData() {
     const tokenCount = _tokenCount === 0 ? tokens?.length || 0 : _tokenCount;
 
     return (
-        <Box
+        <Help
             widget="tokeniseData"
+            placement="top"
             active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
-            style={{ minWidth: '290px' }}
+            message={t('tokeniseData.help')}
         >
-            <div className={style.container}>
-                <BoxTitle
-                    title={t('tokeniseData.title')}
-                    status={done ? 'done' : 'waiting'}
-                />
-                <div className={style.progressBox}>
-                    <DataProgress
-                        samplesProcessed={tokenCount}
-                        desiredSamples={ready ? (model?.getNumParams() || 0) * 2 : 0}
+            <Box style={{ minWidth: '290px' }}>
+                <div className={style.container}>
+                    <BoxTitle
+                        title={t('tokeniseData.title')}
+                        status={done ? 'done' : 'waiting'}
                     />
-                    <ProgressBox
-                        totalSamples={tokenCount}
-                        label={t('tokeniseData.tokens')}
-                    />
-                </div>
-                <div className={style.buttonBox}>
-                    <Button
-                        disabled={tokenising}
-                        variant="contained"
-                        startIcon={<ModelTrainingIcon />}
-                        onClick={() => {
-                            if (model && dataset && dataset.length > 0 && model.tokeniser.trained) {
-                                setTokenising(true);
-                                setTokenCount(0);
-                                setTokens(null);
-
-                                const task = new tasks.PretrainingTask(dataset);
-                                return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
-                                    setTokenCount(tokens);
-                                }).then((newTokens) => {
-                                    setTokens(newTokens);
+                    <div className={style.progressBox}>
+                        <DataProgress
+                            samplesProcessed={tokenCount}
+                            desiredSamples={ready ? (model?.getNumParams() || 0) * 2 : 0}
+                        />
+                        <ProgressBox
+                            totalSamples={tokenCount}
+                            label={t('tokeniseData.tokens')}
+                        />
+                    </div>
+                    <div className={style.buttonBox}>
+                        <Button
+                            disabled={tokenising}
+                            variant="contained"
+                            startIcon={<ModelTrainingIcon />}
+                            onClick={() => {
+                                if (model && dataset && dataset.length > 0 && model.tokeniser.trained) {
+                                    setTokenising(true);
                                     setTokenCount(0);
-                                    setTokenising(false);
-                                });
-                            } else if (!model) {
-                                setMessage({
-                                    notice: t('tokeniseData.noModel'),
-                                    level: 'error',
-                                });
-                            } else if (model && (!model.tokeniser.trained || model.tokeniser.vocabSize === 0)) {
-                                setMessage({
-                                    notice: t('tokeniseData.notTrained'),
-                                    level: 'error',
-                                });
-                            } else if (!dataset || dataset.length === 0) {
-                                setMessage({
-                                    notice: t('tokeniseData.noData'),
-                                    level: 'error',
-                                });
-                            }
-                        }}
-                    >
-                        {t('tokeniseData.start')}
-                    </Button>
-                    <VerticalButton
-                        startIcon={<MarginIcon />}
-                        onClick={() => navigate('tokenised-data')}
-                    >
-                        {t('tokeniseData.show')}
-                    </VerticalButton>
+                                    setTokens(null);
+
+                                    const task = new tasks.PretrainingTask(dataset);
+                                    return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
+                                        setTokenCount(tokens);
+                                    }).then((newTokens) => {
+                                        setTokens(newTokens);
+                                        setTokenCount(0);
+                                        setTokenising(false);
+                                    });
+                                } else if (!model) {
+                                    setMessage({
+                                        notice: t('tokeniseData.noModel'),
+                                        level: 'error',
+                                    });
+                                } else if (model && (!model.tokeniser.trained || model.tokeniser.vocabSize === 0)) {
+                                    setMessage({
+                                        notice: t('tokeniseData.notTrained'),
+                                        level: 'error',
+                                    });
+                                } else if (!dataset || dataset.length === 0) {
+                                    setMessage({
+                                        notice: t('tokeniseData.noData'),
+                                        level: 'error',
+                                    });
+                                }
+                            }}
+                        >
+                            {t('tokeniseData.start')}
+                        </Button>
+                        <VerticalButton
+                            startIcon={<MarginIcon />}
+                            onClick={() => navigate('tokenised-data')}
+                        >
+                            {t('tokeniseData.show')}
+                        </VerticalButton>
+                    </div>
+                    {message && (
+                        <BoxNotice
+                            notice={message}
+                            onClose={() => setMessage(null)}
+                        />
+                    )}
                 </div>
-                {message && (
-                    <BoxNotice
-                        notice={message}
-                        onClose={() => setMessage(null)}
-                    />
-                )}
-            </div>
-        </Box>
+            </Box>
+        </Help>
     );
 }

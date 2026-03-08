@@ -13,6 +13,7 @@ import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { modelAtom } from '../../state/model';
 import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
+import Help from '../../components/Help/Help';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
@@ -106,53 +107,59 @@ export default function PreTrainedModel({ widget, hideMenu }: Props) {
     );
 
     return (
-        <Box
-            widget={widget ?? 'pretrained'}
+        <Help
+            message={t('model.help')}
             active={done}
-            disabled={busy}
-            className={style.modelThread}
+            widget={widget ?? 'pretrained'}
+            style={{ borderRadius: '20px' }}
+            placement="top"
         >
-            <input
-                type="file"
-                accept=".zip"
-                ref={fileRef}
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                    if (e.target.files && e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        openFile(file);
-                    }
-                }}
-            />
-            {showSearch && (
-                <SearchPretrained
-                    onClose={() => setShowSearch(false)}
-                    onModel={setModel}
-                    model={model ?? undefined}
+            <Box
+                disabled={busy}
+                className={style.modelThread}
+            >
+                <input
+                    type="file"
+                    accept=".zip"
+                    ref={fileRef}
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                            const file = e.target.files[0];
+                            openFile(file);
+                        }
+                    }}
                 />
-            )}
-            <div className={style.container}>
-                <BoxTitle
-                    title={title}
-                    setTitle={updateModelTitle}
-                    startIcon={
-                        <div className={style.icon}>
-                            <ModelIcon />
-                        </div>
-                    }
-                    style={{ height: '60px', borderBottom: 'none', backgroundColor: '#945fbf' }}
-                    placeholder={t('model.languageModel')}
-                    dark
-                />
-                {!hideMenu && (
-                    <ModelMenu
-                        disabled={modelBusy}
-                        onUpload={() => fileRef.current?.click()}
-                        onSearch={() => setShowSearch(true)}
-                        onDownload={model ? () => doSave(model?.meta.name || 'model') : undefined}
+                {showSearch && (
+                    <SearchPretrained
+                        onClose={() => setShowSearch(false)}
+                        onModel={setModel}
+                        model={model ?? undefined}
                     />
                 )}
-            </div>
-        </Box>
+                <div className={style.container}>
+                    <BoxTitle
+                        title={title}
+                        setTitle={updateModelTitle}
+                        startIcon={
+                            <div className={style.icon}>
+                                <ModelIcon />
+                            </div>
+                        }
+                        style={{ height: '60px', borderBottom: 'none', backgroundColor: '#945fbf' }}
+                        placeholder={t('model.languageModel')}
+                        dark
+                    />
+                    {!hideMenu && (
+                        <ModelMenu
+                            disabled={modelBusy}
+                            onUpload={() => fileRef.current?.click()}
+                            onSearch={() => setShowSearch(true)}
+                            onDownload={model ? () => doSave(model?.meta.name || 'model') : undefined}
+                        />
+                    )}
+                </div>
+            </Box>
+        </Help>
     );
 }
