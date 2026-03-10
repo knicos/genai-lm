@@ -16,6 +16,7 @@ import { CollapsedTrainingLog, CollapsedTrainingPoint } from './CollapsedTrainin
 import { createMetric } from '../../utilities/metric';
 import { trainerAtom } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
+import Help from '../../components/Help/Help';
 
 interface AdvancedStats {
     samplesPerSecond: number;
@@ -24,11 +25,14 @@ interface AdvancedStats {
 
 export function Component() {
     const { t } = useTranslation();
-    const [metricValue, setMetricValue] = useState<number>(0);
-    const [metricPercentage, setMetricPercentage] = useState<number>(0);
     const model = useAtomValue(modelAtom);
     const trainer = useAtomValue(trainerAtom);
+    const trainerLog = trainer?.log;
     const [metric, setMetric] = useAtom(evaluatorMetrics);
+
+    const [metricValue, setMetricValue] = useState<number>(0);
+    const [metricPercentage, setMetricPercentage] = useState<number>(0);
+
     const setAdvanced = useSetAtom(evaluatorAdvanced);
     const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
     const shouldAnimate = useAtomValue(deviceCapabilities)?.backend === 'webgpu';
@@ -85,15 +89,7 @@ export function Component() {
     }, [model, metric]);
 
     useEffect(() => {
-        setMetricValue(0);
-        setMetricPercentage(0);
-        //}
-    }, [model]);
-
-    const trainerLog = trainer?.log;
-
-    useEffect(() => {
-        if (trainerLog) {
+        if (trainerLog && trainerLog.length > 0) {
             aggregatorRef.current = new CollapsedTrainingLog(
                 1,
                 trainerLog.map((entry) => ({
@@ -110,13 +106,41 @@ export function Component() {
             );
 
             setHistory(aggregatorRef.current.getCollapsed());
+        } else {
+            setMetricValue(0);
+            setMetricPercentage(0);
+            setHistory([]);
         }
     }, [trainerLog]);
+
+    useEffect(() => {
+        if (trainerLog && trainerLog.length > 0 && model && model.loaded) {
+            const log = trainerLog[trainerLog.length - 1];
+            const { value, percentage } = createMetric(metric, log, model.config.vocabSize);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setMetricValue(value);
+            setMetricPercentage(percentage);
+
+            setAdvancedStats({
+                samplesPerSecond: log.samplesPerSecond,
+                memory: log.memoryUsage ?? 0,
+            });
+        }
+    }, [metric, trainerLog, model]);
 
     return (
         <div className="sidePanel">
             <h2>{t('tools.training.title')}</h2>
-            <h3 className={style.subtitle}>{t('tools.training.validation')}</h3>
+
+            <h3 className={style.subtitle}>
+                <Help
+                    message={t('tools.training.validationHelp')}
+                    inplace
+                >
+                    {t('tools.training.validation')}
+                </Help>
+            </h3>
+
             <div className={style.validationBox}>
                 <Circle
                     radius={65}
@@ -168,11 +192,17 @@ export function Component() {
                                 label={t('app.settings.gradientNormMetric')}
                             />
                         )}
-                        <FormControlLabel
-                            value="accuracy"
-                            control={<Radio />}
-                            label={t('app.settings.accuracyMetric')}
-                        />
+                        <Help
+                            message={t('tools.training.accuracyHelp')}
+                            inplace
+                            placement="left"
+                        >
+                            <FormControlLabel
+                                value="accuracy"
+                                control={<Radio />}
+                                label={t('app.settings.accuracyMetric')}
+                            />
+                        </Help>
                         {devMode && (
                             <FormControlLabel
                                 value="perplexity"
@@ -180,11 +210,17 @@ export function Component() {
                                 label={t('app.settings.perplexityMetric')}
                             />
                         )}
-                        <FormControlLabel
-                            value="loss"
-                            control={<Radio />}
-                            label={t('app.settings.lossMetric')}
-                        />
+                        <Help
+                            message={t('tools.training.lossHelp')}
+                            inplace
+                            placement="left"
+                        >
+                            <FormControlLabel
+                                value="loss"
+                                control={<Radio />}
+                                label={t('app.settings.lossMetric')}
+                            />
+                        </Help>
                     </RadioGroup>
                 </FormControl>
             </div>

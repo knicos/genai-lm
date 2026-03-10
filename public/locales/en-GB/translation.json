@@ -278,7 +278,10 @@
             "title": "Training Log",
             "validation": "Validation",
             "history": "History",
-            "performance": "Performance"
+            "performance": "Performance",
+            "validationHelp": "Some of your data is used to test how well the model is learning. This validation data is not shown to the model during training so it cannot cheat.",
+            "accuracyHelp": "Accuracy is the percentage of predictions that were correct.",
+            "lossHelp": "Loss is a measure of how wrong the model's predictions were. It refers to the loss of information."
         },
         "modelPredicting": "Predicting...",
         "modelUpdating": "Updating parameters...",
