@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import { useEffect, useRef, useState } from 'react';
 import { createMetric } from '../../utilities/metric';
+import Help from '../../components/Help/Help';
 
 const CURVE = 10;
 const ARROW_SIZE = 10;
@@ -74,7 +75,12 @@ export default function LossBox({ loss, model, updating }: Props) {
                     stroke="none"
                 />
             </svg>
-            <h3>{t('tools.loss')}</h3>
+            <Help
+                message={t('training.lossBoxHelp')}
+                inplace
+            >
+                <h3>{t('tools.loss')}</h3>
+            </Help>
             <Circle
                 radius={40}
                 progress={metric ? 1 - metric.percentage : 0}

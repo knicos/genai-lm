@@ -1,3 +1,5 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
 .sampleBox {
     white-space: nowrap;
     overflow-x: scroll;
@@ -14,13 +16,27 @@
     padding: 0rem 0.2rem;
     border-bottom: 2px solid rgba(0, 130, 151, 0.6);
     box-sizing: border-box;
+    position: relative;
+}
+
+.selected::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid secondary;
+    top: -10px;
+    left: calc(50% - 8px);
 }
 
 .postText {
-    opacity: 0.2;
+    filter: blur(2px);
+    opacity: 0.4;
 }
 
-.token {
+/*.token {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -29,7 +45,22 @@
     margin: 0 0.1rem;
     border-radius: 4px;
     box-sizing: border-box;
-    /*transition: opacity 0.1s;*/
+}*/
+
+.token {
+    background: rgba(0, 130, 151, 0.2);
+    color: black;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 0;
+    border-bottom: 2px solid rgba(0, 130, 151, 0.4);
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    user-select: none;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .token span {
@@ -37,5 +68,5 @@
 }
 
 .tokenNumber {
-    font-size: 0.8rem;
+    font-size: 0.5rem;
 }

@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import filterTokens from './filterTokens';
+import { useTranslation } from 'react-i18next';
 
 const CURVE = 10;
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function Predictions({ predictions, vocab, target, size, finished }: Props) {
+    const { t } = useTranslation();
     const [lines, setLines] = useState<ILine[]>([]);
     const ref = useRef<HTMLDivElement>(null);
     const tableRef = useRef<HTMLTableElement>(null);
@@ -69,6 +71,9 @@ export default function Predictions({ predictions, vocab, target, size, finished
 
                     const newLines: ILine[] = [];
                     const lineSpacing = tableRect.height / size;
+                    const startY = tableRect.y - mainRect.y - padding;
+
+                    console.log({ mainRect, tableRect, width, height, rightEdge });
 
                     if (width > 40) {
                         for (let i = 0; i < size; i++) {
@@ -76,7 +81,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 x1: 40,
                                 y1: 0,
                                 x2: width,
-                                y2: padding + i * lineSpacing + lineSpacing / 2,
+                                y2: startY + padding + i * lineSpacing + lineSpacing / 2,
                                 flip: false,
                                 id: -1,
                             });
@@ -85,7 +90,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                         for (let i = 0; i < size; i++) {
                             newLines.push({
                                 x1: rightEdge,
-                                y1: padding + i * lineSpacing + lineSpacing / 2,
+                                y1: startY + padding + i * lineSpacing + lineSpacing / 2,
                                 x2: mainRect.width - 40,
                                 y2: height,
                                 flip: true,
@@ -139,49 +144,54 @@ export default function Predictions({ predictions, vocab, target, size, finished
                     );
                 })}
             </svg>
-            <table
-                className={style.predictionsList}
-                ref={tableRef}
-            >
-                <tbody>
-                    {paddedPredictions.map((p, index) => (
-                        <tr key={index}>
-                            <td className={p.token === -1 ? style.noToken : style.token}>
-                                <span>{`${p.text}`}</span>
-                            </td>
-                            <td className={style.probability}>
-                                <PercentageBar
-                                    value={p.probability * 100}
-                                    colour={!finished || p.token === -1 ? 'blue' : p.token === target ? 'green' : 'red'}
-                                    thickness={10}
-                                    hideLabel
-                                    style={{ minHeight: '5px' }}
-                                />
-                            </td>
-                            <td className={style.percentage}>{Math.round(p.probability * 100)}%</td>
-                            <td className={style.icon}>
-                                {p.token >= 0 &&
-                                    (!finished ? (
-                                        <HourglassTopIcon
-                                            htmlColor="#5165c9"
-                                            fontSize="small"
-                                        />
-                                    ) : p.token === target ? (
-                                        <DoneIcon
-                                            color="success"
-                                            fontSize="small"
-                                        />
-                                    ) : (
-                                        <CloseIcon
-                                            color="error"
-                                            fontSize="small"
-                                        />
-                                    ))}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div>
+                <h4>{t('training.predictionsHeader')}</h4>
+                <table
+                    className={style.predictionsList}
+                    ref={tableRef}
+                >
+                    <tbody>
+                        {paddedPredictions.map((p, index) => (
+                            <tr key={index}>
+                                <td className={p.token === -1 ? style.noToken : style.token}>
+                                    <span>{`${p.text}`}</span>
+                                </td>
+                                <td className={style.probability}>
+                                    <PercentageBar
+                                        value={p.probability * 100}
+                                        colour={
+                                            !finished || p.token === -1 ? 'blue' : p.token === target ? 'green' : 'red'
+                                        }
+                                        thickness={10}
+                                        hideLabel
+                                        style={{ minHeight: '5px' }}
+                                    />
+                                </td>
+                                <td className={style.percentage}>{Math.round(p.probability * 100)}%</td>
+                                <td className={style.icon}>
+                                    {p.token >= 0 &&
+                                        (!finished ? (
+                                            <HourglassTopIcon
+                                                htmlColor="#5165c9"
+                                                fontSize="small"
+                                            />
+                                        ) : p.token === target ? (
+                                            <DoneIcon
+                                                color="success"
+                                                fontSize="small"
+                                            />
+                                        ) : (
+                                            <CloseIcon
+                                                color="error"
+                                                fontSize="small"
+                                            />
+                                        ))}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

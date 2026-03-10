@@ -6,6 +6,13 @@
     position: relative;
 }
 
+.section h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    font-weight: normal;
+    font-style: italic;
+}
+
 .linesSVG {
     position: absolute;
     top: 0;

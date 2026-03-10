@@ -1,3 +1,5 @@
+@value secondary from "@genai-fi/base/css/colours.module.css";
+
 .block {
     margin-top: 2rem;
     position: relative;
@@ -17,11 +19,13 @@
     justify-content: flex-end;
     align-self: flex-start;
     gap: 1rem;
+    color: secondary;
 }
 
 .modelLabel {
     font-size: 0.9rem;
     margin-left: 1rem;
+    color: black;
 }
 
 .modelLabel h3 {

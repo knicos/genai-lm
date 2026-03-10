@@ -136,8 +136,6 @@ export function Component() {
     const currentAttention = step === 0 ? null : attention[step - 1] || null;
     const ready = model && loaded && dataset.length > 0;
 
-    console.log('State', done, finished, updating);
-
     useEffect(() => {
         if (finished && !done) {
             setUpdating(true);

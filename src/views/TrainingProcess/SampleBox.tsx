@@ -1,8 +1,9 @@
 import { ITokeniser } from '@genai-fi/nanogpt';
 import { useEffect, useRef, useState } from 'react';
 import style from './sample.module.css';
-
-export const COLORS = ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'];
+import Help from '../../components/Help/Help';
+import { useTranslation } from 'react-i18next';
+import { theme } from '../../theme';
 
 interface Props {
     sampleTokens: number[];
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex, attention }: Props) {
+    const { t } = useTranslation();
     const [preText, setPreText] = useState<string>('');
     const [postText, setPostText] = useState<string>('');
     const [tokenText, setTokenText] = useState<string>('');
@@ -23,9 +25,9 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
         const tokensAfter = sampleTokens.slice(selectedTokenIndex + 1);
         const token = sampleTokens[selectedTokenIndex];
 
-        const decodeTexts = async () => {
-            const pre = await tokeniser.decode(tokensBefore);
-            const post = await tokeniser.decode(tokensAfter);
+        const decodeTexts = () => {
+            const pre = tokeniser.decode(tokensBefore);
+            const post = tokeniser.decode(tokensAfter).slice(0, 10);
             const tokenStr = tokeniser.getVocab()[token] || '';
 
             setPreText(pre);
@@ -49,37 +51,49 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
 
     return (
         <>
-            <div
-                className={style.sampleBox}
-                style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
+            <Help
+                message={t('training.sampleBoxHelp')}
+                inplace
+                placement="left"
             >
-                <span>{preText}</span>
-                <span
-                    ref={selectedRef}
-                    className={style.selected}
+                <div
+                    className={style.sampleBox}
+                    style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
                 >
-                    {tokenText}
-                </span>
-                <span className={style.postText}>{postText}</span>
-            </div>
-            <div
-                className={style.sampleBox}
-                ref={tokenBoxRef}
-            >
-                {sampleTokens.slice(0, selectedTokenIndex).map((token, ix) => (
-                    <div
-                        key={ix}
-                        className={style.token}
-                        style={{
-                            backgroundColor: COLORS[ix % COLORS.length],
-                            opacity: attention ? 0.2 + (attention[ix] || 0) * 0.8 : 1,
-                        }}
+                    <span>{preText}</span>
+                    <span
+                        ref={selectedRef}
+                        className={style.selected}
                     >
-                        <span>{vocab[token] || ''}</span>
-                        <span className={style.tokenNumber}>{token}</span>
-                    </div>
-                ))}
-            </div>
+                        {tokenText}
+                    </span>
+                    <span className={style.postText}>{postText}</span>
+                </div>
+            </Help>
+            <Help
+                message={t('training.attentionHelp')}
+                inplace
+                placement="left"
+            >
+                <div
+                    className={style.sampleBox}
+                    ref={tokenBoxRef}
+                >
+                    {sampleTokens.slice(0, selectedTokenIndex).map((token, ix) => (
+                        <div
+                            key={ix}
+                            className={style.token}
+                            style={{
+                                borderColor: theme.light.chartColours[token % theme.light.chartColours.length],
+                                opacity: attention ? 0.2 + (attention[ix] || 0) * 0.8 : 1,
+                            }}
+                        >
+                            <span>{vocab[token] || ''}</span>
+                            <span className={style.tokenNumber}>{token}</span>
+                        </div>
+                    ))}
+                </div>
+            </Help>
         </>
     );
 }

@@ -29,7 +29,7 @@ export default function ModelLines() {
     return (
         <div
             ref={ref}
-            style={{ width: '100%', height: HEIGHT, position: 'relative' }}
+            style={{ width: 'calc(100% - 48px)', height: HEIGHT, position: 'relative' }}
         >
             <svg
                 className={style.linesSVG}

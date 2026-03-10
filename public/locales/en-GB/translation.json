@@ -200,7 +200,12 @@
             "noData": "Add training data first.",
             "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
         },
-        "help": "Pre-training slowly adjusts the parameters up or down to make it better at predicting each example."
+        "predictionsHeader": "Top calculated predictions",
+        "help": "Pre-training slowly adjusts the parameters up or down to make it better at predicting each example.",
+        "sampleBoxHelp": "A short example taken from your data. The model is trying to predict the highlighted token based on the previous text.",
+        "attentionHelp": "The example is converted to numeric tokens and as the model steps through its layers it will pay attention to different tokens.",
+        "modelBoxHelp": "Each layer of your model contributes towards the final prediction, one layer at a time. The parameters inside each layer are tuned by how well the contributed or not.",
+        "lossBoxHelp": "After the model has made its prediction it is scored against the correct answer. Loss is a measure of how wrong the model's prediction was, so the training process tries to reduce this number."
     },
     "generator": {
         "title": "Generation",
