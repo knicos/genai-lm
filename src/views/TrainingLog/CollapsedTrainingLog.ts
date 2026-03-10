@@ -29,8 +29,11 @@ export class CollapsedTrainingLog {
     private collapsed: CollapsedTrainingPoint[] = [];
     private active: Bucket | null = null;
 
-    constructor(groupSize = 10) {
+    constructor(groupSize = 10, initialLog?: CollapsedTrainingPoint[]) {
         this.groupSize = this.validateGroupSize(groupSize);
+        if (initialLog) {
+            this.pushMany(initialLog);
+        }
     }
 
     public setGroupSize(nextGroupSize: number): void {

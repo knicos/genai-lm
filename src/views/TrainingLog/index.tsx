@@ -14,6 +14,8 @@ import { theme } from '../../theme';
 import { deviceCapabilities } from '../../state/device';
 import { CollapsedTrainingLog, CollapsedTrainingPoint } from './CollapsedTrainingLog';
 import { createMetric } from '../../utilities/metric';
+import { trainerAtom } from '../../state/trainer';
+import { uiDeveloperMode } from '../../state/uiState';
 
 interface AdvancedStats {
     samplesPerSecond: number;
@@ -25,12 +27,14 @@ export function Component() {
     const [metricValue, setMetricValue] = useState<number>(0);
     const [metricPercentage, setMetricPercentage] = useState<number>(0);
     const model = useAtomValue(modelAtom);
+    const trainer = useAtomValue(trainerAtom);
     const [metric, setMetric] = useAtom(evaluatorMetrics);
     const setAdvanced = useSetAtom(evaluatorAdvanced);
     const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
     const shouldAnimate = useAtomValue(deviceCapabilities)?.backend === 'webgpu';
     const aggregatorRef = useRef(new CollapsedTrainingLog(1));
     const [history, setHistory] = useState<CollapsedTrainingPoint[]>([]);
+    const devMode = useAtomValue(uiDeveloperMode);
 
     useEffect(() => {
         setAdvanced(true);
@@ -81,16 +85,33 @@ export function Component() {
     }, [model, metric]);
 
     useEffect(() => {
-        /*if (model && ready && model.model.trainingState) {
-            const lastLog = model.model.trainingState;
-            const { value, percentage } = createMetric(metric, lastLog, model.config.vocabSize);
-            setMetricValue(value);
-            setMetricPercentage(percentage);
-        } else {*/
         setMetricValue(0);
         setMetricPercentage(0);
         //}
     }, [model]);
+
+    const trainerLog = trainer?.log;
+
+    useEffect(() => {
+        if (trainerLog) {
+            aggregatorRef.current = new CollapsedTrainingLog(
+                1,
+                trainerLog.map((entry) => ({
+                    step: entry.step,
+                    trainingLoss: entry.trainingMetrics.loss,
+                    validationLoss: entry.validationMetrics?.loss ?? 0,
+                    trainingPerplexity: entry.trainingMetrics.perplexity,
+                    validationPerplexity: entry.validationMetrics?.perplexity,
+                    trainingAccuracy: entry.trainingMetrics.accuracy,
+                    validationAccuracy: entry.validationMetrics?.accuracy,
+                    gradientNorm: entry.gradientNorm,
+                    count: 1,
+                }))
+            );
+
+            setHistory(aggregatorRef.current.getCollapsed());
+        }
+    }, [trainerLog]);
 
     return (
         <div className="sidePanel">
@@ -140,21 +161,25 @@ export function Component() {
                             setMetricPercentage(0);
                         }}
                     >
-                        <FormControlLabel
-                            value="gradientNorm"
-                            control={<Radio />}
-                            label={t('app.settings.gradientNormMetric')}
-                        />
+                        {devMode && (
+                            <FormControlLabel
+                                value="gradientNorm"
+                                control={<Radio />}
+                                label={t('app.settings.gradientNormMetric')}
+                            />
+                        )}
                         <FormControlLabel
                             value="accuracy"
                             control={<Radio />}
                             label={t('app.settings.accuracyMetric')}
                         />
-                        <FormControlLabel
-                            value="perplexity"
-                            control={<Radio />}
-                            label={t('app.settings.perplexityMetric')}
-                        />
+                        {devMode && (
+                            <FormControlLabel
+                                value="perplexity"
+                                control={<Radio />}
+                                label={t('app.settings.perplexityMetric')}
+                            />
+                        )}
                         <FormControlLabel
                             value="loss"
                             control={<Radio />}

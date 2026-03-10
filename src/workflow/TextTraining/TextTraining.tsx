@@ -89,7 +89,13 @@ export default function TextTraining() {
     useEffect(() => {
         if (model) {
             setMessage(null);
-            setTrainer(null);
+
+            // Slight hack!!
+            if (model['_trainer']) {
+                setTrainer(model['_trainer']);
+            } else {
+                setTrainer(null);
+            }
             const h = () => {
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
