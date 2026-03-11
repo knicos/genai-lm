@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import BoxLink from '../../../components/BoxLink/BoxLink';
 import { useAtomValue } from 'jotai';
-import useModelLoaded from '../../../utilities/useModelLoaded';
+import useModelLoaded from '../../../hooks/useModelLoaded';
 import { modelAtom } from '../../../state/model';
 
 interface Props {

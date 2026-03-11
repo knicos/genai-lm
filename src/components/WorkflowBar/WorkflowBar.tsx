@@ -9,6 +9,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { theme } from '../../theme';
 import InfoPop from '../InfoPop/InfoPop';
+import HomeIcon from '@mui/icons-material/Home';
 
 const ITEM_WIDTH = 200;
 
@@ -70,6 +71,12 @@ export default function WorkflowBar({ items }: Props) {
             className={style.container}
             ref={containerRef}
         >
+            <Link
+                to="/workspace/home"
+                className={`${style.homeButton} ${flow === 'home' ? style.selected : ''}`}
+            >
+                <HomeIcon fontSize="inherit" />
+            </Link>
             <div
                 className={style.itemList}
                 ref={listRef}

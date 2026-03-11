@@ -13,7 +13,7 @@ import Box from '../../components/BoxTitle/Box';
 import DataRows from './DataRows';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
-import useModelStatus from '../../utilities/useModelStatus';
+import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { dataEntries, DataEntry, dataReady, datasetAtom, downloadsAtom } from '../../state/data';

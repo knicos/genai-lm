@@ -6,7 +6,7 @@ import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import useModelBusy from '../../utilities/useModelBusy';
+import useModelBusy from '../../hooks/useModelBusy';
 import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
 import waitModelLoaded from '../../utilities/waitModelLoaded';

@@ -1,6 +1,6 @@
 import { Conversation, Evaluator, ITokeniser, TeachableLLM, Trainer } from '@genai-fi/nanogpt';
 import { useEffect, useState } from 'react';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelLoaded from '../../hooks/useModelLoaded';
 import style from './style.module.css';
 import { PercentageBar } from '@genai-fi/base';
 import { Tooltip } from '@mui/material';

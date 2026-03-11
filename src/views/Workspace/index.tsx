@@ -15,7 +15,7 @@ import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 import { uiShowSidePanel } from '../../state/uiState';
 import { modelAtom } from '../../state/model';
 import { datasetAtom } from '../../state/data';
-import useOrientation from '../../utilities/useOrientation';
+import useOrientation from '../../hooks/useOrientation';
 import ChatOutput from '../../workflow/ChatOutput/ChatOutput';
 import Prompt from '../../workflow/Prompt/Prompt';
 import TrainerLink from './linkboxes/TrainerLink';
@@ -23,7 +23,7 @@ import ProcessDataLink from './linkboxes/ProcessDataLink';
 import TokeniseData from '../../workflow/TokeniseData/TokeniseData';
 import ArchitectureLink from './linkboxes/Architecture';
 import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
-import Initialiser from './Initialiser';
+import Initialiser, { flowType } from './Initialiser';
 import CheckModel from '../../workflow/CheckModel/CheckModel';
 import TextDataLink from './linkboxes/TextDataLink';
 import InstructData from '../../workflow/InstructData/InstructData';
@@ -33,6 +33,7 @@ import FineTuneLink from './linkboxes/FineTuneLink';
 import PeerShareWrap from '../../components/PeerShare/PeerShareWrap';
 import Sharing from '../../workflow/Sharing/Sharing';
 import Tokeniser from '../../workflow/Tokeniser/Tokeniser';
+import Home from './Home';
 
 const CONNECTIONS: IConnection[] = [
     {
@@ -129,8 +130,6 @@ const CONNECTIONS: IConnection[] = [
     },
 ];
 
-type flowType = 'model' | 'pretraindata' | 'pretrain' | 'finetune' | 'deployment';
-
 export function Component() {
     const [model, setModel] = useAtom(modelAtom);
     const textDataset = useAtomValue(datasetAtom);
@@ -194,7 +193,7 @@ export function Component() {
     }, [textDataset, flow]);
 
     const isInputStage = flow === 'model' || flow === 'pretraindata' || flow === 'finetune';
-    const isOutputStage = !isInputStage;
+    const isOutputStage = !isInputStage && flow !== 'home';
 
     return performProbe && !detected ? (
         <DeviceProbe />
@@ -207,7 +206,7 @@ export function Component() {
                 className={style.mainContainer}
                 style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
             >
-                <div className={style.workspaceContainer}>
+                <div className={`${style.workspaceContainer} ${flow === 'home' ? style.homeWorkspace : ''}`}>
                     <WorkflowLayout connections={conn}>
                         {isInputStage && (
                             <section
@@ -225,9 +224,10 @@ export function Component() {
                             </section>
                         )}
                         <section
-                            className={style.processGroup}
+                            className={`${style.processGroup} ${flow === 'home' ? style.homeProcess : ''}`}
                             data-widget="container"
                         >
+                            {flow === 'home' && <Home />}
                             {flow === 'model' && (
                                 <div
                                     data-widget="container"

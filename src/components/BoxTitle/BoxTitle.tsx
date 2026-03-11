@@ -1,5 +1,5 @@
 import { IconButton, styled } from '@mui/material';
-import useWindowSize from '../../utilities/useWindowSize';
+import useWindowSize from '../../hooks/useWindowSize';
 import StatusBox, { BoxStatus } from '../StatusBox/StatusBox';
 import styleModule from './style.module.css';
 import { useTranslation } from 'react-i18next';

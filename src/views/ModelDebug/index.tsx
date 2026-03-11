@@ -3,7 +3,7 @@ import { modelAtom } from '../../state/model';
 import { checks, TeachableLLM, TensorStatistics } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
 import { useState } from 'react';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelLoaded from '../../hooks/useModelLoaded';
 import { squeezeArray } from '../../utilities/arrays';
 
 async function debugModel(model: TeachableLLM) {

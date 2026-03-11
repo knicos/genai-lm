@@ -4,7 +4,7 @@ import { datasetAtom } from '../../state/data';
 import { modelAtom } from '../../state/model';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import extractData from './extractData';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelLoaded from '../../hooks/useModelLoaded';
 import { Conversation, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';

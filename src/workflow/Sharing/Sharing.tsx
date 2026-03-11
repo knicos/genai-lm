@@ -5,7 +5,7 @@ import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import SharingMenu from './SharingMenu';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelLoaded from '../../hooks/useModelLoaded';
 import { enableSharing, sessionCode } from '../../state/share';
 import { QRCode } from '@genai-fi/base';
 

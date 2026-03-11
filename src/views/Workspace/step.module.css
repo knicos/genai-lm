@@ -1,0 +1,96 @@
+.step {
+    display: flex;
+    margin-top: 1rem;
+    border-radius: 16px;
+    box-shadow: 2px 2px 4px var(--dropShadow);
+    background: var(--paleBlue);
+    position: relative;
+    padding: 1rem 1rem 1rem 3rem;
+
+    /* animation */
+    opacity: 0;
+    transform: translateY(12px);
+    animation: stepIn 420ms ease-out forwards;
+    animation-delay: calc(var(--step-index, 0) * 120ms);
+}
+
+@keyframes stepIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step:nth-child(1) {
+    --step-index: 0;
+}
+.step:nth-child(2) {
+    --step-index: 1;
+}
+.step:nth-child(3) {
+    --step-index: 2;
+}
+.step:nth-child(4) {
+    --step-index: 3;
+}
+.step:nth-child(5) {
+    --step-index: 4;
+}
+.step:nth-child(6) {
+    --step-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .step {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.stepNumber {
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: var(--secondary);
+    color: white;
+    width: 4rem;
+    height: 4rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    position: absolute;
+    top: -1rem;
+    left: -1rem;
+}
+
+.stepContent {
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 250px;
+}
+
+.stepContent h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.stepContent p {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.stepContent a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+}

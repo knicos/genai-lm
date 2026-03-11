@@ -5,7 +5,7 @@ import { Conversation } from '@genai-fi/nanogpt';
 import { useAtom, useAtomValue } from 'jotai';
 import { generatorAtom, generatorSettings } from '../../state/generator';
 import { modelAtom } from '../../state/model';
-import useModelStatus from '../../utilities/useModelStatus';
+import useModelStatus from '../../hooks/useModelStatus';
 import { trainerSettings } from '../../state/trainer';
 import logger from '../../utilities/logger';
 import { Notice } from '../../components/BoxTitle/BoxNotice';

@@ -1,7 +1,7 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import style from './style.module.css';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import useModelStatus from '../../utilities/useModelStatus';
+import useModelStatus from '../../hooks/useModelStatus';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import { generatorSettings } from '../../state/generator';

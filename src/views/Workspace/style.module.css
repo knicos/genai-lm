@@ -22,6 +22,12 @@
     flex-shrink: 1;
     flex-grow: 1;
     width: 100%;
+    background: #dee4e8;
+    transition: background 0.3s ease;
+}
+
+.workspaceContainer.homeWorkspace {
+    background: white;
 }
 
 .workspaceContainer > div {
@@ -31,6 +37,7 @@
 .workspaceContainer > div > div {
     padding: 0;
     height: 100%;
+    background: none;
 }
 
 .verticalBox {
@@ -127,6 +134,13 @@
     align-self: flex-start;
 }
 
+.processGroup.homeProcess {
+    margin: 0;
+    max-width: 100vw;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
 .subgroup {
     display: flex;
     flex-direction: column;
@@ -193,4 +207,11 @@
     .processGroup {
         gap: 2rem;
     }
+}
+
+.loadingContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }

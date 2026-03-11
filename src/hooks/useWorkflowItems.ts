@@ -1,0 +1,32 @@
+import { useAtomValue } from 'jotai';
+import { modelAtom } from '../state/model';
+import useModelLoaded from './useModelLoaded';
+import useModelPhase from './useModelPhase';
+import { dataTokens } from '../state/data';
+
+export type WorkflowStatus = 'complete' | 'available' | 'blocked';
+
+interface Item {
+    id: string;
+    status: WorkflowStatus;
+}
+
+export default function useWorkflowItems(): Item[] {
+    const model = useAtomValue(modelAtom);
+    const loaded = useModelLoaded(model ?? undefined);
+    const phase = useModelPhase(model ?? undefined);
+    const preData = useAtomValue(dataTokens);
+
+    const step1 = loaded;
+    const step2 = preData && preData.length > 0;
+    const step3 = step1 && step2 && phase === 'pretrained';
+    const step4 = step1 && step2 && phase === 'finetuned';
+
+    return [
+        { id: 'model', status: step1 ? 'complete' : 'available' },
+        { id: 'pretraindata', status: step2 ? 'complete' : step1 ? 'available' : 'blocked' },
+        { id: 'pretrain', status: step3 ? 'complete' : step2 ? 'available' : 'blocked' },
+        { id: 'finetune', status: step4 ? 'complete' : step3 ? 'available' : 'blocked' },
+        { id: 'deployment', status: step4 ? 'available' : 'blocked' },
+    ];
+}

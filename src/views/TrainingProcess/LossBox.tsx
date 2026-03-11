@@ -78,6 +78,7 @@ export default function LossBox({ loss, model, updating }: Props) {
             <Help
                 message={t('training.lossBoxHelp')}
                 inplace
+                placement="left"
             >
                 <h3>{t('tools.loss')}</h3>
             </Help>

@@ -4,7 +4,7 @@ import { generatorAtom, generatorSettings } from '../../state/generator';
 import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
-import useModelStatus from '../../utilities/useModelStatus';
+import useModelStatus from '../../hooks/useModelStatus';
 import { modelAtom } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';

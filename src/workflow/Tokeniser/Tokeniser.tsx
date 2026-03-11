@@ -9,7 +9,7 @@ import { Button, VerticalButton } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import { useEffect, useState } from 'react';
 import AbcIcon from '@mui/icons-material/Abc';
-import useModelPhase from '../../utilities/useModelPhase';
+import useModelPhase from '../../hooks/useModelPhase';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useNavigate } from 'react-router-dom';

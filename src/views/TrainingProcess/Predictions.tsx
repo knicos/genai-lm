@@ -73,8 +73,6 @@ export default function Predictions({ predictions, vocab, target, size, finished
                     const lineSpacing = tableRect.height / size;
                     const startY = tableRect.y - mainRect.y - padding;
 
-                    console.log({ mainRect, tableRect, width, height, rightEdge });
-
                     if (width > 40) {
                         for (let i = 0; i < size; i++) {
                             newLines.push({

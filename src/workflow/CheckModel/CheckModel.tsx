@@ -6,7 +6,7 @@ import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
-import useModelLoaded from '../../utilities/useModelLoaded';
+import useModelLoaded from '../../hooks/useModelLoaded';
 import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
 import Help from '../../components/Help/Help';
@@ -30,7 +30,7 @@ export default function CheckModel() {
     const ready = useModelLoaded(model ?? undefined);
     const architecture = useAtomValue(modelConfigAtom);
 
-    const isUpToDate = !model || !ready || isConfigEqual(model.config, architecture);
+    const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
 
     return (
         <Help
