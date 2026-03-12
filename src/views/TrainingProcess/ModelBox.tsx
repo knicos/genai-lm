@@ -49,13 +49,15 @@ export default function ModelBox({ layers, step, done, spinning }: Props) {
                     </h3>
 
                     <div>
-                        {step < numLayers
-                            ? t('tools.modelPredicting')
-                            : spinning
-                              ? t('tools.modelUpdating')
-                              : done
-                                ? t('tools.modelComplete')
-                                : t('tools.modelIdle')}
+                        {step < 0
+                            ? t('tools.modelSelecting')
+                            : step < numLayers
+                              ? t('tools.modelPredicting')
+                              : spinning
+                                ? t('tools.modelUpdating')
+                                : done
+                                  ? t('tools.modelComplete')
+                                  : t('tools.modelIdle')}
                     </div>
                 </div>
             </Help>

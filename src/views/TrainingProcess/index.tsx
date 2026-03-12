@@ -2,19 +2,18 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { datasetAtom } from '../../state/data';
 import { modelAtom } from '../../state/model';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import extractData from './extractData';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import { Conversation, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
-import { trainerAtom } from '../../state/trainer';
 import style from './style.module.css';
 import LossBox from './LossBox';
 import ModelBox from './ModelBox';
 import ModelLines from './ModelLines';
 import InfoPanel from '../../workflow/TextData/InfoPanel';
-import ModelControls from './ModelControls';
+import ModelControls, { AnimationStep, AnimationStepName } from './ModelControls';
 
 function reduceAttention(attentionData: number[][][][]): number[][] {
     // layer, head, _, sequence
@@ -47,118 +46,123 @@ export function Component() {
     const dataset = useAtomValue(datasetAtom);
     const model = useAtomValue(modelAtom);
     const loaded = useModelLoaded(model ?? undefined);
-    const [text, setText] = useState<Conversation[]>([]);
     const [tokens, setTokens] = useState<number[]>([]);
     const [predictions, setPredictions] = useState<number[][]>([]);
-    const [trigger, doNext] = useReducer((x) => x + 1, 0);
     const nextToken = useRef<number | null>(null);
-    const trainer = useAtomValue(trainerAtom);
     const [loss, setLoss] = useState<number | null>(null);
-    const [step, setStep] = useState<number>(0);
     const [attention, setAttention] = useState<number[][]>([]);
-    const [warn, setWarn] = useState<boolean>(false);
-    const [updating, setUpdating] = useState<boolean>(false);
-    const [done, setDone] = useState<boolean>(false);
+    const [warn] = useState<boolean>(false);
+    const [step, setStep] = useState<AnimationStep | null>(null);
+    const stepRef = useRef<AnimationStepName>('none');
 
-    useEffect(() => {
-        if (model && loaded && dataset.length > 0) {
-            setWarn(false);
-            const h = async () => {
-                if (!model.tokeniser.trained) {
-                    await model.tokeniser.train(dataset);
-                }
-
-                const vocab = model.tokeniser.getVocab();
-                const largestToken = Math.max(1, vocab[vocab.length - 1].length);
-                const totalDatasetLength = dataset.reduce((sum, item) => sum + item.length, 0);
-                const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
-                const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
-                const sampleText = extractData(dataset, randomStart, sliceSize + randomStart);
-
-                const newTokens = await model.tokeniser.encode(sampleText);
-                const slicedTokens = newTokens.slice(0, model.config.blockSize);
-                const decodedText = await model.tokeniser.decode(slicedTokens);
-                const actualNextToken = newTokens[slicedTokens.length] || 0;
-
-                nextToken.current = actualNextToken;
-                setText([{ role: 'assistant', content: decodedText }]);
-                setTokens(newTokens);
-                setStep(0);
-                setDone(false);
-                setUpdating(false);
-            };
-            h();
+    const steps = useMemo<AnimationStep[]>(() => {
+        if (!model || !loaded) return [];
+        const s: AnimationStep[] = [];
+        s.push({ name: 'next', layer: -1, index: 0 });
+        // s.push({ name: 'wait', layer: -1, index: 1 });
+        for (let i = 0; i < model.config.nLayer; i++) {
+            s.push({ name: 'predict', layer: i, index: i + 1 });
         }
-    }, [model, loaded, dataset, trigger]);
+        s.push({ name: 'updating', layer: model.config.nLayer - 1, index: model.config.nLayer + 1 });
+        s.push({ name: 'done', layer: model.config.nLayer - 1, index: model.config.nLayer + 2 });
+        return s;
+    }, [model, loaded]);
 
     useEffect(() => {
-        if (loaded && model && text.length > 0) {
-            const h = async () => {
-                const generator = model.generator();
-                await generator.generate(text, {
-                    maxLength: 1,
-                    includeProbabilities: true,
-                    attentionScores: true,
-                    embeddings: 'softmax',
-                    temperature: 1.0,
-                    topP: 0.9,
-                    targets: [nextToken.current ?? 0],
+        setStep(steps[0] ?? null);
+    }, [steps]);
+
+    const loadNext = async () => {
+        if (!model || !loaded) return [];
+        if (!model.tokeniser.trained) {
+            await model.tokeniser.train(dataset);
+        }
+
+        const vocab = model.tokeniser.getVocab();
+        const largestToken = Math.max(1, vocab[vocab.length - 1].length);
+        const totalDatasetLength = dataset.reduce((sum, item) => sum + item.length, 0);
+        const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
+        // eslint-disable-next-line react-hooks/purity
+        const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
+        const sampleText = extractData(dataset, randomStart, sliceSize + randomStart);
+
+        const newTokens = model.tokeniser.encode(sampleText);
+        const slicedTokens = newTokens.slice(0, model.config.blockSize);
+        const decodedText = model.tokeniser.decode(slicedTokens);
+        const actualNextToken = newTokens[slicedTokens.length] || 0;
+
+        nextToken.current = actualNextToken;
+        const newText: Conversation[] = [{ role: 'assistant', content: decodedText }];
+        setTokens(newTokens);
+        setPredictions([]);
+        return newText;
+    };
+
+    const generateText = async (text: Conversation[]) => {
+        if (!model || !loaded) return;
+        const generator = model.generator();
+        await generator.generate(text, {
+            maxLength: 1,
+            includeProbabilities: true,
+            attentionScores: true,
+            embeddings: 'softmax',
+            temperature: 1.0,
+            topP: 0.9,
+            targets: [nextToken.current ?? 0],
+        });
+        const probsData = generator.getProbabilitiesData();
+        const top = probsData ? topP(probsData[0], 0.9) : [];
+
+        const attentionData = generator.getAttentionData();
+        setAttention(reduceAttention(attentionData[0]));
+
+        const embeddingData = generator
+            .getEmbeddingsData()[0]
+            .filter((e) => e.name.startsWith('block_output_'))
+            .map((e) => e.tensor[0]);
+        embeddingData[embeddingData.length - 1] = top;
+
+        setLoss(generator.getLastLoss());
+
+        setPredictions(embeddingData);
+        generator.dispose();
+    };
+
+    if (model && loaded && step && stepRef.current !== step?.name) {
+        stepRef.current = step.name;
+        if (step.name === 'next') {
+            step.locked = true;
+            loadNext()
+                .then((newText) => {
+                    generateText(newText)
+                        .then(() => {
+                            step.locked = false;
+                        })
+                        .catch((e) => {
+                            step.locked = false;
+                            console.error('Error during generation:', e);
+                        });
+                })
+                .catch((e) => {
+                    step.locked = false;
+                    console.error('Error loading next sample:', e);
                 });
-                const probsData = generator.getProbabilitiesData();
-                const top = topP(probsData[0], 0.9);
-
-                const attentionData = generator.getAttentionData();
-                setAttention(reduceAttention(attentionData[0]));
-
-                const embeddingData = generator
-                    .getEmbeddingsData()[0]
-                    .filter((e) => e.name.startsWith('block_output_'))
-                    .map((e) => e.tensor[0]);
-                embeddingData[embeddingData.length - 1] = top;
-
-                setLoss(generator.getLastLoss());
-
-                setPredictions(embeddingData);
-                generator.dispose();
-            };
-            h();
-            if (trainer) {
-                trainer.on('log', h);
-                return () => {
-                    trainer.off('log', h);
-                };
-            }
         }
-    }, [loaded, text, model, trainer]);
+    }
 
     const layers = model && loaded ? model.config.nLayer : 0;
-    const finished = step === layers;
-    const currentAttention = step === 0 ? null : attention[step - 1] || null;
+    const finished = step?.name === 'done' || step?.name === 'updating';
+    const hasLayer = step && step.layer >= 0;
+    const currentAttention = hasLayer ? (attention[step.layer] ?? null) : null;
     const ready = model && loaded && dataset.length > 0;
-
-    useEffect(() => {
-        if (finished && !done) {
-            setUpdating(true);
-            const timeout = setTimeout(() => {
-                setDone(true);
-                setUpdating(false);
-            }, 2000);
-            return () => clearTimeout(timeout);
-        }
-    }, [finished, done]);
 
     return (
         <div className="sidePanel">
             <h2>{t('tools.trainingProcess')}</h2>
             <ModelControls
-                step={step}
-                totalSteps={layers}
-                onIncrement={setStep}
-                delay={300}
-                onNext={() => {
-                    if (model && loaded && dataset.length > 0) doNext();
-                    else setWarn(true);
-                }}
+                disabled={!ready}
+                steps={steps}
+                onStepChange={setStep}
             />
             <div className={style.block}>
                 {ready && (
@@ -179,14 +183,14 @@ export function Component() {
             {ready && (
                 <ModelBox
                     layers={layers}
-                    step={step}
-                    done={done}
-                    spinning={updating}
+                    step={finished ? layers : (step?.layer ?? -1)}
+                    done={finished}
+                    spinning={step?.name === 'updating'}
                 />
             )}
             {ready && (
                 <Predictions
-                    predictions={step > 0 ? (predictions[step - 1] ?? []) : []}
+                    predictions={(step?.layer ?? -1 >= 0) ? (predictions[step?.layer ?? 0] ?? []) : []}
                     vocab={model.tokeniser.getVocab()}
                     target={nextToken.current ?? undefined}
                     size={6}
@@ -197,7 +201,7 @@ export function Component() {
                 <LossBox
                     loss={finished ? (loss ?? undefined) : undefined}
                     model={model}
-                    updating={updating}
+                    updating={step?.name === 'updating'}
                 />
             )}
         </div>

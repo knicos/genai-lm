@@ -6,6 +6,7 @@
     padding: 1rem 0;
     scrollbar-width: thin;
     background-color: #e8f0fe;
+    flex-grow: 1;
 }
 
 .selected {

@@ -81,7 +81,8 @@
             "contextHelp": "The number of tokens the model can see to make its predictions.",
             "batchHelp": "The number of samples processed at the same time to average out any problems.",
             "lrHelp": "How fast to tune the parameters with each training step.",
-            "sizeLimit": "Model Size Limit (Millions of Parameters)"
+            "sizeLimit": "Model Size Limit (Millions of Parameters)",
+            "speed": "Speed"
         },
         "close": "Close",
         "ok": "OK",
@@ -292,6 +293,7 @@
         "modelPredicting": "Predicting...",
         "modelUpdating": "Updating parameters...",
         "modelComplete": "Training step complete",
+        "modelSelecting": "Selecting sample",
         "modelIdle": "Waiting...",
         "nlayers": "{{N}} layers",
         "gradients": "Gradients"
