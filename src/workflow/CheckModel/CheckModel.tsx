@@ -1,15 +1,17 @@
 import { useAtom, useAtomValue } from 'jotai';
 import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { modelAtom, modelConfigAtom } from '../../state/model';
+import { modelAtom, modelConfigAtom, modelSizeLimit } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../hooks/useModelLoaded';
-import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
+import { estimateParameterCount, GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
 import Help from '../../components/Help/Help';
+import { useState } from 'react';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -29,8 +31,12 @@ export default function CheckModel() {
     //const status = useModelStatus(model ?? undefined);
     const ready = useModelLoaded(model ?? undefined);
     const architecture = useAtomValue(modelConfigAtom);
+    const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
+    const [message, setMessage] = useState<Notice | null>(null);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
+    const paramCount = estimateParameterCount(architecture);
+    const exceedsSizeLimit = paramCount > sizeLimit;
 
     return (
         <Help
@@ -67,6 +73,13 @@ export default function CheckModel() {
                             startIcon={<ConstructionIcon />}
                             fullWidth
                             onClick={() => {
+                                if (exceedsSizeLimit) {
+                                    setMessage({
+                                        level: 'error',
+                                        notice: t('checkmodel.exceedsSizeLimit'),
+                                    });
+                                    return;
+                                }
                                 setModel((old) => {
                                     if (old) {
                                         old.dispose();
@@ -85,6 +98,12 @@ export default function CheckModel() {
                             {t('checkmodel.start')}
                         </Button>
                     </div>
+                    {message && (
+                        <BoxNotice
+                            notice={message}
+                            onClose={() => setMessage(null)}
+                        />
+                    )}
                 </div>
             </Box>
         </Help>

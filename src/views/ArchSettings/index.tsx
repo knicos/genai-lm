@@ -2,13 +2,14 @@ import { FormControl, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
-import { modelConfigAtom } from '../../state/model';
+import { modelConfigAtom, modelSizeLimit } from '../../state/model';
 import Help from '../../components/Help/Help';
 
 export function Component() {
     const { t } = useTranslation();
 
     const [settings, setSettings] = useAtom(modelConfigAtom);
+    const [sizeLimit, setSizeLimit] = useAtom(modelSizeLimit);
     const { blockSize, mlpFactor } = settings;
 
     return (
@@ -77,6 +78,23 @@ export function Component() {
                     onChange={(_, value) => setSettings({ ...settings, nHead: value as number })}
                     min={1}
                     max={32}
+                    step={1}
+                    valueLabelDisplay="auto"
+                />
+            </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <div
+                    id="size-label"
+                    className={style.label}
+                >
+                    {t('app.settings.sizeLimit')}
+                </div>
+                <Slider
+                    aria-labelledby="size-label"
+                    value={sizeLimit}
+                    onChange={(_, value) => setSizeLimit(value as number)}
+                    min={1}
+                    max={100}
                     step={1}
                     valueLabelDisplay="auto"
                 />

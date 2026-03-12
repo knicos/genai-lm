@@ -19,3 +19,7 @@ export const modelConfigAtom = atom<ExtendedConfig>({
     modelType: 'GenAI_NanoGPT_v2',
     blockSize: 128,
 });
+
+// TODO: Test this empircally.
+// Units are millions.
+export const modelSizeLimit = atom<number>(3);

@@ -7,9 +7,10 @@ import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
 import { estimateParameterCount } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
-import { modelConfigAtom } from '../../state/model';
+import { modelConfigAtom, modelSizeLimit } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
+import WarningIcon from '@mui/icons-material/Warning';
 
 interface Props {
     disableInspect?: boolean;
@@ -21,6 +22,8 @@ interface Props {
 export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) {
     const { t } = useTranslation();
     const arch = useAtomValue(modelConfigAtom);
+    const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
+    const estimated = estimateParameterCount(arch);
 
     return (
         <BoxMenu>
@@ -52,7 +55,14 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
                     message={t('model.parametersHelp')}
                     inplace
                 >
-                    <span className={style.number}>{`${prettyNumber(estimateParameterCount(arch), t)}`}</span>
+                    {estimated > sizeLimit && (
+                        <WarningIcon
+                            color="warning"
+                            fontSize="medium"
+                            sx={{ marginRight: '0.5rem' }}
+                        />
+                    )}
+                    <span className={style.number}>{`${prettyNumber(estimated, t)}`}</span>
                     {`${t('model.parameters')}`}
                 </Help>
             </div>
