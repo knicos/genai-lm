@@ -14,11 +14,11 @@
 }
 
 .dataCard:hover {
-    background-color: rgba(0, 130, 151, 0.1);
+    background-color: rgba(0, 130, 151, 0.2);
 }
 
 .dataCard.expanded {
-    background-color: rgba(0, 130, 151, 0.1);
+    background-color: rgba(0, 130, 151, 0.2);
 }
 
 .dataCard.disabled {

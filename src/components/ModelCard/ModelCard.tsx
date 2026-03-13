@@ -8,6 +8,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ModelInfo from '../ModelInfo/ModelInfo';
 import Downloader from '../../utilities/downloader';
 import SampleWriter from '../DataCard/SampleWriter';
+import ParameterGrid from './NumberGrid';
 
 interface Props {
     onSelect: (card: ModelCardItem, downloader?: Downloader) => void;
@@ -50,6 +51,8 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
 
     const isNone = card.id === 'none';
 
+    const density = parameters < 3 ? 'small' : parameters < 8 ? 'medium' : parameters < 20 ? 'large' : 'xlarge';
+
     return (
         <Card
             onSelect={onSelect}
@@ -62,7 +65,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
             expandedContent={
                 <>
                     <div
-                        className={`${style.sampleBox} ${isNone ? style.noneCard : card.trained ? style.trained : style.untrained}`}
+                        className={`${style.sampleBox} ${isNone ? style.noneCard : card.trained ? style.trained : style.untrained} ${style[density]}`}
                     >
                         {card.example && <SampleWriter sample={card.example} />}
                         {!isNone && (
@@ -88,6 +91,11 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                 </IconButton>
                             </div>
                         )}
+                        <ParameterGrid
+                            density={density}
+                            seed={card.id}
+                            fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                        />
                         <div className={style.infoContainer}>
                             {!isNone && (
                                 <ModelInfo
@@ -95,7 +103,6 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                     tokeniser={card.tokeniser || 'char'}
                                     showTokens={!hasTrainingStats}
                                     showLayers={!hasTrainingStats}
-                                    showContextSize={!hasTrainingStats}
                                     trainingStats={hasTrainingStats ? card.trainingStats : undefined}
                                     showDuration={hasTrainingStats}
                                     showSamples={hasTrainingStats}
@@ -119,22 +126,14 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                   : card.trained
                                     ? style.trained
                                     : style.untrained
-                        }`}
+                        } ${style[density]}`}
                     >
                         {card.example && <div className={style.sampleText}>{card.example}</div>}
-                        <div className={style.infoContainer}>
-                            {!isNone && (
-                                <ModelInfo
-                                    config={card.config || {}}
-                                    tokeniser={card.tokeniser || 'char'}
-                                    trainingStats={hasTrainingStats ? card.trainingStats : undefined}
-                                    showDuration={hasTrainingStats}
-                                    showLayers={!hasTrainingStats && !card.trained}
-                                    showContextSize={!hasTrainingStats && !card.trained}
-                                    showTokens={!hasTrainingStats}
-                                />
-                            )}
-                        </div>
+                        <ParameterGrid
+                            density={density}
+                            seed={card.id}
+                            fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                        />
                         {!isNone && (
                             <div
                                 className={style.sizeText}
