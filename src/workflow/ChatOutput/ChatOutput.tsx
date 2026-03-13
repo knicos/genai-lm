@@ -15,7 +15,11 @@ import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
 import { conversationDataAtom } from '../../state/data';
 
-export default function ChatOutput() {
+interface Props {
+    nonConversational?: boolean;
+}
+
+export default function ChatOutput({ nonConversational = false }: Props) {
     const { t } = useTranslation();
     const model = useAtomValue(modelAtom);
     const [generator, setGenerator] = useAtom(generatorAtom);
@@ -46,8 +50,9 @@ export default function ChatOutput() {
                     try {
                         if (conversations?.length === 0) {
                             const finalText = await generator.generate({
+                                nonConversational: nonConversational,
                                 maxLength: 200,
-                                temperature: 1,
+                                temperature: 0.8,
                                 includeProbabilities: false,
                                 topP: topP > 0 ? topP : undefined,
                             });
@@ -59,11 +64,12 @@ export default function ChatOutput() {
                             generator.reset();
                             const finalText = await generator.generate([conversation[0]], {
                                 maxLength: 200,
-                                temperature: 1,
+                                nonConversational: nonConversational,
+                                temperature: 0.8,
                                 includeProbabilities: false,
                                 topP: topP > 0 ? topP : undefined,
                             });
-                            console.log('Generated text for conversation:', finalText);
+
                             setText([...finalText]);
                             logger.log({ action: 'auto_generated_text', text: finalText });
                         }
@@ -82,7 +88,7 @@ export default function ChatOutput() {
                 };
             }
         }
-    }, [model, ready, outputText, topP, setGenerator, t, conversations]);
+    }, [model, ready, outputText, topP, setGenerator, t, conversations, nonConversational]);
 
     useEffect(() => {
         if (generator) {

@@ -346,7 +346,10 @@
     "finetune": {
         "title": "Fine-tuning",
         "start": "Tune",
-        "stop": "Stop"
+        "stop": "Stop",
+        "warningTitle": "Work-in-Progress",
+        "warningContent": "Fine-tuning is a work-in-progress feature. Please proceed with caution.",
+        "ok": "OK"
     },
     "sharing": {
         "title": "Sharing",

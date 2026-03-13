@@ -322,7 +322,9 @@ export function Component() {
                                     className={style.chatOutputContainer}
                                     data-widget="container"
                                 >
-                                    {(flow === 'pretrain' || flow === 'deployment') && <ChatOutput />}
+                                    {(flow === 'pretrain' || flow === 'deployment') && (
+                                        <ChatOutput nonConversational={flow === 'pretrain'} />
+                                    )}
                                 </div>
                                 <div
                                     className={style.promptGroup}

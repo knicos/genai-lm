@@ -22,6 +22,7 @@ import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
 import FineTuneBars from '../../components/FineTuneBars/FineTuneBars';
+import WarningDialog from './WarningDialog';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -203,6 +204,7 @@ export default function TuneTraining() {
             active={!!model || (!!conversations && conversations.length > 0)}
             style={{ minWidth: '260px' }}
         >
+            <WarningDialog />
             <div className={style.container}>
                 <BoxTitle
                     title={t('finetune.title')}
