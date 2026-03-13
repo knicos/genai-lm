@@ -11,13 +11,23 @@ interface Props extends PropsWithChildren {
     style?: CSSProperties;
     placement?: 'top' | 'bottom' | 'left' | 'right';
     inplace?: boolean;
+    inside?: boolean;
 }
 
-export default function Help({ message, children, widget, style: customStyle, active, placement, inplace }: Props) {
+export default function Help({
+    message,
+    children,
+    widget,
+    style: customStyle,
+    active,
+    placement,
+    inplace,
+    inside,
+}: Props) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
-        setAnchorEl(inplace ? event.currentTarget : event.currentTarget.parentElement);
+        setAnchorEl(inplace || inside ? event.currentTarget : event.currentTarget.parentElement);
     };
 
     const handleClose = () => {
@@ -26,7 +36,7 @@ export default function Help({ message, children, widget, style: customStyle, ac
 
     return (
         <div
-            className={`${inplace ? style.inplaceContainer : style.container} ${anchorEl && !inplace ? style.active : ''}`}
+            className={`${inplace ? style.inplaceContainer : style.container} ${anchorEl && !inplace && !inside ? style.active : ''}`}
             data-widget={widget}
             data-active={active ? 'true' : 'false'}
             style={customStyle}
@@ -35,7 +45,7 @@ export default function Help({ message, children, widget, style: customStyle, ac
                 <IconButton
                     onClick={handleClick}
                     onMouseLeave={handleClose}
-                    className={style.helpButton}
+                    className={`${style.helpButton} ${inside ? style.helpButtonInside : ''}`}
                     color="inherit"
                 >
                     <HelpOutlineIcon fontSize="medium" />

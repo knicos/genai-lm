@@ -12,7 +12,7 @@
         "saveSave": "Save",
         "saveCancel": "Cancel",
         "workflow": {
-            "model_desc": "Choose the size of your mathematical model of language.",
+            "model_desc": "Choose the size and shape of your mathematical model of language.",
             "pretraindata_desc": "Add and process text data into numbers for your model to learn from.",
             "pretrain_desc": "Train your model to learn the structure of language from your data.",
             "finetune_desc": "Give your model conversational capabilities, personality and style.",
@@ -77,12 +77,12 @@
             "mlpFactorHelp": "Change the size of the Multi-Layer Perceptron (MLP) in the transformer blocks. A larger MLP can allow the model to remember more patterns but will increase the number of parameters.",
             "heads": "Attention Heads",
             "headsHelp": "Change the number of attention heads in the transformer blocks. More heads can allow the model to focus on different parts of the input simultaneously.",
-            "arch": "Architecture Settings",
+            "arch": "Model Settings",
             "contextHelp": "The number of tokens the model can see to make its predictions.",
             "batchHelp": "The number of samples processed at the same time to average out any problems.",
             "lrHelp": "How fast to tune the parameters with each training step.",
             "sizeLimit": "Model Size Limit (Millions of Parameters)",
-            "speed": "Speed"
+            "speed": "Animation speed"
         },
         "close": "Close",
         "ok": "OK",
@@ -99,7 +99,7 @@
         "probing": "Checking your hardware..."
     },
     "workflow": {
-        "model": "Architecture",
+        "model": "Model",
         "pretraindata": "Data",
         "pretrain": "Pre-training",
         "finetune": "Fine-tuning",
@@ -109,7 +109,10 @@
         "title": "Training Data",
         "textDialogTitle": "Text Content",
         "addTooltip": "Add new data",
-        "dataHint": "Drop or upload text data (txt, csv, pdf, docx) for training. Any text can be used but there should be a lot.",
+        "datasetTooltip": "Search our dataset library",
+        "writeTip": "Write or paste your own text data.",
+        "uploadTip": "Upload files containing text data. Supported formats: txt, csv, pdf, docx.",
+        "dataHint": "Use our dataset library to find text, or drop files here (txt, csv, pdf, docx) for training text. Any text can be used but there should be a lot.",
         "modelHint": "Please select a model first.",
         "add": "Write",
         "upload": "Upload",
@@ -122,7 +125,7 @@
         "dropHint": "Drop files here...",
         "ok": "OK",
         "samples": "Samples",
-        "search": "Search",
+        "search": "Datasets",
         "downloading": "Downloading {{count}} file(s)",
         "errors": {
             "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx).",
@@ -136,12 +139,12 @@
         "outdated": "The model needs to be rebuilt",
         "upToDate": "Model is ready to use.",
         "help": "Building a model will allocate resources and assign random numbers to the parameters.",
-        "exceedsSizeLimit": "The model has too many parameters for this device."
+        "exceedsSizeLimit": "The model has too many parameters."
     },
     "model": {
         "parameters": "Parameters",
         "memory": "Memory",
-        "title": "Architecture",
+        "title": "Model",
         "create": "Create",
         "upload": "Upload",
         "tools": "Tools",
@@ -174,8 +177,9 @@
         "width": "Width",
         "vocabSize": "Vocabulary Size",
         "reset": "Reset",
-        "parametersHelp": "A mathematical model contains a lot of unknown numbers called parameters. These are tuned up or down when training the model to improve the output predictions.",
-        "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token."
+        "parametersHelp": "The total number of numeric parameters in the model.",
+        "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token.",
+        "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed."
     },
     "training": {
         "title": "Pre-Training",
@@ -208,9 +212,9 @@
             "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
         },
         "predictionsHeader": "Top calculated predictions",
-        "help": "Pre-training slowly adjusts the parameters up or down to make it better at predicting each example.",
+        "help": "The learning process where the parameters are slowly adjusted up or down until it can reproduce the patterns found in your example data. Time remaining is how long it will take to look at all of your data.",
         "sampleBoxHelp": "A short example taken from your data. The model is trying to predict the highlighted token based on the previous text.",
-        "attentionHelp": "The example is converted to numeric tokens and as the model steps through its layers it will pay attention to different tokens.",
+        "attentionHelp": "The example is converted to numeric tokens. Each layer of the model pays attention to different parts of the text.",
         "modelBoxHelp": "Each layer of your model contributes towards the final prediction, one layer at a time. The parameters inside each layer are tuned by how well they contributed or not.",
         "lossBoxHelp": "After the model has made its prediction it is scored against the correct answer. Loss is a measure of how wrong the model's prediction was, so the training process tries to reduce this number."
     },
@@ -296,7 +300,9 @@
         "modelSelecting": "Selecting sample",
         "modelIdle": "Waiting...",
         "nlayers": "{{N}} layers",
-        "gradients": "Gradients"
+        "gradients": "Gradients",
+        "playHelp": "Start or stop the animation.",
+        "stepHelp": "Take one animation step."
     },
     "tokeniser": {
         "title": "Vocabulary",

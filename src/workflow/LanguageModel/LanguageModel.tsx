@@ -11,8 +11,11 @@ import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import Help from '../../components/Help/Help';
+import { useTranslation } from 'react-i18next';
 
 export default function LanguageModel() {
+    const { t } = useTranslation();
     const [config, setConfig] = useAtom(modelConfigAtom);
     const [showSearch, setShowSearch] = useState(false);
     const [showTools, setShowTools] = useState(false);
@@ -54,7 +57,13 @@ export default function LanguageModel() {
                         }
                     }}
                 />
-                <Architecture ref={archRef} />
+                <Help
+                    message={t('model.visualHelp')}
+                    style={{ width: '100%', height: '100%', overflow: 'hidden' }}
+                    inside
+                >
+                    <Architecture ref={archRef} />
+                </Help>
                 <div className={style.zoomControls}>
                     <IconButton onClick={() => archRef.current?.zoomIn()}>
                         <ZoomInIcon />

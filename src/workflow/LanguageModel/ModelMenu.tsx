@@ -37,6 +37,7 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
                     {t('model.examples')}
                 </VerticalButton>
             )}
+            <div style={{ width: '1rem' }} />
             <VerticalButton
                 startIcon={<RestartAltIcon />}
                 onClick={onReset}

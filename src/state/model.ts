@@ -22,4 +22,4 @@ export const modelConfigAtom = atom<ExtendedConfig>({
 
 // TODO: Test this empircally.
 // Units are millions.
-export const modelSizeLimit = atom<number>(3);
+export const modelSizeLimit = atom<number>(4);

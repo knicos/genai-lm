@@ -41,3 +41,7 @@
 .active {
     box-shadow: 0 0 10px #0a4bd6;
 }
+
+.helpButtonInside {
+    left: 1rem;
+}

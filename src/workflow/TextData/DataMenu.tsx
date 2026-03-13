@@ -3,7 +3,8 @@ import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import SearchIcon from '@mui/icons-material/Search';
+import DatasetIcon from '@mui/icons-material/Dataset';
+import { Tooltip } from '@mui/material';
 
 interface Props {
     disabled?: boolean;
@@ -17,33 +18,49 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch }: Prop
 
     return (
         <BoxMenu>
-            <VerticalButton
-                disabled={disabled}
-                color="primary"
-                variant="text"
-                onClick={onWrite}
-                startIcon={<AddIcon color="inherit" />}
+            <Tooltip
+                arrow
+                title={t('data.datasetTooltip')}
             >
-                {t('data.add')}
-            </VerticalButton>
-            <VerticalButton
-                disabled={disabled}
-                color="primary"
-                variant="text"
-                onClick={onUpload}
-                startIcon={<UploadFileIcon color="inherit" />}
+                <VerticalButton
+                    disabled={disabled}
+                    color="primary"
+                    variant="text"
+                    onClick={onSearch}
+                    startIcon={<DatasetIcon color="inherit" />}
+                >
+                    {t('data.search')}
+                </VerticalButton>
+            </Tooltip>
+            <div style={{ width: '1rem' }} />
+            <Tooltip
+                arrow
+                title={t('data.writeTip')}
             >
-                {t('data.upload')}
-            </VerticalButton>
-            <VerticalButton
-                disabled={disabled}
-                color="primary"
-                variant="text"
-                onClick={onSearch}
-                startIcon={<SearchIcon color="inherit" />}
+                <VerticalButton
+                    disabled={disabled}
+                    color="primary"
+                    variant="text"
+                    onClick={onWrite}
+                    startIcon={<AddIcon color="inherit" />}
+                >
+                    {t('data.add')}
+                </VerticalButton>
+            </Tooltip>
+            <Tooltip
+                arrow
+                title={t('data.uploadTip')}
             >
-                {t('data.search')}
-            </VerticalButton>
+                <VerticalButton
+                    disabled={disabled}
+                    color="primary"
+                    variant="text"
+                    onClick={onUpload}
+                    startIcon={<UploadFileIcon color="inherit" />}
+                >
+                    {t('data.upload')}
+                </VerticalButton>
+            </Tooltip>
         </BoxMenu>
     );
 }

@@ -5,7 +5,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { VerticalButton } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import style from './controls.module.css';
-import { FormControl, Slider } from '@mui/material';
+import { FormControl, Slider, Tooltip } from '@mui/material';
 
 export type AnimationStepName = 'none' | 'next' | 'wait' | 'predict' | 'updating' | 'done';
 
@@ -45,26 +45,40 @@ export default function ModelControls({ steps, onStepChange, disabled }: Props) 
 
     return (
         <div className={style.container}>
-            <VerticalButton
-                color="primary"
-                onClick={() => setPlay(!play)}
-                startIcon={play ? <PauseIcon /> : <PlayArrowIcon />}
-                disabled={disabled}
+            <Tooltip
+                arrow
+                title={t('tools.playHelp')}
             >
-                {play ? t('tools.pause') : t('tools.play')}
-            </VerticalButton>
-            <VerticalButton
-                color="primary"
-                onClick={() =>
-                    onStepChange((step) =>
-                        step === null ? (steps[0] ?? null) : step.locked ? step : steps[(step.index + 1) % steps.length]
-                    )
-                }
-                disabled={play || disabled}
-                startIcon={<SkipNextIcon />}
+                <VerticalButton
+                    color="primary"
+                    onClick={() => setPlay(!play)}
+                    startIcon={play ? <PauseIcon /> : <PlayArrowIcon />}
+                    disabled={disabled}
+                >
+                    {play ? t('tools.pause') : t('tools.play')}
+                </VerticalButton>
+            </Tooltip>
+            <Tooltip
+                arrow
+                title={t('tools.stepHelp')}
             >
-                {t('tools.step')}
-            </VerticalButton>
+                <VerticalButton
+                    color="primary"
+                    onClick={() =>
+                        onStepChange((step) =>
+                            step === null
+                                ? (steps[0] ?? null)
+                                : step.locked
+                                  ? step
+                                  : steps[(step.index + 1) % steps.length]
+                        )
+                    }
+                    disabled={play || disabled}
+                    startIcon={<SkipNextIcon />}
+                >
+                    {t('tools.step')}
+                </VerticalButton>
+            </Tooltip>
             <FormControl style={{ marginLeft: '2rem' }}>
                 <div
                     id="speed-label"

@@ -13,6 +13,8 @@ export default function Home() {
                 <img
                     src="/logo192.png"
                     alt="GenAI logo"
+                    width={192}
+                    height={192}
                 />
                 <div className={style.headerColumn}>
                     <h1>
