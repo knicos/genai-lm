@@ -16,7 +16,6 @@ pool:
 
 stages:
     - stage: Static
-      condition: not(contains(variables['build.sourceBranch'], 'refs/tags/'))
       jobs:
           - job: ESLint
             displayName: ESLint
