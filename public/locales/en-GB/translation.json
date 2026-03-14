@@ -82,7 +82,8 @@
             "batchHelp": "The number of samples processed at the same time to average out any problems.",
             "lrHelp": "How fast to tune the parameters with each training step.",
             "sizeLimit": "Model Size Limit (Millions of Parameters)",
-            "speed": "Animation speed"
+            "speed": "Animation speed",
+            "temperatureHelp": "Higher temperature produces more random outputs as it is less likely to select the most obvious next token."
         },
         "close": "Close",
         "ok": "OK",
@@ -204,7 +205,7 @@
         "noData": "No data available",
         "monitor": "Monitor",
         "visualize": "Visualise",
-        "autoOutput": "Show Progress Text",
+        "autoOutput": "Show output during training",
         "preparing": "Tokenizing...",
         "errors": {
             "preparation": "More training data is needed, at least a few thousand samples.",
@@ -218,7 +219,9 @@
         "sampleBoxHelp": "A short example taken from your data. The model is trying to predict the highlighted token based on the previous text.",
         "attentionHelp": "The example is converted to numeric tokens. Each layer of the model pays attention to different parts of the text.",
         "modelBoxHelp": "Each layer of your model contributes towards the final prediction, one layer at a time. The parameters inside each layer are tuned by how well they contributed or not.",
-        "lossBoxHelp": "After the model has made its prediction it is scored against the correct answer. Loss is a measure of how wrong the model's prediction was, so the training process tries to reduce this number."
+        "lossBoxHelp": "After the model has made its prediction it is scored against the correct answer. Loss is a measure of how wrong the model's prediction was, so the training process tries to reduce this number.",
+        "monitorHelp": "Details about the training progress.",
+        "visualizeHelp": "Visualisation of how training works."
     },
     "generator": {
         "title": "Generation",

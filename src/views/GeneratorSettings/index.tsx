@@ -1,14 +1,16 @@
-import { Checkbox, FormControl, FormControlLabel, Slider } from '@mui/material';
+import { FormControl, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { generatorSettings } from '../../state/generator';
+import { uiDeveloperMode } from '../../state/uiState';
+import Help from '../../components/Help/Help';
 
 export function Component() {
     const { t } = useTranslation();
-
+    const devMode = useAtomValue(uiDeveloperMode);
     const [settings, setSettings] = useAtom(generatorSettings);
-    const { temperature, topP, maxLength, showProbabilities: probability, showSettings, showPrompt } = settings;
+    const { temperature, topP, maxLength } = settings;
 
     return (
         <div className="sidePanel">
@@ -18,7 +20,12 @@ export function Component() {
                     id="temperature-label"
                     className={style.label}
                 >
-                    {t('app.settings.temperature')}
+                    <Help
+                        message={t('app.settings.temperatureHelp')}
+                        inplace
+                    >
+                        {t('app.settings.temperature')}
+                    </Help>
                 </div>
                 <Slider
                     aria-labelledby="temperature-label"
@@ -30,74 +37,44 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <div
-                    id="topp-label"
-                    className={style.label}
-                >
-                    {t('app.settings.topP')}
-                </div>
-                <Slider
-                    aria-labelledby="topp-label"
-                    value={topP}
-                    onChange={(_, value) => setSettings({ ...settings, topP: value as number })}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    valueLabelDisplay="auto"
-                />
-            </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <div
-                    id="maxlength-label"
-                    className={style.label}
-                >
-                    {t('app.settings.maxLength')}
-                </div>
-                <Slider
-                    aria-labelledby="maxlength-label"
-                    value={maxLength}
-                    onChange={(_, value) => setSettings({ ...settings, maxLength: value as number })}
-                    min={10}
-                    max={64000}
-                    step={1000}
-                    valueLabelDisplay="auto"
-                />
-            </FormControl>
-            <div className={style.spacer} />
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={probability}
-                            onChange={(_, checked) => setSettings({ ...settings, showProbabilities: checked })}
+            {devMode && (
+                <>
+                    <FormControl sx={{ marginTop: '1rem' }}>
+                        <div
+                            id="topp-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.topP')}
+                        </div>
+                        <Slider
+                            aria-labelledby="topp-label"
+                            value={topP}
+                            onChange={(_, value) => setSettings({ ...settings, topP: value as number })}
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            valueLabelDisplay="auto"
                         />
-                    }
-                    label={t('app.settings.showProbabilities')}
-                />
-            </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={showSettings}
-                            onChange={(_, checked) => setSettings({ ...settings, showSettings: checked })}
+                    </FormControl>
+                    <FormControl sx={{ marginTop: '1rem' }}>
+                        <div
+                            id="maxlength-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.maxLength')}
+                        </div>
+                        <Slider
+                            aria-labelledby="maxlength-label"
+                            value={maxLength}
+                            onChange={(_, value) => setSettings({ ...settings, maxLength: value as number })}
+                            min={10}
+                            max={64000}
+                            step={1000}
+                            valueLabelDisplay="auto"
                         />
-                    }
-                    label={t('app.settings.showSettings')}
-                />
-            </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={showPrompt}
-                            onChange={(_, checked) => setSettings({ ...settings, showPrompt: checked })}
-                        />
-                    }
-                    label={t('app.settings.showPrompt')}
-                />
-            </FormControl>
+                    </FormControl>
+                </>
+            )}
         </div>
     );
 }

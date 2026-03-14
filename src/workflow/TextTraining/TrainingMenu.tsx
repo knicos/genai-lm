@@ -4,6 +4,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@mui/material';
 
 interface Props {
     onShowSettings: () => void;
@@ -17,18 +18,28 @@ export default function TrainingMenu({ onShowSettings, onMonitor, onVisualize, t
 
     return (
         <BoxMenu>
-            <VerticalButton
-                startIcon={<ShowChartIcon />}
-                onClick={onMonitor}
+            <Tooltip
+                arrow
+                title={t('training.monitorHelp')}
             >
-                {t('training.monitor')}
-            </VerticalButton>
-            <VerticalButton
-                startIcon={<AccountTreeIcon />}
-                onClick={onVisualize}
+                <VerticalButton
+                    startIcon={<ShowChartIcon />}
+                    onClick={onMonitor}
+                >
+                    {t('training.monitor')}
+                </VerticalButton>
+            </Tooltip>
+            <Tooltip
+                arrow
+                title={t('training.visualizeHelp')}
             >
-                {t('training.visualize')}
-            </VerticalButton>
+                <VerticalButton
+                    startIcon={<AccountTreeIcon />}
+                    onClick={onVisualize}
+                >
+                    {t('training.visualize')}
+                </VerticalButton>
+            </Tooltip>
             <VerticalButton
                 disabled={!!training}
                 startIcon={<TuneIcon />}
