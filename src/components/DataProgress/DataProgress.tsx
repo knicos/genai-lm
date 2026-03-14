@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material';
 import { qualityToColor } from '../../utilities/colours';
 import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
@@ -35,19 +36,23 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
                 data-testid="progress-blob"
             />
 
-            <div
-                className={style.target}
-                style={{ left: `calc(60% - 10px)` }}
-                data-testid="target-icon"
+            <Tooltip
+                arrow
+                title={t('tokeniseData.progressHelp')}
             >
-                <StarIcon fontSize="small" />
-            </div>
-            <div
-                className={style.targetLabel}
-                style={{ left: `calc(60% - 10px)` }}
-            >
-                {prettyNumber(desiredSamples, t)}
-            </div>
+                <div
+                    className={style.targetContainer}
+                    style={{ left: `calc(60% - 10px)` }}
+                >
+                    <div
+                        className={style.target}
+                        data-testid="target-icon"
+                    >
+                        <StarIcon fontSize="small" />
+                    </div>
+                    <div className={style.targetLabel}>{prettyNumber(desiredSamples, t)}</div>
+                </div>
+            </Tooltip>
         </div>
     );
 }

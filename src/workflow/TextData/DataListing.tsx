@@ -1,10 +1,11 @@
 import { IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import style from './DataListing.module.css';
-import prettyNumber from '../../utilities/prettyNumber';
 import CloseIcon from '@mui/icons-material/Close';
-import { useTranslation } from 'react-i18next';
 import { MouseEvent } from 'react';
 import { DataEntry } from '../../state/data';
+import DescriptionIcon from '@mui/icons-material/Description';
+import InfoPanel from './InfoPanel';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     data: DataEntry[];
@@ -16,7 +17,7 @@ interface Props {
 export default function DataListing({ data, onDelete, selected, setSelected }: Props) {
     const { t } = useTranslation();
     return (
-        <List style={{ width: '100%', maxHeight: '300px', overflowY: 'auto', boxSizing: 'border-box' }}>
+        <List style={{ width: '100%', flex: '0 1 300px', overflowY: 'auto', boxSizing: 'border-box' }}>
             {data.map((entry, index) => (
                 <ListItem
                     key={index}
@@ -27,8 +28,7 @@ export default function DataListing({ data, onDelete, selected, setSelected }: P
                         onClick={() => setSelected && setSelected(index)}
                     >
                         <ListItemAvatar className={style.avatar}>
-                            <div className={style.size}>{prettyNumber(entry.size, t)}</div>
-                            <div className={style.label}>{t('data.samples')}</div>
+                            <DescriptionIcon fontSize="large" />
                         </ListItemAvatar>
                         <ListItemText primary={entry.name} />
                         <IconButton
@@ -44,6 +44,15 @@ export default function DataListing({ data, onDelete, selected, setSelected }: P
                     </ListItemButton>
                 </ListItem>
             ))}
+            {data.length === 0 && (
+                <ListItem>
+                    <InfoPanel
+                        show={data.length === 0}
+                        severity="info"
+                        message={t('data.dataHint')}
+                    />
+                </ListItem>
+            )}
         </List>
     );
 }

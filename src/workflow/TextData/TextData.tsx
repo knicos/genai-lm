@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
+import { Dispatch, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { loadTextData } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +7,8 @@ import DataListing from './DataListing';
 import DataMenu from './DataMenu';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import InfoPanel from './InfoPanel';
 import TextSearch from './TextSearch';
 import Box from '../../components/BoxTitle/Box';
-import DataRows from './DataRows';
 import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
 import useModelStatus from '../../hooks/useModelStatus';
@@ -18,6 +16,7 @@ import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { dataEntries, DataEntry, dataReady, datasetAtom, downloadsAtom } from '../../state/data';
 import { modelAtom } from '../../state/model';
+import ProgressiveDocumentFeed from './ProgressiveDocumentFeed';
 
 interface DragObject {
     files?: File[];
@@ -67,6 +66,11 @@ export default function TextData() {
     useEffect(() => {
         const newDataset = data.map((entry) => entry.content).flat();
         setSelectedSet(new Set(data.map((entry) => entry.id)));
+        setDataset(newDataset);
+    }, [data, setDataset]);
+
+    const doUpdate = useCallback(() => {
+        const newDataset = data.map((entry) => entry.content).flat();
         setDataset(newDataset);
     }, [data, setDataset]);
 
@@ -126,7 +130,10 @@ export default function TextData() {
                     disabled={showInput || showSearch}
                     onWrite={() => {
                         setSelected(-1);
-                        setShowInput(true);
+                        setData((prev) => [
+                            ...prev,
+                            { id: uuid(), name: t('data.untitled'), content: [''], size: 0, source: 'input' },
+                        ]);
                     }}
                     onSearch={() => setShowSearch(true)}
                     onUpload={() => fileRef.current?.click()}
@@ -140,26 +147,17 @@ export default function TextData() {
                         onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
                         selected={selected}
                         setSelected={(index: number) => {
-                            setSelected(index);
-                            if (index >= 0 && index < data.length) {
-                                const entry = data[index];
-                                if (entry.source === 'input') {
-                                    setShowInput(true);
-                                }
-                            }
+                            setSelected((prev) => (prev === index ? -1 : index));
                         }}
                     />
-                    <InfoPanel
-                        show={data.length === 0}
-                        severity="info"
-                        message={t('data.dataHint')}
+
+                    <ProgressiveDocumentFeed
+                        data={selected >= 0 ? [data[selected]] : data}
+                        initialCount={8}
+                        step={6}
+                        rootMargin="800px"
+                        onUpdate={doUpdate}
                     />
-                    {selectedItem?.source === 'file' || selectedItem?.source === 'search' ? (
-                        <DataRows
-                            data={selectedItem}
-                            onClose={() => setSelected(-1)}
-                        />
-                    ) : null}
                     {showInput && (
                         <TextInput
                             initialText={

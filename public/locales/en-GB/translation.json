@@ -130,7 +130,9 @@
         "errors": {
             "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx).",
             "downloadLoadError": "There was an unknown error loading the downloaded file."
-        }
+        },
+        "characters": "{{chars}} characters",
+        "loadingMoreDocuments": "Loading more documents..."
     },
     "checkmodel": {
         "title": "Build Model",
@@ -329,6 +331,7 @@
         "noModel": "No model selected",
         "notTrained": "No vocabulary.",
         "showNumbers": "Show token numbers",
+        "progressHelp": "Target number of tokens needed.",
         "help": "Your text data needs to be split into the numeric tokens that the mathematical model can work with. Larger models need more tokens so the progress bar shows how many you may need."
     },
     "instruct": {
