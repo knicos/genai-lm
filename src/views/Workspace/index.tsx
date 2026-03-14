@@ -77,11 +77,10 @@ const CONNECTIONS: IConnection[] = [
         startOffset: -0.5,
     },
     {
-        start: 'thread',
+        start: 'checkmodel',
         end: 'textData',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: -0.5,
     },
     {
         start: 'checkmodel',
@@ -229,17 +228,24 @@ export function Component() {
                         >
                             {flow === 'home' && <Home />}
                             {flow === 'model' && (
-                                <div
-                                    data-widget="container"
-                                    className={style.subgroup}
-                                >
-                                    <TextDataLink />
-                                    <CheckModel />
-                                    <PreTrainedModel
-                                        hideMenu
-                                        widget="untrainedmodel"
-                                    />
-                                </div>
+                                <>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <CheckModel />
+                                        <PreTrainedModel
+                                            hideMenu
+                                            widget="untrainedmodel"
+                                        />
+                                    </div>
+                                    <div
+                                        data-widget="container"
+                                        className={style.subgroup}
+                                    >
+                                        <TextDataLink />
+                                    </div>
+                                </>
                             )}
                             {flow === 'pretraindata' && (
                                 <>

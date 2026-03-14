@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import NextPlanIcon from '@mui/icons-material/NextPlan';
 import { IconButton } from '@mui/material';
+import style from './style.module.css';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
     title: string;
@@ -17,6 +19,25 @@ interface Props {
 export default function BoxLink({ title, link, widget, active, disabled, flip }: Props) {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const ref = useRef<HTMLButtonElement>(null);
+    const allowed = useRef(false);
+    const [becomesActive, setBecomesActive] = useState(false);
+
+    useEffect(() => {
+        if (active && allowed.current) {
+            ref.current?.focus();
+            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            allowed.current = false;
+            setBecomesActive(true);
+        }
+    }, [active]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            allowed.current = true;
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, []);
 
     return (
         <Box
@@ -24,6 +45,7 @@ export default function BoxLink({ title, link, widget, active, disabled, flip }:
             disabled={disabled}
             widget={widget}
             style={{ alignSelf: 'flex-start' }}
+            className={`${style.boxLink} ${becomesActive ? style.active : ''}`}
         >
             <BoxTitle
                 title={title}
@@ -32,12 +54,13 @@ export default function BoxLink({ title, link, widget, active, disabled, flip }:
                     <IconButton
                         aria-label={t('app.editStep')}
                         onClick={() => navigate(`/workspace/${link}`)}
-                        color="primary"
+                        color="secondary"
+                        disabled={!active}
+                        ref={ref}
                     >
                         <NextPlanIcon
                             style={{ transform: flip ? 'scale(-1, 1)' : 'none' }}
                             fontSize="large"
-                            color="secondary"
                         />
                     </IconButton>
                 }

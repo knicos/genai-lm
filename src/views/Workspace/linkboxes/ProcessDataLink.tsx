@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import BoxLink from '../../../components/BoxLink/BoxLink';
+import { useAtomValue } from 'jotai';
+import { modelReady } from '../../../state/model';
 
 interface Props {
     flip?: boolean;
 }
 
 export default function ProcessDataLink({ flip }: Props) {
+    const ready = useAtomValue(modelReady);
     const { t } = useTranslation();
     return (
         <BoxLink
@@ -13,6 +16,7 @@ export default function ProcessDataLink({ flip }: Props) {
             title={t('workflow.pretraindata')}
             widget="tokeniseData"
             flip={flip}
+            active={ready}
         />
     );
 }
