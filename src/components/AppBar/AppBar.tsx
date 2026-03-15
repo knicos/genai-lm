@@ -47,9 +47,10 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: 
                     to="/about"
                     className={style.logo}
                     title="About"
+                    style={{ pointerEvents: 'none' }}
                 >
                     <img
-                        src="/logo48_bw_invert.png"
+                        src="/logo128_bw.png"
                         alt="GenAI logo"
                         width="48"
                         height="48"
@@ -62,7 +63,7 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: 
                     )}
                 </Link>
                 {logId && <div className={style.buttonBar}>{logId}</div>}
-                {!hideWorkflow && <WorkflowStatusBar />}
+                {!hideWorkflow && <WorkflowStatusBar disabled={istraining} />}
                 {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
                 <div className={style.langBar}>
                     <NativeSelect

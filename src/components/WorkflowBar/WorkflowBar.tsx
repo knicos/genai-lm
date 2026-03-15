@@ -20,9 +20,10 @@ export interface WorkflowItem {
 
 export interface Props {
     items: WorkflowItem[];
+    disabled?: boolean;
 }
 
-export default function WorkflowBar({ items }: Props) {
+export default function WorkflowBar({ items, disabled }: Props) {
     const { t } = useTranslation();
     const [width, setWidth] = useState(0);
     const [itemWidth, setItemWidth] = useState(ITEM_WIDTH);
@@ -74,6 +75,8 @@ export default function WorkflowBar({ items }: Props) {
             <Link
                 to="/workspace/home"
                 className={`${style.homeButton} ${flow === 'home' ? style.selected : ''}`}
+                style={disabled ? { pointerEvents: 'none', opacity: 0.5 } : undefined}
+                aria-disabled={disabled}
             >
                 <HomeIcon fontSize="inherit" />
             </Link>
@@ -86,6 +89,8 @@ export default function WorkflowBar({ items }: Props) {
                         <Link
                             to={`/workspace/${item.id}`}
                             className={`${style.item} ${flow === item.id ? style.selected : ''} ${style[item.status]}`}
+                            style={disabled ? { pointerEvents: 'none', opacity: 0.5 } : undefined}
+                            aria-disabled={disabled}
                             onMouseEnter={(e: MouseEvent<HTMLElement>) => {
                                 setAnchorEl(e.currentTarget);
                                 setHoveredItem(item);
