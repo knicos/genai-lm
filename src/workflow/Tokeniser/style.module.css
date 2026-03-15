@@ -17,3 +17,7 @@
     box-sizing: border-box;
     justify-content: space-between;
 }
+
+.progress {
+    margin: 1rem;
+}

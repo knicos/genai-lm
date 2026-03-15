@@ -27,6 +27,7 @@ export default function Tokeniser() {
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
     const navigate = useNavigate();
+    const [count, setCount] = useState(0);
 
     const isTrained = model?.loaded && model.tokeniser.trained;
 
@@ -58,7 +59,7 @@ export default function Tokeniser() {
                         title={t('tokeniser.title')}
                         status={done ? 'done' : 'waiting'}
                     />
-                    {invalid && isTrained && (
+                    {invalid && isTrained && !tokenising && (
                         <Alert
                             sx={{ margin: '1rem 1rem 0 1rem' }}
                             severity="warning"
@@ -66,7 +67,7 @@ export default function Tokeniser() {
                             {t(phase === 'untrained' ? 'tokeniser.invalidWarning' : 'tokeniser.trainedWarning')}
                         </Alert>
                     )}
-                    {!isTrained && (
+                    {!isTrained && !tokenising && (
                         <Alert
                             sx={{ margin: '1rem 1rem 0 1rem' }}
                             severity="info"
@@ -74,7 +75,8 @@ export default function Tokeniser() {
                             {t('tokeniser.notTrained')}
                         </Alert>
                     )}
-                    {!invalid && isTrained && (
+                    {tokenising && <div className={style.progress}>{t('tokeniser.tokenising', { size: count })}</div>}
+                    {!invalid && isTrained && !tokenising && (
                         <Alert
                             sx={{ margin: '1rem 1rem 0 1rem' }}
                             severity="success"
@@ -90,11 +92,23 @@ export default function Tokeniser() {
                             onClick={() => {
                                 if (model && dataset && dataset.length > 0) {
                                     setTokenising(true);
-                                    model?.tokeniser.train(dataset).then(() => {
-                                        setTokenising(false);
-                                        setInvalid(false);
-                                        setTokens(null);
-                                    });
+                                    model?.tokeniser
+                                        .train(dataset, (progress) => {
+                                            setCount(progress);
+                                        })
+                                        .then(() => {
+                                            setTokenising(false);
+                                            setInvalid(false);
+                                            setTokens(null);
+                                        })
+                                        .catch((e) => {
+                                            console.error(e);
+                                            setTokenising(false);
+                                            setMessage({
+                                                notice: t('tokeniser.trainError'),
+                                                level: 'error',
+                                            });
+                                        });
                                 } else if (!model) {
                                     setMessage({
                                         notice: t('tokeniser.noModel'),
