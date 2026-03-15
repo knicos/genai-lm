@@ -54,7 +54,7 @@ export default function ModelSearch({
     const { t } = useTranslation();
     const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [open, setOpen] = useState(true);
-    const [includeAll, setIncludeAll] = useState(false);
+    const [includeAll, setIncludeAll] = useState(true);
 
     const selectedSet =
         model && model.meta.id ? new Set([model.meta.id]) : config && config.id ? new Set([config.id]) : undefined;

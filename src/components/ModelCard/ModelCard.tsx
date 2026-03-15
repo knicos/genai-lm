@@ -91,11 +91,13 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                 </IconButton>
                             </div>
                         )}
-                        <ParameterGrid
-                            density={density}
-                            seed={card.id}
-                            fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
-                        />
+                        {!card.example && (
+                            <ParameterGrid
+                                density={density}
+                                seed={card.id}
+                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                            />
+                        )}
                         <div className={style.infoContainer}>
                             {!isNone && (
                                 <ModelInfo
@@ -129,11 +131,13 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                         } ${style[density]}`}
                     >
                         {card.example && <div className={style.sampleText}>{card.example}</div>}
-                        <ParameterGrid
-                            density={density}
-                            seed={card.id}
-                            fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
-                        />
+                        {!card.example && (
+                            <ParameterGrid
+                                density={density}
+                                seed={card.id}
+                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                            />
+                        )}
                         {!isNone && (
                             <div
                                 className={style.sizeText}
