@@ -7,7 +7,7 @@ export default function filterTokens(
         const token = i;
         const text = vocab[i];
         const probability = probabilities[i];
-        if (probability > 0.001) {
+        if (probability > 0.0001) {
             filtered.push({ token, text, probability });
         }
     }

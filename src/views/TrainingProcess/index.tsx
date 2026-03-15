@@ -100,18 +100,23 @@ export function Component() {
 
     const generateText = async (text: Conversation[]) => {
         if (!model || !loaded) return;
+        if (text.length === 0) return;
+        if (text[0].content.length === 0) return;
         const generator = model.generator();
+
         await generator.generate(text, {
             maxLength: 1,
             includeProbabilities: true,
             attentionScores: true,
             embeddings: 'softmax',
-            temperature: 1.0,
+            temperature: 0.8,
             topP: 0.9,
             targets: [nextToken.current ?? 0],
+            nonConversational: true,
+            continuation: true,
         });
         const probsData = generator.getProbabilitiesData();
-        const top = probsData ? topP(probsData[0], 0.9) : [];
+        const top = probsData && probsData[0] ? topP(probsData[0], 0.9) : [];
 
         const attentionData = generator.getAttentionData();
         setAttention(reduceAttention(attentionData[0]));
@@ -120,6 +125,7 @@ export function Component() {
             .getEmbeddingsData()[0]
             .filter((e) => e.name.startsWith('block_output_'))
             .map((e) => e.tensor[0]);
+
         embeddingData[embeddingData.length - 1] = top;
 
         setLoss(generator.getLastLoss());
