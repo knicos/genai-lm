@@ -2,6 +2,8 @@
     "app": {
         "little": "Pieni",
         "languageMachine": "Kielikone",
+        "subtitle": "Luo oma pieni tekoälychatbotti seuraamalla näitä vaiheita.",
+        "startHere": "Aloita tästä",
         "save": "Tallenna",
         "load": "Avaa",
         "saveTitle": "Tallenna kielimalli",
@@ -9,9 +11,18 @@
         "saveName": "Kielimallin nimi",
         "saveSave": "Tallenna",
         "saveCancel": "Peruuta",
+        "workflow": {
+            "model_desc": "Valitse kielellesi matemaattisen mallin koko ja muoto.",
+            "pretraindata_desc": "Lisää ja käsittele tekstiä numeroiksi, joista mallisi oppii.",
+            "pretrain_desc": "Opeta mallisi oppimaan kielen rakenteet aineistostasi.",
+            "finetune_desc": "Anna mallillesi keskustelutaitoja, persoonallisuutta ja tyyliä.",
+            "deployment_desc": "Ota mallisi käyttöön ja jaa se muille."
+        },
         "settings": {
             "title": "Asetukset",
             "general": "Yleiset",
+            "developer": "Kehittäjä",
+            "llmAPI": "LLM API",
             "training": "Opettaminen",
             "generator": "Generointi",
             "showModelSelect": "Näytä kielimallien valinta",
@@ -30,13 +41,53 @@
             "checkpointing": "Poista gradienttitarkistuspisteet käytöstä",
             "showXAI": "Näytä selittävä tekoäly (XAI)",
             "topP": "Top P -otanta",
-            "evaluationMetrics": "Evaluation Metrics",
-            "qualityMetric": "Quality",
-            "perplexityMetric": "Perplexity",
-            "lossMetric": "Loss",
-            "advancedMetrics": "Advanced Metrics"
+            "evaluationMetrics": "Arviointimittarit",
+            "qualityMetric": "Laatu",
+            "perplexityMetric": "Perpleksisyys",
+            "gradientNormMetric": "Gradienttinormi",
+            "accuracyMetric": "Tarkkuus",
+            "lossMetric": "Häviö",
+            "advancedMetrics": "Edistyneet mittarit",
+            "performProbe": "Tarkista laitteisto käynnistyksen yhteydessä",
+            "developerMode": "Kehittäjätila",
+            "mixedPrecision": "Käytä sekatarkkuutta (Mixed Precision)",
+            "orthoGrad": "Käytä OrthoGradia",
+            "optimizer": "Optimointimenetelmä",
+            "lowPowerMode": "Virransäästötila",
+            "disableSubgroups": "Poista alaryhmittely käytöstä",
+            "apiEndpoint": "API-päätepiste",
+            "apiKey": "API-avain",
+            "developerOptions": "Kehittäjäasetukset",
+            "loraConfig": "LoRA",
+            "loraRank": "LoRA-rank",
+            "sftModeLora": "Käytä LoRAa hienosäädössä",
+            "sftMode": "Hienosäädön tila",
+            "sftModeLastLayer": "Hienosäädä viimeinen kerros",
+            "sftModeFull": "Hienosäädä koko malli",
+            "loraVariables": "Muuttujat",
+            "gradClipping": "Gradientin leikkaus",
+            "warmupSteps": "Lämmittelyaskeleet",
+            "decayEpochs": "Vaimennusepookit",
+            "weightDecay": "Painovaimennus",
+            "labelSmoothing": "Label-siloitus",
+            "layerDrop": "Stokastinen syvyys",
+            "dropout": "Dropout",
+            "blockSize": "Kontekstin pituus",
+            "mlpFactor": "MLP-kerroin",
+            "mlpFactorHelp": "Muuta transformer-lohkojen monikerrosperseptronin (MLP) kokoa. Suurempi MLP voi auttaa mallia muistamaan enemmän kuvioita, mutta kasvattaa parametrien määrää.",
+            "heads": "Huomiopäät",
+            "headsHelp": "Muuta transformer-lohkojen huomiopäiden määrää. Useammat päät voivat auttaa mallia keskittymään samanaikaisesti syötteen eri osiin.",
+            "arch": "Malliasetukset",
+            "contextHelp": "Tokenien määrä, jonka malli näkee tehdessään ennusteita.",
+            "batchHelp": "Kerralla käsiteltävien näytteiden määrä, jolla tasataan vaihtelua.",
+            "lrHelp": "Kuinka nopeasti parametreja säädetään jokaisella opetusaskeleella.",
+            "sizeLimit": "Mallin kokoraja (miljoonaa parametria)",
+            "speed": "Animaation nopeus",
+            "temperatureHelp": "Korkeampi lämpötila tuottaa satunnaisempia vastauksia, koska ilmeisintä seuraavaa tokenia valitaan harvemmin."
         },
         "close": "Sulje",
+        "ok": "OK",
+        "editStep": "Siirry vaiheeseen",
         "annotations": {
             "model": "Malli",
             "data": "Aineisto"
@@ -48,11 +99,21 @@
     "deviceProbe": {
         "probing": "Tarkastellaan laitteistosi suorituskykyä"
     },
+    "workflow": {
+        "model": "Malli",
+        "pretraindata": "Data",
+        "pretrain": "Esikoulutus",
+        "finetune": "Hienosäätö",
+        "deployment": "Käyttöönotto"
+    },
     "data": {
         "title": "Opetusaineisto",
         "textDialogTitle": "Tekstisisältö",
-        "addTooltip": "Lisää uutena opetusaineistona",
-        "dataHint": "Kirjoita tekstiä tai lataa erilaisia tiedostotyyppejä (txt, csv, pdf, docx) opetusaineistoksi. Mitä enemmän tekstiä, sitä parempi.",
+        "addTooltip": "Lisää uusi data",
+        "datasetTooltip": "Etsi aineistokirjastostamme",
+        "writeTip": "Kirjoita tai liitä omaa tekstiaineistoasi.",
+        "uploadTip": "Lataa tekstiä sisältäviä tiedostoja. Tuetut muodot: txt, csv, pdf, docx.",
+        "dataHint": "Käytä aineistokirjastoa tekstin löytämiseen tai pudota tähän tiedostoja (txt, csv, pdf, docx) opetustekstiksi. Melkein mitä tahansa tekstiä voi käyttää, mutta sitä kannattaa olla paljon.",
         "modelHint": "Valitse ensin malli.",
         "add": "Kirjoita",
         "upload": "Lataa",
@@ -63,11 +124,25 @@
         "close": "Sulje",
         "textPlaceholder": "Kirjoita tai liitä oma tekstisi tähän...",
         "dropHint": "Pudota tiedostot tähän...",
-        "dropError": "Voit pudottaa vain tekstitiedostoja (txt, csv, pdf, docx).",
         "ok": "OK",
         "samples": "Tekstinäytettä",
         "search": "Hae",
-        "downloading": "Ladataan {{count}} tiedosto(a)"
+        "downloading": "Ladataan {{count}} tiedosto(a)",
+        "errors": {
+            "fileLoadError": "Voit pudottaa vain tekstitiedostoja (txt, csv, pdf, docx).",
+            "downloadLoadError": "Ladatun tiedoston avaamisessa tapahtui tuntematon virhe."
+        },
+        "characters": "{{chars}} merkkiä",
+        "loadingMoreDocuments": "Ladataan lisää dokumentteja..."
+    },
+    "checkmodel": {
+        "title": "Rakenna malli",
+        "start": "Rakenna",
+        "stop": "Pysäytä",
+        "outdated": "Malli täytyy rakentaa uudelleen",
+        "upToDate": "Malli on valmis käyttöön.",
+        "help": "Mallin rakentaminen varaa resursseja ja asettaa parametreille satunnaiset alkuarvot.",
+        "exceedsSizeLimit": "Mallissa on liikaa parametreja."
     },
     "model": {
         "parameters": "Parametrit",
@@ -75,6 +150,9 @@
         "title": "Kielimalli",
         "create": "Luo uusi",
         "upload": "Lataa",
+        "tools": "Työkalut",
+        "share": "Jaa",
+        "download": "Lataa",
         "search": "Hae",
         "charTokeniser": "{{size}} merkkiä",
         "bpeTokeniser": "{{size}} sanaketta",
@@ -86,7 +164,25 @@
         "durationSeconds": "{{count}} sekuntia",
         "samples": "{{samples}} tekstinäytettä",
         "embeddingSize": "Sisäinen koko {{size}}",
-        "modelHint": "Valitse tai lataa kielimalli."
+        "modelHint": "Valitse tai lataa kielimalli.",
+        "languageModel": "Kielimalli",
+        "visualisation": {
+            "next": "Seuraava"
+        },
+        "preTraining": "Esikoulutus",
+        "defaultName": "Oma mallisi",
+        "includeAll": "Sisällytä eri arkkitehtuurit",
+        "noModelsFound": "Malleja ei löytynyt",
+        "zoomIn": "Lähennä",
+        "zoomOut": "Loitonna",
+        "examples": "Esimerkit",
+        "layer": "Kerros {{index}}",
+        "width": "Leveys",
+        "vocabSize": "Sanaston koko",
+        "reset": "Palauta",
+        "parametersHelp": "Mallin numeeristen parametrien kokonaismäärä.",
+        "help": "Malli sisältää parametrit ja arkkitehtuurin, joita säädetään opetuksen aikana ja joita käytetään seuraavan tokenin ennustamiseen.",
+        "visualHelp": "Tämä kaavio näyttää mallin rakenteen eli arkkitehtuurin. Siinä on syötteitä, useita parametrikerroksia ja ulostulo. Voit muokata mallin muotoa muuttaaksesi parametrien määrää ja sijaintia."
     },
     "training": {
         "title": "Opettaminen",
@@ -96,17 +192,55 @@
         "hours": "t",
         "minutes": "m",
         "seconds": "s",
-        "remaining": "Jäljellä"
+        "remaining": "Jäljellä",
+        "settings": "Asetukset",
+        "loss": "Häviö (loss)",
+        "valLoss": "Validointihäviö (validation loss)",
+        "accuracy": "Accuracy",
+        "valAccuracy": "Validation Accuracy",
+        "gradientNorm": "Gradient Norm",
+        "perplexity": "Perplexity",
+        "valPerplexity": "Validation Perplexity",
+        "steps": "Askelta",
+        "noData": "Opetusaineistoa ei ole saatavilla",
+        "monitor": "Seuranta",
+        "visualize": "Visualisointi",
+        "autoOutput": "Näytä mallin kehittyminen",
+        "preparing": "Tokenizing...",
+        "errors": {
+            "preparation": "Tarvitaan lisää opetusaineistoa, vähintään muutama tuhat tekstinäytettä.",
+            "noModel": "Valitse tai lataa malli ennen opettamista.",
+            "notReady": "Malli tai aineisto ei ole valmis opettamiseen.",
+            "noData": "Lisää ensin opetusaineistoa.",
+            "trainingFailed": "Mallin opettaminen epäonnistui. Päivitä sivu ja kokeile pienempää mallia tai erän kokoa (batch size)."
+        },
+        "predictionsHeader": "Parhaat lasketut ennusteet",
+        "help": "Oppimisprosessi, jossa parametreja säädetään vähitellen ylös ja alas, kunnes malli pystyy toistamaan esimerkkidatastasi löytyviä kuvioita. Jäljellä oleva aika kertoo, kuinka kauan koko datan läpikäynti kestää.",
+        "sampleBoxHelp": "Lyhyt esimerkki datastasi. Malli yrittää ennustaa korostetun tokenin aiemman tekstin perusteella.",
+        "attentionHelp": "Esimerkki muunnetaan numeerisiksi tokeneiksi. Mallin jokainen kerros kohdistaa huomiota tekstin eri osiin.",
+        "modelBoxHelp": "Mallisi jokainen kerros osallistuu lopulliseen ennusteeseen yksi kerrallaan. Kerrosten parametreja säädetään sen mukaan, kuinka hyvin ne auttoivat ennustamaan.",
+        "lossBoxHelp": "Kun malli on tehnyt ennusteen, sitä verrataan oikeaan vastaukseen. Häviö mittaa, kuinka väärä ennuste oli, joten opetuksessa pyritään pienentämään tätä arvoa.",
+        "monitorHelp": "Tietoja opetuksen etenemisestä.",
+        "visualizeHelp": "Visualisointi siitä, miten opetus toimii."
     },
     "generator": {
         "title": "Tekstin luominen",
         "generate": "Luo tekstiä",
         "promptPlaceholder": "Valinnainen kehoteteksti...",
         "settingsTooltip": "Generoinnin asetukset",
+        "settings": "Asetukset",
         "pause": "Pysäytä",
+        "stop": "Stop",
         "editPlaceholder": "Kirjoita halutessasi kehoteteksti tähän...",
         "reset": "Tyhjennä",
-        "copy": "Kopioi leikepöydälle"
+        "copy": "Kopioi leikepöydälle",
+        "autoGenerateAriaLabel": "Vaihda automaattinen generointi päälle/pois",
+        "autoGenerate": "Automaattinen generointi",
+        "step": "Seuraava",
+        "errors": {
+            "modelNotReady": "Malli ei ole valmis generointiin, yritä hetken kuluttua uudelleen.",
+            "generationError": "Tekstin generoinnissa tapahtui tuntematon virhe."
+        }
     },
     "evaluation": {
         "title": "Laatu",
@@ -115,7 +249,8 @@
         "loss": "Häviö",
         "samplesPerSecond": "Näytteitä/s",
         "memory": "Muisti",
-        "gradientNorm": "Gradientin normi"
+        "gradientNorm": "Gradientin normi",
+        "accuracy": "Tarkkuus"
     },
     "modelStatus": {
         "warmup": "Mallia valmistellaan...",
@@ -129,7 +264,7 @@
     },
     "validation": {
         "invalid_number": "Virheellinen numero",
-        "out_of_range": "Arvon on oltava välillä  {{min}} ja {{max}}",
+        "out_of_range": "Arvon on oltava välillä {{min}} ja {{max}}",
         "required": "Tämä kenttä on pakollinen",
         "positive_integer": "Arvon on oltava positiivinen kokonaisluku",
         "unknown_error": "Tuntematon virhe tapahtui",
@@ -138,5 +273,144 @@
     },
     "xai": {
         "title": "Selitys"
+    },
+    "tools": {
+        "Settings": "Asetukset",
+        "Visualizations": "Visualisoinnit",
+        "generatorSettings": "Generoinnin asetukset",
+        "trainingSettings": "Opettamisen asetukset",
+        "checks": "Operaattoritestit",
+        "advanced": "Edistyneet työkalut",
+        "debugModel": "Debuggaa malli",
+        "nextSample": "Seuraava",
+        "trainingProcess": "Opetusprosessi",
+        "loss": "Häviö (loss)",
+        "model": "Malli",
+        "modelMissingHint": "Lataa malli ja opetusaineisto nähdäksesi opetusprosessin.",
+        "play": "Toista",
+        "pause": "Tauko (pause)",
+        "step": "Askel",
+        "training": {
+            "title": "Opetuksen loki",
+            "validation": "Validointi",
+            "history": "Historia",
+            "performance": "Suorituskyky",
+            "validationHelp": "Osa datastasi käytetään testaamaan, kuinka hyvin malli oppii. Tätä validointidataa ei näytetä mallille opetuksen aikana, joten se ei voi huijata.",
+            "accuracyHelp": "Tarkkuus on niiden ennusteiden prosenttiosuus, jotka olivat oikein.",
+            "lossHelp": "Häviö mittaa, kuinka väärin mallin ennusteet menivät. Se kuvaa informaation menetystä."
+        },
+        "modelPredicting": "Ennustetaan...",
+        "modelUpdating": "Päivitetään parametreja...",
+        "modelComplete": "Opetusaskel valmis",
+        "modelSelecting": "Valitaan näytettä",
+        "modelIdle": "Odotetaan...",
+        "nlayers": "{{N}} kerrosta",
+        "gradients": "Gradientit",
+        "playHelp": "Käynnistä tai pysäytä animaatio.",
+        "stepHelp": "Siirry animaatiossa yksi askel eteenpäin."
+    },
+    "tokeniser": {
+        "title": "Sanasto",
+        "start": "Rakenna",
+        "stop": "Pysäytä",
+        "vocabulary": "Näytä",
+        "settings": "Asetukset",
+        "invalidWarning": "Sanastoa ei valittu nykyisestä datasta.",
+        "trainedWarning": "Malli on jo opetettu, sanaston muuttaminen voi aiheuttaa ongelmia.",
+        "notTrained": "Ei sanastoa.",
+        "trained": "Sanastossa {{size}} tokenia.",
+        "tokenising": "{{size}} tokenia",
+        "noData": "Dataa ei saatavilla",
+        "noModel": "Mallia ei valittu",
+        "includeSpecial": "Sisällytä erikoistokenit",
+        "help": "Sanasto on kirjaimista, sanoista tai sananosista koostuva joukko, joka toimii mallin kielen rakennuspalikoina. Näitä palikoita kutsutaan tokeneiksi, ja jokaiselle annetaan yksilöllinen numero. Sanaston rakentaminen käsittelee datasi ja etsii parhaat tokenit."
+    },
+    "tokeniseData": {
+        "title": "Tokenisoi data",
+        "sideTitle": "Teksti tokeneina",
+        "start": "Tokenisoi",
+        "stop": "Pysäytä",
+        "tokens": "Tokenit",
+        "show": "Näytä",
+        "noData": "Dataa ei saatavilla",
+        "noModel": "Mallia ei valittu",
+        "notTrained": "Ei sanastoa.",
+        "showNumbers": "Näytä tokenien numerot",
+        "progressHelp": "Tarvittavien tokenien tavoitemäärä.",
+        "help": "Tekstidata täytyy jakaa numeerisiksi tokeneiksi, joita matemaattinen malli voi käyttää. Suuremmat mallit tarvitsevat enemmän tokeneita, joten etenemispalkki näyttää, paljonko niitä saatat tarvita."
+    },
+    "instruct": {
+        "title": "Hienosäätödata",
+        "autoTune": "Automaattinen hienosäätö",
+        "newConversation": "Uusi data",
+        "conversations": "Keskustelut ({{count}})",
+        "upload": "Avaa",
+        "download": "Tallenna",
+        "autoTunePrompt": "Mallipohjakehote",
+        "generateTuneData": "Luo keskusteluja",
+        "deleteAll": "Poista kaikki"
+    },
+    "conversation": {
+        "userPlaceholder": "Kirjoita viesti...",
+        "botPlaceholder": "Tekoälyn vastaus...",
+        "save": "Päivitä",
+        "cancel": "Peruuta",
+        "addMessage": "Lisää viesti"
+    },
+    "finetune": {
+        "title": "Hienosäätö",
+        "start": "Säädä",
+        "stop": "Pysäytä",
+        "warningTitle": "Keskeneräinen ominaisuus",
+        "warningContent": "Hienosäätö on vielä kehitysvaiheessa. Jatka varoen.",
+        "ok": "OK"
+    },
+    "sharing": {
+        "title": "Jakaminen",
+        "start": "Jaa",
+        "stop": "Lopeta jakaminen",
+        "settings": "Asetukset",
+        "users": "Käyttäjät"
+    },
+    "deploy": {
+        "actions": {
+            "copy": "Kopioi linkki",
+            "close": "Sulje"
+        },
+        "welcome_message": "Kokeile jutella kanssani!",
+        "placeholder": "Kirjoita viesti..."
+    },
+    "loader": {
+        "messages": {
+            "connecting": "Yritetään yhdistää...",
+            "disconnected": "Yhteys toiseen laitteeseen katkaistiin",
+            "retry": "Yritetään uudelleen...",
+            "ready": "Yhdistetty",
+            "starting": "Yhdistetään...",
+            "quality0": "Tarkistetaan...",
+            "quality1": "Heikko yhteys",
+            "quality2": "Yhdistetty",
+            "quality3": "Yhdistetty",
+            "failed": "Ei yhteyttä"
+        },
+        "errors": {
+            "unknown": "Yhteysongelma ilmeni",
+            "id-in-use": "Joku käyttää jo tätä koodia",
+            "peer-not-found": "Koodia ei löytynyt",
+            "missing-ice": "Yhteyttä ei voitu muodostaa, saatat olla offline-tilassa.",
+            "no-signaling": "Palvelimemme ei vastaa",
+            "bad-browser": "Laitteesi ei tue tätä sovellusta",
+            "none": "OK"
+        },
+        "titles": {
+            "iceConfig": "Määritetään",
+            "permission": "Käyttöoikeudet",
+            "connecting": "Yhteys",
+            "error": "Ongelma",
+            "networkType": "Tietoa"
+        },
+        "actions": {
+            "close": "Sulje"
+        }
     }
 }
