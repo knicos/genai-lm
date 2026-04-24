@@ -9,7 +9,6 @@
 
 .subtitle {
     width: 100%;
-    border-bottom: 2px solid #eee;
     margin-top: 2rem;
 }
 
@@ -26,11 +25,11 @@
 .value {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 1.6rem;
-    color: #333;
+    color: white;
 }
 
 .label {
-    color: #005d6b;
+    color: white;
     font-size: 0.9rem;
 }
 
@@ -47,14 +46,22 @@
 }
 
 .chartContainer :global .MuiChartsAxis-tickLabel {
-    fill: #005d6b;
+    fill: white;
 }
 
 .chartContainer :global .MuiChartsAxis-label text {
-    fill: #005d6b;
+    fill: white;
     font-weight: bold !important;
 }
 
 .chartContainer :global .MuiLineElement-series-loss {
     stroke-dasharray: 5 5;
+}
+
+.chartContainer :global .MuiChartsLegend-label {
+    color: white;
+}
+
+.chartContainer :global .MuiChartsSurface-root text {
+    fill: white;
 }

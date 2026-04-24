@@ -7,9 +7,10 @@ interface Props extends PropsWithChildren {
     progress: number;
     color?: string;
     animated?: boolean;
+    dark?: boolean;
 }
 
-export default function Circle({ radius, children, progress, color, animated }: Props) {
+export default function Circle({ radius, children, progress, color, animated, dark }: Props) {
     const stroke = 8;
     const normalizedRadius = radius - stroke / 2;
     const circumference = 2 * Math.PI * normalizedRadius;
@@ -22,15 +23,15 @@ export default function Circle({ radius, children, progress, color, animated }: 
                 width={radius * 2}
             >
                 <circle
-                    stroke="rgba(0, 130, 151, 0.1)"
-                    fill="rgba(0, 130, 151, 0.06)"
+                    stroke={dark ? 'rgba(65, 188, 207, 0.3)' : 'rgba(0, 130, 151, 0.1)'}
+                    fill={dark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 130, 151, 0.06)'}
                     strokeWidth={stroke}
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}
                 />
                 <circle
-                    stroke={color || theme.light.success}
+                    stroke={color || (dark ? theme.dark.success : theme.light.success)}
                     fill="none"
                     strokeWidth={stroke}
                     strokeLinecap="round"

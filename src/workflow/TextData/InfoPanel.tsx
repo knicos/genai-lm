@@ -8,14 +8,15 @@ interface Props {
     onClose?: () => void;
     severity: 'info' | 'warning' | 'error';
     message: string;
+    dark?: boolean;
 }
 
-export default function InfoPanel({ show, onClose, message }: Props) {
+export default function InfoPanel({ show, onClose, message, dark }: Props) {
     const { t } = useTranslation();
     if (!show) return null;
 
     return show ? (
-        <div className={style.innerContainer}>
+        <div className={`${style.innerContainer} ${dark ? style.dark : ''}`}>
             <InfoOutlineIcon
                 fontSize="large"
                 color="inherit"

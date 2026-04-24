@@ -183,6 +183,7 @@ export function Component() {
                     show={!ready}
                     severity={warn ? 'warning' : 'info'}
                     message={t('tools.modelMissingHint')}
+                    dark
                 />
             </div>
             {ready && <ModelLines />}

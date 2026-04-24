@@ -214,7 +214,7 @@
             "noData": "Add training data first.",
             "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
         },
-        "predictionsHeader": "Top calculated predictions",
+        "predictionsHeader": "Top predictions",
         "help": "The learning process where the parameters are slowly adjusted up or down until it can reproduce the patterns found in your example data. Time remaining is how long it will take to look at all of your data.",
         "sampleBoxHelp": "A short example taken from your data. The model is trying to predict the highlighted token based on the previous text.",
         "attentionHelp": "The example is converted to numeric tokens. Each layer of the model pays attention to different parts of the text.",

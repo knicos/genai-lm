@@ -1,10 +1,8 @@
 import { CSSProperties, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import boxstyle from './style.module.css';
-import { useWorkflowContext } from '@genai-fi/base';
 
 interface Props extends PropsWithChildren {
     style?: CSSProperties;
-    widget?: string;
     active?: boolean;
     disabled?: boolean;
     className?: string;
@@ -14,9 +12,8 @@ interface Props extends PropsWithChildren {
 
 const isTest = globalThis?.process?.env?.NODE_ENV === 'test';
 
-export default function Box({
+export default function BoxStandalone({
     style,
-    widget,
     active = true,
     disabled = false,
     className,
@@ -26,30 +23,23 @@ export default function Box({
 }: Props) {
     const ref = useRef<HTMLDivElement>(null);
     const [visible, setVisible] = useState(false);
-    const workflowContext = useWorkflowContext();
 
     useEffect(() => {
         if (ref.current) {
-            const remove = widget ? workflowContext.registerElement(widget, ref.current) : undefined;
-            const io = new IntersectionObserver(
-                ([entry]) => {
-                    setVisible(entry.isIntersecting);
-                },
-                { rootMargin: '50px' }
-            );
+            const io = new IntersectionObserver(([entry]) => {
+                setVisible(entry.isIntersecting);
+            });
             io.observe(ref.current);
             return () => {
                 io.disconnect();
-                remove?.();
             };
         }
-    }, [widget, workflowContext]);
+    }, []);
 
     return (
         <div
             ref={ref}
             className={`${boxstyle.box} ${fullWidth ? boxstyle.fullWidth : ''} ${className || ''}`}
-            data-widget={widget}
             data-active={active ? 'true' : 'false'}
             style={style}
         >

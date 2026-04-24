@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from 'jotai';
-import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { modelAtom, modelConfigAtom, modelSizeLimit } from '../../state/model';
 import style from './style.module.css';
@@ -9,9 +8,10 @@ import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import { estimateParameterCount, GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
-import Help from '../../components/Help/Help';
 import { useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
+import HelpBox from '../../components/Help/HelpBox';
+import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -39,12 +39,15 @@ export default function CheckModel() {
     const exceedsSizeLimit = paramCount > sizeLimit;
 
     return (
-        <Help
+        <HelpBox
             message={t('checkmodel.help')}
             widget="checkmodel"
             active={ready}
         >
-            <Box style={{ minWidth: '290px' }}>
+            <BoxStandalone
+                style={{ minWidth: '290px', minHeight: '100px' }}
+                active={ready}
+            >
                 <div className={style.container}>
                     <BoxTitle
                         title={t('checkmodel.title')}
@@ -105,7 +108,7 @@ export default function CheckModel() {
                         />
                     )}
                 </div>
-            </Box>
-        </Help>
+            </BoxStandalone>
+        </HelpBox>
     );
 }

@@ -1,13 +1,20 @@
 .MuiOutlinedInput-root {
-    background: white;
+    /*background: white;*/
     border-radius: 10px;
 }
 
 .sidePanel {
     display: flex;
     flex-direction: column;
-    margin: 1rem 3rem;
+    margin: 1rem auto;
     flex-grow: 1;
+    max-width: 600px;
+    width: calc(100% - 6rem);
+}
+
+.MuiSlider-valueLabel {
+    background: white;
+    color: black;
 }
 
 .MuiTooltip-tooltip {

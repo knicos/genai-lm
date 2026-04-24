@@ -33,6 +33,6 @@ export const theme: Theme = {
         error: '#e57373',
         info: '#75a4e2',
         highlightColours: ['#FBC6C6', '#C6FBCC', '#C6C8FB', '#FBC6FB', '#C6FBF2', '#F2C6FB', '#FBEDC6'],
-        chartColours: ['#e04f66', '#fd9d32', '#fad630', '#a77bca', '#2e6df5', '#19b1a8', '#c2a251', '#97999b'],
+        chartColours: ['#e04f66', '#fcc07a', '#fad630', '#a77bca', '#6492f6', '#19b1a8', '#c2a251', '#97999b'],
     },
 };

@@ -23,8 +23,11 @@
 }
 
 .predictionsList {
-    padding: 0;
+    padding: 0.5rem;
     border-spacing: 0;
+    background: white;
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .probability {

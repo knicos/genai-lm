@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
 import { useAtom, useAtomValue } from 'jotai';
-import { generatorAtom, generatorSettings } from '../../state/generator';
+import { rawGeneratorAtom, generatorSettings } from '../../state/generator';
 import { modelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import { trainerSettings } from '../../state/trainer';
@@ -14,15 +14,12 @@ import { useTranslation } from 'react-i18next';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
 import { conversationDataAtom } from '../../state/data';
+import { useWorkflowContext } from '@genai-fi/base';
 
-interface Props {
-    nonConversational?: boolean;
-}
-
-export default function ChatOutput({ nonConversational = false }: Props) {
+export default function RawGeneration() {
     const { t } = useTranslation();
     const model = useAtomValue(modelAtom);
-    const [generator, setGenerator] = useAtom(generatorAtom);
+    const [generator, setGenerator] = useAtom(rawGeneratorAtom);
     const [text, setText] = useState<Conversation[]>([]);
     const status = useModelStatus(model ?? undefined);
     const outputText = useAtomValue(trainerSettings).outputText;
@@ -30,6 +27,17 @@ export default function ChatOutput({ nonConversational = false }: Props) {
     const { topP } = useAtomValue(generatorSettings);
     const navigate = useNavigate();
     const conversations = useAtomValue(conversationDataAtom);
+    const workflowContext = useWorkflowContext();
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (ref.current) {
+            const remove = workflowContext.registerElement('chatOutput', ref.current);
+            return () => {
+                remove?.();
+            };
+        }
+    }, [workflowContext]);
 
     const ready = status !== 'loading';
 
@@ -50,7 +58,7 @@ export default function ChatOutput({ nonConversational = false }: Props) {
                     try {
                         if (conversations?.length === 0) {
                             const finalText = await generator.generate({
-                                nonConversational: nonConversational,
+                                nonConversational: true,
                                 maxLength: 200,
                                 temperature: 0.8,
                                 includeProbabilities: false,
@@ -64,7 +72,7 @@ export default function ChatOutput({ nonConversational = false }: Props) {
                             generator.reset();
                             const finalText = await generator.generate([conversation[0]], {
                                 maxLength: 200,
-                                nonConversational: nonConversational,
+                                nonConversational: true,
                                 temperature: 0.8,
                                 includeProbabilities: false,
                                 topP: topP > 0 ? topP : undefined,
@@ -88,7 +96,7 @@ export default function ChatOutput({ nonConversational = false }: Props) {
                 };
             }
         }
-    }, [model, ready, outputText, topP, setGenerator, t, conversations, nonConversational]);
+    }, [model, ready, outputText, topP, setGenerator, t, conversations]);
 
     useEffect(() => {
         if (generator) {
@@ -110,6 +118,7 @@ export default function ChatOutput({ nonConversational = false }: Props) {
             className={style.container}
             data-widget="chat-output"
             data-testid="chat-output"
+            ref={ref}
         >
             <ChatMenu
                 onReset={() => {

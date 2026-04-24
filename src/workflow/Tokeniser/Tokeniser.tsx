@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { datasetAtom, dataTokens, tokeniserInvalid } from '../../state/data';
 import { modelAtom } from '../../state/model';
@@ -13,7 +12,8 @@ import useModelPhase from '../../hooks/useModelPhase';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useNavigate } from 'react-router-dom';
-import Help from '../../components/Help/Help';
+import HelpBox from '../../components/Help/HelpBox';
+import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
@@ -48,12 +48,15 @@ export default function Tokeniser() {
     }, [model]);
 
     return (
-        <Help
+        <HelpBox
             widget="tokeniser"
             message={t('tokeniser.help')}
             active={dataset !== null && dataset.length > 0}
         >
-            <Box style={{ maxWidth: '300px' }}>
+            <BoxStandalone
+                style={{ width: '250px', minHeight: '200px' }}
+                active={dataset !== null && dataset.length > 0}
+            >
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniser.title')}
@@ -138,7 +141,7 @@ export default function Tokeniser() {
                         />
                     )}
                 </div>
-            </Box>
-        </Help>
+            </BoxStandalone>
+        </HelpBox>
     );
 }

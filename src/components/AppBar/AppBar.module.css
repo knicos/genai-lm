@@ -27,45 +27,6 @@
     height: 80px;
 }
 
-.langBar {
-    display: flex;
-    gap: 0.5rem;
-    height: 100%;
-    align-items: center;
-    margin-right: 0.5rem;
-    color: white;
-    flex-shrink: 0;
-}
-
-.langBar :global .MuiNativeSelect-root::before {
-    border-bottom: 1px solid white;
-}
-
-.langBar :global .MuiNativeSelect-root:hover::before {
-    border-bottom: 2px solid white;
-}
-
-.langBar :global .Mui-focused {
-    border-bottom: 1px solid #444;
-}
-
-.langBar :global .MuiNativeSelect-icon {
-    color: white;
-}
-
-.langBar select {
-    color: white;
-    font-size: 0.8rem;
-}
-
-.langBar option {
-    color: black;
-}
-
-.langBarWithSettings {
-    composes: langBar;
-}
-
 .logo {
     background: primary;
     /*padding-left: 0.5rem;

@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from 'jotai';
-import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { datasetAtom, dataTokens, dataTokensReady } from '../../state/data';
 import { modelAtom } from '../../state/model';
@@ -16,7 +15,8 @@ import useModelStatus from '../../hooks/useModelStatus';
 import MarginIcon from '@mui/icons-material/Margin';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useNavigate } from 'react-router-dom';
-import Help from '../../components/Help/Help';
+import HelpBox from '../../components/Help/HelpBox';
+import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
 export default function TokeniseData() {
     const { t } = useTranslation();
@@ -34,13 +34,16 @@ export default function TokeniseData() {
     const tokenCount = _tokenCount === 0 ? tokens?.length || 0 : _tokenCount;
 
     return (
-        <Help
+        <HelpBox
             widget="tokeniseData"
             placement="top"
             active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
             message={t('tokeniseData.help')}
         >
-            <Box style={{ minWidth: '290px' }}>
+            <BoxStandalone
+                style={{ width: '290px', minHeight: '200px' }}
+                active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
+            >
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniseData.title')}
@@ -109,7 +112,7 @@ export default function TokeniseData() {
                         />
                     )}
                 </div>
-            </Box>
-        </Help>
+            </BoxStandalone>
+        </HelpBox>
     );
 }

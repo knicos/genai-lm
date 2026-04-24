@@ -29,6 +29,7 @@ export default function LanguageModel() {
             active={true}
             className={style.modelThread}
             fullWidth
+            style={{ width: '40rem', height: '100%' }}
         >
             {showSearch && (
                 <SearchUntrained

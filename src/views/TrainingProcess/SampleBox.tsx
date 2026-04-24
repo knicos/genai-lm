@@ -1,7 +1,7 @@
 import { ITokeniser } from '@genai-fi/nanogpt';
 import { useEffect, useRef, useState } from 'react';
 import style from './sample.module.css';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import { theme } from '../../theme';
 
@@ -55,6 +55,7 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
                 message={t('training.sampleBoxHelp')}
                 inplace
                 placement="left"
+                dark
             >
                 <div
                     className={style.sampleBox}
@@ -74,6 +75,7 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
                 message={t('training.attentionHelp')}
                 inplace
                 placement="left"
+                dark
             >
                 <div
                     className={style.sampleBox}

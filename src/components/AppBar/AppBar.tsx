@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './AppBar.module.css';
-import { IconButton, NativeSelect, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { uiShowSettings } from '../../state/uiState';
@@ -10,25 +10,20 @@ import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
 import logger from '../../utilities/logger';
 import WorkflowStatusBar from './WorkflowStatusBar';
+import { LangSelect } from '@genai-fi/base';
 
 interface Props {
     noSettings?: boolean;
     hideTitle?: boolean;
     hideWorkflow?: boolean;
+    sidepanel?: string;
 }
 
-export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: Props) {
-    const { t, i18n } = useTranslation();
+export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, sidepanel }: Props) {
+    const { t } = useTranslation();
     const showSettings = useSetAtom(uiShowSettings);
     const istraining = useAtomValue(trainingAnimation);
     const [logId, setLogId] = useState<string | null>(null);
-
-    const doChangeLanguage = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
-            i18n.changeLanguage(e.target.value || 'en-GB');
-        },
-        [i18n]
-    );
 
     useEffect(() => {
         const h = (_: string, idNumber: number) => {
@@ -63,27 +58,18 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow }: 
                     )}
                 </Link>
                 {logId && <div className={style.buttonBar}>{logId}</div>}
-                {!hideWorkflow && <WorkflowStatusBar disabled={istraining} />}
-                {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
-                <div className={style.langBar}>
-                    <NativeSelect
-                        value={i18n.language}
-                        onChange={doChangeLanguage}
-                        variant="outlined"
-                        data-testid="select-lang"
+                {!hideWorkflow && (
+                    <WorkflowStatusBar
                         disabled={istraining}
-                        inputProps={{ 'aria-label': t('app.language') }}
-                    >
-                        {LANGS.map((lng) => (
-                            <option
-                                key={lng.name}
-                                value={lng.name}
-                            >
-                                {lng.label}
-                            </option>
-                        ))}
-                    </NativeSelect>
-                </div>
+                        sidepanel={sidepanel}
+                    />
+                )}
+                {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
+                <LangSelect
+                    languages={LANGS}
+                    dark
+                    ns="translation"
+                />
                 {!noSettings && (
                     <Tooltip
                         title={t('app.settings.title')}

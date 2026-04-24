@@ -4,19 +4,20 @@
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     padding: 0rem 0.6rem;
-    border-bottom: 2px solid rgba(0, 130, 151, 0.4);
+    border-bottom: 2px solid rgba(0, 130, 151, 0.6);
     box-sizing: border-box;
     font-size: 1.1rem;
     user-select: none;
 }
 
 .token:hover {
-    background: rgba(0, 130, 151, 0.3);
-    border-bottom: 2px solid rgba(0, 130, 151, 0.6);
+    background: rgba(0, 130, 151, 0.4);
+    border-bottom: 2px solid rgba(0, 130, 151, 0.9);
 }
 
 .vocabList {
-    padding: 0;
+    padding: 1rem;
+    background: white;
     border-spacing: 0;
     list-style: none;
     display: flex;
@@ -24,6 +25,7 @@
     gap: 0.5rem;
     justify-content: center;
     align-items: center;
+    border-radius: 8px;
 }
 
 .popper {

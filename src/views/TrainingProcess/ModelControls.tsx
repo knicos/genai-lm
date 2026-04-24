@@ -49,35 +49,39 @@ export default function ModelControls({ steps, onStepChange, disabled }: Props) 
                 arrow
                 title={t('tools.playHelp')}
             >
-                <VerticalButton
-                    color="primary"
-                    onClick={() => setPlay(!play)}
-                    startIcon={play ? <PauseIcon /> : <PlayArrowIcon />}
-                    disabled={disabled}
-                >
-                    {play ? t('tools.pause') : t('tools.play')}
-                </VerticalButton>
+                <div>
+                    <VerticalButton
+                        color="primary"
+                        onClick={() => setPlay(!play)}
+                        startIcon={play ? <PauseIcon /> : <PlayArrowIcon />}
+                        disabled={disabled}
+                    >
+                        {play ? t('tools.pause') : t('tools.play')}
+                    </VerticalButton>
+                </div>
             </Tooltip>
             <Tooltip
                 arrow
                 title={t('tools.stepHelp')}
             >
-                <VerticalButton
-                    color="primary"
-                    onClick={() =>
-                        onStepChange((step) =>
-                            step === null
-                                ? (steps[0] ?? null)
-                                : step.locked
-                                  ? step
-                                  : steps[(step.index + 1) % steps.length]
-                        )
-                    }
-                    disabled={play || disabled}
-                    startIcon={<SkipNextIcon />}
-                >
-                    {t('tools.step')}
-                </VerticalButton>
+                <div>
+                    <VerticalButton
+                        color="primary"
+                        onClick={() =>
+                            onStepChange((step) =>
+                                step === null
+                                    ? (steps[0] ?? null)
+                                    : step.locked
+                                      ? step
+                                      : steps[(step.index + 1) % steps.length]
+                            )
+                        }
+                        disabled={play || disabled}
+                        startIcon={<SkipNextIcon />}
+                    >
+                        {t('tools.step')}
+                    </VerticalButton>
+                </div>
             </Tooltip>
             <FormControl style={{ marginLeft: '2rem' }}>
                 <div

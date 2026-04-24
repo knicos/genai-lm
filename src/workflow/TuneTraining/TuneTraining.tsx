@@ -202,7 +202,7 @@ export default function TuneTraining() {
         <Box
             widget="finetuner"
             active={!!model || (!!conversations && conversations.length > 0)}
-            style={{ minWidth: '260px' }}
+            style={{ minWidth: '260px', minHeight: '287px' }}
         >
             <WarningDialog />
             <div className={style.container}>

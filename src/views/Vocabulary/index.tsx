@@ -79,6 +79,7 @@ export function Component() {
                 anchorEl={anchor}
                 placement="bottom"
                 sx={{ zIndex: 3 }}
+                theme="dark"
             >
                 <div className={style.popper}>{selectedToken}</div>
             </InfoPop>

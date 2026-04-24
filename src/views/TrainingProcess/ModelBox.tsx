@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import CircularProgress from '../../components/CircularProgress/CircularProgress';
 import { useEffect, useState } from 'react';
 import ModelIcon from '../../icons/ModelIcon';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 
 interface Props {
     layers: number;
@@ -42,6 +42,7 @@ export default function ModelBox({ layers, step, done, spinning }: Props) {
             <Help
                 message={t('training.modelBoxHelp')}
                 inplace
+                dark
             >
                 <div className={style.modelLabel}>
                     <h3>

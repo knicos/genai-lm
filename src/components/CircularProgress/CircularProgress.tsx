@@ -22,7 +22,7 @@ export default function CircularProgress({ radius, children, step, totalSteps, d
                 width={radius * 2}
             >
                 <circle
-                    fill="rgba(0, 130, 151, 0.06)"
+                    fill="rgba(0, 0, 0, 0.4)"
                     strokeWidth={0}
                     r={normalizedRadius}
                     cx={radius}
@@ -67,9 +67,9 @@ export default function CircularProgress({ radius, children, step, totalSteps, d
                             fill={
                                 (i < step && !spin) || i === step
                                     ? !done
-                                        ? '#5165c9'
-                                        : theme.light.success
-                                    : 'rgba(0, 130, 151, 0.1)'
+                                        ? '#75a4e2'
+                                        : theme.dark.success
+                                    : 'rgba(65, 188, 207, 0.3)'
                             }
                         />
                     );

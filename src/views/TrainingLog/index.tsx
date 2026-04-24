@@ -16,7 +16,7 @@ import { CollapsedTrainingLog, CollapsedTrainingPoint } from './CollapsedTrainin
 import { createMetric } from '../../utilities/metric';
 import { trainerAtom } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 
 interface AdvancedStats {
     samplesPerSecond: number;
@@ -136,6 +136,7 @@ export function Component() {
                 <Help
                     message={t('tools.training.validationHelp')}
                     inplace
+                    dark
                 >
                     {t('tools.training.validation')}
                 </Help>
@@ -147,6 +148,7 @@ export function Component() {
                     progress={metricPercentage}
                     color={qualityToColor(metricPercentage)}
                     animated={shouldAnimate}
+                    dark
                 >
                     {metric === 'gradientNorm' && (
                         <>
@@ -196,6 +198,7 @@ export function Component() {
                             message={t('tools.training.accuracyHelp')}
                             inplace
                             placement="left"
+                            dark
                         >
                             <FormControlLabel
                                 value="accuracy"
@@ -214,6 +217,7 @@ export function Component() {
                             message={t('tools.training.lossHelp')}
                             inplace
                             placement="left"
+                            dark
                         >
                             <FormControlLabel
                                 value="loss"
@@ -237,14 +241,14 @@ export function Component() {
                                       dataKey: 'validationLoss',
                                       showMark: false,
                                       label: t('training.valLoss'),
-                                      color: theme.light.chartColours[4],
+                                      color: theme.dark.chartColours[4],
                                       id: 'valLoss',
                                   },
                                   {
                                       dataKey: 'trainingLoss',
                                       showMark: false,
                                       label: t('training.loss'),
-                                      color: theme.light.chartColours[1],
+                                      color: theme.dark.chartColours[1],
                                       id: 'loss',
                                   },
                               ]
@@ -254,14 +258,14 @@ export function Component() {
                                         dataKey: 'validationPerplexity',
                                         showMark: false,
                                         label: t('training.valPerplexity'),
-                                        color: theme.light.chartColours[4],
+                                        color: theme.dark.chartColours[4],
                                         id: 'valPerplexity',
                                     },
                                     {
                                         dataKey: 'trainingPerplexity',
                                         showMark: false,
                                         label: t('training.perplexity'),
-                                        color: theme.light.chartColours[1],
+                                        color: theme.dark.chartColours[1],
                                         id: 'perplexity',
                                     },
                                 ]
@@ -271,7 +275,7 @@ export function Component() {
                                           dataKey: 'gradientNorm',
                                           showMark: false,
                                           label: t('training.gradientNorm'),
-                                          color: theme.light.chartColours[1],
+                                          color: theme.dark.chartColours[1],
                                           id: 'gradientNorm',
                                       },
                                   ]
@@ -281,14 +285,14 @@ export function Component() {
                                             dataKey: 'validationAccuracy',
                                             showMark: false,
                                             label: t('training.valAccuracy'),
-                                            color: theme.light.chartColours[4],
+                                            color: theme.dark.chartColours[4],
                                             id: 'valAccuracy',
                                         },
                                         {
                                             dataKey: 'trainingAccuracy',
                                             showMark: false,
                                             label: t('training.accuracy'),
-                                            color: theme.light.chartColours[1],
+                                            color: theme.dark.chartColours[1],
                                             id: 'accuracy',
                                         },
                                     ]

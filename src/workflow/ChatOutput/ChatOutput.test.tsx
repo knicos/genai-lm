@@ -3,15 +3,18 @@ import { render, screen } from '@testing-library/react';
 import type { Generator } from '@genai-fi/nanogpt';
 import { createStore } from 'jotai';
 import TestWrapper from '../../utilities/TestWrapper';
-import ChatOutput from './ChatOutput';
-import { generatorAtom } from '../../state/generator';
+import RawGeneration from './RawGeneration';
+import { rawGeneratorAtom } from '../../state/generator';
 import { BrowserRouter } from 'react-router-dom';
+import { WorkflowLayout } from '@genai-fi/base';
 
-describe('ChatOutput', () => {
+describe('RawGeneration', () => {
     it('renders without a model', async ({ expect }) => {
         render(
             <BrowserRouter>
-                <ChatOutput />
+                <WorkflowLayout connections={[]}>
+                    <RawGeneration />
+                </WorkflowLayout>
             </BrowserRouter>
         );
         expect(screen.getByTestId('chat-output')).toBeInTheDocument();
@@ -27,12 +30,14 @@ describe('ChatOutput', () => {
 
         const store = createStore();
 
-        store.set(generatorAtom, mockGenerator);
+        store.set(rawGeneratorAtom, mockGenerator);
 
         render(
             <BrowserRouter>
                 <TestWrapper initializeState={store}>
-                    <ChatOutput />
+                    <WorkflowLayout connections={[]}>
+                        <RawGeneration />
+                    </WorkflowLayout>
                 </TestWrapper>
             </BrowserRouter>
         );

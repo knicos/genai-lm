@@ -11,7 +11,6 @@ import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { trainerAtom, trainerSettings } from '../../state/trainer';
 import NumberBox from '../../components/NumberBox/NumberBox';
-import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../hooks/wakeLock';
@@ -23,7 +22,8 @@ import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { dataTokens } from '../../state/data';
-import Help from '../../components/Help/Help';
+import HelpBox from '../../components/Help/HelpBox';
+import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -221,12 +221,15 @@ export default function TextTraining() {
     };
 
     return (
-        <Help
+        <HelpBox
             message={t('training.help')}
             widget="trainer"
             active={!!model || (!!dataset && dataset.length > 0)}
         >
-            <Box style={{ minWidth: '260px' }}>
+            <BoxStandalone
+                style={{ width: '300px', minHeight: '431px' }}
+                active={!!model || (!!dataset && dataset.length > 0)}
+            >
                 <div className={style.container}>
                     <BoxTitle
                         title={t('training.title')}
@@ -297,7 +300,7 @@ export default function TextTraining() {
                         />
                     )}
                 </div>
-            </Box>
-        </Help>
+            </BoxStandalone>
+        </HelpBox>
     );
 }

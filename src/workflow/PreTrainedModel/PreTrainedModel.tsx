@@ -2,7 +2,6 @@ import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
-import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -14,14 +13,14 @@ import { modelAtom } from '../../state/model';
 import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
+import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 
 interface Props {
-    widget?: string;
     hideMenu?: boolean;
 }
 
-export default function PreTrainedModel({ widget, hideMenu }: Props) {
+export default function PreTrainedModel({ hideMenu }: Props) {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
     const [showSearch, setShowSearch] = useState(false);
@@ -109,14 +108,13 @@ export default function PreTrainedModel({ widget, hideMenu }: Props) {
     return (
         <Help
             message={t('model.help')}
-            active={done}
-            widget={widget ?? 'pretrained'}
             style={{ borderRadius: '20px' }}
             placement="top"
         >
-            <Box
+            <BoxStandalone
                 disabled={busy}
                 className={style.modelThread}
+                active={done}
             >
                 <input
                     type="file"
@@ -159,7 +157,7 @@ export default function PreTrainedModel({ widget, hideMenu }: Props) {
                         />
                     )}
                 </div>
-            </Box>
+            </BoxStandalone>
         </Help>
     );
 }

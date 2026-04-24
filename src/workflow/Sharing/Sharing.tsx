@@ -21,7 +21,7 @@ export default function Sharing() {
         <Box
             widget="sharing"
             active={ready}
-            style={{ minWidth: '290px' }}
+            style={{ minWidth: '290px', minHeight: '361px' }}
         >
             <div className={style.container}>
                 <BoxTitle

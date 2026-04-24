@@ -8,12 +8,17 @@ import { createStore } from 'jotai';
 import { modelAtom } from '../../state/model';
 import TestWrapper from '../../utilities/TestWrapper';
 import { dataTokens } from '../../state/data';
+import { WorkflowLayout } from '@genai-fi/base';
 
 vi.mock('react-router-dom');
 
 describe('TextTraining', () => {
     it('renders without a model or data', async ({ expect }) => {
-        render(<TextTraining />);
+        render(
+            <WorkflowLayout connections={[]}>
+                <TextTraining />
+            </WorkflowLayout>
+        );
         expect(screen.getByText('training.title')).toBeInTheDocument();
         expect(screen.getByText('training.start')).toBeEnabled();
     });
@@ -52,7 +57,9 @@ describe('TextTraining', () => {
 
         render(
             <TestWrapper initializeState={store}>
-                <TextTraining />
+                <WorkflowLayout connections={[]}>
+                    <TextTraining />
+                </WorkflowLayout>
             </TestWrapper>
         );
         expect(await screen.findByText('training.title')).toBeInTheDocument();
@@ -111,7 +118,9 @@ describe('TextTraining', () => {
 
         render(
             <TestWrapper initializeState={store}>
-                <TextTraining />
+                <WorkflowLayout connections={[]}>
+                    <TextTraining />
+                </WorkflowLayout>
             </TestWrapper>
         );
 

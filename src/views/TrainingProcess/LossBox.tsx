@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import { useEffect, useRef, useState } from 'react';
 import { createMetric } from '../../utilities/metric';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 
 const CURVE = 10;
 const ARROW_SIZE = 10;
@@ -64,14 +64,14 @@ export default function LossBox({ loss, model, updating }: Props) {
                         line.x2
                     } ${line.y2}`}
                     fill="none"
-                    stroke={updating ? '#5b68c2' : '#e8f0fe'}
+                    stroke={updating ? '#75a4e2' : '#e8f0fe'}
                     strokeWidth="5"
                 />
                 <path
                     d={`M ${line.x1} ${line.y1} L ${line.x1 + ARROW_SIZE} ${line.y1 + ARROW_SIZE * 2} L ${
                         line.x1 - ARROW_SIZE
                     } ${line.y1 + ARROW_SIZE * 2} L ${line.x1} ${line.y1} Z`}
-                    fill={updating ? '#5b68c2' : '#e8f0fe'}
+                    fill={updating ? '#75a4e2' : '#e8f0fe'}
                     stroke="none"
                 />
             </svg>
@@ -79,6 +79,7 @@ export default function LossBox({ loss, model, updating }: Props) {
                 message={t('training.lossBoxHelp')}
                 inplace
                 placement="left"
+                dark
             >
                 <h3>{t('tools.loss')}</h3>
             </Help>
@@ -87,12 +88,13 @@ export default function LossBox({ loss, model, updating }: Props) {
                 progress={metric ? 1 - metric.percentage : 0}
                 color={metric ? lossToColor(1 - metric.percentage) : 'gray'}
                 animated
+                dark
             >
                 {metric ? (
                     metric.value.toFixed(2)
                 ) : (
                     <HourglassTopIcon
-                        htmlColor="#5165c960"
+                        htmlColor="#75a4e2"
                         fontSize="large"
                     />
                 )}

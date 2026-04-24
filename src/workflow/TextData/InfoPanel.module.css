@@ -16,3 +16,9 @@
     color: #444;
     text-align: center;
 }
+
+.innerContainer.dark {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed white;
+}

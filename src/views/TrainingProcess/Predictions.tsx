@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import filterTokens from './filterTokens';
 import { useTranslation } from 'react-i18next';
+import { theme } from '../../theme';
 
 const CURVE = 10;
 
@@ -134,8 +135,8 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                 line.id === -1 || !finished
                                     ? '#e8f0fe'
                                     : paddedPredictions[line.id].token === target && finished
-                                      ? '#e2ecd9'
-                                      : '#f3ddd5'
+                                      ? theme.dark.success
+                                      : theme.dark.error
                             }
                             strokeWidth="5"
                         />

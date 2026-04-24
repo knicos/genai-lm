@@ -33,4 +33,5 @@ export const generatorSettings = atomWithStorage<GeneratorSettings>(
     storage
 );
 
-export const generatorAtom = atom<Generator | null>(null);
+export const rawGeneratorAtom = atom<Generator | null>(null);
+export const conversationGeneratorAtom = atom<Generator | null>(null);

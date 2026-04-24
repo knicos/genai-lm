@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react-swc';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    resolve: {
+        preserveSymlinks: true,
+    },
     test: {
         environment: 'jsdom',
         setupFiles: ['./src/setupTests.ts', '@vitest/web-worker'],

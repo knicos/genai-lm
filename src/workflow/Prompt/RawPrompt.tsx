@@ -1,31 +1,36 @@
 import { useAtomValue } from 'jotai';
 import style from './style.module.css';
-import { generatorAtom, generatorSettings } from '../../state/generator';
-import { useRef, useState } from 'react';
+import { rawGeneratorAtom, generatorSettings } from '../../state/generator';
+import { useEffect, useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { modelAtom } from '../../state/model';
-import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import StopIcon from '@mui/icons-material/Stop';
-import { Button } from '@genai-fi/base';
+import { Button, useWorkflowContext } from '@genai-fi/base';
 
-interface Props {
-    showPromptInput?: boolean;
-}
-
-export default function Prompt({ showPromptInput }: Props) {
+export default function RawPrompt() {
     const { t } = useTranslation();
-    const generator = useAtomValue(generatorAtom);
+    const generator = useAtomValue(rawGeneratorAtom);
     const [generate, setGenerate] = useState(false);
     const [, setHasGenerated] = useState(false);
-    const { temperature, topP, maxLength, showAttention, showProbabilities, showPrompt } =
-        useAtomValue(generatorSettings);
+    const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
     const busyRef = useRef<boolean>(false);
     const model = useAtomValue(modelAtom);
     const status = useModelStatus(model ?? undefined);
+    const workflowContext = useWorkflowContext();
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (ref.current) {
+            const remove = workflowContext.registerElement('prompt', ref.current);
+            return () => {
+                remove?.();
+            };
+        }
+    }, [workflowContext]);
 
     const disable = status === 'training';
 
@@ -60,7 +65,7 @@ export default function Prompt({ showPromptInput }: Props) {
             includeProbabilities: showProbabilities,
             topP: topP > 0 ? topP : undefined,
             noCache: false,
-            nonConversational: !showPromptInput && !showPrompt,
+            nonConversational: true,
         };
 
         const filteredText = text.filter((part) => part.content.trim().length > 0);
@@ -88,29 +93,20 @@ export default function Prompt({ showPromptInput }: Props) {
         <div
             className={style.container}
             data-widget="prompt"
-            data-testid="textgenerator"
+            data-testid="rawtextgenerator"
+            ref={ref}
         >
-            {showPromptInput && (
-                <ChatPromptInput
-                    onSend={(prompt) => doGenerate(maxLength, prompt)}
-                    disabled={disable}
-                    generating={generate}
-                    onStop={() => generator?.stop()}
-                />
-            )}
-            {!showPromptInput && (
-                <Button
-                    className={style.generateButton}
-                    onClick={() => doGenerate(maxLength)}
-                    startIcon={generate ? <StopIcon /> : <ArrowUpwardIcon />}
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    disabled={disable}
-                >
-                    {generate ? t('generator.stop') : t('generator.generate')}
-                </Button>
-            )}
+            <Button
+                className={style.generateButton}
+                onClick={() => doGenerate(maxLength)}
+                startIcon={generate ? <StopIcon /> : <ArrowUpwardIcon />}
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={disable}
+            >
+                {generate ? t('generator.stop') : t('generator.generate')}
+            </Button>
             {messages && (
                 <BoxNotice
                     notice={messages}

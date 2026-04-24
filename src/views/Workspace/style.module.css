@@ -22,12 +22,16 @@
     flex-shrink: 1;
     flex-grow: 1;
     width: 100%;
-    background: #dee4e8;
-    transition: background 0.3s ease;
+    background-color: #dee4e8;
+    transition: background-color 0.3s ease;
+    position: relative;
 }
 
 .workspaceContainer.homeWorkspace {
     background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .workspaceContainer > div {
@@ -38,6 +42,12 @@
     padding: 0;
     height: 100%;
     background: none;
+}
+
+.modelOverlay {
+    position: fixed;
+    left: 3rem;
+    bottom: 3rem;
 }
 
 .verticalBox {
@@ -214,4 +224,18 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+}
+
+.frame {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    box-sizing: border-box;
+    min-width: 80vw;
+    display: grid;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    grid-template-columns: repeat(2, max-content);
+    min-height: 0;
 }

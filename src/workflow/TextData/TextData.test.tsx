@@ -10,12 +10,15 @@ import { modelAtom } from '../../state/model';
 import TestWrapper from '../../utilities/TestWrapper';
 import JotaiObserver from '../../utilities/Observer';
 import { datasetAtom } from '../../state/data';
+import { WorkflowLayout } from '@genai-fi/base';
 
 describe('TextData', () => {
     it('renders without a model', async ({ expect }) => {
         render(
             <DndProvider backend={HTML5Backend}>
-                <TextData />
+                <WorkflowLayout connections={[]}>
+                    <TextData />
+                </WorkflowLayout>
             </DndProvider>
         );
         expect(screen.getByText('data.add')).toBeInTheDocument();
@@ -49,7 +52,9 @@ describe('TextData', () => {
         render(
             <TestWrapper initializeState={store}>
                 <DndProvider backend={HTML5Backend}>
-                    <TextData />
+                    <WorkflowLayout connections={[]}>
+                        <TextData />
+                    </WorkflowLayout>
                 </DndProvider>
             </TestWrapper>
         );
@@ -79,7 +84,9 @@ describe('TextData', () => {
                     node={datasetAtom}
                     onChange={dataCB}
                 />
-                <TextData />
+                <WorkflowLayout connections={[]}>
+                    <TextData />
+                </WorkflowLayout>
             </DndProvider>
         );
 
