@@ -8,34 +8,14 @@
     background-color: #e8f0fe;
     flex-grow: 1;
     color: black;
-}
-
-.selected {
-    background: rgba(0, 130, 151, 0.2);
-    color: black;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    padding: 0rem 0.2rem;
-    border-bottom: 2px solid rgba(0, 130, 151, 0.6);
-    box-sizing: border-box;
-    position: relative;
-}
-
-.selected::before {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid secondary;
-    top: -10px;
-    left: calc(50% - 8px);
+    font-size: 1.1rem;
 }
 
 .postText {
-    filter: blur(2px);
+    display: inline-flex;
+    filter: blur(3px);
     opacity: 0.4;
+    user-select: none;
 }
 
 /*.token {
@@ -50,19 +30,19 @@
 }*/
 
 .token {
-    background: rgba(0, 130, 151, 0.2);
+    /*background: rgba(0, 130, 151, 0.2);*/
     color: black;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     padding: 0;
     border-bottom: 2px solid rgba(0, 130, 151, 0.4);
     box-sizing: border-box;
-    font-size: 1.1rem;
+    /*font-size: 1.1rem;*/
     user-select: none;
-    display: inline-flex;
+    /*display: inline;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center;*/
 }
 
 .token span {
@@ -71,4 +51,67 @@
 
 .tokenNumber {
     font-size: 0.5rem;
+}
+
+.selected {
+    background: rgba(0, 130, 151, 0.2);
+    color: black;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 0;
+    border-bottom: 2px solid rgba(0, 130, 151, 0.6);
+    box-sizing: border-box;
+    position: relative;
+    user-select: none;
+    text-align: center;
+}
+.selected.correct {
+    background: rgba(0, 200, 100, 0.2);
+    border-bottom-color: rgba(0, 200, 100, 0.6);
+}
+.selected.incorrect {
+    background: rgba(200, 50, 50, 0.2);
+    border-bottom-color: rgba(200, 50, 50, 0.6);
+}
+
+.selected::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid secondary;
+    top: -10px;
+    left: calc(50% - 8px);
+}
+
+/* correct: replace arrow with tick */
+.selected.correct::before {
+    content: '✓';
+    border: none;
+    width: auto;
+    height: auto;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(0, 200, 100, 0.9);
+    font-size: 0.8rem;
+    line-height: 1;
+    font-weight: 700;
+}
+
+/* incorrect: replace arrow with cross */
+.selected.incorrect::before {
+    content: '✕';
+    border: none;
+    width: auto;
+    height: auto;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(200, 50, 50, 0.9);
+    font-size: 0.8rem;
+    line-height: 1;
+    font-weight: 700;
 }

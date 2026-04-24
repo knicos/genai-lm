@@ -4,6 +4,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import filterTokens from './filterTokens';
 import { useTranslation } from 'react-i18next';
 import { theme } from '../../theme';
@@ -151,7 +152,14 @@ export default function Predictions({ predictions, vocab, target, size, finished
                 >
                     <tbody>
                         {paddedPredictions.map((p, index) => (
-                            <tr key={index}>
+                            <tr
+                                key={index}
+                                style={
+                                    index === 0 && finished
+                                        ? { backgroundColor: 'rgba(117, 164, 226, 0.2)' }
+                                        : undefined
+                                }
+                            >
                                 <td className={p.token === -1 ? style.noToken : style.token}>
                                     <span>{`${p.text}`}</span>
                                 </td>
@@ -185,6 +193,12 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                                 fontSize="small"
                                             />
                                         ))}
+                                    {p.token < 0 && (
+                                        <HourglassEmptyIcon
+                                            htmlColor="#5165c9"
+                                            fontSize="small"
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ))}

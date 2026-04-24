@@ -59,12 +59,12 @@ export function Component() {
         if (!model || !loaded) return [];
         const s: AnimationStep[] = [];
         s.push({ name: 'next', layer: -1, index: 0 });
-        // s.push({ name: 'wait', layer: -1, index: 1 });
+        s.push({ name: 'tokenise', layer: -1, index: 1 });
         for (let i = 0; i < model.config.nLayer; i++) {
-            s.push({ name: 'predict', layer: i, index: i + 1 });
+            s.push({ name: 'predict', layer: i, index: i + 2 });
         }
-        s.push({ name: 'updating', layer: model.config.nLayer - 1, index: model.config.nLayer + 1 });
-        s.push({ name: 'done', layer: model.config.nLayer - 1, index: model.config.nLayer + 2 });
+        s.push({ name: 'updating', layer: model.config.nLayer - 1, index: model.config.nLayer + 2 });
+        s.push({ name: 'done', layer: model.config.nLayer - 1, index: model.config.nLayer + 3 });
         return s;
     }, [model, loaded]);
 
@@ -177,6 +177,8 @@ export function Component() {
                         tokeniser={model?.tokeniser}
                         selectedTokenIndex={128}
                         attention={currentAttention}
+                        showTokens={step?.name !== 'next' && !finished}
+                        showAnswer={finished}
                     />
                 )}
                 <InfoPanel

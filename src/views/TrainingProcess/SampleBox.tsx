@@ -10,9 +10,20 @@ interface Props {
     tokeniser: ITokeniser;
     selectedTokenIndex: number;
     attention: number[] | null;
+    showTokens?: boolean;
+    showAnswer?: boolean;
+    isCorrect?: boolean;
 }
 
-export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex, attention }: Props) {
+export default function SampleBox({
+    sampleTokens,
+    tokeniser,
+    selectedTokenIndex,
+    attention,
+    showTokens,
+    showAnswer,
+    isCorrect,
+}: Props) {
     const { t } = useTranslation();
     const [preText, setPreText] = useState<string>('');
     const [postText, setPostText] = useState<string>('');
@@ -45,44 +56,25 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
         if (tokenBoxRef.current) {
             tokenBoxRef.current.scroll(tokenBoxRef.current.scrollWidth, 0);
         }
-    }, [preText, postText, tokenText]);
+    }, [preText, postText, tokenText, showTokens]);
 
     const vocab = tokeniser.getVocab();
 
     return (
-        <>
-            <Help
-                message={t('training.sampleBoxHelp')}
-                inplace
-                placement="left"
-                dark
+        <Help
+            message={t('training.attentionHelp')}
+            inplace
+            placement="left"
+            dark
+        >
+            <div
+                className={style.sampleBox}
+                style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
+                ref={tokenBoxRef}
             >
-                <div
-                    className={style.sampleBox}
-                    style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
-                >
-                    <span>{preText}</span>
-                    <span
-                        ref={selectedRef}
-                        className={style.selected}
-                    >
-                        {tokenText}
-                    </span>
-                    <span className={style.postText}>{postText}</span>
-                </div>
-            </Help>
-            <Help
-                message={t('training.attentionHelp')}
-                inplace
-                placement="left"
-                dark
-            >
-                <div
-                    className={style.sampleBox}
-                    ref={tokenBoxRef}
-                >
-                    {sampleTokens.slice(0, selectedTokenIndex).map((token, ix) => (
-                        <div
+                {showTokens &&
+                    sampleTokens.slice(0, selectedTokenIndex).map((token, ix) => (
+                        <span
                             key={ix}
                             className={style.token}
                             style={{
@@ -90,12 +82,19 @@ export default function SampleBox({ sampleTokens, tokeniser, selectedTokenIndex,
                                 opacity: attention ? 0.2 + (attention[ix] || 0) * 0.8 : 1,
                             }}
                         >
-                            <span>{vocab[token] || ''}</span>
-                            <span className={style.tokenNumber}>{token}</span>
-                        </div>
+                            {vocab[token] || ''}
+                        </span>
                     ))}
-                </div>
-            </Help>
-        </>
+                {!showTokens && <span>{preText}</span>}
+                <span
+                    ref={selectedRef}
+                    className={`${style.selected} ${isCorrect ? style.correct : showAnswer ? style.incorrect : ''}`}
+                    style={!showAnswer ? { padding: '0 1rem' } : undefined}
+                >
+                    {showAnswer ? tokenText : ' '}
+                </span>
+                <span className={showAnswer ? style.text : style.postText}>{postText}</span>
+            </div>
+        </Help>
     );
 }

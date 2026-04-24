@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import style from './controls.module.css';
 import { FormControl, Slider, Tooltip } from '@mui/material';
 
-export type AnimationStepName = 'none' | 'next' | 'wait' | 'predict' | 'updating' | 'done';
+export type AnimationStepName = 'none' | 'next' | 'tokenise' | 'predict' | 'updating' | 'done';
 
 export interface AnimationStep {
     name: AnimationStepName;
