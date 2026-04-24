@@ -17,7 +17,6 @@ import useWakeLock from '../../hooks/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
-import TrainingMenu from './TrainingMenu';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
@@ -227,12 +226,13 @@ export default function TextTraining() {
             active={!!model || (!!dataset && dataset.length > 0)}
         >
             <BoxStandalone
-                style={{ width: '300px', minHeight: '431px' }}
+                style={{ width: '300px', minHeight: '360px' }}
                 active={!!model || (!!dataset && dataset.length > 0)}
             >
                 <div className={style.container}>
                     <BoxTitle
                         title={t('training.title')}
+                        onSettings={() => navigate('training-settings')}
                         status={
                             !done
                                 ? 'busy'
@@ -242,12 +242,6 @@ export default function TextTraining() {
                                     ? 'done'
                                     : 'disabled'
                         }
-                    />
-                    <TrainingMenu
-                        training={training}
-                        onShowSettings={() => navigate('training-settings')}
-                        onMonitor={() => navigate('training-log')}
-                        onVisualize={() => navigate('training-process')}
                     />
                     <div className={style.clockContainer}>
                         <Clock

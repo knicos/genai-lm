@@ -4,7 +4,7 @@ import { datasetAtom, dataTokens, dataTokensReady } from '../../state/data';
 import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button, VerticalButton } from '@genai-fi/base';
+import { Button } from '@genai-fi/base';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import { useState } from 'react';
 import { tasks, tokensFromTasks } from '@genai-fi/nanogpt';
@@ -12,9 +12,7 @@ import DataProgress from '../../components/DataProgress/DataProgress';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import ProgressBox from '../TextData/ProgressBox';
 import useModelStatus from '../../hooks/useModelStatus';
-import MarginIcon from '@mui/icons-material/Margin';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { useNavigate } from 'react-router-dom';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
@@ -29,7 +27,6 @@ export default function TokeniseData() {
     const [_tokenCount, setTokenCount] = useState(0);
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
-    const navigate = useNavigate();
 
     const tokenCount = _tokenCount === 0 ? tokens?.length || 0 : _tokenCount;
 
@@ -98,12 +95,6 @@ export default function TokeniseData() {
                         >
                             {t('tokeniseData.start')}
                         </Button>
-                        <VerticalButton
-                            startIcon={<MarginIcon />}
-                            onClick={() => navigate('tokenised-data')}
-                        >
-                            {t('tokeniseData.show')}
-                        </VerticalButton>
                     </div>
                     {message && (
                         <BoxNotice

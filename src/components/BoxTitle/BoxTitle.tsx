@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { CSSProperties, ReactNode, useCallback, useEffect, useRef } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import MTextField from '@mui/material/TextField';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const NARROW_SCREEN = 600;
 
@@ -25,9 +26,20 @@ interface Props {
     dark?: boolean;
     startIcon?: ReactNode;
     setTitle?: (title: string) => void;
+    onSettings?: () => void;
 }
 
-export default function BoxTitle({ title, button, status, style, dark, setTitle, placeholder, startIcon }: Props) {
+export default function BoxTitle({
+    title,
+    button,
+    status,
+    style,
+    dark,
+    setTitle,
+    placeholder,
+    startIcon,
+    onSettings,
+}: Props) {
     const { t } = useTranslation();
     const { width } = useWindowSize();
     const editRef = useRef<HTMLDivElement>(null);
@@ -102,7 +114,18 @@ export default function BoxTitle({ title, button, status, style, dark, setTitle,
                         </IconButton>
                     )}
                 </h2>
+                <div className={styleModule.spacer} />
                 {!isNarrow && button}
+                {onSettings && (
+                    <IconButton
+                        onClick={onSettings}
+                        aria-label={t('widget.aria.settings')}
+                        size="small"
+                        color="primary"
+                    >
+                        <TuneIcon fontSize="medium" />
+                    </IconButton>
+                )}
                 {status !== undefined && (
                     <StatusBox
                         status={status}

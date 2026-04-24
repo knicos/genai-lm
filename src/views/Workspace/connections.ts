@@ -34,12 +34,26 @@ export const CONNECTIONS: IConnection[] = [
         startOffset: 0.2,
     },
     {
+        start: 'tokeniser',
+        end: 'vocabulary',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0.2,
+    },
+    {
         start: 'tokeniseData',
         end: 'trainer',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.2,
+        startOffset: -0.4,
         endOffset: -0.2,
+    },
+    {
+        start: 'tokeniseData',
+        end: 'tokenised-data',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0.2,
     },
     {
         start: 'trainer',
@@ -47,6 +61,20 @@ export const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
         startOffset: 0.5,
+    },
+    {
+        start: 'trainer',
+        end: 'training-monitor',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0,
+    },
+    {
+        start: 'trainer',
+        end: 'training-visualize',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0.0,
     },
     {
         start: 'chatOutput',
@@ -73,10 +101,17 @@ export const CONNECTIONS: IConnection[] = [
         endOffset: -0.4,
     },
     {
+        start: 'finetuner',
+        end: 'tuning-monitor',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0,
+    },
+    {
         start: 'sharing',
         end: 'promptWithInput',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.4,
+        startOffset: -0.4,
     },
 ];

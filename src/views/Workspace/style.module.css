@@ -160,6 +160,23 @@
     width: 100%;
 }
 
+.buttongroup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.rowGroup {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    width: 100%;
+}
+
 .promptGroup {
     display: flex;
     flex-direction: column;

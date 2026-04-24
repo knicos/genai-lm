@@ -4,14 +4,12 @@ import { datasetAtom, dataTokens, tokeniserInvalid } from '../../state/data';
 import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button, VerticalButton } from '@genai-fi/base';
+import { Button } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import { useEffect, useState } from 'react';
-import AbcIcon from '@mui/icons-material/Abc';
 import useModelPhase from '../../hooks/useModelPhase';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { useNavigate } from 'react-router-dom';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 
@@ -26,7 +24,6 @@ export default function Tokeniser() {
     const [invalid, setInvalid] = useAtom(tokeniserInvalid);
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
-    const navigate = useNavigate();
     const [count, setCount] = useState(0);
 
     const isTrained = model?.loaded && model.tokeniser.trained;
@@ -127,12 +124,6 @@ export default function Tokeniser() {
                         >
                             {tokenising ? t('tokeniser.stop') : t('tokeniser.start')}
                         </Button>
-                        <VerticalButton
-                            startIcon={<AbcIcon />}
-                            onClick={() => navigate('vocabulary')}
-                        >
-                            {t('tokeniser.vocabulary')}
-                        </VerticalButton>
                     </div>
                     {message && (
                         <BoxNotice

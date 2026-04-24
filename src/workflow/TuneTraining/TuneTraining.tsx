@@ -17,7 +17,6 @@ import useWakeLock from '../../hooks/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
-import TrainingMenu from './TrainingMenu';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
@@ -202,20 +201,16 @@ export default function TuneTraining() {
         <Box
             widget="finetuner"
             active={!!model || (!!conversations && conversations.length > 0)}
-            style={{ minWidth: '260px', minHeight: '287px' }}
+            style={{ minWidth: '260px', minHeight: '215px' }}
         >
             <WarningDialog />
             <div className={style.container}>
                 <BoxTitle
                     title={t('finetune.title')}
+                    onSettings={() => navigate('tuning-settings')}
                     status={
                         !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
                     }
-                />
-                <TrainingMenu
-                    training={training}
-                    onShowSettings={() => navigate('tuning-settings')}
-                    onMonitor={() => navigate('training-log')}
                 />
                 <div className={style.clockContainer}>
                     {model && trainer && conversations && (

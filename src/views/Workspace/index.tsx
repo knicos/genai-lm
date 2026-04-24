@@ -34,8 +34,15 @@ import RawGeneration from '../../workflow/ChatOutput/RawGeneration';
 import ChatConversation from '../../workflow/ChatOutput/ChatConversation';
 import RawPrompt from '../../workflow/Prompt/RawPrompt';
 import ChatPrompt from '../../workflow/Prompt/ChatPrompt';
+import { BoxButton } from '../../components/BoxButton/BoxButton';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import { useTranslation } from 'react-i18next';
+import AbcIcon from '@mui/icons-material/Abc';
+import MarginIcon from '@mui/icons-material/Margin';
 
 export function Component() {
+    const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
@@ -161,8 +168,25 @@ export function Component() {
                                     data-widget="container"
                                     className={style.subgroup}
                                 >
-                                    <Tokeniser />
-                                    <TokeniseData />
+                                    <div className={style.rowGroup}>
+                                        <Tokeniser />
+                                        <BoxButton
+                                            icon={<AbcIcon />}
+                                            label={t('tokeniser.vocabulary')}
+                                            widget="vocabulary"
+                                            onClick={() => navigate('vocabulary')}
+                                        />
+                                    </div>
+                                    <div className={style.rowGroup}>
+                                        <TokeniseData />
+                                        <BoxButton
+                                            icon={<MarginIcon />}
+                                            label={t('tokeniseData.show')}
+                                            widget="tokenised-data"
+                                            onClick={() => navigate('tokenised-data')}
+                                            style={{ marginTop: '70px' }}
+                                        />
+                                    </div>
                                 </div>
                             </Frame>
                             <Frame
@@ -171,6 +195,20 @@ export function Component() {
                                 scroll={scrollFrame === 'pretrain'}
                             >
                                 <TextTrainer />
+                                <div className={style.buttongroup}>
+                                    <BoxButton
+                                        icon={<ShowChartIcon />}
+                                        label={t('training.monitor')}
+                                        widget="training-monitor"
+                                        onClick={() => navigate('training-log')}
+                                    />
+                                    <BoxButton
+                                        icon={<AccountTreeIcon />}
+                                        label={t('training.visualize')}
+                                        widget="training-visualize"
+                                        onClick={() => navigate('training-process')}
+                                    />
+                                </div>
                                 <section
                                     data-widget="container"
                                     className={style.chatGroup}
@@ -186,6 +224,15 @@ export function Component() {
                             >
                                 <InstructData />
                                 <TuneTraining />
+                                <div className={style.buttongroup}>
+                                    <BoxButton
+                                        icon={<ShowChartIcon />}
+                                        label={t('training.monitor')}
+                                        widget="tuning-monitor"
+                                        onClick={() => navigate('training-log')}
+                                        style={{ marginBottom: '70px' }}
+                                    />
+                                </div>
                             </Frame>
                             <Frame
                                 name="deployment"
