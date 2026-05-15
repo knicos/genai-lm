@@ -1,11 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { datasetAtom } from '../../state/data';
-import { modelAtom } from '../../state/model';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import extractData from './extractData';
-import useModelLoaded from '../../hooks/useModelLoaded';
-import { Conversation, topP } from '@genai-fi/nanogpt';
+import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
 import style from './style.module.css';
@@ -13,64 +11,25 @@ import LossBox from './LossBox';
 import ModelBox from './ModelBox';
 import ModelLines from './ModelLines';
 import InfoPanel from '../../workflow/TextData/InfoPanel';
-import ModelControls, { AnimationStep, AnimationStepName } from './ModelControls';
+import { AnimationStep, AnimationStepName } from './ModelControls';
+import { reduceAttention } from './attention';
 
-function reduceAttention(attentionData: number[][][][]): number[][] {
-    // layer, head, _, sequence
-    // Reduce to layer and sequence by taking the max over heads
-    const reduced: number[][] = [];
-    for (const layerData of attentionData) {
-        const seqLength = layerData[0][0].length;
-        const sums = new Array(seqLength).fill(0);
-        let overallMax = 0;
-
-        for (const head of layerData) {
-            for (let i = 0; i < seqLength; i++) {
-                const v = head[0][i];
-                overallMax = Math.max(overallMax, v);
-                sums[i] = Math.max(sums[i], v);
-            }
-        }
-
-        // Normalize
-        for (let i = 0; i < seqLength; i++) {
-            sums[i] = sums[i] / overallMax;
-        }
-        reduced.push(sums);
-    }
-    return reduced;
+interface Props {
+    model: TeachableLLM | null;
+    step: AnimationStep | null;
+    loaded: boolean;
 }
 
-export function Component() {
+export function Training({ model, step, loaded }: Props) {
     const { t } = useTranslation();
     const dataset = useAtomValue(datasetAtom);
-    const model = useAtomValue(modelAtom);
-    const loaded = useModelLoaded(model ?? undefined);
     const [tokens, setTokens] = useState<number[]>([]);
     const [predictions, setPredictions] = useState<number[][]>([]);
     const nextToken = useRef<number | null>(null);
     const [loss, setLoss] = useState<number | null>(null);
     const [attention, setAttention] = useState<number[][]>([]);
     const [warn] = useState<boolean>(false);
-    const [step, setStep] = useState<AnimationStep | null>(null);
     const stepRef = useRef<AnimationStepName>('none');
-
-    const steps = useMemo<AnimationStep[]>(() => {
-        if (!model || !loaded) return [];
-        const s: AnimationStep[] = [];
-        s.push({ name: 'next', layer: -1, index: 0 });
-        s.push({ name: 'tokenise', layer: -1, index: 1 });
-        for (let i = 0; i < model.config.nLayer; i++) {
-            s.push({ name: 'predict', layer: i, index: i + 2 });
-        }
-        s.push({ name: 'updating', layer: model.config.nLayer - 1, index: model.config.nLayer + 2 });
-        s.push({ name: 'done', layer: model.config.nLayer - 1, index: model.config.nLayer + 3 });
-        return s;
-    }, [model, loaded]);
-
-    useEffect(() => {
-        setStep(steps[0] ?? null);
-    }, [steps]);
 
     const loadNext = async () => {
         if (!model || !loaded) return [];
@@ -160,16 +119,10 @@ export function Component() {
     const finished = step?.name === 'done' || step?.name === 'updating';
     const hasLayer = step && step.layer >= 0;
     const currentAttention = hasLayer ? (attention[step.layer] ?? null) : null;
-    const ready = model && loaded && dataset.length > 0;
+    const ready = model && loaded;
 
     return (
-        <div className="sidePanel">
-            <h2>{t('tools.trainingProcess')}</h2>
-            <ModelControls
-                disabled={!ready}
-                steps={steps}
-                onStepChange={setStep}
-            />
+        <>
             <div className={style.block}>
                 {ready && (
                     <SampleBox
@@ -204,6 +157,9 @@ export function Component() {
                     target={nextToken.current ?? undefined}
                     size={6}
                     finished={finished}
+                    inferenceMode={false}
+                    committed={step?.name === 'done'}
+                    multinomialRand={null}
                 />
             )}
             {ready && (
@@ -213,6 +169,6 @@ export function Component() {
                     updating={step?.name === 'updating'}
                 />
             )}
-        </div>
+        </>
     );
 }

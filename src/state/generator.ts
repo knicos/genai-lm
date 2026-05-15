@@ -1,6 +1,6 @@
 import { atomWithStorage } from 'jotai/utils';
 import { storage } from './storage';
-import { Generator } from '@genai-fi/nanogpt';
+import { IGenerator } from '@genai-fi/nanogpt';
 import { atom } from 'jotai';
 
 export interface GeneratorSettings {
@@ -33,5 +33,5 @@ export const generatorSettings = atomWithStorage<GeneratorSettings>(
     storage
 );
 
-export const rawGeneratorAtom = atom<Generator | null>(null);
-export const conversationGeneratorAtom = atom<Generator | null>(null);
+export const rawGeneratorAtom = atom<IGenerator | null>(null);
+export const conversationGeneratorAtom = atom<IGenerator | null>(null);

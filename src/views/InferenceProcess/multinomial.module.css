@@ -1,0 +1,61 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 48px;
+    margin: 10px 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    box-sizing: border-box;
+    position: relative;
+    border-radius: 6px;
+    gap: 2px;
+    padding: 2px;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    margin: 0;
+    margin-left: 20px;
+}
+
+.bar {
+    background-color: #5165c9;
+    margin-left: 0;
+    border-radius: 6px;
+    width: 0;
+    transition:
+        width 0.3s ease-out,
+        margin-left 0.3s ease-out;
+}
+
+.bar.target {
+    background-color: #81c784;
+}
+
+.indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background-color: white;
+    /*transition: left 0.3s ease-out;*/
+}
+
+.indicator.animating {
+    filter: blur(2px);
+}
+
+.indicator::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+    top: -8px;
+    left: calc(50% - 8px);
+}

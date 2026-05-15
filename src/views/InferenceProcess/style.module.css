@@ -1,0 +1,64 @@
+@value primaryLight, secondaryLight from "@genai-fi/base/css/colours.module.css";
+
+.tokenOut {
+    background: rgba(0, 130, 151, 0.2);
+    color: black;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 0rem 1rem;
+    border-bottom: 4px solid primaryLight;
+    box-sizing: border-box;
+    font-size: 1.4rem;
+    min-width: 4rem;
+}
+
+.outputBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    gap: 1rem;
+    min-width: 100px;
+}
+
+.outputContent {
+    color: black;
+    background: white;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.outputContent.outputPlaceholder {
+    background: unset;
+}
+
+.block {
+    margin-top: 2rem;
+    position: relative;
+}
+
+.lossBlock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modelBlock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    align-self: flex-start;
+    gap: 1rem;
+    color: secondaryLight;
+}
+
+.modelLabel {
+    font-size: 0.9rem;
+    margin-left: 1rem;
+    color: white;
+}
+
+.modelLabel h3 {
+    margin: 0;
+}

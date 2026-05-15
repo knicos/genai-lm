@@ -119,8 +119,8 @@ export const routes = createRoutesFromElements(
                 lazy={() => import('./views/ModelDebug')}
             />
             <Route
-                path="training-process"
-                lazy={() => import('./views/TrainingProcess')}
+                path="inference-process"
+                lazy={() => import('./views/InferenceProcess')}
             />
             <Route
                 path="training-log"

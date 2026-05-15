@@ -15,6 +15,7 @@ import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
 import { conversationDataAtom } from '../../state/data';
 import { useWorkflowContext } from '@genai-fi/base';
+import { createGenerator } from '../../utilities/generatorFactory';
 
 export default function RawGeneration() {
     const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function RawGeneration() {
 
     useEffect(() => {
         if (ready && model) {
-            const generator = model.generator();
+            const generator = createGenerator(model);
             setGenerator(generator);
             setText([]);
 

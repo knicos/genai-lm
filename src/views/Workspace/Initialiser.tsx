@@ -8,8 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '@mui/material';
 import { Spinner } from '@genai-fi/base';
 import style from './style.module.css';
-
-export type flowType = 'model' | 'pretraindata' | 'pretrain' | 'finetune' | 'deployment' | 'home';
+import { FlowType } from '../../hooks/useChangePath';
 
 const PRETRAINED_URL = 'https://store.gen-ai.fi/llm/BPE_Stories.zip';
 
@@ -18,7 +17,7 @@ export default function Initialiser() {
     // const [searchParams] = useSearchParams();
     const [modelConfig, setModelConfig] = useAtom(modelConfigAtom);
     const [, setModel] = useAtom(modelAtom);
-    const { flow } = useParams() as { flow: flowType };
+    const { flow } = useParams() as { flow: FlowType };
     const [loading, setLoading] = useState(false);
 
     const pageLog = useRef(new Set<string>());

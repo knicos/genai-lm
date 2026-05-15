@@ -1,13 +1,12 @@
 import { PercentageBar } from '@genai-fi/base';
 import style from './predictions.module.css';
 import DoneIcon from '@mui/icons-material/Done';
-import CloseIcon from '@mui/icons-material/Close';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import filterTokens from './filterTokens';
 import { useTranslation } from 'react-i18next';
 import { theme } from '../../theme';
+import padPredictions from './paddedPredictions';
+import Multinomial from './Multinomial';
 
 const CURVE = 10;
 
@@ -26,59 +25,55 @@ interface Props {
     target?: number;
     size: number;
     finished: boolean;
+    committed: boolean;
+    inferenceMode?: boolean;
+    multinomialRand: number | null;
+    leftMargin?: number;
+    rightMargin?: number;
 }
 
-export default function Predictions({ predictions, vocab, target, size, finished }: Props) {
+export default function Predictions({
+    predictions,
+    vocab,
+    target,
+    size,
+    finished,
+    committed,
+    inferenceMode,
+    multinomialRand,
+    leftMargin = 40,
+    rightMargin = 40,
+}: Props) {
     const { t } = useTranslation();
     const [lines, setLines] = useState<ILine[]>([]);
     const ref = useRef<HTMLDivElement>(null);
     const tableRef = useRef<HTMLTableElement>(null);
     const observer = useRef<ResizeObserver>(null);
+    const [lineHeight, setLineHeight] = useState(30);
 
     const paddedPredictions = useMemo(() => {
-        if (predictions.length === 0) {
-            return Array(size).fill({ token: -1, text: '', probability: 0 });
-        }
-        const filtered = filterTokens(vocab, predictions);
-        filtered.sort((a, b) => b.probability - a.probability);
-        const sliced = filtered.slice(0, 6);
-        if (finished) {
-            const hasTarget = sliced.find((p) => p.token === target);
-            if (!hasTarget) {
-                sliced.pop();
-                sliced.push({
-                    token: target ?? 0,
-                    text: vocab[target ?? 0],
-                    probability: predictions[target ?? 0],
-                });
-            }
-        }
-        const paddedPredictions =
-            sliced.length < size
-                ? [...sliced, ...Array(size - sliced.length).fill({ token: -1, text: '', probability: 0 })]
-                : sliced;
-        return paddedPredictions;
+        return padPredictions(predictions, vocab, size, finished ? (target ?? null) : null);
     }, [predictions, vocab, target, size, finished]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (ref.current && tableRef.current) {
             const f = () => {
                 if (ref.current && tableRef.current) {
                     const mainRect = ref.current.getBoundingClientRect();
                     const tableRect = tableRef.current.getBoundingClientRect();
-                    const width = Math.floor((mainRect.width - tableRect.width) / 2);
+                    const width = Math.floor(tableRect.left - mainRect.left);
                     const height = mainRect.height;
-                    const rightEdge = mainRect.width - width;
+                    const rightEdge = mainRect.width - width + (inferenceMode ? -70 : 0);
                     const padding = 20;
 
                     const newLines: ILine[] = [];
-                    const lineSpacing = tableRect.height / size;
-                    const startY = tableRect.y - mainRect.y - padding;
+                    const lineSpacing = (tableRect.height - padding) / size;
+                    const startY = tableRect.y - mainRect.y - padding / 2;
 
                     if (width > 40) {
                         for (let i = 0; i < size; i++) {
                             newLines.push({
-                                x1: 40,
+                                x1: leftMargin,
                                 y1: 0,
                                 x2: width,
                                 y2: startY + padding + i * lineSpacing + lineSpacing / 2,
@@ -91,7 +86,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                             newLines.push({
                                 x1: rightEdge,
                                 y1: startY + padding + i * lineSpacing + lineSpacing / 2,
-                                x2: mainRect.width - 40,
+                                x2: mainRect.width - rightMargin,
                                 y2: height,
                                 flip: true,
                                 id: i,
@@ -99,17 +94,19 @@ export default function Predictions({ predictions, vocab, target, size, finished
                         }
                     }
 
+                    setLineHeight(lineSpacing);
                     setLines(newLines);
                 }
             };
             observer.current = new ResizeObserver(f);
             observer.current.observe(ref.current);
             observer.current.observe(tableRef.current);
+            f();
         }
         return () => {
             observer.current?.disconnect();
         };
-    }, [size]);
+    }, [size, inferenceMode, leftMargin, rightMargin]);
 
     return (
         <div
@@ -123,6 +120,7 @@ export default function Predictions({ predictions, vocab, target, size, finished
                 height="100%"
             >
                 {lines.map((line, ix) => {
+                    const isTarget = line.id >= 0 ? paddedPredictions[line.id].token === target : false;
                     return (
                         <path
                             key={ix}
@@ -133,12 +131,15 @@ export default function Predictions({ predictions, vocab, target, size, finished
                             } ${line.y2}`}
                             fill="none"
                             stroke={
-                                line.id === -1 || !finished
-                                    ? '#e8f0fe'
-                                    : paddedPredictions[line.id].token === target && finished
+                                line.id === -1 || !committed
+                                    ? 'white'
+                                    : isTarget && committed
                                       ? theme.dark.success
-                                      : theme.dark.error
+                                      : !inferenceMode
+                                        ? theme.dark.error
+                                        : 'white'
                             }
+                            strokeOpacity={inferenceMode ? (committed && !isTarget && line.id !== -1 ? 0.1 : 1.0) : 1.0}
                             strokeWidth="5"
                         />
                     );
@@ -167,18 +168,20 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                     <PercentageBar
                                         value={p.probability * 100}
                                         colour={
-                                            !finished || p.token === -1 ? 'blue' : p.token === target ? 'green' : 'red'
+                                            !finished || p.token === -1 ? 'blue' : p.token === target ? 'green' : 'blue'
                                         }
                                         thickness={10}
                                         hideLabel
                                         style={{ minHeight: '5px' }}
                                     />
                                 </td>
-                                <td className={style.percentage}>{Math.round(p.probability * 100)}%</td>
+                                <td className={style.percentage}>
+                                    {p.token === -1 ? '' : `${Math.round(p.probability * 100)}%`}
+                                </td>
                                 <td className={style.icon}>
                                     {p.token >= 0 &&
                                         (!finished ? (
-                                            <HourglassTopIcon
+                                            <HourglassEmptyIcon
                                                 htmlColor="#5165c9"
                                                 fontSize="small"
                                             />
@@ -187,24 +190,22 @@ export default function Predictions({ predictions, vocab, target, size, finished
                                                 color="success"
                                                 fontSize="small"
                                             />
-                                        ) : (
-                                            <CloseIcon
-                                                color="error"
-                                                fontSize="small"
-                                            />
-                                        ))}
-                                    {p.token < 0 && (
-                                        <HourglassEmptyIcon
-                                            htmlColor="#5165c9"
-                                            fontSize="small"
-                                        />
-                                    )}
+                                        ) : null)}
+                                    {p.token < 0 && null}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            {inferenceMode && (
+                <Multinomial
+                    predictions={paddedPredictions}
+                    lineHeight={lineHeight}
+                    multinomialRand={finished ? multinomialRand : null}
+                    target={finished ? target : undefined}
+                />
+            )}
         </div>
     );
 }

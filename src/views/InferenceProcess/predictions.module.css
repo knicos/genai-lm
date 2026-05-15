@@ -1,7 +1,7 @@
 .section {
     padding: 20px 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     position: relative;
 }
@@ -72,6 +72,10 @@
     box-sizing: border-box;
 }
 
+.icon {
+    min-width: 30px;
+}
+
 .icon svg {
     display: block;
     margin-left: 0.5rem;
@@ -81,4 +85,5 @@
     font-size: 0.9rem;
     color: #666;
     padding-left: 0.5rem;
+    min-width: 3rem;
 }

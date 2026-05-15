@@ -8,35 +8,36 @@ import { theme } from '../../theme';
 interface Props {
     sampleTokens: number[];
     tokeniser: ITokeniser;
-    selectedTokenIndex: number;
     attention: number[] | null;
+    selectedTokenIndex?: number;
     showTokens?: boolean;
     showAnswer?: boolean;
-    isCorrect?: boolean;
 }
 
 export default function SampleBox({
     sampleTokens,
     tokeniser,
-    selectedTokenIndex,
     attention,
+    selectedTokenIndex,
     showTokens,
     showAnswer,
-    isCorrect,
 }: Props) {
     const { t } = useTranslation();
     const [preText, setPreText] = useState<string>('');
-    const [postText, setPostText] = useState<string>('');
-    const [tokenText, setTokenText] = useState<string>('');
+    const [postText, setPostText] = useState<string | null>(null);
+    const [tokenText, setTokenText] = useState<string | null>(null);
     const selectedRef = useRef<HTMLSpanElement>(null);
     const tokenBoxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const tokensBefore = sampleTokens.slice(0, selectedTokenIndex);
-        const tokensAfter = sampleTokens.slice(selectedTokenIndex + 1);
-        const token = sampleTokens[selectedTokenIndex];
+        if (selectedTokenIndex === undefined) {
+            const pre = tokeniser.decode(sampleTokens);
+            setPreText(pre);
+        } else {
+            const tokensBefore = sampleTokens.slice(0, selectedTokenIndex);
+            const tokensAfter = sampleTokens.slice(selectedTokenIndex + 1);
+            const token = sampleTokens[selectedTokenIndex];
 
-        const decodeTexts = () => {
             const pre = tokeniser.decode(tokensBefore);
             const post = tokeniser.decode(tokensAfter).slice(0, 10);
             const tokenStr = tokeniser.getVocab()[token] || '';
@@ -44,10 +45,8 @@ export default function SampleBox({
             setPreText(pre);
             setPostText(post);
             setTokenText(tokenStr);
-        };
-
-        decodeTexts();
-    }, [sampleTokens, selectedTokenIndex, tokeniser]);
+        }
+    }, [sampleTokens, tokeniser, selectedTokenIndex]);
 
     useEffect(() => {
         if (selectedRef.current) {
@@ -56,9 +55,11 @@ export default function SampleBox({
         if (tokenBoxRef.current) {
             tokenBoxRef.current.scroll(tokenBoxRef.current.scrollWidth, 0);
         }
-    }, [preText, postText, tokenText, showTokens]);
+    }, [preText, postText, tokenText]);
 
     const vocab = tokeniser.getVocab();
+
+    const slicedTokens = selectedTokenIndex !== undefined ? sampleTokens.slice(0, selectedTokenIndex) : sampleTokens;
 
     return (
         <Help
@@ -69,11 +70,11 @@ export default function SampleBox({
         >
             <div
                 className={style.sampleBox}
-                style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
+                style={{ borderTopLeftRadius: 10, borderTopRightRadius: 10, paddingRight: '2rem' }}
                 ref={tokenBoxRef}
             >
                 {showTokens &&
-                    sampleTokens.slice(0, selectedTokenIndex).map((token, ix) => (
+                    slicedTokens.map((token, ix) => (
                         <span
                             key={ix}
                             className={style.token}
@@ -88,12 +89,12 @@ export default function SampleBox({
                 {!showTokens && <span>{preText}</span>}
                 <span
                     ref={selectedRef}
-                    className={`${style.selected} ${isCorrect ? style.correct : showAnswer ? style.incorrect : ''}`}
-                    style={!showAnswer ? { padding: '0 1rem' } : undefined}
+                    className={style.selected}
+                    style={{ padding: '0 1rem' }}
                 >
-                    {showAnswer ? tokenText : ' '}
+                    {showAnswer && tokenText ? tokenText : ' '}
                 </span>
-                <span className={showAnswer ? style.text : style.postText}>{postText}</span>
+                {postText && <span className={showAnswer ? style.text : style.postText}>{postText}</span>}
             </div>
         </Help>
     );

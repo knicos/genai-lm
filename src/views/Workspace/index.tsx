@@ -9,7 +9,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
-import { Outlet, useLocation, useNavigate, useOutlet, useParams, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useOutlet, useParams, useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
 import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
 import { uiShowSidePanel } from '../../state/uiState';
@@ -17,7 +17,7 @@ import { modelAtom } from '../../state/model';
 import useOrientation from '../../hooks/useOrientation';
 import TokeniseData from '../../workflow/TokeniseData/TokeniseData';
 import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
-import Initialiser, { flowType } from './Initialiser';
+import Initialiser from './Initialiser';
 import CheckModel from '../../workflow/CheckModel/CheckModel';
 import InstructData from '../../workflow/InstructData/InstructData';
 import TuneTraining from '../../workflow/TuneTraining/TuneTraining';
@@ -29,7 +29,7 @@ import Frame from './Frame';
 import { CONNECTIONS } from './connections';
 import { darkTheme } from '@genai-fi/base';
 import { ThemeProvider } from '@mui/material';
-import useChangeFlow from '../../hooks/useChangeFlow';
+import useChangePath, { FlowType } from '../../hooks/useChangePath';
 import RawGeneration from '../../workflow/ChatOutput/RawGeneration';
 import ChatConversation from '../../workflow/ChatOutput/ChatConversation';
 import RawPrompt from '../../workflow/Prompt/RawPrompt';
@@ -47,27 +47,26 @@ export function Component() {
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const [params] = useSearchParams();
-    const { flow } = useParams() as { flow: flowType };
+    const { flow } = useParams() as { flow: FlowType };
     const [sidePanelOpen, setSidePanelOpen] = useAtom(uiShowSidePanel);
     const location = useLocation();
     const outlet = useOutlet();
-    const changeFlow = useChangeFlow();
-    const navigate = useNavigate();
+    const changeFlow = useChangePath();
     const orientation = useOrientation();
-    const routeToScrollLock = useRef<flowType | null>(flow);
-    const visibleFlow = useRef<flowType | null>(null);
+    const routeToScrollLock = useRef<FlowType | null>(flow);
+    const visibleFlow = useRef<FlowType | null>(null);
     const intersectionObserver = useRef<IntersectionObserver | null>(null);
-    const [scrollFrame, setScrollFrame] = useState<flowType | null>(null);
+    const [scrollFrame, setScrollFrame] = useState<FlowType | null>(null);
 
     if (!intersectionObserver.current) {
         intersectionObserver.current = new IntersectionObserver(
             (entries) => {
                 const intersecting = entries.find((e) => e.isIntersecting);
                 if (intersecting) {
-                    const name = intersecting.target.id.replace('frame-', '') as flowType;
+                    const name = intersecting.target.id.replace('frame-', '') as FlowType;
                     visibleFlow.current = name;
                     if (routeToScrollLock.current === null) {
-                        changeFlow(name);
+                        changeFlow({ flow: name, replace: true, preserveSearch: true });
                     }
                     if (routeToScrollLock.current === name) {
                         routeToScrollLock.current = null;
@@ -174,7 +173,7 @@ export function Component() {
                                             icon={<AbcIcon />}
                                             label={t('tokeniser.vocabulary')}
                                             widget="vocabulary"
-                                            onClick={() => navigate('vocabulary')}
+                                            onClick={() => changeFlow({ sidepanel: 'vocabulary' })}
                                         />
                                     </div>
                                     <div className={style.rowGroup}>
@@ -183,7 +182,7 @@ export function Component() {
                                             icon={<MarginIcon />}
                                             label={t('tokeniseData.show')}
                                             widget="tokenised-data"
-                                            onClick={() => navigate('tokenised-data')}
+                                            onClick={() => changeFlow({ sidepanel: 'tokenised-data' })}
                                             style={{ marginTop: '70px' }}
                                         />
                                     </div>
@@ -200,13 +199,18 @@ export function Component() {
                                         icon={<ShowChartIcon />}
                                         label={t('training.monitor')}
                                         widget="training-monitor"
-                                        onClick={() => navigate('training-log')}
+                                        onClick={() => changeFlow({ sidepanel: 'training-log' })}
                                     />
                                     <BoxButton
                                         icon={<AccountTreeIcon />}
                                         label={t('training.visualize')}
                                         widget="training-visualize"
-                                        onClick={() => navigate('training-process')}
+                                        onClick={() =>
+                                            changeFlow({
+                                                sidepanel: 'inference-process',
+                                                query: { vismode: 'training' },
+                                            })
+                                        }
                                     />
                                 </div>
                                 <section
@@ -216,6 +220,20 @@ export function Component() {
                                     <RawGeneration />
                                     <RawPrompt />
                                 </section>
+                                <div className={style.buttongroup}>
+                                    <BoxButton
+                                        style={{ marginBottom: '70px' }}
+                                        icon={<AccountTreeIcon />}
+                                        label={t('training.visualize')}
+                                        widget="inference-visualize"
+                                        onClick={() =>
+                                            changeFlow({
+                                                sidepanel: 'inference-process',
+                                                query: { vismode: 'inference' },
+                                            })
+                                        }
+                                    />
+                                </div>
                             </Frame>
                             <Frame
                                 name="finetune"
@@ -229,8 +247,8 @@ export function Component() {
                                         icon={<ShowChartIcon />}
                                         label={t('training.monitor')}
                                         widget="tuning-monitor"
-                                        onClick={() => navigate('training-log')}
-                                        style={{ marginBottom: '70px' }}
+                                        onClick={() => changeFlow({ sidepanel: 'training-log' })}
+                                        style={{ marginTop: '120px' }}
                                     />
                                 </div>
                             </Frame>
@@ -262,12 +280,7 @@ export function Component() {
                         open={sidePanelOpen}
                         position={orientation === 'portrait' ? 'bottom' : 'right'}
                         onClose={() => {
-                            const segments = location.pathname.split('/').filter(Boolean);
-                            if (segments.length > 0) {
-                                segments.pop(); // Remove last segment
-                                const newPath = '/' + segments.join('/');
-                                navigate(newPath, { replace: true });
-                            }
+                            changeFlow({ sidepanel: null });
                         }}
                         onOpen={() => setSidePanelOpen(true)}
                     >

@@ -10,9 +10,10 @@ interface Props {
     step: number;
     done?: boolean;
     spinning?: boolean;
+    inferenceMode?: boolean;
 }
 
-export default function ModelBox({ layers, step, done, spinning }: Props) {
+export default function ModelBox({ layers, step, done, spinning, inferenceMode }: Props) {
     const { t } = useTranslation();
     const [spinStep, setSpinStep] = useState(0);
 
@@ -27,6 +28,29 @@ export default function ModelBox({ layers, step, done, spinning }: Props) {
     }, [spinning, layers]);
 
     const numLayers = layers;
+
+    let statusText = 'tools.modelIdle';
+    if (inferenceMode) {
+        if (step < 0) {
+            statusText = 'tools.modelTokenising';
+        } else if (step < numLayers) {
+            statusText = 'tools.modelPredicting';
+        } else if (spinning) {
+            statusText = 'tools.modelDeciding';
+        } else if (done) {
+            statusText = 'tools.modelSelected';
+        }
+    } else {
+        if (step < 0) {
+            statusText = 'tools.modelSelecting';
+        } else if (step < numLayers) {
+            statusText = 'tools.modelPredicting';
+        } else if (spinning) {
+            statusText = 'tools.modelUpdating';
+        } else if (done) {
+            statusText = 'tools.modelComplete';
+        }
+    }
 
     return (
         <div className={style.modelBlock}>
@@ -49,17 +73,7 @@ export default function ModelBox({ layers, step, done, spinning }: Props) {
                         {t('tools.model')} ({t('tools.nlayers', { N: numLayers })})
                     </h3>
 
-                    <div>
-                        {step < 0
-                            ? t('tools.modelSelecting')
-                            : step < numLayers
-                              ? t('tools.modelPredicting')
-                              : spinning
-                                ? t('tools.modelUpdating')
-                                : done
-                                  ? t('tools.modelComplete')
-                                  : t('tools.modelIdle')}
-                    </div>
+                    <div>{t(statusText)}</div>
                 </div>
             </Help>
         </div>

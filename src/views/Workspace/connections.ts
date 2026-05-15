@@ -81,8 +81,15 @@ export const CONNECTIONS: IConnection[] = [
         end: 'tuneData',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.4,
-        endOffset: -0.4,
+        startOffset: -0.3,
+        endOffset: -0.5,
+    },
+    {
+        start: 'chatOutput',
+        end: 'inference-visualize',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: -0.2,
     },
     {
         start: 'tuneData',
@@ -97,7 +104,7 @@ export const CONNECTIONS: IConnection[] = [
         end: 'sharing',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.4,
+        startOffset: -0.2,
         endOffset: -0.4,
     },
     {
@@ -112,6 +119,6 @@ export const CONNECTIONS: IConnection[] = [
         end: 'promptWithInput',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: -0.4,
+        startOffset: 0.6,
     },
 ];

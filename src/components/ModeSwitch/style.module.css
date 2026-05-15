@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #333;
+    border: none;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container input {
+    appearance: none;
+}
+
+.container label {
+    background-color: white;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.3rem 1rem 0.3rem 0.5rem;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.container label.active {
+    background-color: var(--primary);
+    color: white;
+}
