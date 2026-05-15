@@ -108,6 +108,8 @@ export default function Predictions({
         };
     }, [size, inferenceMode, leftMargin, rightMargin]);
 
+    const showCorrect = inferenceMode ? committed : finished;
+
     return (
         <div
             className={style.section}
@@ -168,7 +170,11 @@ export default function Predictions({
                                     <PercentageBar
                                         value={p.probability * 100}
                                         colour={
-                                            !finished || p.token === -1 ? 'blue' : p.token === target ? 'green' : 'blue'
+                                            !showCorrect || p.token === -1
+                                                ? 'blue'
+                                                : p.token === target
+                                                  ? 'green'
+                                                  : 'blue'
                                         }
                                         thickness={10}
                                         hideLabel
@@ -180,7 +186,7 @@ export default function Predictions({
                                 </td>
                                 <td className={style.icon}>
                                     {p.token >= 0 &&
-                                        (!finished ? (
+                                        (!showCorrect ? (
                                             <HourglassEmptyIcon
                                                 htmlColor="#5165c9"
                                                 fontSize="small"

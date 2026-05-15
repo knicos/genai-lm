@@ -29,7 +29,7 @@ import Frame from './Frame';
 import { CONNECTIONS } from './connections';
 import { darkTheme } from '@genai-fi/base';
 import { ThemeProvider } from '@mui/material';
-import useChangePath, { FlowType } from '../../hooks/useChangePath';
+import { FlowType, useChangePath } from '../../hooks/useChangePath';
 import RawGeneration from '../../workflow/ChatOutput/RawGeneration';
 import ChatConversation from '../../workflow/ChatOutput/ChatConversation';
 import RawPrompt from '../../workflow/Prompt/RawPrompt';

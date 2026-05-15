@@ -63,7 +63,7 @@ export default function SampleBox({
 
     return (
         <Help
-            message={t('training.attentionHelp')}
+            message={selectedTokenIndex !== undefined ? t('training.attentionHelp') : t('tools.sampleHelp')}
             inplace
             placement="left"
             dark

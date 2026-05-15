@@ -1,0 +1,52 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.icon {
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.icon a {
+    color: white;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.icon a:hover {
+    color: white;
+}
+
+.inferenceIcon {
+    opacity: 0.5;
+}
+
+.line {
+    width: 5px;
+    background-color: white;
+    height: 40px;
+    margin-left: 27.5px;
+}
+
+.dataLabel {
+    font-size: 0.9rem;
+    margin-left: 1rem;
+    color: white;
+}
+
+.dataLabel h3 {
+    margin: 0;
+}

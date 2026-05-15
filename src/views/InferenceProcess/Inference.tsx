@@ -12,6 +12,7 @@ import { IGenerator, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import { reduceAttention } from './attention';
 import OutputBox from './OutputBox';
 import { MULTINOMIAL_ANIMATION_DURATION } from './Multinomial';
+import DataBox from './DataBox';
 
 interface Props {
     generator: IGenerator | null;
@@ -103,6 +104,7 @@ export function Inference({ generator, step, model, loaded }: Props) {
 
     return (
         <>
+            <DataBox inferenceMode />
             <div className={style.block}>
                 {ready && (
                     <SampleBox

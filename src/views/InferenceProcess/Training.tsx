@@ -13,6 +13,7 @@ import ModelLines from './ModelLines';
 import InfoPanel from '../../workflow/TextData/InfoPanel';
 import { AnimationStep, AnimationStepName } from './ModelControls';
 import { reduceAttention } from './attention';
+import DataBox from './DataBox';
 
 interface Props {
     model: TeachableLLM | null;
@@ -123,6 +124,7 @@ export function Training({ model, step, loaded }: Props) {
 
     return (
         <>
+            <DataBox />
             <div className={style.block}>
                 {ready && (
                     <SampleBox
