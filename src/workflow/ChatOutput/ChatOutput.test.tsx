@@ -43,6 +43,6 @@ describe('RawGeneration', () => {
         );
 
         expect(mockGenerator.getConversation).toHaveBeenCalled();
-        expect(screen.getByText('Hello world')).toBeInTheDocument();
+        expect(await screen.findByText('Hello world')).toBeInTheDocument();
     });
 });

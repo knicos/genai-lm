@@ -30,6 +30,8 @@ export default function RawGeneration() {
     const conversations = useAtomValue(conversationDataAtom);
     const workflowContext = useWorkflowContext();
     const ref = useRef<HTMLDivElement>(null);
+    const convoRef = useRef<Conversation[]>([]);
+    const animationFrameRef = useRef<number>(-1);
 
     useEffect(() => {
         if (ref.current) {
@@ -102,14 +104,24 @@ export default function RawGeneration() {
     useEffect(() => {
         if (generator) {
             const h = () => {
-                const convo = generator.getConversation().slice();
-                setText(convo);
+                const convo = generator.getConversation();
+                //setText(convo);
+                convoRef.current = convo;
+                if (animationFrameRef.current === -1) {
+                    animationFrameRef.current = requestAnimationFrame(() => {
+                        setText(convoRef.current.slice());
+                        animationFrameRef.current = -1;
+                    });
+                }
             };
             generator.on('tokens', h);
             h();
             return () => {
                 generator.off('tokens', h);
                 generator.dispose();
+                if (animationFrameRef.current !== -1) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                }
             };
         }
     }, [generator]);

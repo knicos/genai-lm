@@ -79,7 +79,8 @@ export default function RawPrompt() {
 
             setGenerate(false);
             busyRef.current = false;
-        } catch {
+        } catch (e) {
+            console.error(e);
             setMessage({
                 level: 'error',
                 notice: t('generator.errors.generationError'),
