@@ -194,6 +194,8 @@
         "hours": "Hr",
         "minutes": "Min",
         "seconds": "Sec",
+        "Wh": "Wh",
+        "kWh": "kWh",
         "remaining": "Remaining",
         "settings": "Settings",
         "loss": "Loss",

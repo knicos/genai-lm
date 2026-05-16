@@ -8,16 +8,20 @@ interface Props extends PropsWithChildren {
     color?: string;
     animated?: boolean;
     dark?: boolean;
+    onClick?: () => void;
 }
 
-export default function Circle({ radius, children, progress, color, animated, dark }: Props) {
+export default function Circle({ radius, children, progress, color, animated, dark, onClick }: Props) {
     const stroke = 8;
     const normalizedRadius = radius - stroke / 2;
     const circumference = 2 * Math.PI * normalizedRadius;
     const offset = circumference * (1 - progress);
 
     return (
-        <div className={style.clock}>
+        <div
+            className={`${style.clock} ${onClick ? style.clickable : ''}`}
+            onClick={onClick}
+        >
             <svg
                 height={radius * 2}
                 width={radius * 2}

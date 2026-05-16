@@ -9,9 +9,10 @@ interface Props {
     style?: CSSProperties;
     unit?: string;
     flip?: boolean;
+    fixed?: number;
 }
 
-export default function NumberBox({ value, label, style, unit, flip }: Props) {
+export default function NumberBox({ value, label, style, unit, flip, fixed }: Props) {
     const { t } = useTranslation();
     return (
         <div
@@ -19,7 +20,9 @@ export default function NumberBox({ value, label, style, unit, flip }: Props) {
             style={style}
         >
             {flip && <div className={styleM.label}>{label}</div>}
-            <div className={styleM.size}>{unit ? `${value} ${unit}` : prettyNumber(value, t)}</div>
+            <div className={styleM.size}>
+                {unit ? `${fixed ? value.toFixed(fixed) : value} ${unit}` : prettyNumber(value, t)}
+            </div>
             {!flip && <div className={styleM.label}>{label}</div>}
         </div>
     );

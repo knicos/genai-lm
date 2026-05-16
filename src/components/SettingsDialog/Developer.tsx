@@ -69,6 +69,7 @@ export default function DeveloperSettings() {
                     <div>Subgroup Size: {capabilities?.subgroupSize ?? 'N/A'}</div>
                     <div>Float16 Support: {capabilities?.float16 ? 'Yes' : 'No'}</div>
                     <div>Vendor: {capabilities?.vendor ?? 'N/A'}</div>
+                    <div>Power Use: {capabilities?.powerUse ?? 'N/A'} W</div>
                 </div>
             </div>
         </div>

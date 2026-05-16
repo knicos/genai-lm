@@ -12,6 +12,7 @@ export interface DeviceCapabilities {
     subgroupSize: number;
     float16: boolean;
     vendor: string;
+    powerUse: number;
 }
 
 export const deviceCapabilities = atom<DeviceCapabilities | null>(null);

@@ -4,7 +4,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { trainerSettings } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 
 export function Component() {
     const { t } = useTranslation();
@@ -22,6 +22,7 @@ export function Component() {
                     <Help
                         message={t('app.settings.batchHelp')}
                         inplace
+                        dark
                     >
                         {t('app.settings.batchSize')}
                     </Help>
@@ -44,6 +45,7 @@ export function Component() {
                     <Help
                         message={t('app.settings.lrHelp')}
                         inplace
+                        dark
                     >
                         {t('app.settings.learningRate')}
                     </Help>

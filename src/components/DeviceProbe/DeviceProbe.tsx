@@ -46,7 +46,7 @@ export default function DeviceProbe() {
             });
             setDone(true);
         });
-    }, [setHasWebGL, setHasWebGPU, setDetected, setCapabilities, lowPowerMode]);
+    }, [setHasWebGL, setHasWebGPU, setDetected, setCapabilities, lowPowerMode, subgroupsDisabled]);
 
     if (done) {
         return null;

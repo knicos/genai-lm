@@ -47,3 +47,12 @@
     color: #005d6b;
     font-weight: bold;
 }
+
+.clickable {
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.clickable:hover {
+    background-color: #005d6b1a;
+}

@@ -1,4 +1,5 @@
 import { DeviceCapabilities } from '../../state/device';
+import { estimateFullTrainingPowerWatts } from './power';
 
 async function hasWebGPU(lowPower?: boolean): Promise<DeviceCapabilities | null> {
     try {
@@ -18,6 +19,8 @@ async function hasWebGPU(lowPower?: boolean): Promise<DeviceCapabilities | null>
         const hasSubgroups = features.has('subgroups');
         let subgroupSize = 0;
 
+        const power = await estimateFullTrainingPowerWatts(adapter);
+
         if (hasSubgroups) {
             subgroupSize = adapter.info.subgroupMaxSize ?? 0;
         }
@@ -28,6 +31,7 @@ async function hasWebGPU(lowPower?: boolean): Promise<DeviceCapabilities | null>
             subgroupSize: subgroupSize,
             float16: hasFloat16,
             vendor: adapter.info.vendor || 'unknown',
+            powerUse: power,
         };
     } catch {
         return null;
@@ -71,6 +75,7 @@ export async function getDeviceInfo(lowPower?: boolean): Promise<{
             subgroupSize: 0,
             float16: gl2,
             vendor: 'unknown',
+            powerUse: await estimateFullTrainingPowerWatts(),
         },
     };
 }
