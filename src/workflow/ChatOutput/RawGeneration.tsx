@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
 import { conversationDataAtom } from '../../state/data';
-import { useWorkflowContext } from '@genai-fi/base';
 import { createGenerator } from '../../utilities/generatorFactory';
 
 export default function RawGeneration() {
@@ -28,19 +27,9 @@ export default function RawGeneration() {
     const { topP } = useAtomValue(generatorSettings);
     const navigate = useNavigate();
     const conversations = useAtomValue(conversationDataAtom);
-    const workflowContext = useWorkflowContext();
     const ref = useRef<HTMLDivElement>(null);
     const convoRef = useRef<Conversation[]>([]);
     const animationFrameRef = useRef<number>(-1);
-
-    useEffect(() => {
-        if (ref.current) {
-            const remove = workflowContext.registerElement('chatOutput', ref.current);
-            return () => {
-                remove?.();
-            };
-        }
-    }, [workflowContext]);
 
     const ready = status !== 'loading';
 

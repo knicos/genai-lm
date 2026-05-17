@@ -230,6 +230,8 @@
         "title": "Generation",
         "generate": "Generate",
         "promptPlaceholder": "Optional prompt...",
+        "startPrompt": "Try generating some text.",
+        "startChatPrompt": "Try chatting with the model.",
         "settingsTooltip": "Generator Settings",
         "settings": "Settings",
         "pause": "Pause",

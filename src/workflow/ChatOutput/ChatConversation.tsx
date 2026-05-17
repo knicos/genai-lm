@@ -8,7 +8,6 @@ import { modelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
-import { useWorkflowContext } from '@genai-fi/base';
 
 export default function ChatConversation() {
     const model = useAtomValue(modelAtom);
@@ -16,17 +15,7 @@ export default function ChatConversation() {
     const [text, setText] = useState<Conversation[]>([]);
     const status = useModelStatus(model ?? undefined);
     const navigate = useNavigate();
-    const workflowContext = useWorkflowContext();
     const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (ref.current) {
-            const remove = workflowContext.registerElement('conversationOutput', ref.current);
-            return () => {
-                remove?.();
-            };
-        }
-    }, [workflowContext]);
 
     const ready = status !== 'loading';
 

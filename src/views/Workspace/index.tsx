@@ -40,6 +40,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import { useTranslation } from 'react-i18next';
 import AbcIcon from '@mui/icons-material/Abc';
 import MarginIcon from '@mui/icons-material/Margin';
+import FullSizeGroup from './FullSizeGroup';
 
 export function Component() {
     const { t } = useTranslation();
@@ -213,13 +214,10 @@ export function Component() {
                                         }
                                     />
                                 </div>
-                                <section
-                                    data-widget="container"
-                                    className={style.chatGroup}
-                                >
+                                <FullSizeGroup widget="chatOutput">
                                     <RawGeneration />
                                     <RawPrompt />
-                                </section>
+                                </FullSizeGroup>
                                 <div className={style.buttongroup}>
                                     <BoxButton
                                         style={{ marginBottom: '70px' }}
@@ -258,13 +256,10 @@ export function Component() {
                                 scroll={scrollFrame === 'deployment'}
                             >
                                 <Sharing />
-                                <section
-                                    data-widget="container"
-                                    className={style.chatGroup}
-                                >
+                                <FullSizeGroup widget="conversationOutput">
                                     <ChatConversation />
                                     <ChatPrompt />
-                                </section>
+                                </FullSizeGroup>
                             </Frame>
                         </WorkflowLayout>
                     )}

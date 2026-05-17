@@ -57,10 +57,11 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'trainer',
-        end: 'prompt',
+        end: 'chatOutput',
         startPoint: 'right',
         endPoint: 'left',
         startOffset: 0.5,
+        endOffset: 0.6,
     },
     {
         start: 'trainer',
@@ -116,7 +117,7 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'sharing',
-        end: 'promptWithInput',
+        end: 'conversationOutput',
         startPoint: 'right',
         endPoint: 'left',
         startOffset: 0.6,

@@ -8,31 +8,34 @@ import useModelStatus from '../../hooks/useModelStatus';
 import { modelAtom } from '../../state/model';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import StopIcon from '@mui/icons-material/Stop';
-import { Button, useWorkflowContext } from '@genai-fi/base';
+import { Button } from '@genai-fi/base';
 
 export default function RawPrompt() {
     const { t } = useTranslation();
     const generator = useAtomValue(rawGeneratorAtom);
     const [generate, setGenerate] = useState(false);
-    const [, setHasGenerated] = useState(false);
+    const [hasGenerated, setHasGenerated] = useState(false);
     const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
     const busyRef = useRef<boolean>(false);
     const model = useAtomValue(modelAtom);
     const status = useModelStatus(model ?? undefined);
-    const workflowContext = useWorkflowContext();
     const ref = useRef<HTMLDivElement>(null);
 
+    const disable = status === 'training';
+
     useEffect(() => {
-        if (ref.current) {
-            const remove = workflowContext.registerElement('prompt', ref.current);
+        setHasGenerated(false);
+        if (generator) {
+            const h = () => {
+                setHasGenerated(false);
+            };
+            generator.on('reset', h);
             return () => {
-                remove?.();
+                generator.off('reset', h);
             };
         }
-    }, [workflowContext]);
-
-    const disable = status === 'training';
+    }, [generator]);
 
     const doGenerate = async (maxLength: number, prompt?: string) => {
         if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
@@ -92,19 +95,20 @@ export default function RawPrompt() {
 
     return (
         <div
-            className={style.container}
+            className={`${style.container} ${!hasGenerated ? style.start : ''}`}
             data-widget="prompt"
             data-testid="rawtextgenerator"
             ref={ref}
         >
+            {!hasGenerated && <h2>{t('generator.startPrompt')}</h2>}
             <Button
                 className={style.generateButton}
                 onClick={() => doGenerate(maxLength)}
                 startIcon={generate ? <StopIcon /> : <ArrowUpwardIcon />}
-                fullWidth
                 variant="contained"
                 color="primary"
                 disabled={disable}
+                fullWidth
             >
                 {generate ? t('generator.stop') : t('generator.generate')}
             </Button>
