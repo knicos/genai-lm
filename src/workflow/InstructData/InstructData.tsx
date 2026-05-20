@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import Box from '../../components/BoxTitle/Box';
 import style from './style.module.css';
 import InstructMenu from './InstructMenu';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { conversationDataAtom } from '../../state/data';
 import ConversationList from './ConversationList';
@@ -21,7 +21,7 @@ export default function InstructData() {
     const done = conversations.length > 1;
     const busy = false;
 
-    useEffect(() => {
+    /*useEffect(() => {
         setConversations((old) => {
             if (old.length === 0) {
                 return [
@@ -33,7 +33,7 @@ export default function InstructData() {
             }
             return old;
         });
-    }, [setConversations]);
+    }, [setConversations]);*/
 
     return (
         <Box
