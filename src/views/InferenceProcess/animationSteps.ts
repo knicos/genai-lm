@@ -20,7 +20,7 @@ export function trainingSteps(config: GPTConfig) {
     for (let i = 0; i < config.nLayer; i++) {
         s.push({ name: 'predict', layer: i, index: i + 2 });
     }
-    s.push({ name: 'updating', layer: config.nLayer - 1, index: config.nLayer + 2 });
-    s.push({ name: 'done', layer: config.nLayer - 1, index: config.nLayer + 3 });
+    s.push({ name: 'updating', layer: config.nLayer - 1, index: config.nLayer + 2, multiplier: 10 });
+    s.push({ name: 'done', layer: config.nLayer - 1, index: config.nLayer + 3, multiplier: 10 });
     return s;
 }

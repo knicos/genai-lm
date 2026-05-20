@@ -1,6 +1,6 @@
 import { Dispatch, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
-import { loadTextData } from '@genai-fi/nanogpt';
+import { Conversation, loadTextData } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
 import DataListing from './DataListing';
@@ -29,7 +29,7 @@ interface DragObject {
 async function handleTextLoad(
     id: string,
     name: string,
-    text: string[],
+    text: Conversation[][],
     source: 'file' | 'input' | 'search',
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
@@ -95,12 +95,24 @@ export default function TextData() {
                     }
                 } else if (items.text) {
                     logger.log({ action: 'dropped_text' });
-                    await handleTextLoad(uuid(), t('data.untitled'), [items.text], 'input', setData);
+                    await handleTextLoad(
+                        uuid(),
+                        t('data.untitled'),
+                        [[{ role: 'text', content: items.text }]],
+                        'input',
+                        setData
+                    );
                 } else if (items.html) {
                     logger.log({ action: 'dropped_html' });
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
-                    await handleTextLoad(uuid(), t('data.untitled'), [element.textContent], 'input', setData);
+                    await handleTextLoad(
+                        uuid(),
+                        t('data.untitled'),
+                        [[{ role: 'text', content: element.textContent }]],
+                        'input',
+                        setData
+                    );
                 }
                 setBusy(false);
             },
@@ -132,7 +144,13 @@ export default function TextData() {
                         setSelected(-1);
                         setData((prev) => [
                             ...prev,
-                            { id: uuid(), name: t('data.untitled'), content: [''], size: 0, source: 'input' },
+                            {
+                                id: uuid(),
+                                name: t('data.untitled'),
+                                content: [[{ role: 'text', content: '' }]],
+                                size: 0,
+                                source: 'input',
+                            },
                         ]);
                     }}
                     onSearch={() => setShowSearch(true)}
@@ -161,7 +179,9 @@ export default function TextData() {
                     {showInput && (
                         <TextInput
                             initialText={
-                                selectedItem && selectedItem.source === 'input' ? selectedItem.content[0] : undefined
+                                selectedItem && selectedItem.source === 'input'
+                                    ? selectedItem.content[0][0].content
+                                    : undefined
                             }
                             onClose={() => setShowInput(false)}
                             onText={(text) => {
@@ -171,7 +191,7 @@ export default function TextData() {
                                             i === selected
                                                 ? {
                                                       ...entry,
-                                                      content: [text],
+                                                      content: [[{ role: 'text', content: text }]],
                                                       size: text.length,
                                                   }
                                                 : entry
@@ -184,7 +204,7 @@ export default function TextData() {
                                         {
                                             id: uuid(),
                                             name: t('data.untitled'),
-                                            content: [text],
+                                            content: [[{ role: 'text', content: text }]],
                                             size: text.length,
                                             source: 'input',
                                         },

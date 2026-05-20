@@ -2,7 +2,7 @@ import { describe, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TextTraining from './TextTraining';
-import { CharTokeniser, tasks, tokensFromTasks, type TeachableLLM } from '@genai-fi/nanogpt';
+import { CharTokeniser, Conversation, tasks, tokensFromTasks, type TeachableLLM } from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
 import { createStore } from 'jotai';
 import { modelAtom } from '../../state/model';
@@ -11,6 +11,10 @@ import { dataTokens } from '../../state/data';
 import { WorkflowLayout } from '@genai-fi/base';
 
 vi.mock('react-router-dom');
+
+function textToConversations(texts: string[]): Conversation[][] {
+    return texts.map((text) => [{ role: 'text', content: text }]);
+}
 
 describe('TextTraining', () => {
     it('renders without a model or data', async ({ expect }) => {
@@ -26,7 +30,7 @@ describe('TextTraining', () => {
     it('renders with a model and data', async ({ expect }) => {
         const dataset = ['some test text'];
         const tokeniser = new CharTokeniser(100);
-        await tokeniser.train(dataset);
+        await tokeniser.train(textToConversations(dataset));
 
         const mockModel = {
             on: () => {},
@@ -111,7 +115,7 @@ describe('TextTraining', () => {
 
         const dataset = ['some test text'];
         const tokeniser = new CharTokeniser(100);
-        await tokeniser.train(dataset);
+        await tokeniser.train(textToConversations(dataset));
         const task = new tasks.PretrainingTask(dataset);
         const tokens = await tokensFromTasks([task], tokeniser);
         store.set(dataTokens, tokens);

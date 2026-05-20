@@ -27,7 +27,9 @@ export function Component() {
                 .then(() => {
                     generator
                         .start({
-                            dataSet: dataset,
+                            dataSet: dataset
+                                .map((entry) => entry.map((item) => item.content).flat())
+                                .flat(2) as string[],
                             count: 10,
                             rate: 1,
                             mode: 'direct',

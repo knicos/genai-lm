@@ -5,7 +5,7 @@ import { Conversation } from '@genai-fi/nanogpt';
 export interface DataEntry {
     id: string;
     name: string;
-    content: string[];
+    content: Conversation[][];
     size: number;
     source: 'file' | 'input' | 'search';
 }
@@ -19,7 +19,8 @@ export const dataReady = atom<boolean>((get) => {
     return entries.length > 0;
 });
 
-export const datasetAtom = atom<string[]>([]);
+// Pre-training
+export const datasetAtom = atom<Conversation[][]>([]);
 
 export const downloadsAtom = atom<Downloader[]>([]);
 
@@ -30,4 +31,5 @@ export const dataTokensReady = atom<boolean>((get) => {
     return tokens !== null && tokens.length > 0;
 });
 
+// Fine-tuning
 export const conversationDataAtom = atom<Conversation[][]>([]);

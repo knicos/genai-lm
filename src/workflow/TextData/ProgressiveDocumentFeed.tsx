@@ -42,7 +42,6 @@ function takeNextDocs(data: DataEntry[], start: Cursor, count: number) {
 
     while (docs.length < count && cursor.entryIndex < data.length) {
         const entry = data[cursor.entryIndex];
-        const text = entry?.content[cursor.contentIndex];
 
         docs.push({
             key: `${entry.id}-${cursor.contentIndex}`,
@@ -54,14 +53,6 @@ function takeNextDocs(data: DataEntry[], start: Cursor, count: number) {
             entryIndex: cursor.entryIndex,
             contentIndex: cursor.contentIndex + 1,
         });
-
-        // guard in case of unexpected holes
-        if (typeof text !== 'string') {
-            cursor = normalizeCursor(data, {
-                entryIndex: cursor.entryIndex + 1,
-                contentIndex: 0,
-            });
-        }
     }
 
     const hasMore = normalizeCursor(data, cursor).entryIndex < data.length;

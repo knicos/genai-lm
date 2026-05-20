@@ -1,16 +1,14 @@
 import { useAtomValue } from 'jotai';
 import style from './style.module.css';
-import { rawGeneratorAtom, generatorSettings } from '../../state/generator';
+import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
 import { useEffect, useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { modelAtom } from '../../state/model';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import StopIcon from '@mui/icons-material/Stop';
-import { Button } from '@genai-fi/base';
+import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 
-export default function RawPrompt() {
+export default function ChatPrompt() {
     const { t } = useTranslation();
     const generator = useAtomValue(rawGeneratorAtom);
     const [generate, setGenerate] = useState(false);
@@ -68,7 +66,7 @@ export default function RawPrompt() {
             includeProbabilities: showProbabilities,
             topP: topP > 0 ? topP : undefined,
             noCache: false,
-            nonConversational: true,
+            nonConversational: false,
         };
 
         const filteredText = text.filter((part) => part.content.trim().length > 0);
@@ -82,8 +80,7 @@ export default function RawPrompt() {
 
             setGenerate(false);
             busyRef.current = false;
-        } catch (e) {
-            console.error(e);
+        } catch {
             setMessage({
                 level: 'error',
                 notice: t('generator.errors.generationError'),
@@ -96,22 +93,16 @@ export default function RawPrompt() {
     return (
         <div
             className={`${style.container} ${!hasGenerated ? style.start : ''}`}
-            data-widget="prompt"
             data-testid="rawtextgenerator"
             ref={ref}
         >
             {!hasGenerated && <h2>{t('generator.startPrompt')}</h2>}
-            <Button
-                className={style.generateButton}
-                onClick={() => doGenerate(maxLength)}
-                startIcon={generate ? <StopIcon /> : <ArrowUpwardIcon />}
-                variant="contained"
-                color="primary"
+            <ChatPromptInput
+                onSend={(prompt) => doGenerate(maxLength, prompt)}
                 disabled={disable}
-                fullWidth
-            >
-                {generate ? t('generator.stop') : t('generator.generate')}
-            </Button>
+                generating={generate}
+                onStop={() => generator?.stop()}
+            />
             {messages && (
                 <BoxNotice
                     notice={messages}

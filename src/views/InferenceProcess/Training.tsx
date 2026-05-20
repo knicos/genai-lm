@@ -1,8 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { datasetAtom } from '../../state/data';
+import { dataTokens } from '../../state/data';
 import { useRef, useState } from 'react';
-import extractData from './extractData';
 import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
@@ -23,7 +22,7 @@ interface Props {
 
 export function Training({ model, step, loaded }: Props) {
     const { t } = useTranslation();
-    const dataset = useAtomValue(datasetAtom);
+    const dataset = useAtomValue(dataTokens);
     const [tokens, setTokens] = useState<number[]>([]);
     const [predictions, setPredictions] = useState<number[][]>([]);
     const nextToken = useRef<number | null>(null);
@@ -35,25 +34,26 @@ export function Training({ model, step, loaded }: Props) {
     const loadNext = async () => {
         if (!model || !loaded) return [];
         if (!model.tokeniser.trained) {
-            await model.tokeniser.train(dataset);
+            return [];
         }
+        if (!dataset) return [];
 
         const vocab = model.tokeniser.getVocab();
         const largestToken = Math.max(1, vocab[vocab.length - 1].length);
-        const totalDatasetLength = dataset.reduce((sum, item) => sum + item.length, 0);
+        const totalDatasetLength = dataset.length;
         const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
         // eslint-disable-next-line react-hooks/purity
         const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
-        const sampleText = extractData(dataset, randomStart, sliceSize + randomStart);
+        const newTokens = dataset.slice(randomStart, randomStart + sliceSize);
 
-        const newTokens = model.tokeniser.encode(sampleText);
+        //const sampleText = model.tokeniser.decode(newTokens);
         const slicedTokens = newTokens.slice(0, model.config.blockSize);
         const decodedText = model.tokeniser.decode(slicedTokens);
         const actualNextToken = newTokens[slicedTokens.length] || 0;
 
         nextToken.current = actualNextToken;
         const newText: Conversation[] = [{ role: 'assistant', content: decodedText }];
-        setTokens(newTokens);
+        setTokens(Array.from(newTokens));
         setPredictions([]);
         return newText;
     };

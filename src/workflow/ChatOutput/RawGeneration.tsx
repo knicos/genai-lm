@@ -3,30 +3,18 @@ import ConversationDisplay from '../../components/ConversationDisplay/Conversati
 import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
 import { useAtom, useAtomValue } from 'jotai';
-import { rawGeneratorAtom, generatorSettings } from '../../state/generator';
+import { rawGeneratorAtom } from '../../state/generator';
 import { modelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
-import { trainerSettings } from '../../state/trainer';
-import logger from '../../utilities/logger';
-import { Notice } from '../../components/BoxTitle/BoxNotice';
-import { wait } from '../../utilities/wait';
-import { useTranslation } from 'react-i18next';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
-import { conversationDataAtom } from '../../state/data';
-import { createGenerator } from '../../utilities/generatorFactory';
 
-export default function RawGeneration() {
-    const { t } = useTranslation();
+export default function ChatConversation() {
     const model = useAtomValue(modelAtom);
     const [generator, setGenerator] = useAtom(rawGeneratorAtom);
     const [text, setText] = useState<Conversation[]>([]);
     const status = useModelStatus(model ?? undefined);
-    const outputText = useAtomValue(trainerSettings).outputText;
-    const [messages, setMessage] = useState<Notice | null>(null);
-    const { topP } = useAtomValue(generatorSettings);
     const navigate = useNavigate();
-    const conversations = useAtomValue(conversationDataAtom);
     const ref = useRef<HTMLDivElement>(null);
     const convoRef = useRef<Conversation[]>([]);
     const animationFrameRef = useRef<number>(-1);
@@ -35,60 +23,11 @@ export default function RawGeneration() {
 
     useEffect(() => {
         if (ready && model) {
-            const generator = createGenerator(model);
+            const generator = model.generator();
             setGenerator(generator);
             setText([]);
-
-            const state = {
-                count: 0,
-            };
-
-            if (outputText) {
-                const h = async () => {
-                    state.count++;
-                    if (state.count % 2 !== 0) return;
-                    try {
-                        if (conversations?.length === 0) {
-                            const finalText = await generator.generate({
-                                nonConversational: true,
-                                maxLength: 200,
-                                temperature: 0.8,
-                                includeProbabilities: false,
-                                topP: topP > 0 ? topP : undefined,
-                            });
-                            setText([...finalText]);
-                            logger.log({ action: 'auto_generated_text', text: finalText });
-                        } else {
-                            const randomIndex = Math.floor(Math.random() * conversations.length);
-                            const conversation = conversations[randomIndex];
-                            generator.reset();
-                            const finalText = await generator.generate([conversation[0]], {
-                                maxLength: 200,
-                                nonConversational: true,
-                                temperature: 0.8,
-                                includeProbabilities: false,
-                                topP: topP > 0 ? topP : undefined,
-                            });
-
-                            setText([...finalText]);
-                            logger.log({ action: 'auto_generated_text', text: finalText });
-                        }
-                    } catch {
-                        setMessage({
-                            level: 'error',
-                            notice: t('generator.errors.generationError'),
-                        });
-                    }
-
-                    await wait(10);
-                };
-                model.on('trainStep', h);
-                return () => {
-                    model.off('trainStep', h);
-                };
-            }
         }
-    }, [model, ready, outputText, topP, setGenerator, t, conversations]);
+    }, [model, ready, setGenerator]);
 
     useEffect(() => {
         if (generator) {
@@ -129,17 +68,12 @@ export default function RawGeneration() {
                         generator.reset();
                     }
                     setText([]);
-                    //setHasGenerated(false);
                 }}
                 onShowSettings={() => {
                     navigate('generator-settings');
                 }}
             />
-            <ConversationDisplay
-                conversation={
-                    messages ? [...text, { role: 'status', content: messages.notice, level: messages.level }] : text
-                }
-            />
+            <ConversationDisplay conversation={text} />
         </div>
     );
 }

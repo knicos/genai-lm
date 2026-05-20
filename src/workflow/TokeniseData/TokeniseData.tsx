@@ -67,7 +67,7 @@ export default function TokeniseData() {
                                     setTokenCount(0);
                                     setTokens(null);
 
-                                    const task = new tasks.PretrainingTask(dataset);
+                                    const task = new tasks.ConversationTask(dataset);
                                     return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
                                         setTokenCount(tokens);
                                     }).then((newTokens) => {

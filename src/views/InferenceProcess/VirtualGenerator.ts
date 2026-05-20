@@ -5,7 +5,7 @@ interface ExtendedConversation extends Conversation {
     _completed?: boolean;
 }
 
-export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens'> implements IGenerator {
+export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | 'reset'> implements IGenerator {
     public model: TeachableLLM;
     public generator: IGenerator;
     private embeddingsData: { name: string; tensor: number[][] }[][] = [];
@@ -143,5 +143,6 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens'> im
 
     reset() {
         this.generator.reset();
+        this.emit('reset');
     }
 }

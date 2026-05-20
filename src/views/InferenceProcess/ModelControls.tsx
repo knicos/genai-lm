@@ -77,6 +77,9 @@ export default function ModelControls({ steps, onStepChange, generator, visMode,
 
                 if (step?.index === steps.length - 1 && !step.locked && playRef.current?.resolve) {
                     playRef.current.resolve();
+                    if (playRef.current.interval) {
+                        clearTimeout(playRef.current.interval);
+                    }
                     playRef.current = null;
                     return steps[(step.index + 1) % steps.length];
                 }

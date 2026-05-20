@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Button } from '@genai-fi/base';
+import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 
 export interface DocRef {
     key: string;
@@ -22,9 +23,12 @@ export default function DocumentEntry({ data, doc, onUpdate }: Props) {
     const { t } = useTranslation();
     const [editing, setEditing] = useState(false);
     const entry = data[doc.entryIndex];
-    const text = entry?.content?.[doc.contentIndex];
+    const conversation = entry?.content[doc.contentIndex] ?? null;
+    const text = entry?.content?.[doc.contentIndex]?.[0]?.content || '';
     const [draft, setDraft] = useState<string>(text);
-    if (!entry || typeof text !== 'string') return null;
+    if (!conversation) return null;
+
+    const isConversation = conversation.length > 1 || conversation[0].role !== 'text';
 
     return (
         <article
@@ -38,58 +42,67 @@ export default function DocumentEntry({ data, doc, onUpdate }: Props) {
                 <span className={style.meta}>{t('data.characters', { chars: text.length.toLocaleString() })}</span>
             </header>
 
-            <div className={style.body}>
-                {!editing && (
-                    <>
-                        <p className={style.paragraph}>{text}</p>
-                        <div className={style.actions}>
-                            <IconButton
-                                size="small"
-                                color="primary"
-                                onClick={() => {
-                                    setEditing(true);
-                                    setDraft(text);
-                                }}
-                            >
-                                <EditIcon fontSize="small" />
-                            </IconButton>
+            {!isConversation && (
+                <div className={style.body}>
+                    {!editing && (
+                        <>
+                            <p className={style.paragraph}>{text}</p>
+                            <div className={style.actions}>
+                                <IconButton
+                                    size="small"
+                                    color="primary"
+                                    onClick={() => {
+                                        setEditing(true);
+                                        setDraft(text);
+                                    }}
+                                >
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+                            </div>
+                        </>
+                    )}
+                    {editing && (
+                        <div className={style.editingContainer}>
+                            <TextField
+                                multiline
+                                rows={8}
+                                value={draft}
+                                onChange={(e) => setDraft(e.target.value)}
+                            />
+                            <div className={style.editActions}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => {
+                                        setEditing(false);
+                                        setDraft(text);
+                                    }}
+                                >
+                                    {t('data.cancel')}
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => {
+                                        if (entry) {
+                                            entry.content[doc.contentIndex][0].content = draft;
+                                        }
+                                        onUpdate();
+                                        setEditing(false);
+                                    }}
+                                >
+                                    {t('data.save')}
+                                </Button>
+                            </div>
                         </div>
-                    </>
-                )}
-                {editing && (
-                    <div className={style.editingContainer}>
-                        <TextField
-                            multiline
-                            rows={8}
-                            value={draft}
-                            onChange={(e) => setDraft(e.target.value)}
-                        />
-                        <div className={style.editActions}>
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    setEditing(false);
-                                    setDraft(text);
-                                }}
-                            >
-                                {t('data.cancel')}
-                            </Button>
-                            <Button
-                                variant="contained"
-                                onClick={() => {
-                                    if (entry) {
-                                        entry.content[doc.contentIndex] = draft;
-                                    }
-                                    onUpdate();
-                                    setEditing(false);
-                                }}
-                            >
-                                {t('data.save')}
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
+
+            {isConversation && (
+                <ConversationDisplay
+                    conversation={conversation}
+                    editable
+                />
+            )}
         </article>
     );
 }
