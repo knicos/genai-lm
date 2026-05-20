@@ -3,7 +3,7 @@ import ConversationDisplay from '../../components/ConversationDisplay/Conversati
 import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { rawGeneratorAtom } from '../../state/generator';
+import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
 import { modelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
@@ -20,6 +20,7 @@ export default function ChatConversation() {
     const ref = useRef<HTMLDivElement>(null);
     const convoRef = useRef<Conversation[]>([]);
     const animationFrameRef = useRef<number>(-1);
+    const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
 
     const ready = status !== 'loading';
 
@@ -66,7 +67,33 @@ export default function ChatConversation() {
                 }
             };
         }
-    }, [generator]);
+    }, [generator, setConversationLog]);
+
+    const doRetry = async (index: number) => {
+        if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+            return;
+        }
+
+        const text = generator.getConversation().slice(0, index + 1);
+        generator.reset();
+
+        const options = {
+            maxLength,
+            temperature,
+            attentionScores: showAttention,
+            includeProbabilities: showProbabilities,
+            topP: topP > 0 ? topP : undefined,
+            noCache: false,
+            nonConversational: false,
+        };
+
+        try {
+            await generator.generate(text, options);
+        } catch (e) {
+            console.error('Generation error:', e);
+            // ignore
+        }
+    };
 
     return (
         <div
@@ -87,7 +114,10 @@ export default function ChatConversation() {
                     navigate('generator-settings');
                 }}
             />
-            <ConversationDisplay conversation={text} />
+            <ConversationDisplay
+                conversation={text}
+                onRetry={doRetry}
+            />
         </div>
     );
 }

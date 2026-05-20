@@ -10,9 +10,10 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 interface Props {
     conversation?: ExtendedConversation[];
     editable?: boolean;
+    onRetry?: (index: number) => void;
 }
 
-export default function ConversationDisplay({ conversation, editable = false }: Props) {
+export default function ConversationDisplay({ conversation, onRetry, editable = false }: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const { t } = useTranslation();
 
@@ -22,8 +23,10 @@ export default function ConversationDisplay({ conversation, editable = false }: 
                 part.role === 'user' || part.role === 'auto_user' ? (
                     <UserItem
                         key={index}
+                        index={index}
                         item={part}
                         editable={editable}
+                        onRetry={onRetry}
                         onDelete={
                             editable
                                 ? () => {

@@ -7,14 +7,17 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 interface Props {
+    index: number;
     item: ExtendedConversation;
     editable?: boolean;
     onDelete?: () => void;
+    onRetry?: (index: number) => void;
 }
 
-export default function UserItem({ item, editable = false, onDelete }: Props) {
+export default function UserItem({ index, item, editable = false, onDelete, onRetry }: Props) {
     const { t } = useTranslation();
     const [editing, setEditing] = useState<boolean>(false);
     const [draft, setDraft] = useState<string>(item.content);
@@ -32,6 +35,19 @@ export default function UserItem({ item, editable = false, onDelete }: Props) {
                     >
                         <ContentCopyIcon fontSize="small" />
                     </IconButton>
+                    {onRetry && (
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                                if (onRetry) {
+                                    onRetry(index);
+                                }
+                            }}
+                        >
+                            <ReplayIcon fontSize="small" />
+                        </IconButton>
+                    )}
                     {editable && (
                         <>
                             <IconButton

@@ -25,12 +25,18 @@ export default function ChatPrompt() {
     useEffect(() => {
         setHasGenerated(false);
         if (generator) {
-            const h = () => {
+            const onReset = () => {
                 setHasGenerated(false);
             };
-            generator.on('reset', h);
+            generator.on('reset', onReset);
+
+            const onStart = () => {
+                setHasGenerated(true);
+            };
+            generator.on('start', onStart);
             return () => {
-                generator.off('reset', h);
+                generator.off('reset', onReset);
+                generator.off('start', onStart);
             };
         }
     }, [generator]);

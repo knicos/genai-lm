@@ -21,20 +21,6 @@ export default function InstructData() {
     const done = conversations.length > 1;
     const busy = false;
 
-    /*useEffect(() => {
-        setConversations((old) => {
-            if (old.length === 0) {
-                return [
-                    [
-                        { role: 'user', content: '' },
-                        { role: 'assistant', content: '' },
-                    ],
-                ];
-            }
-            return old;
-        });
-    }, [setConversations]);*/
-
     return (
         <Box
             widget="tuneData"
