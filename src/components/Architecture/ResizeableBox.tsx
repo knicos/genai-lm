@@ -14,7 +14,7 @@ interface Props extends PropsWithChildren {
 
 type Edge = 'left' | 'right';
 
-const HANDLE_PADDING = 40;
+const HANDLE_PADDING = 25;
 const HANDLE_WIDTH = 4;
 
 export default function ResizeableBox({
@@ -95,10 +95,18 @@ export default function ResizeableBox({
                     onPointerUp={endDrag}
                     onPointerCancel={endDrag}
                 />
+                <path
+                    d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
+                        L ${handleWidth / 2 - handleWidth * 8} ${(height - HANDLE_PADDING) / 2}
+                        L ${handleWidth / 2 - handleWidth * 8 + 4} ${(height - HANDLE_PADDING) / 2 - 4}
+                        L ${handleWidth / 2 - handleWidth * 8 + 4} ${(height - HANDLE_PADDING) / 2 + 4}
+                        L ${handleWidth / 2 - handleWidth * 8} ${(height - HANDLE_PADDING) / 2}`}
+                    className={style.handle}
+                />
                 <circle
                     cx={handleWidth / 2}
                     cy={(height - HANDLE_PADDING) / 2}
-                    r={handleWidth * 4}
+                    r={handleWidth * 3}
                     fill="white"
                     stroke="black"
                     strokeWidth={2}
@@ -133,10 +141,18 @@ export default function ResizeableBox({
                     onPointerUp={endDrag}
                     onPointerCancel={endDrag}
                 />
+                <path
+                    d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
+                        L ${handleWidth / 2 + handleWidth * 8} ${(height - HANDLE_PADDING) / 2}
+                        L ${handleWidth / 2 + handleWidth * 8 - 4} ${(height - HANDLE_PADDING) / 2 - 4}
+                        L ${handleWidth / 2 + handleWidth * 8 - 4} ${(height - HANDLE_PADDING) / 2 + 4}
+                        L ${handleWidth / 2 + handleWidth * 8} ${(height - HANDLE_PADDING) / 2}`}
+                    className={style.handle}
+                />
                 <circle
                     cx={handleWidth / 2}
                     cy={(height - HANDLE_PADDING) / 2}
-                    r={handleWidth * 4}
+                    r={handleWidth * 3}
                     fill="white"
                     stroke="black"
                     strokeWidth={2}

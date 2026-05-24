@@ -2,7 +2,7 @@
     cursor: ew-resize;
     touch-action: none;
     fill: white;
-    stroke: #75a4e288;
+    stroke: #82b8ff88;
     stroke-width: 4px;
 }
 
@@ -14,16 +14,16 @@
 .handleBar {
     cursor: ew-resize;
     touch-action: none;
-    fill: #75a4e288;
+    fill: #82b8ff88;
 }
 
 .handleGroup:hover .handle {
-    fill: #75a4e2;
-    stroke: #75a4e2;
+    fill: #147aff;
+    stroke: #147aff;
 }
 
 .handleGroup:hover .handleBar {
-    fill: #75a4e2;
+    fill: #147aff;
 }
 
 .svg {
