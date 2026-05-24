@@ -361,7 +361,10 @@
         "download": "Save",
         "autoTunePrompt": "Template prompt",
         "generateTuneData": "Generate Conversations",
-        "deleteAll": "Delete All"
+        "deleteAll": "Delete All",
+        "addLoRA": "Add Tuning",
+        "noLoRA": "No tuning",
+        "loraName": "Tuning Name"
     },
     "conversation": {
         "userPlaceholder": "Write a message...",

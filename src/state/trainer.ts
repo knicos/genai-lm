@@ -36,8 +36,8 @@ export const trainerAtom = atom<Trainer | null>(null);
 export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',
     {
-        batchSize: 16,
-        maxEpochs: 1000,
+        batchSize: 8,
+        maxEpochs: 10,
         learningRate: 1e-4,
         outputText: true,
         disableCheckpointing: false,
@@ -47,13 +47,14 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
             alpha: 8,
             variables: ['*'],
         },
-        sftMode: 'full',
+        sftMode: 'lora',
         warmupSteps: 10,
-        decayEpochs: 1,
-        weightDecay: 0.0,
+        decayEpochs: 2,
+        weightDecay: 0.01,
         logInterval: 20,
         metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
         orthoGrad: false,
+        clipNorm: 1.0,
     },
     storage
 );

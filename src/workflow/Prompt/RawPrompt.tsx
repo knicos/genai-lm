@@ -32,8 +32,15 @@ export default function ChatPrompt() {
 
             const onStart = () => {
                 setHasGenerated(true);
+                setGenerate(true);
             };
             generator.on('start', onStart);
+
+            const onStop = () => {
+                setGenerate(false);
+                //busyRef.current = false;
+            };
+            generator.on('stop', onStop);
             return () => {
                 generator.off('reset', onReset);
                 generator.off('start', onStart);

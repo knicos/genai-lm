@@ -1,0 +1,94 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.container ul {
+    list-style: none;
+    padding-left: 0;
+    width: 300px;
+}
+
+.dataRow {
+    cursor: pointer;
+}
+
+.rowContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 60px;
+    background: white;
+    white-space: nowrap;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    user-select: none;
+}
+
+.rowContent:hover {
+    background: #eff3f5;
+}
+
+.icon svg {
+    font-size: 3rem;
+}
+.rowContent:hover .icon svg {
+    color: rgba(0, 130, 151, 0.3);
+}
+.rowContent.selected .icon svg {
+    color: rgba(0, 130, 151, 0.5);
+}
+
+.rowContent button {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.rowContent:hover button {
+    visibility: visible;
+    opacity: 1;
+}
+
+.column {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+.dataName {
+    filter: blur(3px);
+    font-weight: bold;
+    color: black;
+}
+
+.dataText {
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 400px;
+    color: #666;
+}
+
+.newContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.addButton {
+    padding-right: 1rem;
+    padding-left: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}

@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { tasks, TrainingLogEntry, TrainingOptions } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { tunerSettings, tunerAtom } from '../../state/trainer';
-import NumberBox from '../../components/NumberBox/NumberBox';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import useWakeLock from '../../hooks/wakeLock';
@@ -20,14 +19,14 @@ import { useNavigate } from 'react-router-dom';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { modelAtom } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
-import FineTuneBars from '../../components/FineTuneBars/FineTuneBars';
+import LoRAList from './LoRAList';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
 export default function TuneTraining() {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(tunerAtom);
-    const [epochs, setEpochs] = useState<number | undefined>(undefined);
+    const [, setEpochs] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
@@ -41,6 +40,7 @@ export default function TuneTraining() {
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [totalSamples, setTotalSamples] = useState(0);
+    const [selectedLoRA, setSelectedLoRA] = useState<string | null>(null);
 
     useWakeLock(training);
 
@@ -130,9 +130,10 @@ export default function TuneTraining() {
 
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-            const trainingOptions = {
+            const trainingOptions: TrainingOptions = {
                 ...settings,
                 gradientCheckpointing: useCheckpointing,
+                loraName: selectedLoRA ?? undefined,
             };
             const currentTrainer = model.trainer('sft', trainingOptions);
 
@@ -200,7 +201,7 @@ export default function TuneTraining() {
         <Box
             widget="finetuner"
             active={!!model || (!!conversations && conversations.length > 0)}
-            style={{ minWidth: '260px', minHeight: '215px' }}
+            style={{ minWidth: '260px', minHeight: '200px' }}
         >
             <div className={style.container}>
                 <BoxTitle
@@ -210,29 +211,21 @@ export default function TuneTraining() {
                         !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
                     }
                 />
-                <div className={style.clockContainer}>
-                    {model && trainer && conversations && (
-                        <FineTuneBars
-                            model={model}
-                            trainer={trainer}
-                            conversations={conversations}
-                        />
-                    )}
-                </div>
-                <div className={style.buttonBox}>
-                    <Button
-                        disabled={!done && !training}
-                        variant="contained"
-                        startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
-                        onClick={() => startTraining()}
-                    >
-                        {done ? t('finetune.start') : t('finetune.stop')}
-                    </Button>
-                    <NumberBox
-                        value={(epochs || 0) * batchSize}
-                        label={t('training.samples')}
-                    />
-                </div>
+                <LoRAList
+                    model={model}
+                    selected={selectedLoRA}
+                    onSelect={setSelectedLoRA}
+                    extraActions={
+                        <Button
+                            disabled={!done && !training}
+                            variant="contained"
+                            startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
+                            onClick={() => startTraining()}
+                        >
+                            {done ? t('finetune.start') : t('finetune.stop')}
+                        </Button>
+                    }
+                />
                 {message && (
                     <BoxNotice
                         notice={message}

@@ -1,13 +1,4 @@
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    InputLabel,
-    MenuItem,
-    Select,
-    Slider,
-    TextField,
-} from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, Slider, TextField } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
@@ -149,21 +140,6 @@ export function Component() {
                         />
                     </FormControl>
                     <div className={style.spacer} />
-                    <FormControl style={{ marginTop: '2rem' }}>
-                        <InputLabel id="sftMode-label">{t('app.settings.sftMode')}</InputLabel>
-                        <Select
-                            labelId="sftMode-label"
-                            value={settings.sftMode}
-                            onChange={(e) =>
-                                setSettings({ ...settings, sftMode: e.target.value as 'last-layer' | 'full' | 'lora' })
-                            }
-                            label={t('app.settings.sftMode')}
-                        >
-                            <MenuItem value="last-layer">{t('app.settings.sftModeLastLayer')}</MenuItem>
-                            <MenuItem value="full">{t('app.settings.sftModeFull')}</MenuItem>
-                            <MenuItem value="lora">{t('app.settings.sftModeLora')}</MenuItem>
-                        </Select>
-                    </FormControl>
                     <fieldset className={style.fieldset}>
                         <legend className={style.label}>{t('app.settings.loraConfig')}</legend>
                         <FormControl>
