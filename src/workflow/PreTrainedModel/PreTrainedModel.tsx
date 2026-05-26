@@ -2,7 +2,6 @@ import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
-import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useModelBusy from '../../hooks/useModelBusy';
@@ -14,13 +13,13 @@ import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
+import { IconButton, Popover } from '@mui/material';
+import ModelName from './ModelName';
+import ModelStage from './ModelStage';
 // import useModelLoaded from '../../utilities/useModelLoaded';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-interface Props {
-    hideMenu?: boolean;
-}
-
-export default function PreTrainedModel({ hideMenu }: Props) {
+export default function PreTrainedModel() {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
     const [showSearch, setShowSearch] = useState(false);
@@ -30,6 +29,8 @@ export default function PreTrainedModel({ hideMenu }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [title, setTitle] = useState(model?.meta.name || '');
+    const [hideMenu, setHideMenu] = useState(true);
+    const anchorRef = useRef<HTMLDivElement>(null);
 
     // Prevent double loading issues
     const modelRef = useRef<TeachableLLM | undefined>(model);
@@ -135,27 +136,68 @@ export default function PreTrainedModel({ hideMenu }: Props) {
                         model={model ?? undefined}
                     />
                 )}
-                <div className={style.container}>
-                    <BoxTitle
-                        title={title}
-                        setTitle={updateModelTitle}
-                        startIcon={
-                            <div className={style.icon}>
-                                <ModelIcon />
-                            </div>
-                        }
-                        style={{ height: '60px', borderBottom: 'none', backgroundColor: '#945fbf' }}
-                        placeholder={t('model.languageModel')}
-                        dark
-                    />
-                    {!hideMenu && (
+                <div
+                    className={style.container}
+                    ref={anchorRef}
+                >
+                    <div
+                        className={style.icon}
+                        onClick={() => setHideMenu((h) => !h)}
+                    >
+                        <ModelIcon model={model ?? undefined} />
+                    </div>
+                    <div className={style.nameStatusGroup}>
+                        <ModelName
+                            title={title}
+                            setTitle={updateModelTitle}
+                            style={{ borderBottom: 'none', backgroundColor: '#945fbf' }}
+                            placeholder={t('model.languageModel')}
+                        />
+                        <ModelStage model={model ?? null} />
+                    </div>
+                    <IconButton
+                        color="inherit"
+                        onClick={() => setHideMenu((h) => !h)}
+                    >
+                        <MoreVertIcon
+                            color="inherit"
+                            fontSize="large"
+                        />
+                    </IconButton>
+                    <Popover
+                        open={!hideMenu}
+                        onClose={() => setHideMenu(true)}
+                        anchorEl={anchorRef.current}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        className={style.popover}
+                    >
                         <ModelMenu
                             disabled={modelBusy}
-                            onUpload={() => fileRef.current?.click()}
-                            onSearch={() => setShowSearch(true)}
-                            onDownload={model ? () => doSave(model?.meta.name || 'model') : undefined}
+                            onUpload={() => {
+                                fileRef.current?.click();
+                                setHideMenu(true);
+                            }}
+                            onSearch={() => {
+                                setShowSearch(true);
+                                setHideMenu(true);
+                            }}
+                            onDownload={
+                                model
+                                    ? () => {
+                                          doSave(model?.meta.name || 'model');
+                                          setHideMenu(true);
+                                      }
+                                    : undefined
+                            }
                         />
-                    )}
+                    </Popover>
                 </div>
             </BoxStandalone>
         </Help>

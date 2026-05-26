@@ -1,0 +1,49 @@
+.title {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.title h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    text-wrap: nowrap;
+    display: flex;
+}
+
+.title button {
+    color: white;
+}
+
+.title input {
+    padding: 0.4rem 1rem;
+    height: initial;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    max-width: 240px;
+}
+
+.title input:focus {
+    border: 2px solid primary;
+    border-radius: 5px;
+    cursor: initial;
+}
+
+.title fieldset {
+    border: none;
+}
+
+.title button {
+    margin-left: 0.5rem;
+}
+
+.spacer {
+    flex-grow: 1;
+}

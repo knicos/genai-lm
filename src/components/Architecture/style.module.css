@@ -45,10 +45,11 @@
 
 .box {
     cursor: pointer;
+    fill: #00a0b8;
 }
 
 .transformerBox:hover .box {
-    fill: #00a0b8;
+    fill: #a77bca;
 }
 
 .transformerBox text {

@@ -61,7 +61,7 @@ export default function ModelBox({ layers, step, done, spinning, inferenceMode }
                 done={done}
                 spin={spinning}
             >
-                <ModelIcon />
+                <ModelIcon noExtraIcon />
             </CircularProgress>
             <Help
                 message={t('training.modelBoxHelp')}

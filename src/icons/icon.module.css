@@ -1,8 +1,45 @@
 .icon {
-    width: 1em;
-    height: 1em;
+    width: 1.2em;
+    height: 1.2em;
     display: inline-block;
     user-select: none;
     flex-shrink: 0;
-    font-size: 2rem;
+    font-size: 3rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.hourglass {
+    fill: rgb(76, 175, 80);
+    opacity: 0.2;
+}
+
+.vocab {
+    fill: #00a0b8;
+}
+
+.layer {
+    fill: #00a0b8;
+}
+
+.circle {
+    fill: white;
+    stroke: none;
+}
+
+.container {
+    position: relative;
+    display: flex;
+}
+
+.extraIcon {
+    position: absolute;
+    bottom: -0.05em;
+    right: -0.1em;
+    display: flex;
+    color: var(--secondary);
+    background-color: white;
+    border-radius: 50%;
+    padding: 0.15rem;
+    overflow: hidden;
 }

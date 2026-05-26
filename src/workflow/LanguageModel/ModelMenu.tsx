@@ -32,7 +32,7 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
                     disabled={!onSearch}
                     variant="text"
                     onClick={onSearch}
-                    startIcon={<ModelIcon />}
+                    startIcon={<ModelIcon noExtraIcon />}
                 >
                     {t('model.examples')}
                 </VerticalButton>

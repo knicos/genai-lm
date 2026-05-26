@@ -1,6 +1,5 @@
 import { MouseEvent, useMemo } from 'react';
 import style from './style.module.css';
-import { theme } from '../../theme';
 
 interface Props {
     index: number;
@@ -61,7 +60,6 @@ export default function TransformerBox({
                 height={height}
                 className={style.box}
                 rx={10}
-                fill={theme.dark.chartColours[3]}
             />
             {randomNumbers.map((num, i) => (
                 <text

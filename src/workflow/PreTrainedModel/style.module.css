@@ -1,6 +1,6 @@
 .icon {
-    font-size: 2rem;
-    margin-left: 1rem;
+    font-size: 3rem;
+    margin: 0.5rem;
     display: flex;
     align-items: center;
 }
@@ -9,11 +9,14 @@
     background: #945fbf;
     color: white;
     border-radius: 20px;
+    z-index: 2000;
+    max-width: 350px;
 }
 
 .modelThread :global .MuiOutlinedInput-root {
     background: transparent;
     color: white;
+    padding-right: 0;
 }
 
 .modelThread input {
@@ -41,19 +44,23 @@
 
 .container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    position: relative;
+    align-items: center;
+    color: white;
 }
 
 .modelMenu {
-    background-color: white;
     display: flex;
-    padding: 0.5rem 1rem;
-    box-sizing: border-box;
-    /*border-bottom: 1px solid #eee;*/
-    width: 100%;
     justify-content: flex-start;
     gap: 0.5rem;
     align-items: center;
+    margin-bottom: 2rem;
+    background-color: white;
+    box-shadow: 2px 2px 4px #a4acbb;
+    padding: 0.5rem 1rem;
+    margin: 10px;
+    border-radius: 6px;
 }
 
 .headerBar {
@@ -72,6 +79,23 @@
     justify-content: center;
     align-items: center;
     min-height: 50vh;
+}
+
+.popover :global .MuiPaper-root {
+    box-shadow: none;
+    background: transparent;
+}
+
+.nameStatusGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.modelStage {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: 1rem;
 }
 
 @media (max-width: 600px) {
