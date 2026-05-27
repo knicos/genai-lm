@@ -12,8 +12,7 @@ export interface GeneratorSettings {
     attentionBlock: number;
     attentionHead: number;
     showProbabilities: boolean;
-    showSettings: boolean;
-    showPrompt: boolean;
+    promptMode: 'none' | 'completion' | 'conversation';
 }
 
 export const generatorSettings = atomWithStorage<GeneratorSettings>(
@@ -27,8 +26,23 @@ export const generatorSettings = atomWithStorage<GeneratorSettings>(
         attentionBlock: 5,
         attentionHead: 0,
         showProbabilities: false,
-        showSettings: true,
-        showPrompt: false,
+        promptMode: 'completion',
+    },
+    storage
+);
+
+export const chatSettings = atomWithStorage<GeneratorSettings>(
+    'chatSettings',
+    {
+        temperature: 0.8,
+        topK: 10,
+        topP: 0.9,
+        maxLength: 40000,
+        showAttention: false,
+        attentionBlock: 5,
+        attentionHead: 0,
+        showProbabilities: false,
+        promptMode: 'conversation',
     },
     storage
 );

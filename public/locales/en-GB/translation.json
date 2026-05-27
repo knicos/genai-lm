@@ -85,7 +85,11 @@
             "speed": "Animation speed",
             "temperatureHelp": "Higher temperature produces more random outputs as it is less likely to select the most obvious next token.",
             "trainingVis": "Training",
-            "inferenceVis": "Generation"
+            "inferenceVis": "Generation",
+            "promptMode": "Prompt Mode",
+            "promptModeNone": "None",
+            "promptModeCompletion": "Completion",
+            "promptModeConversation": "Conversation"
         },
         "close": "Close",
         "ok": "OK",

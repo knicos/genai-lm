@@ -52,19 +52,19 @@ export default function ModelIcon({ model, noExtraIcon }: Props) {
         <div className={style.container}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 64 64"
+                viewBox={noExtraIcon ? '0 0 48 48' : '0 0 64 64'}
                 fill="currentColor"
-                width="1.2em"
-                height="1.2em"
-                className={style.icon}
+                width={noExtraIcon ? '1em' : '1.2em'}
+                height={noExtraIcon ? '1em' : '1.2em'}
+                className={noExtraIcon ? style.smallIcon : style.icon}
             >
                 <circle
-                    cx="32"
-                    cy="32"
-                    r="31"
+                    cx={noExtraIcon ? '24' : '32'}
+                    cy={noExtraIcon ? '24' : '32'}
+                    r={noExtraIcon ? '23' : '31'}
                     className={style.circle}
                 />
-                <g transform="translate(16 14)">
+                <g transform={noExtraIcon ? 'translate(12 10)' : 'translate(16 14)'}>
                     <path
                         d="M0 1 L8 7 L8 25 L0 31 L32 31 L24 25 L24 7 L32 1 Z"
                         className={style.hourglass}

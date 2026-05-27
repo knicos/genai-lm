@@ -23,7 +23,7 @@
     flex-grow: 1;
     width: 100%;
     background-color: #dee4e8;
-    transition: background-color 0.3s ease;
+    /*transition: background-color 0.3s ease;*/
     position: relative;
 }
 

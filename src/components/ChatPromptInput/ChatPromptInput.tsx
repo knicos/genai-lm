@@ -7,6 +7,7 @@ import { IconButton } from '@mui/material';
 interface Props {
     onSend?: (value: string) => void;
     onStop?: () => void;
+    onChange?: (value: string) => void;
     placeholder?: string;
     disabled?: boolean;
     generating?: boolean;
@@ -15,6 +16,7 @@ interface Props {
 export default function ChatPromptInput({
     onSend,
     onStop,
+    onChange,
     placeholder = 'Send a message',
     disabled = false,
     generating = false,
@@ -59,7 +61,12 @@ export default function ChatPromptInput({
                 placeholder={generating ? '' : placeholder}
                 rows={1}
                 disabled={disabled || generating}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                    setText(e.target.value);
+                    if (onChange) {
+                        onChange(e.target.value);
+                    }
+                }}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();

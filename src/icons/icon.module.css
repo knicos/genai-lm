@@ -9,6 +9,17 @@
     line-height: 1;
 }
 
+.smallIcon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    user-select: none;
+    flex-shrink: 0;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 20px;
+}
+
 .hourglass {
     fill: rgb(76, 175, 80);
     opacity: 0.2;

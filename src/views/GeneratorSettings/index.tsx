@@ -1,4 +1,4 @@
-import { FormControl, Slider } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
@@ -72,6 +72,24 @@ export function Component() {
                             step={1000}
                             valueLabelDisplay="auto"
                         />
+                    </FormControl>
+                    <FormControl sx={{ marginTop: '1rem' }}>
+                        <InputLabel id="prompt-mode-label">{t('app.settings.promptMode')}</InputLabel>
+                        <Select
+                            label={t('app.settings.promptMode')}
+                            labelId="prompt-mode-label"
+                            value={settings.promptMode}
+                            onChange={(e: SelectChangeEvent) =>
+                                setSettings({
+                                    ...settings,
+                                    promptMode: e.target.value as 'none' | 'completion' | 'conversation',
+                                })
+                            }
+                        >
+                            <MenuItem value="none">{t('app.settings.promptModeNone')}</MenuItem>
+                            <MenuItem value="completion">{t('app.settings.promptModeCompletion')}</MenuItem>
+                            <MenuItem value="conversation">{t('app.settings.promptModeConversation')}</MenuItem>
+                        </Select>
                     </FormControl>
                 </>
             )}
