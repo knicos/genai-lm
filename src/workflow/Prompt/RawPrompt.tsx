@@ -124,7 +124,7 @@ export default function ChatPrompt() {
             topP: topP > 0 ? topP : undefined,
             noCache: false,
             nonConversational: promptMode !== 'conversation',
-            continuation: promptMode === 'completion',
+            continuation: !!prompt && prompt.length > 0 && promptMode === 'completion',
         };
 
         const filteredText = promptMode === 'none' ? [] : text.filter((part) => part.content.trim().length > 0);
@@ -163,6 +163,7 @@ export default function ChatPrompt() {
                 disabled={disable}
                 generating={generate}
                 onStop={() => generator?.stop()}
+                noPrompt={promptMode === 'none'}
             />
             {messages && (
                 <BoxNotice
