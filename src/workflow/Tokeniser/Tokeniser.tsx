@@ -122,7 +122,7 @@ export default function Tokeniser() {
                                 }
                             }}
                         >
-                            {tokenising ? t('tokeniser.stop') : t('tokeniser.start')}
+                            {t('tokeniser.start')}
                         </Button>
                     </div>
                     {message && (
