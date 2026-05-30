@@ -1,11 +1,14 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { modelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useMemo, useState } from 'react';
-import { Alert, FormControlLabel, Slider, Switch } from '@mui/material';
+import { Alert, FormControlLabel, IconButton, Slider, Switch } from '@mui/material';
 import { dataTokens } from '../../state/data';
 import { theme } from '../../theme';
+import { uiDeveloperMode } from '../../state/uiState';
+import DownloadIcon from '@mui/icons-material/Download';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 const BLOCK_SIZE = 200;
 const STEP = 10; // offset step for wheel/keys
@@ -13,10 +16,11 @@ const STEP = 10; // offset step for wheel/keys
 export function Component() {
     const { t } = useTranslation();
     const model = useAtomValue(modelAtom);
-    const data = useAtomValue(dataTokens);
+    const [data, setData] = useAtom(dataTokens);
     const [showNumbers, setShowNumbers] = useState(false);
     const [sliceIndex, setSliceIndex] = useState(0);
     const [selectedToken, setSelectedToken] = useState<number>(-1);
+    const devMode = useAtomValue(uiDeveloperMode);
 
     const tokeniser = model?.tokeniser;
     const dataLength = data?.length ?? 0;
@@ -105,6 +109,51 @@ export function Component() {
                     ))}
                 </div>
             </div>
+            {devMode && (
+                <div className={style.devTools}>
+                    <IconButton
+                        color="secondary"
+                        onClick={() => {
+                            if (data) {
+                                const blob = new Blob([data.buffer as ArrayBuffer], {
+                                    type: 'application/octet-stream',
+                                });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = 'data.bin';
+                                a.click();
+                                URL.revokeObjectURL(url);
+                            }
+                        }}
+                    >
+                        <DownloadIcon />
+                    </IconButton>
+                    <IconButton
+                        color="secondary"
+                        onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = '.bin';
+                            input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement).files?.[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                        const arrayBuffer = reader.result as ArrayBuffer;
+                                        const uint16Array = new Uint16Array(arrayBuffer);
+                                        setData(uint16Array);
+                                    };
+                                    reader.readAsArrayBuffer(file);
+                                }
+                            };
+                            input.click();
+                        }}
+                    >
+                        <FileUploadIcon />
+                    </IconButton>
+                </div>
+            )}
         </div>
     );
 }

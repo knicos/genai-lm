@@ -38,3 +38,10 @@
     background: #0a4bd6;
     color: white;
 }
+
+.devTools {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
