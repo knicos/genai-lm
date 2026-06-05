@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useMemo, useState } from 'react';
 import { Alert, FormControlLabel, IconButton, Slider, Switch } from '@mui/material';
@@ -15,7 +15,7 @@ const STEP = 10; // offset step for wheel/keys
 
 export function Component() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const [data, setData] = useAtom(dataTokens);
     const [showNumbers, setShowNumbers] = useState(false);
     const [sliceIndex, setSliceIndex] = useState(0);
@@ -23,13 +23,13 @@ export function Component() {
     const devMode = useAtomValue(uiDeveloperMode);
 
     const tokeniser = model?.tokeniser;
-    const dataLength = data?.length ?? 0;
+    const dataLength = data?.tokens.length ?? 0;
     const maxStart = Math.max(0, dataLength - BLOCK_SIZE);
 
     const clampedSliceIndex = Math.min(sliceIndex, maxStart);
 
     const slicedData = useMemo(
-        () => Array.from(data?.slice(clampedSliceIndex, clampedSliceIndex + BLOCK_SIZE) ?? []),
+        () => Array.from(data?.tokens.slice(clampedSliceIndex, clampedSliceIndex + BLOCK_SIZE) ?? []),
         [data, clampedSliceIndex]
     );
 
@@ -115,7 +115,7 @@ export function Component() {
                         color="secondary"
                         onClick={() => {
                             if (data) {
-                                const blob = new Blob([data.buffer as ArrayBuffer], {
+                                const blob = new Blob([data.tokens.buffer as ArrayBuffer], {
                                     type: 'application/octet-stream',
                                 });
                                 const url = URL.createObjectURL(blob);
@@ -142,7 +142,7 @@ export function Component() {
                                     reader.onload = () => {
                                         const arrayBuffer = reader.result as ArrayBuffer;
                                         const uint16Array = new Uint16Array(arrayBuffer);
-                                        setData(uint16Array);
+                                        setData({ tokens: uint16Array, tokeniserId: '', datasetId: '' });
                                     };
                                     reader.readAsArrayBuffer(file);
                                 }

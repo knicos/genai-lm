@@ -256,3 +256,8 @@
     grid-template-columns: repeat(2, max-content);
     min-height: 0;
 }
+
+.loading {
+    width: 80vw;
+    height: 100%;
+}

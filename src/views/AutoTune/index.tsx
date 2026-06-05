@@ -2,14 +2,15 @@ import { Button } from '@genai-fi/base';
 import { TextField } from '@mui/material';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { conversationDataAtom, datasetAtom } from '../../state/data';
+import { conversationDataAtom, dataEntries } from '../../state/data';
 import InstructGenerator from '../../utilities/InstructGenerator';
 import { Conversation } from '@genai-fi/nanogpt';
 import { useEffect, useState } from 'react';
+import { createDatasetFromEntries } from '../../utilities/dataset';
 
 export function Component() {
     const { t } = useTranslation();
-    const dataset = useAtomValue(datasetAtom);
+    const dataset = useAtomValue(dataEntries);
     const setConversations = useSetAtom(conversationDataAtom);
     const [generating, setGenerating] = useState(false);
     const [prompt, setPrompt] = useState('');
@@ -20,16 +21,15 @@ export function Component() {
             console.log('Starting instruction generation...');
             generator.on('conversation', (convo: Conversation[]) => {
                 console.log('New conversation generated:', convo);
-                setConversations((old: Conversation[][]) => [...old, convo]);
+                setConversations(async (old: Conversation[][] | Promise<Conversation[][]>) => [...(await old), convo]);
             });
             generator
                 .initialize()
-                .then(() => {
+                .then(async () => {
+                    const data = await createDatasetFromEntries(dataset);
                     generator
                         .start({
-                            dataSet: dataset
-                                .map((entry) => entry.map((item) => item.content).flat())
-                                .flat(2) as string[],
+                            dataSet: data.map((entry) => entry.map((item) => item.content).flat()).flat(2) as string[],
                             count: 10,
                             rate: 1,
                             mode: 'direct',
@@ -51,7 +51,7 @@ export function Component() {
                 generator.stop();
             };
         }
-    }, [generating, dataset, setConversations]);
+    }, [generating, dataset, setConversations, prompt]);
 
     return (
         <div className="sidePanel">

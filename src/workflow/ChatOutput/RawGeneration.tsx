@@ -4,14 +4,14 @@ import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router-dom';
 import { conversationDataAtom } from '../../state/data';
 
 export default function ChatConversation() {
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const [generator, setGenerator] = useAtom(rawGeneratorAtom);
     const setConversationLog = useSetAtom(conversationDataAtom);
     const [text, setText] = useState<Conversation[]>([]);
@@ -22,15 +22,13 @@ export default function ChatConversation() {
     const animationFrameRef = useRef<number>(-1);
     const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
 
-    const ready = status !== 'loading';
-
     useEffect(() => {
-        if (ready && model) {
+        if (model) {
             const generator = model.generator();
             setGenerator(generator);
             setText([]);
         }
-    }, [model, ready, setGenerator]);
+    }, [model, setGenerator]);
 
     useEffect(() => {
         if (generator) {
@@ -49,12 +47,13 @@ export default function ChatConversation() {
             h();
 
             const onEnd = () => {
-                setConversationLog((prev) => {
+                setConversationLog(async (prev) => {
                     const convo = generator.getConversation();
-                    if (prev.includes(convo)) {
-                        return [...prev];
+                    const data = await prev;
+                    if (data.includes(convo)) {
+                        return [...data];
                     }
-                    return [...prev, convo];
+                    return [...data, convo];
                 });
             };
             generator.on('stop', onEnd);

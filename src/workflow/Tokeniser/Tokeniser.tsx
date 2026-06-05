@@ -1,7 +1,7 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { datasetAtom, dataTokens, tokeniserInvalid } from '../../state/data';
-import { modelAtom } from '../../state/model';
+import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
+import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
@@ -12,27 +12,24 @@ import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
+import { createDatasetFromEntries } from '../../utilities/dataset';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     //const status = useModelStatus(model ?? undefined);
-    const dataset = useAtomValue(datasetAtom);
+    const dataset = useAtomValue(dataEntries);
+    const datasetId = useAtomValue(datasetIdAtom);
     const [tokenising, setTokenising] = useState(false);
     const [done, setDone] = useState(model?.loaded && model.tokeniser.trained);
     const phase = useModelPhase(model ?? undefined);
-    const [invalid, setInvalid] = useAtom(tokeniserInvalid);
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
     const [count, setCount] = useState(0);
 
     const isTrained = model?.loaded && model.tokeniser.trained;
 
-    useEffect(() => {
-        if (dataset && dataset.length > 0) {
-            setInvalid(true);
-        }
-    }, [dataset, setInvalid]);
+    const invalid = isTrained && datasetId !== model.tokeniser.datasetID;
 
     useEffect(() => {
         const h = () => {
@@ -89,16 +86,20 @@ export default function Tokeniser() {
                             disabled={tokenising}
                             variant="contained"
                             startIcon={<ConstructionIcon />}
-                            onClick={() => {
+                            onClick={async () => {
                                 if (model && dataset && dataset.length > 0) {
                                     setTokenising(true);
+                                    const data = await createDatasetFromEntries(dataset);
                                     model?.tokeniser
-                                        .train(dataset, (progress) => {
-                                            setCount(progress);
-                                        })
+                                        .train(
+                                            data,
+                                            (progress) => {
+                                                setCount(progress);
+                                            },
+                                            datasetId
+                                        )
                                         .then(() => {
                                             setTokenising(false);
-                                            setInvalid(false);
                                             setTokens(null);
                                         })
                                         .catch((e) => {

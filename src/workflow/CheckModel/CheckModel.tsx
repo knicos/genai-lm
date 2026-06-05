@@ -12,6 +12,7 @@ import { useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -71,9 +72,8 @@ export default function CheckModel() {
                     )}
                     <div className={style.buttonBox}>
                         <Button
-                            disabled={isUpToDate}
                             variant="contained"
-                            startIcon={<ConstructionIcon />}
+                            startIcon={isUpToDate ? <RestoreIcon /> : <ConstructionIcon />}
                             fullWidth
                             onClick={() => {
                                 if (exceedsSizeLimit) {
@@ -98,7 +98,7 @@ export default function CheckModel() {
                                 });
                             }}
                         >
-                            {t('checkmodel.start')}
+                            {t(isUpToDate ? 'checkmodel.refresh' : 'checkmodel.start')}
                         </Button>
                     </div>
                     {message && (

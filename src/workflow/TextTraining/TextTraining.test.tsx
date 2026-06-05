@@ -5,7 +5,7 @@ import TextTraining from './TextTraining';
 import { CharTokeniser, Conversation, tasks, tokensFromTasks, type TeachableLLM } from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
 import { createStore } from 'jotai';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import TestWrapper from '../../utilities/TestWrapper';
 import { dataTokens } from '../../state/data';
 import { WorkflowLayout } from '@genai-fi/base';
@@ -53,11 +53,11 @@ describe('TextTraining', () => {
 
         const store = createStore();
 
-        store.set(modelAtom, mockModel);
+        store.set(loadedModelAtom, mockModel);
 
         const task = new tasks.PretrainingTask(dataset);
         const tokens = await tokensFromTasks([task], tokeniser);
-        store.set(dataTokens, tokens);
+        store.set(dataTokens, { tokens, tokeniserId: '', datasetId: '' });
 
         render(
             <TestWrapper initializeState={store}>
@@ -97,6 +97,7 @@ describe('TextTraining', () => {
                 train: trainFunc,
                 getTotalSamples: () => 1000,
                 options: {},
+                log: [],
             })),
             tokeniser: {
                 trained: true,
@@ -111,14 +112,14 @@ describe('TextTraining', () => {
 
         const store = createStore();
 
-        store.set(modelAtom, mockModel);
+        store.set(loadedModelAtom, mockModel);
 
         const dataset = ['some test text'];
         const tokeniser = new CharTokeniser(100);
         await tokeniser.train(textToConversations(dataset));
         const task = new tasks.PretrainingTask(dataset);
         const tokens = await tokensFromTasks([task], tokeniser);
-        store.set(dataTokens, tokens);
+        store.set(dataTokens, { tokens, tokeniserId: '', datasetId: '' });
 
         render(
             <TestWrapper initializeState={store}>

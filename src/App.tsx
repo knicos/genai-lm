@@ -14,6 +14,7 @@ import { theme } from '@genai-fi/base';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import logger from './utilities/logger';
+import { store } from './state/store';
 
 interface RouterError {
     status: number;
@@ -155,7 +156,7 @@ function App({ router }: Props) {
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
-                <Provider>
+                <Provider store={store}>
                     <DndProvider backend={HTML5Backend}>
                         <React.Suspense fallback={'...'}>
                             <RouterProvider router={router || defaultRouter} />

@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren, Suspense, useEffect } from 'react';
 import style from './style.module.css';
 
 interface Props extends PropsWithChildren {
@@ -27,7 +27,10 @@ export default function Frame({ name, children, columns, ignoredColumns, observe
             const element = document.getElementById(`frame-${name}`);
             if (element) {
                 const t = setTimeout(() => {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.scrollIntoView({
+                        behavior: performance.now() > 5000 ? 'smooth' : 'instant',
+                        block: 'center',
+                    });
                 }, 100);
                 return () => clearTimeout(t);
             } else {
@@ -51,7 +54,7 @@ export default function Frame({ name, children, columns, ignoredColumns, observe
                 }, max-content)`,
             }}
         >
-            {children}
+            <Suspense fallback={<div className={style.loading}>...</div>}>{children}</Suspense>
         </div>
     );
 }

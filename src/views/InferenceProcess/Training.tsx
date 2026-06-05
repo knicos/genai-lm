@@ -40,11 +40,11 @@ export function Training({ model, step, loaded }: Props) {
 
         const vocab = model.tokeniser.getVocab();
         const largestToken = Math.max(1, vocab[vocab.length - 1].length);
-        const totalDatasetLength = dataset.length;
+        const totalDatasetLength = dataset.tokens.length;
         const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
         // eslint-disable-next-line react-hooks/purity
         const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
-        const newTokens = dataset.slice(randomStart, randomStart + sliceSize);
+        const newTokens = dataset.tokens.slice(randomStart, randomStart + sliceSize);
 
         //const sampleText = model.tokeniser.decode(newTokens);
         const slicedTokens = newTokens.slice(0, model.config.blockSize);

@@ -1,24 +1,23 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom, modelConfigAtom } from '../../state/model';
-import waitModelLoaded from '../../utilities/waitModelLoaded';
+import { createEntriesFromManifest, dataEntries, dataTokens } from '../../state/data';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Modal } from '@mui/material';
-import { Spinner } from '@genai-fi/base';
-import style from './style.module.css';
 import { FlowType } from '../../hooks/useChangePath';
+import { get, del } from 'idb-keyval';
 
 const PRETRAINED_URL = 'https://store.gen-ai.fi/llm/BPE_Stories.zip';
 
 export default function Initialiser() {
     const { t } = useTranslation();
     // const [searchParams] = useSearchParams();
-    const [modelConfig, setModelConfig] = useAtom(modelConfigAtom);
+    const modelConfig = useAtomValue(modelConfigAtom);
     const [, setModel] = useAtom(modelAtom);
     const { flow } = useParams() as { flow: FlowType };
-    const [loading, setLoading] = useState(false);
+    const setDataTokens = useSetAtom(dataTokens);
+    const setDataEntries = useSetAtom(dataEntries);
 
     const pageLog = useRef(new Set<string>());
 
@@ -27,58 +26,76 @@ export default function Initialiser() {
         newModel.meta.id = 'untrained-custom';
         newModel.meta.name = t('model.defaultName');
         newModel.meta.trained = false;
-        await waitModelLoaded(newModel);
         setModel(newModel);
+        del('dataTokens_tokens');
+        del('dataTokens_tokeniserId');
+        del('dataTokens_datasetId');
     };
 
     const loadModel = async (url: string) => {
         const blob = await fetch(url).then((res) => res.blob());
         const file = new File([blob], `model.zip`, { type: 'application/zip' });
         const newModel = TeachableLLM.loadModel(file, { sourceURL: url });
-        newModel.meta.id = 'unknown-loaded';
-        newModel.meta.name = t('model.defaultName');
-        newModel.meta.trained = true;
-
-        await waitModelLoaded(newModel);
         setModel(newModel);
-        setModelConfig(newModel.config);
+        del('dataTokens_tokens');
+        del('dataTokens_tokeniserId');
+        del('dataTokens_datasetId');
+    };
+
+    const initialise = async () => {
+        const checkpoint = await get('model_checkpoint');
+
+        if (checkpoint) {
+            const newModel = TeachableLLM.loadModel(checkpoint as File);
+            setModel(newModel);
+
+            const existingTokens: Uint16Array | undefined = await get('dataTokens_tokens');
+            const existingTokeniserId: string | undefined = await get('dataTokens_tokeniserId');
+            const existingDatasetId: string | undefined = await get('dataTokens_datasetId');
+
+            newModel.on('loaded', () => {
+                if (existingTokens && existingTokeniserId === newModel.tokeniser.id && existingDatasetId) {
+                    setDataTokens({
+                        tokens: existingTokens,
+                        tokeniserId: existingTokeniserId,
+                        datasetId: existingDatasetId,
+                    });
+                } else {
+                    setDataTokens(null);
+                    del('dataTokens_tokens');
+                    del('dataTokens_tokeniserId');
+                    del('dataTokens_datasetId');
+                }
+
+                if (newModel.meta.pretrainingData) {
+                    createEntriesFromManifest(newModel.meta.pretrainingData).then((entries) => {
+                        setDataEntries(entries);
+                    });
+                }
+            });
+
+            return;
+        }
+
+        if (flow === 'pretraindata') {
+            buildModel().catch((e) => {
+                console.error('Failed to build model', e);
+            });
+        } else if (flow === 'pretrain') {
+            // Load and tokenise data
+            buildModel().catch((e) => {
+                console.error('Failed to build model', e);
+            });
+            // Also load data
+        } else if (flow === 'finetune') {
+            loadModel(PRETRAINED_URL).catch((e) => {
+                console.error('Failed to load pretrained model', e);
+            });
+        }
     };
 
     if (pageLog.current.size === 0 && flow !== 'home') {
-        console.log(`Visited page for first time: ${flow}`);
-        if (flow === 'pretraindata') {
-            setLoading(true);
-            buildModel()
-                .then(() => {
-                    setLoading(false);
-                })
-                .catch((e) => {
-                    console.error('Failed to build model', e);
-                    setLoading(false);
-                });
-        } else if (flow === 'pretrain') {
-            setLoading(true);
-            // Load and tokenise data
-            buildModel()
-                .then(() => {
-                    setLoading(false);
-                })
-                .catch((e) => {
-                    console.error('Failed to build model', e);
-                    setLoading(false);
-                });
-            // Also load data
-        } else if (flow === 'finetune') {
-            setLoading(true);
-            loadModel(PRETRAINED_URL)
-                .then(() => {
-                    setLoading(false);
-                })
-                .catch((e) => {
-                    console.error('Failed to load pretrained model', e);
-                    setLoading(false);
-                });
-        }
+        initialise();
     }
     if (flow !== 'home') {
         pageLog.current.add(flow);
@@ -95,11 +112,6 @@ export default function Initialiser() {
             // loadModelById('untrained-small');
         }
     }, [modelParam, loadModelById]);*/
-    return (
-        <Modal open={loading}>
-            <div className={style.loadingContainer}>
-                <Spinner />
-            </div>
-        </Modal>
-    );
+
+    return null;
 }

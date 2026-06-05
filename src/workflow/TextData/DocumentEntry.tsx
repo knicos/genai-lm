@@ -6,6 +6,8 @@ import { IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Button } from '@genai-fi/base';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
+import useContent from '../../hooks/useContent';
+import useDataEntryStatus from '../../hooks/useDataEntryStatus';
 
 export interface DocRef {
     key: string;
@@ -14,19 +16,21 @@ export interface DocRef {
 }
 
 interface Props {
-    data: DataEntry[];
+    data: DataEntry;
     doc: DocRef;
-    onUpdate: () => void;
 }
 
-export default function DocumentEntry({ data, doc, onUpdate }: Props) {
+export default function DocumentEntry({ data, doc }: Props) {
     const { t } = useTranslation();
     const [editing, setEditing] = useState(false);
-    const entry = data[doc.entryIndex];
-    const conversation = entry?.content[doc.contentIndex] ?? null;
-    const text = entry?.content?.[doc.contentIndex]?.[0]?.content || '';
+    const entry = data;
+    const content = useContent(entry);
+    useDataEntryStatus(entry);
+    const conversation = content?.[doc.contentIndex] ?? null;
+    const text = content?.[doc.contentIndex]?.[0]?.content || '';
     const [draft, setDraft] = useState<string>(text);
     if (!conversation) return null;
+    if (!entry) return null;
 
     const isConversation = conversation.length > 1 || conversation[0].role !== 'text';
 
@@ -37,7 +41,7 @@ export default function DocumentEntry({ data, doc, onUpdate }: Props) {
         >
             <header className={style.header}>
                 <h4 className={style.title}>
-                    {entry.content.length > 1 ? `${entry.name} (${doc.contentIndex + 1})` : entry.name}
+                    {content && content.length > 1 ? `${entry.name} (${doc.contentIndex + 1})` : entry.name}
                 </h4>
                 <span className={style.meta}>{t('data.characters', { chars: text.length.toLocaleString() })}</span>
             </header>
@@ -82,10 +86,10 @@ export default function DocumentEntry({ data, doc, onUpdate }: Props) {
                                 <Button
                                     variant="contained"
                                     onClick={() => {
-                                        if (entry) {
-                                            entry.content[doc.contentIndex][0].content = draft;
+                                        if (entry && content) {
+                                            content[doc.contentIndex][0].content = draft;
                                         }
-                                        onUpdate();
+                                        // onUpdate();
                                         setEditing(false);
                                     }}
                                 >

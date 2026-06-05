@@ -100,8 +100,8 @@ export function Component() {
                             value={settings.layerDrop}
                             onChange={(_, value) => setSettings({ ...settings, layerDrop: value as number })}
                             min={0}
-                            max={0.5}
-                            step={0.1}
+                            max={0.1}
+                            step={0.01}
                             valueLabelDisplay="auto"
                         />
                     </FormControl>
@@ -170,7 +170,7 @@ export function Component() {
                                 value={settings.decayEpochs}
                                 onChange={(_, value) => setSettings({ ...settings, decayEpochs: value as number })}
                                 min={1}
-                                max={100}
+                                max={10}
                                 step={1}
                                 valueLabelDisplay="auto"
                             />
@@ -187,7 +187,7 @@ export function Component() {
                                 value={settings.weightDecay}
                                 onChange={(_, value) => setSettings({ ...settings, weightDecay: value as number })}
                                 min={0}
-                                max={0.2}
+                                max={0.1}
                                 step={0.01}
                                 valueLabelDisplay="auto"
                             />

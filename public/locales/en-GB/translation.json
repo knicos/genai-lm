@@ -134,17 +134,20 @@
         "samples": "Samples",
         "search": "Datasets",
         "downloading": "Downloading {{count}} file(s)",
+        "load": "Load",
         "errors": {
             "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx).",
             "downloadLoadError": "There was an unknown error loading the downloaded file."
         },
         "characters": "{{chars}} characters",
-        "loadingMoreDocuments": "Loading more documents..."
+        "loadingMoreDocuments": "Loading more documents...",
+        "missingFile": "File not available",
+        "missingData": "Data not found"
     },
     "checkmodel": {
         "title": "Build Model",
         "start": "Build",
-        "stop": "Stop",
+        "refresh": "Reset",
         "outdated": "The model needs to be rebuilt",
         "upToDate": "Model is ready to use.",
         "help": "Building a model will allocate resources and assign random numbers to the parameters.",
@@ -193,6 +196,7 @@
     "training": {
         "title": "Pre-Training",
         "samples": "Samples",
+        "tokens": "Tokens",
         "start": "Train",
         "stop": "Pause",
         "hours": "Hr",
@@ -257,6 +261,7 @@
         "perplexity": "Perplexity",
         "loss": "Loss",
         "samplesPerSecond": "Samples/s",
+        "tokensPerSecond": "Tokens/s",
         "memory": "Memory",
         "gradientNorm": "Grad Norm",
         "accuracy": "Accuracy"

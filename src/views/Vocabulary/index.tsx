@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { MouseEvent, PointerEvent, useEffect, useMemo, useState } from 'react';
 import { FormControlLabel, Switch } from '@mui/material';
@@ -8,7 +8,7 @@ import InfoPop from '../../components/InfoPop/InfoPop';
 
 export function Component() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const [anchor, setAnchor] = useState<null | HTMLElement>(null);
     const [selectedToken, setSelectedToken] = useState<number | null>(null);
     const [includeSpecial, setIncludeSpecial] = useState(false);

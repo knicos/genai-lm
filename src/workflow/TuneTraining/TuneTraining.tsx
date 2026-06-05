@@ -17,7 +17,7 @@ import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
 import LoRAList from './LoRAList';
 
@@ -30,7 +30,7 @@ export default function TuneTraining() {
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const conversations = useAtomValue(conversationDataAtom);
     const settings = useAtomValue(tunerSettings);
@@ -61,7 +61,7 @@ export default function TuneTraining() {
                         action: 'training_step',
                         step: log.step,
                         loss: log.trainingMetrics.loss,
-                        samplesPerSecond: log.samplesPerSecond,
+                        tokensPerSecond: log.tokensPerSecond,
                         validationLoss: log.validationMetrics?.loss,
                     });
                 }

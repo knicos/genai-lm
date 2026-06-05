@@ -18,7 +18,7 @@ export default function useWorkflowItems(): Item[] {
     const preData = useAtomValue(dataTokens);
 
     const step1 = loaded;
-    const step2 = preData && preData.length > 0;
+    const step2 = preData && preData.tokens.length > 0;
     const step3 = step1 && step2 && phase === 'pretrained';
     const step4 = step1 && step2 && phase === 'finetuned';
 

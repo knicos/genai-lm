@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, RefObject, useRef, useState } from 'react';
 import style from './style.module.css';
 import { Conversation, loadTextData } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,9 @@ import { v4 as uuid } from 'uuid';
 import logger from '../../utilities/logger';
 import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { dataEntries, DataEntry, dataReady, datasetAtom, downloadsAtom } from '../../state/data';
-import { modelAtom } from '../../state/model';
+import { useAtom, useAtomValue } from 'jotai';
+import { dataEntries, DataEntry, dataReady } from '../../state/data';
+import { loadedModelAtom } from '../../state/model';
 import ProgressiveDocumentFeed from './ProgressiveDocumentFeed';
 
 interface DragObject {
@@ -33,16 +33,7 @@ async function handleTextLoad(
     source: 'file' | 'input' | 'search',
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
-    setData((prev) => [
-        ...prev,
-        {
-            id,
-            name,
-            content: text,
-            size: text.reduce((acc, curr) => acc + curr.length, 0),
-            source,
-        },
-    ]);
+    setData((prev) => [...prev, new DataEntry(id, name, text, source)]);
 }
 
 export default function TextData() {
@@ -50,29 +41,24 @@ export default function TextData() {
     const [, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [data, setData] = useAtom(dataEntries);
-    const setDataset = useSetAtom(datasetAtom);
+    //const setDataset = useSetAtom(datasetAtom);
     const [showInput, setShowInput] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const [selected, setSelected] = useState<number>(-1);
-    const [downloads, setDownloads] = useAtom(downloadsAtom);
-    const [selectedSet, setSelectedSet] = useState<Set<string>>();
+    //const [downloads, setDownloads] = useAtom(downloadsAtom);
     const status = useModelStatus(model ?? undefined);
     const [message, setMessage] = useState<Notice | null>(null);
     const done = useAtomValue(dataReady);
 
     const disable = status === 'training' || status === 'busy';
 
-    useEffect(() => {
-        const newDataset = data.map((entry) => entry.content).flat();
-        setSelectedSet(new Set(data.map((entry) => entry.id)));
-        setDataset(newDataset);
-    }, [data, setDataset]);
+    const selectedSet = new Set(data.map((entry) => entry.id));
 
-    const doUpdate = useCallback(() => {
+    /*const doUpdate = useCallback(() => {
         const newDataset = data.map((entry) => entry.content).flat();
-        setDataset(newDataset);
-    }, [data, setDataset]);
+        //setDataset(newDataset);
+    }, [data, setDataset]);*/
 
     const [dropProps, drop] = useDrop(
         {
@@ -144,13 +130,7 @@ export default function TextData() {
                         setSelected(-1);
                         setData((prev) => [
                             ...prev,
-                            {
-                                id: uuid(),
-                                name: t('data.untitled'),
-                                content: [[{ role: 'text', content: '' }]],
-                                size: 0,
-                                source: 'input',
-                            },
+                            new DataEntry(uuid(), t('data.untitled'), [[{ role: 'text', content: '' }]], 'input'),
                         ]);
                     }}
                     onSearch={() => setShowSearch(true)}
@@ -162,52 +142,55 @@ export default function TextData() {
                 >
                     <DataListing
                         data={data}
-                        onDelete={(index) => setData((prev) => prev.filter((_, i) => i !== index))}
+                        onDelete={(index) =>
+                            setData((prev) =>
+                                prev.filter((entry, i) => {
+                                    if (i === index) {
+                                        entry.dispose();
+                                    }
+                                    return i !== index;
+                                })
+                            )
+                        }
                         selected={selected}
-                        setSelected={(index: number) => {
-                            setSelected((prev) => (prev === index ? -1 : index));
-                        }}
+                        setSelected={setSelected}
                     />
 
                     <ProgressiveDocumentFeed
-                        data={selected >= 0 ? [data[selected]] : data}
+                        data={selected >= 0 ? data[selected] : data}
                         initialCount={8}
                         step={6}
                         rootMargin="800px"
-                        onUpdate={doUpdate}
                     />
                     {showInput && (
                         <TextInput
                             initialText={
                                 selectedItem && selectedItem.source === 'input'
-                                    ? selectedItem.content[0][0].content
+                                    ? selectedItem.syncContent?.[0][0].content
                                     : undefined
                             }
                             onClose={() => setShowInput(false)}
                             onText={(text) => {
                                 if (selectedItem) {
                                     setData((prev) =>
-                                        prev.map((entry, i) =>
-                                            i === selected
-                                                ? {
-                                                      ...entry,
-                                                      content: [[{ role: 'text', content: text }]],
-                                                      size: text.length,
-                                                  }
-                                                : entry
-                                        )
+                                        prev.map((entry, i) => {
+                                            if (i === selected) {
+                                                entry.content = [[{ role: 'text', content: text }]];
+                                            }
+
+                                            return entry;
+                                        })
                                     );
                                 } else {
                                     logger.log({ action: 'added_input_text', size: text.length });
                                     setData((prev) => [
                                         ...prev,
-                                        {
-                                            id: uuid(),
-                                            name: t('data.untitled'),
-                                            content: [[{ role: 'text', content: text }]],
-                                            size: text.length,
-                                            source: 'input',
-                                        },
+                                        new DataEntry(
+                                            uuid(),
+                                            t('data.untitled'),
+                                            [[{ role: 'text', content: text }]],
+                                            'input'
+                                        ),
                                     ]);
                                 }
                                 setShowInput(false);
@@ -218,9 +201,9 @@ export default function TextData() {
                         <TextSearch
                             selectedSet={selectedSet}
                             onClose={() => setShowSearch(false)}
-                            downloads={downloads}
+                            downloads={[]}
                             onDownload={(downloader) => {
-                                setDownloads((prev) => [...prev, downloader]);
+                                /*setDownloads((prev) => [...prev, downloader]);
                                 downloader.on('error', () => {
                                     setDownloads((prev) => prev.filter((d) => d !== downloader));
                                     setMessage({
@@ -243,7 +226,11 @@ export default function TextData() {
                                         });
                                     }
                                     setDownloads((prev) => prev.filter((d) => d !== downloader));
-                                });
+                                });*/
+                                setData((prev) => [
+                                    ...prev,
+                                    new DataEntry(downloader.id, downloader.name, downloader, 'search'),
+                                ]);
                             }}
                         />
                     )}

@@ -1,11 +1,8 @@
-import { IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-import style from './DataListing.module.css';
-import CloseIcon from '@mui/icons-material/Close';
-import { MouseEvent } from 'react';
+import { List, ListItem } from '@mui/material';
 import { DataEntry } from '../../state/data';
-import DescriptionIcon from '@mui/icons-material/Description';
 import InfoPanel from './InfoPanel';
 import { useTranslation } from 'react-i18next';
+import DataListItem from './DataListItem';
 
 interface Props {
     data: DataEntry[];
@@ -19,30 +16,14 @@ export default function DataListing({ data, onDelete, selected, setSelected }: P
     return (
         <List style={{ width: '100%', flex: '0 1 300px', overflowY: 'auto', boxSizing: 'border-box' }}>
             {data.map((entry, index) => (
-                <ListItem
-                    key={index}
-                    className={style.item}
-                >
-                    <ListItemButton
-                        selected={index === selected}
-                        onClick={() => setSelected && setSelected(index)}
-                    >
-                        <ListItemAvatar className={style.avatar}>
-                            <DescriptionIcon fontSize="large" />
-                        </ListItemAvatar>
-                        <ListItemText primary={entry.name} />
-                        <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={(e: MouseEvent) => {
-                                e.stopPropagation();
-                                onDelete(index);
-                            }}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    </ListItemButton>
-                </ListItem>
+                <DataListItem
+                    entry={entry}
+                    index={index}
+                    key={entry.id}
+                    onDelete={onDelete}
+                    selected={selected ?? -1}
+                    setSelected={setSelected}
+                />
             ))}
             {data.length === 0 && (
                 <ListItem>

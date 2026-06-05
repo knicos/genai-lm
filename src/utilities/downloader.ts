@@ -12,6 +12,7 @@ export default class Downloader {
     protected _total = 0;
     protected _loaded = 0;
     protected _cancelled = false;
+    protected _downloading = false;
     private controller = new AbortController();
 
     get loaded() {
@@ -22,6 +23,10 @@ export default class Downloader {
         return this._total;
     }
 
+    get downloading() {
+        return this._downloading;
+    }
+
     constructor(id: string, url: string, name: string, type: string) {
         this.id = id;
         this.url = url;
@@ -29,8 +34,9 @@ export default class Downloader {
         this.type = type;
     }
 
-    private async start() {
+    async start() {
         this._cancelled = false;
+        this._downloading = true;
 
         this.ee.emit('start');
         try {
@@ -85,6 +91,7 @@ export default class Downloader {
 
     public cancel() {
         this._cancelled = true;
+        this._downloading = false;
         this.controller.abort();
     }
 
@@ -112,7 +119,7 @@ export default class Downloader {
 
     static downloadFile(id: string, url: string, name: string, type: string): Downloader {
         const downloader = new Downloader(id, url, name, type);
-        downloader.start();
+        // downloader.start();
         return downloader;
     }
 }

@@ -1,8 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import { useEffect, useMemo, useState } from 'react';
-import useModelLoaded from '../../hooks/useModelLoaded';
 import ModelControls, { AnimationStep } from './ModelControls';
 import { rawGeneratorAtom } from '../../state/generator';
 import VirtualGenerator from './VirtualGenerator';
@@ -15,8 +14,7 @@ import useQueryState from '../../hooks/useQueryState';
 
 export function Component() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
-    const loaded = useModelLoaded(model ?? undefined);
+    const model = useAtomValue(loadedModelAtom);
     const [generator, setGenerator] = useAtom(rawGeneratorAtom);
     const trainer = useAtomValue(trainerAtom);
     const [visMode, setVisMode] = useQueryState<'training' | 'inference'>('vismode', 'inference');
@@ -47,9 +45,9 @@ export function Component() {
     }, [model, setGenerator, setVisMode]);
 
     const steps = useMemo<AnimationStep[]>(() => {
-        if (!model || !loaded) return [];
+        if (!model) return [];
         return visMode === 'inference' ? inferenceSteps(model.config) : trainingSteps(model.config);
-    }, [model, loaded, visMode]);
+    }, [model, visMode]);
 
     // Hook into the trainer
     useEffect(() => {
@@ -69,7 +67,7 @@ export function Component() {
         setStep(steps[0] ?? null);
     }, [steps]);
 
-    const ready = model && loaded;
+    const ready = !!model;
 
     return (
         <div className="sidePanel">
@@ -87,12 +85,12 @@ export function Component() {
                     generator={generator}
                     step={step}
                     model={model}
-                    loaded={loaded}
+                    loaded={true}
                 />
             ) : (
                 <Training
                     model={model}
-                    loaded={loaded}
+                    loaded={true}
                     step={step}
                 />
             )}

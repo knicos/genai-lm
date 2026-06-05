@@ -42,7 +42,7 @@ export default function DataBox({ inferenceMode = false }: Props) {
                             {t('tools.data')} (
                             {inferenceMode
                                 ? t('tools.dataUnused')
-                                : t('tools.ntokens', { N: prettyNumber(data?.length ?? 0, t) })}
+                                : t('tools.ntokens', { N: prettyNumber(data?.tokens.length ?? 0, t) })}
                             )
                         </h3>
                     </div>

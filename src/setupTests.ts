@@ -17,6 +17,12 @@ function MOCK_T(str: string) {
     return str;
 }
 
+vi.mock('idb-keyval', () => ({
+    get: () => Promise.resolve(),
+    set: () => Promise.resolve(),
+    del: () => Promise.resolve(),
+}));
+
 vi.mock('react-i18next', () => ({
     useTranslation: () => {
         return {
@@ -69,6 +75,7 @@ class IntersectionObserver {
     disconnect() {}
     root = null;
     rootMargin = '';
+    scrollMargin = '';
     thresholds = [];
     takeRecords() {
         return [];

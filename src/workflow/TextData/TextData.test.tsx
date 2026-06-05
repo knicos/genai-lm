@@ -9,7 +9,7 @@ import { createStore } from 'jotai';
 import { modelAtom } from '../../state/model';
 import TestWrapper from '../../utilities/TestWrapper';
 import JotaiObserver from '../../utilities/Observer';
-import { datasetAtom } from '../../state/data';
+import { dataEntries } from '../../state/data';
 import { WorkflowLayout } from '@genai-fi/base';
 
 describe('TextData', () => {
@@ -81,7 +81,7 @@ describe('TextData', () => {
         render(
             <DndProvider backend={HTML5Backend}>
                 <JotaiObserver
-                    node={datasetAtom}
+                    node={dataEntries}
                     onChange={dataCB}
                 />
                 <WorkflowLayout connections={[]}>

@@ -5,11 +5,10 @@ import { useTranslation } from 'react-i18next';
 import DocumentEntry from './DocumentEntry';
 
 interface Props {
-    data: DataEntry[];
+    data: DataEntry | DataEntry[];
     initialCount?: number;
     step?: number;
     rootMargin?: string;
-    onUpdate: () => void;
 }
 
 interface Cursor {
@@ -27,7 +26,7 @@ function normalizeCursor(data: DataEntry[], cursor: Cursor): Cursor {
     let { entryIndex, contentIndex } = cursor;
 
     while (entryIndex < data.length) {
-        const len = data[entryIndex]?.content.length ?? 0;
+        const len = data[entryIndex]?.length ?? 0;
         if (contentIndex < len) return { entryIndex, contentIndex };
         entryIndex += 1;
         contentIndex = 0;
@@ -59,13 +58,7 @@ function takeNextDocs(data: DataEntry[], start: Cursor, count: number) {
     return { docs, nextCursor: cursor, hasMore };
 }
 
-export default function ProgressiveDocumentFeed({
-    data,
-    initialCount = 8,
-    step = 6,
-    rootMargin = '800px',
-    onUpdate,
-}: Props) {
+export default function ProgressiveDocumentFeed({ data, initialCount = 8, step = 6, rootMargin = '800px' }: Props) {
     const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const sentinelRef = useRef<HTMLDivElement>(null);
@@ -75,13 +68,16 @@ export default function ProgressiveDocumentFeed({
     const [visibleDocs, setVisibleDocs] = useState<DocRef[]>([]);
     const [hasMore, setHasMore] = useState(false);
 
+    const dataArray = Array.isArray(data) ? data : [data];
+
     const loadMore = useCallback(
         (count = step, replace = false) => {
             if (loadingRef.current) return;
             loadingRef.current = true;
+            const dataArray = Array.isArray(data) ? data : [data];
 
             requestAnimationFrame(() => {
-                const { docs, nextCursor, hasMore: more } = takeNextDocs(data, cursorRef.current, count);
+                const { docs, nextCursor, hasMore: more } = takeNextDocs(dataArray, cursorRef.current, count);
 
                 cursorRef.current = nextCursor;
                 setVisibleDocs((prev) => (replace ? docs : [...prev, ...docs]));
@@ -94,11 +90,12 @@ export default function ProgressiveDocumentFeed({
 
     // Reset and seed when data changes (safe for edits/deletes/appends)
     useEffect(() => {
+        const dataArray = Array.isArray(data) ? data : [data];
         cursorRef.current = { entryIndex: 0, contentIndex: 0 };
         setVisibleDocs([]);
 
-        const start = normalizeCursor(data, cursorRef.current);
-        const canLoad = start.entryIndex < data.length;
+        const start = normalizeCursor(dataArray, cursorRef.current);
+        const canLoad = start.entryIndex < dataArray.length;
         setHasMore(canLoad);
 
         if (canLoad) loadMore(initialCount, true);
@@ -129,14 +126,16 @@ export default function ProgressiveDocumentFeed({
             role="feed"
             aria-busy={hasMore}
         >
-            {visibleDocs.map((doc) => (
-                <DocumentEntry
-                    key={doc.key}
-                    data={data}
-                    doc={doc}
-                    onUpdate={onUpdate}
-                />
-            ))}
+            {visibleDocs.map(
+                (doc) =>
+                    dataArray[doc.entryIndex] && (
+                        <DocumentEntry
+                            key={doc.key}
+                            data={dataArray[doc.entryIndex]}
+                            doc={doc}
+                        />
+                    )
+            )}
 
             <div
                 ref={sentinelRef}

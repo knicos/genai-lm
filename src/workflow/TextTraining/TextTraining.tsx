@@ -19,43 +19,42 @@ import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { modelAtom } from '../../state/model';
-import { dataTokens } from '../../state/data';
+import { loadedModelAtom } from '../../state/model';
+import { dataEntries, dataTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
+import { set } from 'idb-keyval';
 
 const CHECKPT_THRESHOLD = 3_000_000;
-
-interface TrainingProgress {
-    progress: number; // Progress as a fraction between 0 and 1
-    remaining: number; // Estimated remaining time in seconds
-}
-
-type ExtendedTrainingLogEntry = TrainingLogEntry & TrainingProgress;
 
 export default function TextTraining() {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(trainerAtom);
-    const [epochs, setEpochs] = useState<number | undefined>(undefined);
+    const [tokens, setTokens] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const dataset = useAtomValue(dataTokens);
+    const entries = useAtomValue(dataEntries);
     const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    const [trainingProgress, setTrainingProgress] = useState<ExtendedTrainingLogEntry | null>(null);
+    const [trainingProgress, setTrainingProgress] = useState<TrainingLogEntry | null>(null);
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
-    const [totalSamples, setTotalSamples] = useState(0);
     const [preparing, setPreparing] = useState(false);
 
     useWakeLock(training);
 
-    const canTrain = !!model && !!dataset && dataset.length > 0 && status !== 'loading' && status !== 'busy';
+    const canTrain = !!model && !!dataset && dataset.tokens.length > 0 && status !== 'loading' && status !== 'busy';
+
+    const progress = trainingProgress && dataset ? trainingProgress.totalTokens / dataset.tokens.length : 0;
+    const remaining =
+        trainingProgress && progress > 0 ? trainingProgress.duration / progress - trainingProgress.duration : 0;
+    const totalTokens = dataset ? dataset.tokens.length : 0;
 
     useEffect(() => {
         setTrainingAnimation(training);
@@ -64,23 +63,38 @@ export default function TextTraining() {
     // Event to update training progress
     useEffect(() => {
         if (trainer) {
-            const h = async (log: TrainingLogEntry, progress: TrainingProgress) => {
-                setEpochs(log.step);
-                setTrainingProgress({ ...log, ...progress });
+            const h = async (log: TrainingLogEntry) => {
+                setTokens(log.totalTokens);
+                setTrainingProgress(log);
                 if (log.step % 100 === 0) {
                     logger.log({
                         action: 'training_step',
                         step: log.step,
                         loss: log.trainingMetrics.loss,
-                        samplesPerSecond: log.samplesPerSecond,
+                        tokensPerSecond: log.tokensPerSecond,
                         validationLoss: log.validationMetrics?.loss,
                     });
                 }
             };
             trainer.on('log', h);
+
+            // Check for existing progress
+            const lastLog = trainer.log[trainer.log.length - 1];
+            if (lastLog) {
+                console.log('Resuming training from existing progress', lastLog);
+                setTokens(lastLog.totalTokens);
+                setTrainingProgress(lastLog);
+            } else {
+                setTokens(0);
+                setTrainingProgress(null);
+            }
+
             return () => {
                 trainer.off('log', h);
             };
+        } else {
+            setTokens(0);
+            setTrainingProgress(null);
         }
     }, [trainer]);
 
@@ -88,13 +102,6 @@ export default function TextTraining() {
     useEffect(() => {
         if (model) {
             setMessage(null);
-
-            // Slight hack!!
-            if (model['_trainer']) {
-                setTrainer(model['_trainer']);
-            } else {
-                setTrainer(null);
-            }
             const h = () => {
                 setNeedsTraining(!model.meta.trained);
                 model.off('loaded', h);
@@ -108,7 +115,7 @@ export default function TextTraining() {
 
     // Check if training and validation datasets need updating
     useEffect(() => {
-        if (dataset && dataset.length > 0) {
+        if (dataset && dataset.tokens.length > 0) {
             setNeedsTraining(true);
             setMessage(null);
         }
@@ -122,7 +129,7 @@ export default function TextTraining() {
             });
             return;
         }
-        if (!dataset || dataset.length === 0) {
+        if (!dataset || dataset.tokens.length === 0) {
             setMessage({
                 notice: t('training.errors.noData'),
                 level: 'warning',
@@ -171,7 +178,7 @@ export default function TextTraining() {
             // setEpochs(0);
             await wait(200);
 
-            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
+            logger.log({ action: 'training_started', modelSize, totalTokens, batchSize });
 
             model.enableProfiler = advanced;
             //currentTrainer.options.metrics = advanced ? ['gradientNorm', 'accuracy'] : undefined;
@@ -180,9 +187,8 @@ export default function TextTraining() {
                 try {
                     //const task = new tasks.PretrainingTask(dataset);
                     setPreparing(true);
-                    await currentTrainer.prepare(dataset);
+                    await currentTrainer.prepare(dataset.tokens, entries);
                     setPreparing(false);
-                    setTotalSamples(currentTrainer.getTotalSamples());
                 } catch (err) {
                     console.error('Error preparing training', err);
                     setMessage({
@@ -200,10 +206,22 @@ export default function TextTraining() {
             setTrainer(currentTrainer);
             currentTrainer
                 .train()
-                .then(() => {
+                .then(async () => {
                     setDone(true);
                     setTraining(false);
                     logger.log({ action: 'training_stopped' });
+
+                    try {
+                        // Save checkpoint
+                        const blob = await model.saveModel({
+                            name: model.meta.name ?? 'model_checkpoint',
+                            includeOptimizer: true,
+                        });
+                        const file = new File([blob], `model_checkpoint.zip`, { type: 'application/zip' });
+                        await set('model_checkpoint', file);
+                    } catch (err) {
+                        console.error('Error saving checkpoint', err);
+                    }
                 })
                 .catch((err) => {
                     setDone(true);
@@ -223,11 +241,11 @@ export default function TextTraining() {
         <HelpBox
             message={t('training.help')}
             widget="trainer"
-            active={!!model || (!!dataset && dataset.length > 0)}
+            active={!!model || (!!dataset && dataset.tokens.length > 0)}
         >
             <BoxStandalone
                 style={{ width: '300px', minHeight: '360px' }}
-                active={!!model || (!!dataset && dataset.length > 0)}
+                active={!!model || (!!dataset && dataset.tokens.length > 0)}
             >
                 <div className={style.container}>
                     <BoxTitle
@@ -246,20 +264,18 @@ export default function TextTraining() {
                     <div className={style.clockContainer}>
                         <Clock
                             duration={trainingProgress?.duration || 0}
-                            totalDuration={
-                                trainingProgress ? trainingProgress.duration + trainingProgress.remaining : 0
-                            }
-                            remaining={Math.max(0, trainingProgress?.remaining || 0)}
+                            totalDuration={trainingProgress ? trainingProgress.duration + remaining : 0}
+                            remaining={Math.max(0, remaining)}
                             message={preparing ? t('training.preparing') : undefined}
                         />
                         <div className={style.stats}>
                             <NumberBox
-                                value={(epochs || 0) * batchSize}
-                                label={t('training.samples')}
+                                value={tokens ?? 0}
+                                label={t('training.tokens')}
                                 flip
                             />
                             <NumberBox
-                                value={Math.max(0, totalSamples - (epochs || 0) * batchSize)}
+                                value={Math.max(0, totalTokens - (tokens || 0))}
                                 label={t('training.remaining')}
                             />
                         </div>

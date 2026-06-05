@@ -37,3 +37,12 @@
     justify-content: center;
     box-sizing: border-box;
 }
+
+.error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+    color: #f44336;
+}

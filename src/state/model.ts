@@ -1,7 +1,11 @@
 import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { atom } from 'jotai';
+import { observe } from 'jotai-effect';
+import { store } from './store';
 
 export const modelAtom = atom<TeachableLLM | null>(null);
+
+export const loadedModelAtom = atom<TeachableLLM | null>(null);
 
 export type ExtendedConfig = GPTConfig & {
     id?: string;
@@ -19,6 +23,28 @@ export const modelConfigAtom = atom<ExtendedConfig>({
     modelType: 'GenAI_NanoGPT_v2',
     blockSize: 128,
 });
+
+// Ensure config matches the model.
+observe((get, set) => {
+    const model = get(modelAtom);
+    if (model) {
+        const h = () => {
+            const config = model.config;
+            set(modelConfigAtom, {
+                id: model.meta.id,
+                tokenizer: model.tokeniser.vocabSize <= 256 ? 'char' : 'bpe',
+                ...config,
+            });
+            set(loadedModelAtom, model);
+        };
+        model.on('loaded', h);
+        return () => {
+            model.off('loaded', h);
+        };
+    } else {
+        set(loadedModelAtom, null);
+    }
+}, store);
 
 // TODO: Test this empircally.
 // Units are millions.

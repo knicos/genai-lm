@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { datasetAtom, dataTokens, dataTokensReady } from '../../state/data';
-import { modelAtom } from '../../state/model';
+import { datasetIdAtom, dataTokens, dataTokensReady, dataEntries } from '../../state/data';
+import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
@@ -15,20 +15,22 @@ import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
+import { createDatasetFromEntries } from '../../utilities/dataset';
 
 export default function TokeniseData() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ready = useModelLoaded(model ?? undefined);
-    const dataset = useAtomValue(datasetAtom);
+    const dataset = useAtomValue(dataEntries);
+    const datasetId = useAtomValue(datasetIdAtom);
     const [tokens, setTokens] = useAtom(dataTokens);
     const [tokenising, setTokenising] = useState(false);
     const [_tokenCount, setTokenCount] = useState(0);
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
 
-    const tokenCount = _tokenCount === 0 ? tokens?.length || 0 : _tokenCount;
+    const tokenCount = _tokenCount === 0 ? tokens?.tokens.length || 0 : _tokenCount;
 
     return (
         <HelpBox
@@ -61,17 +63,17 @@ export default function TokeniseData() {
                             disabled={tokenising}
                             variant="contained"
                             startIcon={<ModelTrainingIcon />}
-                            onClick={() => {
+                            onClick={async () => {
                                 if (model && dataset && dataset.length > 0 && model.tokeniser.trained) {
                                     setTokenising(true);
                                     setTokenCount(0);
                                     setTokens(null);
 
-                                    const task = new tasks.ConversationTask(dataset);
+                                    const task = new tasks.ConversationTask(await createDatasetFromEntries(dataset));
                                     return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
                                         setTokenCount(tokens);
                                     }).then((newTokens) => {
-                                        setTokens(newTokens);
+                                        setTokens({ tokens: newTokens, tokeniserId: model.tokeniser.id, datasetId });
                                         setTokenCount(0);
                                         setTokenising(false);
                                     });

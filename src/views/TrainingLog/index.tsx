@@ -4,7 +4,7 @@ import style from './style.module.css';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
 import { useEffect, useRef, useState } from 'react';
 import { TrainingLogEntry } from '@genai-fi/nanogpt';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import Circle from '../../components/Clock/Circle';
 import { qualityToColor } from '../../utilities/colours';
 import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
@@ -17,15 +17,16 @@ import { createMetric } from '../../utilities/metric';
 import { trainerAtom } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
 import { Help } from '@genai-fi/base';
+import prettyNumber from '../../utilities/prettyNumber';
 
 interface AdvancedStats {
-    samplesPerSecond: number;
+    tokensPerSecond: number;
     memory: number;
 }
 
 export function Component() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const trainer = useAtomValue(trainerAtom);
     const trainerLog = trainer?.log;
     const [metric, setMetric] = useAtom(evaluatorMetrics);
@@ -55,7 +56,7 @@ export function Component() {
                 setMetricPercentage(percentage);
 
                 setAdvancedStats({
-                    samplesPerSecond: log.samplesPerSecond,
+                    tokensPerSecond: log.tokensPerSecond,
                     memory: log.memoryUsage ?? 0,
                 });
 
@@ -114,7 +115,7 @@ export function Component() {
     }, [trainerLog]);
 
     useEffect(() => {
-        if (trainerLog && trainerLog.length > 0 && model && model.loaded) {
+        if (trainerLog && trainerLog.length > 0 && model) {
             const log = trainerLog[trainerLog.length - 1];
             const { value, percentage } = createMetric(metric, log, model.config.vocabSize);
             // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -122,7 +123,7 @@ export function Component() {
             setMetricPercentage(percentage);
 
             setAdvancedStats({
-                samplesPerSecond: log.samplesPerSecond,
+                tokensPerSecond: log.tokensPerSecond,
                 memory: log.memoryUsage ?? 0,
             });
         }
@@ -318,8 +319,10 @@ export function Component() {
             <h3 className={style.subtitle}>{t('tools.training.performance')}</h3>
             <div className={style.advanced}>
                 <div className={style.advancedItem}>
-                    <div className={style.advancedLabel}>{t('evaluation.samplesPerSecond')}</div>
-                    <div className={style.advancedValue}>{advancedStats?.samplesPerSecond.toFixed(0) ?? 0}</div>
+                    <div className={style.advancedLabel}>{t('evaluation.tokensPerSecond')}</div>
+                    <div className={style.advancedValue}>
+                        {prettyNumber(advancedStats?.tokensPerSecond ?? 0, t, undefined, 1)}
+                    </div>
                 </div>
                 <div className={style.advancedItem}>
                     <div className={style.advancedLabel}>{t('evaluation.memory')}</div>
