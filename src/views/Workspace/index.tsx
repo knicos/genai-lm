@@ -11,12 +11,12 @@ import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { Outlet, useLocation, useOutlet, useParams, useSearchParams } from 'react-router-dom';
 import logger, { initializeLogger } from '../../utilities/logger';
-import LanguageModel from '../../workflow/LanguageModel/LanguageModel';
+import ModelDesign from '../../workflow/ModelDesign/ModelDesign';
 import { uiShowSidePanel } from '../../state/uiState';
 import { modelAtom } from '../../state/model';
 import useOrientation from '../../hooks/useOrientation';
 import TokeniseData from '../../workflow/TokeniseData/TokeniseData';
-import PreTrainedModel from '../../workflow/PreTrainedModel/PreTrainedModel';
+import ModelState from '../../workflow/ModelState/ModelState';
 import Initialiser from './Initialiser';
 import CheckModel from '../../workflow/CheckModel/CheckModel';
 import InstructData from '../../workflow/InstructData/InstructData';
@@ -155,7 +155,7 @@ export function Component() {
                                 observer={intersectionObserver.current}
                                 scroll={scrollFrame === 'model'}
                             >
-                                <LanguageModel />
+                                <ModelDesign />
                                 <CheckModel />
                             </Frame>
                             <Frame
@@ -265,7 +265,7 @@ export function Component() {
                     )}
                     {flow !== 'home' && (
                         <div className={style.modelOverlay}>
-                            <PreTrainedModel />
+                            <ModelState />
                         </div>
                     )}
                 </div>

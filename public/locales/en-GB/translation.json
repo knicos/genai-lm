@@ -174,7 +174,7 @@
         "samples": "{{samples}} samples",
         "embeddingSize": "Hidden size of {{size}}",
         "modelHint": "Select or upload a model.",
-        "languageModel": "Language Model",
+        "languageModel": "Model Name",
         "visualisation": {
             "next": "Next"
         },
@@ -189,6 +189,11 @@
         "width": "Width",
         "vocabSize": "Vocabulary Size",
         "reset": "Reset",
+        "loading": "Loading model...",
+        "downloading": "Downloading model...",
+        "training": "Training model...",
+        "busy": "Model working...",
+        "error": "Model broke",
         "parametersHelp": "The total number of numeric parameters in the model.",
         "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token.",
         "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed."

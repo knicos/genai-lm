@@ -2,6 +2,9 @@ import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { atom } from 'jotai';
 import { observe } from 'jotai-effect';
 import { store } from './store';
+import Downloader from '../utilities/downloader';
+
+export const modelDownloadAtom = atom<Downloader | null>(null);
 
 export const modelAtom = atom<TeachableLLM | null>(null);
 

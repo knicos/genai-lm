@@ -1,14 +1,14 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useModelBusy from '../../hooks/useModelBusy';
 import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
-import waitModelLoaded from '../../utilities/waitModelLoaded';
-import { modelAtom } from '../../state/model';
+//import waitModelLoaded from '../../utilities/waitModelLoaded';
+import { modelAtom, modelDownloadAtom } from '../../state/model';
 import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
@@ -18,19 +18,23 @@ import ModelName from './ModelName';
 import ModelStage from './ModelStage';
 // import useModelLoaded from '../../utilities/useModelLoaded';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import useModelStatus from '../../hooks/useModelStatus';
+import { Spinner } from '@genai-fi/base';
 
-export default function PreTrainedModel() {
+export default function ModelState() {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
+    const status = useModelStatus(model ?? undefined);
     const [showSearch, setShowSearch] = useState(false);
     const [done, setDone] = useState(false);
     const busy = useModelBusy(model ?? undefined);
     const [saving, setSaving] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    //const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [title, setTitle] = useState(model?.meta.name || '');
     const [hideMenu, setHideMenu] = useState(true);
     const anchorRef = useRef<HTMLDivElement>(null);
+    const downloader = useAtomValue(modelDownloadAtom);
 
     // Prevent double loading issues
     const modelRef = useRef<TeachableLLM | undefined>(model);
@@ -54,23 +58,23 @@ export default function PreTrainedModel() {
 
     const openFile = useCallback(
         (file: File) => {
-            setIsLoading(true);
+            //setIsLoading(true);
             setModel((old) => {
                 if (old) {
                     old.dispose();
                 }
                 const model = TeachableLLM.loadModel(file);
                 model.meta.trained = true;
-                waitModelLoaded(model).then(() => {
+                /*waitModelLoaded(model).then(() => {
                     setIsLoading(false);
-                });
+                });*/
                 return model;
             });
         },
         [setModel]
     );
 
-    const modelBusy = busy || isLoading || saving;
+    const modelBusy = busy || saving;
 
     useEffect(() => {
         if (model) {
@@ -106,6 +110,8 @@ export default function PreTrainedModel() {
         [model]
     );
 
+    const spin = (status !== 'ready' && status !== 'awaitingTokens') || downloader;
+
     return (
         <Help
             message={t('model.help')}
@@ -113,7 +119,6 @@ export default function PreTrainedModel() {
             placement="top"
         >
             <BoxStandalone
-                disabled={busy}
                 className={style.modelThread}
                 active={done}
             >
@@ -142,22 +147,45 @@ export default function PreTrainedModel() {
                 >
                     <div
                         className={style.icon}
-                        onClick={() => setHideMenu((h) => !h)}
+                        onClick={() => !modelBusy && setHideMenu((h) => !h)}
                     >
-                        <ModelIcon model={model ?? undefined} />
+                        {!spin && <ModelIcon model={model ?? undefined} />}
+                        {spin && (
+                            <div className={style.loadingIcon}>
+                                <Spinner
+                                    size="small"
+                                    color="dark"
+                                />
+                            </div>
+                        )}
                     </div>
-                    <div className={style.nameStatusGroup}>
-                        <ModelName
-                            title={title}
-                            setTitle={updateModelTitle}
-                            style={{ borderBottom: 'none', backgroundColor: '#945fbf' }}
-                            placeholder={t('model.languageModel')}
-                        />
-                        <ModelStage model={model ?? null} />
-                    </div>
+                    {!spin && (
+                        <div className={style.nameStatusGroup}>
+                            <ModelName
+                                title={title}
+                                setTitle={updateModelTitle}
+                                style={{ borderBottom: 'none', backgroundColor: '#945fbf' }}
+                                placeholder={t('model.languageModel')}
+                            />
+                            <ModelStage model={model ?? null} />
+                        </div>
+                    )}
+                    {downloader && <div className={style.statusMessage}>{t('model.downloading')}</div>}
+                    {status === 'loading' && !downloader && (
+                        <div className={style.statusMessage}>{t('model.loading')}</div>
+                    )}
+                    {status === 'training' && !downloader && (
+                        <div className={style.statusMessage}>{t('model.training')}</div>
+                    )}
+                    {(status === 'busy' || status == 'warmup') && !downloader && (
+                        <div className={style.statusMessage}>{t('model.busy')}</div>
+                    )}
+                    {status === 'error' && !downloader && <div className={style.statusMessage}>{t('model.error')}</div>}
                     <IconButton
+                        disabled={modelBusy}
                         color="inherit"
-                        onClick={() => setHideMenu((h) => !h)}
+                        onClick={() => !modelBusy && setHideMenu((h) => !h)}
+                        sx={{ marginLeft: 'auto' }}
                     >
                         <MoreVertIcon
                             color="inherit"

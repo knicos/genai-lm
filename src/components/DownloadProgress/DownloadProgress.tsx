@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 interface Props {
-    downloads: Downloader[];
+    downloads: Downloader[] | Downloader;
 }
 
 export default function DownloadProgress({ downloads }: Props) {
@@ -16,15 +16,17 @@ export default function DownloadProgress({ downloads }: Props) {
 
     useEffect(() => {
         const updateProgress = () => {
-            const total = downloads.reduce((acc, d) => acc + d.total, 0);
-            const loaded = downloads.reduce((acc, d) => acc + d.loaded, 0);
+            const total = Array.isArray(downloads) ? downloads.reduce((acc, d) => acc + d.total, 0) : downloads.total;
+            const loaded = Array.isArray(downloads)
+                ? downloads.reduce((acc, d) => acc + d.loaded, 0)
+                : downloads.loaded;
             setTotal(total);
             setLoaded(loaded);
         };
 
         updateProgress();
 
-        downloads.forEach((downloader) => {
+        (Array.isArray(downloads) ? downloads : [downloads]).forEach((downloader) => {
             downloader.on('progress', updateProgress);
             downloader.on('end', updateProgress);
             downloader.on('error', updateProgress);
@@ -32,7 +34,7 @@ export default function DownloadProgress({ downloads }: Props) {
         });
 
         return () => {
-            downloads.forEach((downloader) => {
+            (Array.isArray(downloads) ? downloads : [downloads]).forEach((downloader) => {
                 downloader.off('progress', updateProgress);
                 downloader.off('end', updateProgress);
                 downloader.off('error', updateProgress);
@@ -41,12 +43,13 @@ export default function DownloadProgress({ downloads }: Props) {
         };
     }, [downloads]);
 
-    if (downloads.length === 0) return null;
+    if (Array.isArray(downloads) && downloads.length === 0) return null;
+    if (!Array.isArray(downloads) && !downloads) return null;
 
     return (
         <div className={style.downloadProgress}>
             <div>
-                {t('data.downloading', { count: downloads.length })}
+                {t('data.downloading', { count: Array.isArray(downloads) ? downloads.length : 1 })}
                 <LinearProgress
                     sx={{ width: '100%' }}
                     variant="determinate"
@@ -58,7 +61,7 @@ export default function DownloadProgress({ downloads }: Props) {
                 aria-label={t('data.cancelDownloads')}
                 size="small"
                 onClick={() => {
-                    downloads.forEach((download) => download.cancel());
+                    (Array.isArray(downloads) ? downloads : [downloads]).forEach((download) => download.cancel());
                 }}
             >
                 <CancelIcon fontSize="small" />

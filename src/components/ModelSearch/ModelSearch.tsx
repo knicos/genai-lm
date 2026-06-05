@@ -22,9 +22,8 @@ import Downloader from '../../utilities/downloader';
 import DownloadProgress from '../DownloadProgress/DownloadProgress';
 import { Spinner } from '@genai-fi/base';
 import { useAtom } from 'jotai';
-import { downloadsAtom } from '../../state/data';
 import { configMatch } from './manifest';
-import { ExtendedConfig } from '../../state/model';
+import { ExtendedConfig, modelDownloadAtom } from '../../state/model';
 
 interface Props {
     model?: TeachableLLM;
@@ -52,7 +51,7 @@ export default function ModelSearch({
     limitToModelArchitecture,
 }: Props) {
     const { t } = useTranslation();
-    const [downloads, setDownloads] = useAtom(downloadsAtom);
+    const [download, setDownload] = useAtom(modelDownloadAtom);
     const [open, setOpen] = useState(true);
     const [includeAll, setIncludeAll] = useState(true);
 
@@ -106,7 +105,7 @@ export default function ModelSearch({
             }
             if (downloader) {
                 if (!onModel) return;
-                setDownloads((prev) => [...prev, downloader]);
+                setDownload(downloader);
                 downloader.on('end', (file: File) => {
                     const newModel = TeachableLLM.loadModel(file, { sourceURL: card.url });
                     newModel.meta.id = card.id;
@@ -118,15 +117,17 @@ export default function ModelSearch({
                         }
                         return newModel;
                     });
-                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                    setDownload(null);
                 });
                 downloader.on('error', (error) => {
                     console.error('Download error:', error);
-                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                    setDownload(null);
                 });
                 downloader.on('cancel', () => {
-                    setDownloads((prev) => prev.filter((d) => d !== downloader));
+                    setDownload(null);
                 });
+
+                downloader.start();
             } else if (!card.url && card.config) {
                 if (onModel) {
                     const newModel = TeachableLLM.create(card.tokeniser || 'char', card.config);
@@ -144,7 +145,7 @@ export default function ModelSearch({
                 }
             }
         },
-        [model, onModel, onConfig, setDownloads]
+        [model, onModel, onConfig, setDownload]
     );
 
     return (
@@ -157,7 +158,7 @@ export default function ModelSearch({
         >
             <DialogContent sx={{ padding: '0' }}>
                 <div className={style.headerBar}>
-                    {langs.length > 0 && downloads.length === 0 && (
+                    {langs.length > 0 && !download && (
                         <FormControl size="small">
                             <Select
                                 aria-label={t('data.language')}
@@ -187,7 +188,7 @@ export default function ModelSearch({
                         />
                     )}
 
-                    <DownloadProgress downloads={downloads} />
+                    {download && <DownloadProgress downloads={download} />}
                     <div style={{ flexGrow: 1 }} />
                     <IconButton
                         onClick={() => setOpen(false)}

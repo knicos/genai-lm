@@ -5,12 +5,22 @@
     align-items: center;
 }
 
+.loadingIcon {
+    font-size: 3rem;
+    width: 1.2em;
+    height: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .modelThread {
     background: #945fbf;
     color: white;
     border-radius: 20px;
-    z-index: 2000;
+    z-index: 2000 !important;
     max-width: 350px;
+    width: 350px;
 }
 
 .modelThread :global .MuiOutlinedInput-root {
@@ -96,6 +106,10 @@
     gap: 0.5rem;
     align-items: center;
     margin-left: 1rem;
+}
+
+.statusMessage {
+    font-weight: bold;
 }
 
 @media (max-width: 600px) {

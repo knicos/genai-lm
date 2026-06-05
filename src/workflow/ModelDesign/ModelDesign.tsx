@@ -14,7 +14,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import Help from '../../components/Help/Help';
 import { useTranslation } from 'react-i18next';
 
-export default function LanguageModel() {
+export default function ModelDesign() {
     const { t } = useTranslation();
     const [config, setConfig] = useAtom(modelConfigAtom);
     const [showSearch, setShowSearch] = useState(false);
