@@ -229,7 +229,8 @@
             "noModel": "Please load a model before training.",
             "notReady": "Model or data is not ready for training.",
             "noData": "Add training data first.",
-            "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size."
+            "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size.",
+            "noLoRA": "No tuning extension selected."
         },
         "predictionsHeader": "Top predictions",
         "help": "The learning process where the parameters are slowly adjusted up or down until it can reproduce the patterns found in your example data. Time remaining is how long it will take to look at all of your data.",
@@ -378,7 +379,8 @@
         "deleteAll": "Delete All",
         "addLoRA": "Add Tuning",
         "noLoRA": "No tuning",
-        "loraName": "Tuning Name"
+        "loraName": "Tuning Name",
+        "stopTraining": "Stop Tuning"
     },
     "conversation": {
         "userPlaceholder": "Write a message...",

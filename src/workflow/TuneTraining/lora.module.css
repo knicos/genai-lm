@@ -1,7 +1,6 @@
 .container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     width: 100%;
 }
 
@@ -13,6 +12,11 @@
 
 .dataRow {
     cursor: pointer;
+}
+
+.dataRow.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .rowContent {
@@ -35,10 +39,10 @@
     font-size: 3rem;
 }
 .rowContent:hover .icon svg {
-    color: rgba(0, 130, 151, 0.3);
+    color: rgba(0, 130, 151, 0.5);
 }
 .rowContent.selected .icon svg {
-    color: rgba(0, 130, 151, 0.5);
+    color: rgba(0, 130, 151, 0.7);
 }
 
 .rowContent button {
@@ -86,6 +90,7 @@
 .addButton {
     padding-right: 1rem;
     padding-left: 1rem;
+    margin-bottom: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -108,6 +108,7 @@ export function Component() {
 
             setHistory(aggregatorRef.current.getCollapsed());
         } else {
+            aggregatorRef.current = new CollapsedTrainingLog(1);
             setMetricValue(0);
             setMetricPercentage(0);
             setHistory([]);

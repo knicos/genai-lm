@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { tasks, TrainingLogEntry, TrainingOptions } from '@genai-fi/nanogpt';
+import { tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -26,7 +26,7 @@ const CHECKPT_THRESHOLD = 3_000_000;
 export default function TuneTraining() {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(tunerAtom);
-    const [, setEpochs] = useState<number | undefined>(undefined);
+    const [currentStep, setStep] = useState<number>(0);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
     const [needsTraining, setNeedsTraining] = useState(true);
@@ -54,7 +54,7 @@ export default function TuneTraining() {
     useEffect(() => {
         if (trainer) {
             const h = async (log: TrainingLogEntry) => {
-                setEpochs(log.step);
+                setStep(log.step);
 
                 if (log.step % 100 === 0) {
                     logger.log({
@@ -109,6 +109,15 @@ export default function TuneTraining() {
             });
             return;
         }
+
+        if (!model.hasLoRA()) {
+            setMessage({
+                notice: t('training.errors.noLoRA'),
+                level: 'warning',
+            });
+            return;
+        }
+
         if (!conversations || conversations.length === 0) {
             setMessage({
                 notice: t('training.errors.noData'),
@@ -130,12 +139,14 @@ export default function TuneTraining() {
 
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-            const trainingOptions: TrainingOptions = {
-                ...settings,
-                gradientCheckpointing: useCheckpointing,
-                loraName: selectedLoRA ?? undefined,
-            };
-            const currentTrainer = model.trainer('sft', trainingOptions);
+
+            // Patch the settings
+            if (useCheckpointing) {
+                settings.gradientCheckpointing = true;
+            }
+            settings.loraName = selectedLoRA ?? undefined;
+
+            const currentTrainer = model.trainer('sft', settings);
 
             if (!done) {
                 // already training
@@ -147,7 +158,7 @@ export default function TuneTraining() {
 
             const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
 
-            // setEpochs(0);
+            setStep(0);
             await wait(200);
 
             logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
@@ -217,6 +228,12 @@ export default function TuneTraining() {
                     model={model}
                     selected={selectedLoRA}
                     onSelect={setSelectedLoRA}
+                    onStop={() => {
+                        if (training) {
+                            trainer?.stop();
+                        }
+                    }}
+                    progress={training ? currentStep / ((settings.epochSteps || 1) * (settings.maxEpochs || 1)) : null}
                     extraActions={
                         <Button
                             disabled={!done && !training}

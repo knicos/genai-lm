@@ -8,16 +8,19 @@ import LoRAItem from './LoRAItem';
 import NewLoRA from './NewLoRA';
 import { tunerSettings } from '../../state/trainer';
 import { useAtomValue } from 'jotai';
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, LinearProgress, Tooltip } from '@mui/material';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
 
 interface Props {
     model: TeachableLLM | null;
     selected: string | null;
     extraActions?: React.ReactNode;
     onSelect: (fn: (prev: string | null) => string | null) => void;
+    progress: number | null;
+    onStop: () => void;
 }
 
-export default function LoRAList({ model, onSelect, selected, extraActions }: Props) {
+export default function LoRAList({ model, onSelect, selected, extraActions, progress, onStop }: Props) {
     const { t } = useTranslation();
     const [loras, setLoras] = useState<string[]>([]);
     const ready = useModelLoaded(model ?? undefined);
@@ -34,6 +37,7 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
             <ul>
                 <li key="none">
                     <LoRAItem
+                        disabled={progress !== null}
                         onClick={() => {
                             onSelect(() => null);
                             if (model) {
@@ -52,6 +56,7 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
                 {loras.map((lora) => (
                     <li key={lora}>
                         <LoRAItem
+                            disabled={progress !== null}
                             text={lora}
                             selected={selected === lora}
                             onClick={() => {
@@ -106,25 +111,49 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
                         />
                     </li>
                 )}
-                <li className={style.addButton}>
-                    {extraActions}
-                    <Tooltip title={t('instruct.addLoRA')}>
-                        <IconButton
-                            color="primary"
-                            disabled={!model || !ready}
-                            onClick={() => {
-                                if (!model) return;
-                                setAddNew(true);
-                            }}
-                        >
-                            <AddIcon
-                                fontSize="large"
-                                color="inherit"
-                            />
-                        </IconButton>
-                    </Tooltip>
-                </li>
             </ul>
+            <div className={style.addButton}>
+                {progress !== null && (
+                    <>
+                        <LinearProgress
+                            sx={{ width: 'calc(100% - 2rem)', margin: '1rem' }}
+                            variant="determinate"
+                            value={progress * 100}
+                        />
+                        <Tooltip title={t('instruct.stopTraining')}>
+                            <IconButton
+                                color="primary"
+                                onClick={onStop}
+                            >
+                                <StopCircleIcon
+                                    fontSize="large"
+                                    color="inherit"
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                )}
+                {progress === null && (
+                    <>
+                        {extraActions}
+                        <Tooltip title={t('instruct.addLoRA')}>
+                            <IconButton
+                                color="primary"
+                                disabled={!model || !ready}
+                                onClick={() => {
+                                    if (!model) return;
+                                    setAddNew(true);
+                                }}
+                            >
+                                <AddIcon
+                                    fontSize="large"
+                                    color="inherit"
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

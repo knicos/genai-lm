@@ -10,15 +10,17 @@ interface RowProps {
     onClick: () => void;
     onDelete?: () => void;
     off?: boolean;
+    disabled?: boolean;
 }
 
-export default function LoRAItem({ text, selected, onClick, onDelete, off }: RowProps) {
+export default function LoRAItem({ text, selected, onClick, onDelete, off, disabled }: RowProps) {
     return (
         <div
-            className={style.dataRow}
+            className={`${style.dataRow} ${disabled ? style.disabled : ''}`}
             style={style}
             role="button"
-            onClick={onClick}
+            aria-disabled={disabled}
+            onClick={disabled ? undefined : onClick}
         >
             <div className={`${style.rowContent} ${selected ? style.selected : ''}`}>
                 <div className={style.icon}>
@@ -37,7 +39,7 @@ export default function LoRAItem({ text, selected, onClick, onDelete, off }: Row
                 <div className={style.column}>
                     <span className={style.dataText}>{text}</span>
                 </div>
-                {onDelete && !off && (
+                {onDelete && !off && !disabled && (
                     <IconButton
                         color="primary"
                         onClick={(e) => {
