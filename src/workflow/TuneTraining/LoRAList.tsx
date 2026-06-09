@@ -34,7 +34,16 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
             <ul>
                 <li key="none">
                     <LoRAItem
-                        onClick={() => onSelect(() => null)}
+                        onClick={() => {
+                            onSelect(() => null);
+                            if (model) {
+                                try {
+                                    model.detachLoRA();
+                                } catch (e) {
+                                    console.error('Failed to detach LoRA:', e);
+                                }
+                            }
+                        }}
                         selected={selected === null}
                         text={t('instruct.noLoRA')}
                         off
@@ -47,6 +56,13 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
                             selected={selected === lora}
                             onClick={() => {
                                 onSelect(() => lora);
+                                if (model) {
+                                    try {
+                                        model.attachLoRA(lora);
+                                    } catch (e) {
+                                        console.error('Failed to attach LoRA:', e);
+                                    }
+                                }
                             }}
                             onDelete={() => {
                                 if (!model) return;
@@ -56,7 +72,7 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
                                     console.error('Failed to delete LoRA:', e);
                                     return;
                                 }
-                                setLoras(model.model.listLoRAs());
+                                setLoras(model.listLoRAs());
                                 onSelect((prev) => (prev === lora ? null : prev));
                             }}
                         />
@@ -72,17 +88,19 @@ export default function LoRAList({ model, onSelect, selected, extraActions }: Pr
                                 }
                                 if (model && ready) {
                                     try {
-                                        model.model.createLoRA(name, {
+                                        model.createLoRA(name, {
                                             rank: trainingSettings.loraConfig?.rank || 4,
                                             alpha: trainingSettings.loraConfig?.alpha || 8,
                                             variables: ['*'],
                                         });
+                                        model.attachLoRA(name);
                                     } catch (e) {
                                         console.error('Failed to create LoRA:', e);
                                         return;
                                     }
-                                    setLoras(model.model.listLoRAs());
+                                    setLoras(model.listLoRAs());
                                     setAddNew(false);
+                                    onSelect(() => name);
                                 }
                             }}
                         />

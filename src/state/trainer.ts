@@ -62,26 +62,45 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',
     {
         batchSize: 8,
-        maxEpochs: 10,
+        maxEpochs: 5,
         learningRate: 1e-3,
         outputText: true,
         disableCheckpointing: false,
         mixedPrecision: true,
         loraConfig: {
-            rank: 8,
-            alpha: 32,
+            rank: 4,
+            alpha: 8,
             variables: ['*'],
         },
         sftMode: 'lora',
-        warmupSteps: 4,
-        decayEpochs: 2,
+        warmupSteps: 10,
+        decayEpochs: 1,
         weightDecay: 0.01,
-        logInterval: 20,
+        dropout: 0.1,
+        layerDrop: 0.0,
+        labelSmoothing: 0.0,
+        logInterval: 40,
         metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
         orthoGrad: false,
         clipNorm: 1.0,
+        maskedLoss: true,
+        debug: false,
     },
     storage
 );
 
 export const tunerAtom = atom<Trainer | null>(null);
+
+// Make sure tuner resets on LoRA change
+observe((get, set) => {
+    const model = get(modelAtom);
+    if (model) {
+        const h = () => {
+            set(tunerAtom, null);
+        };
+        model.on('changeLoRA', h);
+        return () => {
+            model.off('changeLoRA', h);
+        };
+    }
+}, store);

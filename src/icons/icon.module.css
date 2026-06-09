@@ -51,6 +51,7 @@
     color: var(--secondary);
     background-color: white;
     border-radius: 50%;
-    padding: 0.15rem;
+    padding: 0.2rem;
     overflow: hidden;
+    font-size: 1.1rem;
 }

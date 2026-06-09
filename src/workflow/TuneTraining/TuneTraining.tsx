@@ -17,7 +17,7 @@ import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { loadedModelAtom } from '../../state/model';
+import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
 import LoRAList from './LoRAList';
 
@@ -40,7 +40,7 @@ export default function TuneTraining() {
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [totalSamples, setTotalSamples] = useState(0);
-    const [selectedLoRA, setSelectedLoRA] = useState<string | null>(null);
+    const [selectedLoRA, setSelectedLoRA] = useAtom(modelLoRAName);
 
     useWakeLock(training);
 
@@ -78,7 +78,7 @@ export default function TuneTraining() {
             setMessage(null);
             setTrainer(null);
             const h = () => {
-                setNeedsTraining(!model.meta.trained);
+                setNeedsTraining(true);
                 model.off('loaded', h);
             };
             model.on('loaded', h);
@@ -157,6 +157,7 @@ export default function TuneTraining() {
             if (shouldPrepare) {
                 try {
                     const task = new tasks.ConversationTask(conversations);
+                    console.log('Preparing trainer with task', conversations);
                     //setPreparing(true);
                     await currentTrainer.prepare([task]);
                     //setPreparing(false);
@@ -186,6 +187,7 @@ export default function TuneTraining() {
                 .catch((err) => {
                     setDone(true);
                     setTraining(false);
+                    console.error('Error during training', err);
                     logger.error({ action: 'training_error', message: err.message });
                     currentTrainer.stop();
                     currentTrainer.reset();

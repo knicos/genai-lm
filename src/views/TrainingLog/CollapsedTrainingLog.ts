@@ -24,7 +24,6 @@ interface Bucket {
 }
 
 export class CollapsedTrainingLog {
-    // private readonly raw: CollapsedTrainingPoint[] = [];
     private groupSize: number;
     private collapsed: CollapsedTrainingPoint[] = [];
     private active: Bucket | null = null;
@@ -40,7 +39,7 @@ export class CollapsedTrainingLog {
         const normalized = this.validateGroupSize(nextGroupSize);
         if (normalized === this.groupSize) return;
 
-        // Fast path: only when doubling (as per your assumption).
+        // Fast path: only when doubling
         if (normalized === this.groupSize * 2) {
             this.rebuildByDoubling();
             this.groupSize = normalized;
@@ -48,7 +47,6 @@ export class CollapsedTrainingLog {
         }
 
         this.groupSize = normalized;
-        // this.rebuild();
         throw new Error('Changing group size to non-double values is not supported in this implementation.');
     }
 
@@ -57,14 +55,12 @@ export class CollapsedTrainingLog {
     }
 
     public push(entry: CollapsedTrainingPoint): CollapsedTrainingPoint[] {
-        // this.raw.push(entry);
         this.addToBuckets(entry);
         return this.getCollapsed();
     }
 
     public pushMany(entries: CollapsedTrainingPoint[]): CollapsedTrainingPoint[] {
         for (const e of entries) {
-            // this.raw.push(e);
             this.addToBuckets(e);
         }
         return this.getCollapsed();
@@ -83,18 +79,9 @@ export class CollapsedTrainingLog {
     }
 
     public clear(): void {
-        // this.raw.length = 0;
         this.collapsed = [];
         this.active = null;
     }
-
-    /*private rebuild(): void {
-        this.collapsed = [];
-        this.active = null;
-        for (const entry of this.raw) {
-            this.addToBuckets(entry);
-        }
-    }*/
 
     private addToBuckets(entry: CollapsedTrainingPoint): void {
         if (!this.active) {

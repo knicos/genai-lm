@@ -15,6 +15,23 @@ export function Component() {
             <h2>{t('app.settings.training')}</h2>
             <FormControl sx={{ marginTop: '1rem' }}>
                 <div
+                    id="epoch-label"
+                    className={style.label}
+                >
+                    {t('app.settings.epochs')}
+                </div>
+                <Slider
+                    aria-labelledby="epoch-label"
+                    value={settings.maxEpochs}
+                    onChange={(_, value) => setSettings({ ...settings, maxEpochs: value as number })}
+                    min={1}
+                    max={1000}
+                    step={1}
+                    valueLabelDisplay="auto"
+                />
+            </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <div
                     id="batch-label"
                     className={style.label}
                 >

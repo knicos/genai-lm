@@ -57,3 +57,5 @@ export const modelReady = atom<boolean>((get) => {
     const model = get(modelAtom);
     return model !== null;
 });
+
+export const modelLoRAName = atom<string | null>(null);

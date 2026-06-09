@@ -32,7 +32,6 @@ export default function ModelIcon({ model, noExtraIcon }: Props) {
         if (model && ready) {
             const h = () => {
                 const newIcon = calculateExtraIcon(model);
-                console.log('Model status/phase changed, new extra icon:', newIcon);
                 setExtraIcon(newIcon);
             };
             model.on('status', h);
@@ -93,11 +92,11 @@ export default function ModelIcon({ model, noExtraIcon }: Props) {
             </svg>
             {!noExtraIcon && (
                 <div className={style.extraIcon}>
-                    {extraIcon === 'hourglass' && <HourglassTopIcon />}
-                    {extraIcon === 'trained' && <SchoolIcon />}
-                    {extraIcon === 'untrained' && <RadioButtonUncheckedIcon />}
-                    {extraIcon === 'empty' && <DoDisturbIcon />}
-                    {extraIcon === 'puzzle' && <ExtensionIcon />}
+                    {extraIcon === 'hourglass' && <HourglassTopIcon fontSize="inherit" />}
+                    {extraIcon === 'trained' && <SchoolIcon fontSize="inherit" />}
+                    {extraIcon === 'untrained' && <RadioButtonUncheckedIcon fontSize="inherit" />}
+                    {extraIcon === 'empty' && <DoDisturbIcon fontSize="inherit" />}
+                    {extraIcon === 'puzzle' && <ExtensionIcon fontSize="inherit" />}
                 </div>
             )}
         </div>

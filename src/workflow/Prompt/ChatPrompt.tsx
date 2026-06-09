@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
-import { loadedModelAtom } from '../../state/model';
+import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
+import { IGenerateOptions } from '@genai-fi/nanogpt';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
@@ -19,6 +20,7 @@ export default function ChatPrompt() {
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ref = useRef<HTMLDivElement>(null);
+    const loraName = useAtomValue(modelLoRAName);
 
     const disable = status === 'training';
 
@@ -59,14 +61,15 @@ export default function ChatPrompt() {
             text.push({ role: 'user', content: prompt ?? '' });
         }
 
-        const options = {
-            maxLength,
+        const options: IGenerateOptions = {
+            maxLength: model?.config.blockSize ? Math.min(maxLength, model.config.blockSize * 4) : maxLength,
             temperature,
             attentionScores: showAttention,
             includeProbabilities: showProbabilities,
             topP: topP > 0 ? topP : undefined,
             noCache: false,
             nonConversational: false,
+            loraName: loraName ?? undefined,
         };
 
         const filteredText = text.filter((part) => part.content.trim().length > 0);

@@ -245,7 +245,7 @@ export function Component() {
                                         icon={<ShowChartIcon />}
                                         label={t('training.monitor')}
                                         widget="tuning-monitor"
-                                        onClick={() => changeFlow({ sidepanel: 'training-log' })}
+                                        onClick={() => changeFlow({ sidepanel: 'tune-log' })}
                                         style={{ marginTop: '120px' }}
                                     />
                                 </div>

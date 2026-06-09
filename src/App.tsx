@@ -128,6 +128,10 @@ export const routes = createRoutesFromElements(
                 lazy={() => import('./views/TrainingLog')}
             />
             <Route
+                path="tune-log"
+                lazy={() => import('./views/TuneLog')}
+            />
+            <Route
                 path="gradients"
                 lazy={() => import('./views/Gradients')}
             />
