@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export type FlowType = 'model' | 'pretraindata' | 'pretrain' | 'finetune' | 'deployment' | 'home';
+export type FlowType = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment' | 'home';
 
 interface ChangePath {
     flow?: FlowType;

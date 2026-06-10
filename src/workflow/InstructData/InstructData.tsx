@@ -24,7 +24,7 @@ export default function InstructData() {
     return (
         <Box
             widget="tuneData"
-            style={{ width: '40rem', height: '100%', display: 'flex', flexDirection: 'column' }}
+            style={{ width: '40rem', display: 'flex', flexDirection: 'column' }}
             active={done}
             disabled={disable}
             fullWidth

@@ -20,3 +20,16 @@
     width: 100%;
     min-height: 1rem;
 }
+
+.fieldset {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.fieldset legend {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}

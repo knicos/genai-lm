@@ -29,7 +29,7 @@ export default function ModelDesign() {
             active={true}
             className={style.modelThread}
             fullWidth
-            style={{ width: '40rem', height: '100%' }}
+            style={{ width: '40rem' }}
         >
             {showSearch && (
                 <SearchUntrained

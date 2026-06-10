@@ -1,5 +1,6 @@
 import { GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import { observe } from 'jotai-effect';
 import { store } from './store';
 import Downloader from '../utilities/downloader';
@@ -59,3 +60,5 @@ export const modelReady = atom<boolean>((get) => {
 });
 
 export const modelLoRAName = atom<string | null>(null);
+
+export const modelSaveCheckpoints = atomWithStorage<boolean>('modelSaveCheckpoints', true);

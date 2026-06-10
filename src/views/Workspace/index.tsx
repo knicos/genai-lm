@@ -159,9 +159,9 @@ export function Component() {
                                 <CheckModel />
                             </Frame>
                             <Frame
-                                name="pretraindata"
+                                name="data"
                                 observer={intersectionObserver.current}
-                                scroll={scrollFrame === 'pretraindata'}
+                                scroll={scrollFrame === 'data'}
                             >
                                 <TextData />
                                 <div

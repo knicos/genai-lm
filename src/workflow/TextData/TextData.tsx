@@ -118,7 +118,7 @@ export default function TextData() {
     return (
         <Box
             widget="textData"
-            style={{ flexGrow: 1, width: '40rem', height: '100%' }}
+            style={{ flexGrow: 1, width: '40rem' }}
             active={done}
             disabled={disable}
             fullWidth

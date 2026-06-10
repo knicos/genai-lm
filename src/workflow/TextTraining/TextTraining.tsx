@@ -19,7 +19,7 @@ import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
 import { Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import { loadedModelAtom } from '../../state/model';
+import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
 import { dataEntries, dataTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
@@ -38,6 +38,7 @@ export default function TextTraining() {
     const status = useModelStatus(model ?? undefined);
     const dataset = useAtomValue(dataTokens);
     const entries = useAtomValue(dataEntries);
+    const saveCheckpoints = useAtomValue(modelSaveCheckpoints);
     const [settings, setSettings] = useAtom(trainerSettings);
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
@@ -211,16 +212,18 @@ export default function TextTraining() {
                     setTraining(false);
                     logger.log({ action: 'training_stopped' });
 
-                    try {
-                        // Save checkpoint
-                        const blob = await model.saveModel({
-                            name: model.meta.name ?? 'model_checkpoint',
-                            includeOptimizer: true,
-                        });
-                        const file = new File([blob], `model_checkpoint.zip`, { type: 'application/zip' });
-                        await set('model_checkpoint', file);
-                    } catch (err) {
-                        console.error('Error saving checkpoint', err);
+                    if (saveCheckpoints) {
+                        try {
+                            // Save checkpoint
+                            const blob = await model.saveModel({
+                                name: model.meta.name ?? 'model_checkpoint',
+                                includeOptimizer: true,
+                            });
+                            const file = new File([blob], `model_checkpoint.zip`, { type: 'application/zip' });
+                            await set('model_checkpoint', file);
+                        } catch (err) {
+                            console.error('Error saving checkpoint', err);
+                        }
                     }
                 })
                 .catch((err) => {

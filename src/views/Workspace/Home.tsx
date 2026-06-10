@@ -25,36 +25,15 @@ export default function Home() {
                 </div>
             </div>
             <div className={style.cards}>
-                <Step
-                    description={t('app.workflow.model_desc')}
-                    step={1}
-                    id="model"
-                    status={workflowItems[0].status}
-                />
-                <Step
-                    description={t('app.workflow.pretraindata_desc')}
-                    step={2}
-                    id="pretraindata"
-                    status={workflowItems[1].status}
-                />
-                <Step
-                    description={t('app.workflow.pretrain_desc')}
-                    step={3}
-                    id="pretrain"
-                    status={workflowItems[2].status}
-                />
-                <Step
-                    description={t('app.workflow.finetune_desc')}
-                    step={4}
-                    id="finetune"
-                    status={workflowItems[3].status}
-                />
-                <Step
-                    description={t('app.workflow.deployment_desc')}
-                    step={5}
-                    id="deployment"
-                    status={workflowItems[4].status}
-                />
+                {workflowItems.map((item, index) => (
+                    <Step
+                        description={t(`app.workflow.${item.id}_desc`)}
+                        step={index + 1}
+                        id={item.id}
+                        status={item.status}
+                        key={item.id}
+                    />
+                ))}
             </div>
         </div>
     );

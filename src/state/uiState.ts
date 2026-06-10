@@ -5,3 +5,4 @@ export const uiShowSettings = atom(false);
 export const uiShowVisualisation = atom(false);
 export const uiShowSidePanel = atom(false);
 export const uiDeveloperMode = atomWithStorage('uiDeveloperMode', false);
+export const uiCompactMode = atomWithStorage('uiCompactMode', false);

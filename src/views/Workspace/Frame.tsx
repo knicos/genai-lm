@@ -1,8 +1,11 @@
 import { PropsWithChildren, Suspense, useEffect } from 'react';
 import style from './style.module.css';
+import { workflowStages } from '../../state/workflowSettings';
+import { useAtomValue } from 'jotai';
+import { uiCompactMode } from '../../state/uiState';
 
 interface Props extends PropsWithChildren {
-    name: string;
+    name: 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
     columns?: number;
     ignoredColumns?: number;
     observer: IntersectionObserver;
@@ -10,6 +13,9 @@ interface Props extends PropsWithChildren {
 }
 
 export default function Frame({ name, children, columns, ignoredColumns, observer, scroll }: Props) {
+    const stages = useAtomValue(workflowStages);
+    const compact = useAtomValue(uiCompactMode);
+
     useEffect(() => {
         const element = document.getElementById(`frame-${name}`);
         if (element) {
@@ -39,11 +45,15 @@ export default function Frame({ name, children, columns, ignoredColumns, observe
         }
     }, [scroll, name]);
 
+    if (!stages.has(name)) {
+        return null;
+    }
+
     return (
         <div
             id={`frame-${name}`}
             data-widget="container"
-            className={style.frame}
+            className={`${style.frame} ${compact ? style.compact : ''}`}
             style={{
                 gridTemplateColumns: `repeat(${
                     columns !== undefined

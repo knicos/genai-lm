@@ -77,7 +77,7 @@ export default function Initialiser() {
             return;
         }
 
-        if (flow === 'pretraindata') {
+        if (flow === 'data') {
             buildModel().catch((e) => {
                 console.error('Failed to build model', e);
             });

@@ -13,7 +13,7 @@
         "saveCancel": "Cancel",
         "workflow": {
             "model_desc": "Choose the size and shape of your mathematical model of language.",
-            "pretraindata_desc": "Add and process text data into numbers for your model to learn from.",
+            "data_desc": "Add and process text data into numbers for your model to learn from.",
             "pretrain_desc": "Train your model to learn the structure of language from your data.",
             "finetune_desc": "Give your model conversational capabilities, personality and style.",
             "deployment_desc": "Deploy your model and share it with others."
@@ -25,14 +25,12 @@
             "llmAPI": "LLM API",
             "training": "Training Parameters",
             "generator": "Generator",
-            "showModelSelect": "Show Models",
-            "showEvaluation": "Show Evaluation",
-            "showTrainer": "Show Trainer",
-            "showDataEntry": "Show Data Entry",
-            "showSettings": "Show Settings",
-            "showPrompt": "Show Prompt Input",
-            "showProbabilities": "Show Probabilities",
-            "showAttention": "Show Attention",
+            "showModelSelect": "Model Architecture",
+            "showTrainer": "Pre-training",
+            "showFinetune": "Fine-tuning",
+            "workflowElements": "Workflow Elements",
+            "compactMode": "Compact Workflow",
+            "saveModelCheckpoints": "Auto-Save Checkpoints",
             "maxLength": "Maximum output length",
             "temperature": "Temperature",
             "batchSize": "Batch Size",
@@ -107,7 +105,7 @@
     },
     "workflow": {
         "model": "Model",
-        "pretraindata": "Data",
+        "data": "Data",
         "pretrain": "Pre-training",
         "finetune": "Fine-tuning",
         "deployment": "Deployment"

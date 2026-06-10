@@ -115,15 +115,17 @@
     flex-direction: column;
     align-items: center;
     /*gap: 2rem;*/
-    align-self: stretch;
     min-height: 0;
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
     width: 40rem;
-    height: 100%;
+    height: calc(100% - 2rem);
     justify-content: flex-end;
     margin-right: 2rem;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #a4acbb;
+    animation: fadein 0.5s 1;
 }
 
 .inputGroup {
@@ -255,6 +257,10 @@
     height: 100%;
     grid-template-columns: repeat(2, max-content);
     min-height: 0;
+}
+
+.frame.compact {
+    min-width: 0;
 }
 
 .loading {
