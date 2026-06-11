@@ -1,4 +1,4 @@
-import { Checkbox, FormControl, FormControlLabel, Slider, TextField } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
@@ -25,9 +25,10 @@ export function Component() {
                     value={settings.maxEpochs}
                     onChange={(_, value) => setSettings({ ...settings, maxEpochs: value as number })}
                     min={1}
-                    max={1000}
+                    max={10}
                     step={1}
                     valueLabelDisplay="auto"
+                    marks
                 />
             </FormControl>
             <FormControl sx={{ marginTop: '1rem' }}>
@@ -43,7 +44,15 @@ export function Component() {
                     onChange={(_, value) => setSettings({ ...settings, batchSize: value as number })}
                     min={1}
                     max={32}
-                    step={1}
+                    step={null}
+                    marks={[
+                        { value: 1, label: '1' },
+                        { value: 2, label: '2' },
+                        { value: 4, label: '4' },
+                        { value: 8, label: '8' },
+                        { value: 16, label: '16' },
+                        { value: 32, label: '32' },
+                    ]}
                     valueLabelDisplay="auto"
                 />
             </FormControl>
@@ -61,6 +70,11 @@ export function Component() {
                     min={0.00001}
                     max={0.001}
                     step={0.00001}
+                    marks={[
+                        { value: 0.00001, label: '1e-5' },
+                        { value: 0.0002, label: '2e-4' },
+                        { value: 0.001, label: '1e-3' },
+                    ]}
                     valueLabelDisplay="auto"
                 />
             </FormControl>
@@ -105,6 +119,17 @@ export function Component() {
                             label={t('app.settings.gradClipping')}
                         />
                     </FormControl>
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={settings.maskedLoss}
+                                    onChange={(_, checked) => setSettings({ ...settings, maskedLoss: checked })}
+                                />
+                            }
+                            label={t('app.settings.maskedLoss')}
+                        />
+                    </FormControl>
                     <FormControl className={style.sliderControl}>
                         <div
                             id="warmup-label"
@@ -120,6 +145,13 @@ export function Component() {
                             max={1000}
                             step={10}
                             valueLabelDisplay="auto"
+                            marks={[
+                                { value: 0, label: '0' },
+                                { value: 250, label: '250' },
+                                { value: 500, label: '500' },
+                                { value: 750, label: '750' },
+                                { value: 1000, label: '1000' },
+                            ]}
                         />
                     </FormControl>
                     <FormControl className={style.sliderControl}>
@@ -134,9 +166,10 @@ export function Component() {
                             value={settings.decayEpochs}
                             onChange={(_, value) => setSettings({ ...settings, decayEpochs: value as number })}
                             min={1}
-                            max={100}
+                            max={10}
                             step={1}
                             valueLabelDisplay="auto"
+                            marks
                         />
                     </FormControl>
                     <FormControl className={style.sliderControl}>
@@ -154,6 +187,37 @@ export function Component() {
                             max={0.2}
                             step={0.01}
                             valueLabelDisplay="auto"
+                            marks={[
+                                { value: 0, label: '0' },
+                                { value: 0.05, label: '0.05' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.15, label: '0.15' },
+                                { value: 0.2, label: '0.2' },
+                            ]}
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
+                            id="drop-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.dropout')}
+                        </div>
+                        <Slider
+                            aria-labelledby="drop-label"
+                            value={settings.dropout}
+                            onChange={(_, value) => setSettings({ ...settings, dropout: value as number })}
+                            min={0}
+                            max={0.2}
+                            step={0.01}
+                            valueLabelDisplay="auto"
+                            marks={[
+                                { value: 0, label: '0' },
+                                { value: 0.05, label: '0.05' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.15, label: '0.15' },
+                                { value: 0.2, label: '0.2' },
+                            ]}
                         />
                     </FormControl>
                     <div className={style.spacer} />
@@ -168,35 +232,52 @@ export function Component() {
                                     setSettings({
                                         ...settings,
                                         loraConfig: {
-                                            ...(settings.loraConfig ?? { alpha: 8, variables: ['*'] }),
+                                            ...(settings.loraConfig ?? { rank: 4, alpha: 8, variables: ['*'] }),
                                             rank: value as number,
                                         },
                                     })
                                 }
                                 min={2}
                                 max={16}
-                                step={2}
+                                step={null}
+                                marks={[
+                                    { value: 2, label: '2' },
+                                    { value: 4, label: '4' },
+                                    { value: 8, label: '8' },
+                                    { value: 16, label: '16' },
+                                ]}
                                 valueLabelDisplay="auto"
                                 disabled={settings.loraConfig === undefined}
                             />
                         </FormControl>
-                        <TextField
-                            multiline
-                            minRows={2}
-                            label={t('app.settings.loraVariables')}
-                            value={settings.loraConfig?.variables.join('\n') ?? ''}
-                            onChange={(e) => {
-                                const variables = e.target.value.split('\n').map((v) => v.trim());
-                                setSettings({
-                                    ...settings,
-                                    loraConfig: {
-                                        ...(settings.loraConfig ?? { rank: 4, alpha: 8 }),
-                                        variables,
-                                    },
-                                });
-                            }}
-                            disabled={settings.loraConfig === undefined}
-                        />
+                        <FormControl>
+                            <div id="loraAlpha-label">{t('app.settings.loraAlpha')}</div>
+                            <Slider
+                                aria-labelledby="loraAlpha-label"
+                                value={settings.loraConfig?.alpha ?? 8}
+                                onChange={(_, value) =>
+                                    setSettings({
+                                        ...settings,
+                                        loraConfig: {
+                                            ...(settings.loraConfig ?? { rank: 4, alpha: 8, variables: ['*'] }),
+                                            alpha: value as number,
+                                        },
+                                    })
+                                }
+                                min={4}
+                                max={64}
+                                step={null}
+                                marks={[
+                                    { value: 4, label: '4' },
+                                    { value: 8, label: '8' },
+                                    { value: 16, label: '16' },
+                                    { value: 32, label: '32' },
+                                    { value: 64, label: '64' },
+                                ]}
+                                valueLabelDisplay="auto"
+                                disabled={settings.loraConfig === undefined}
+                            />
+                        </FormControl>
                     </fieldset>
                 </>
             )}

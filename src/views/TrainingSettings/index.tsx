@@ -33,7 +33,16 @@ export function Component() {
                     onChange={(_, value) => setSettings({ ...settings, batchSize: value as number })}
                     min={2}
                     max={64}
-                    step={2}
+                    step={null}
+                    marks={[
+                        { value: 1, label: '1' },
+                        { value: 2, label: '2' },
+                        { value: 4, label: '4' },
+                        { value: 8, label: '8' },
+                        { value: 16, label: '16' },
+                        { value: 32, label: '32' },
+                        { value: 64, label: '64' },
+                    ]}
                     valueLabelDisplay="auto"
                 />
             </FormControl>
@@ -58,6 +67,11 @@ export function Component() {
                     max={0.001}
                     step={0.00001}
                     valueLabelDisplay="auto"
+                    marks={[
+                        { value: 0.00001, label: '1e-5' },
+                        { value: 0.0002, label: '2e-4' },
+                        { value: 0.001, label: '1e-3' },
+                    ]}
                 />
             </FormControl>
             {devMode && (
@@ -86,6 +100,17 @@ export function Component() {
                                 />
                             }
                             label={t('app.settings.mixedPrecision')}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={settings.maskedLoss}
+                                    onChange={(_, checked) => setSettings({ ...settings, maskedLoss: checked })}
+                                />
+                            }
+                            label={t('app.settings.maskedLoss')}
                         />
                     </FormControl>
                     <FormControl className={style.sliderControl}>
@@ -120,6 +145,13 @@ export function Component() {
                             max={0.2}
                             step={0.01}
                             valueLabelDisplay="auto"
+                            marks={[
+                                { value: 0, label: '0' },
+                                { value: 0.05, label: '0.05' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.15, label: '0.15' },
+                                { value: 0.2, label: '0.2' },
+                            ]}
                         />
                     </FormControl>
                     <FormControl className={style.sliderControl}>
@@ -156,6 +188,13 @@ export function Component() {
                                 max={1000}
                                 step={10}
                                 valueLabelDisplay="auto"
+                                marks={[
+                                    { value: 0, label: '0' },
+                                    { value: 250, label: '250' },
+                                    { value: 500, label: '500' },
+                                    { value: 750, label: '750' },
+                                    { value: 1000, label: '1000' },
+                                ]}
                             />
                         </FormControl>
                         <FormControl className={style.sliderControl}>
@@ -173,6 +212,7 @@ export function Component() {
                                 max={10}
                                 step={1}
                                 valueLabelDisplay="auto"
+                                marks
                             />
                         </FormControl>
                         <FormControl className={style.sliderControl}>
@@ -187,9 +227,16 @@ export function Component() {
                                 value={settings.weightDecay}
                                 onChange={(_, value) => setSettings({ ...settings, weightDecay: value as number })}
                                 min={0}
-                                max={0.1}
+                                max={0.2}
                                 step={0.01}
                                 valueLabelDisplay="auto"
+                                marks={[
+                                    { value: 0, label: '0' },
+                                    { value: 0.05, label: '0.05' },
+                                    { value: 0.1, label: '0.1' },
+                                    { value: 0.15, label: '0.15' },
+                                    { value: 0.2, label: '0.2' },
+                                ]}
                             />
                         </FormControl>
                         <FormControl>

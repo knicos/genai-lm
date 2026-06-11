@@ -14,6 +14,7 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     gap: 1rem;
+    padding: 1rem 2rem;
 }
 
 .fieldset legend {
