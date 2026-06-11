@@ -4,7 +4,7 @@ import Downloader from '../../utilities/downloader';
 import { DataCardItem } from './type';
 import Card from '../Card/Card';
 import SampleWriter from './SampleWriter';
-import { CircularProgress, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckIcon from '@mui/icons-material/Check';
 
@@ -28,7 +28,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
     const handleDownload = () => {
         if (downloader) return;
         const d = Downloader.downloadFile(card.id, card.url, card.title, card.mime);
-        d.on('end', () => setDone(true));
+        setDone(true);
         setDownloader(d);
         onSelect(card, d);
     };
@@ -52,9 +52,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
                                 disabled={downloader !== null || done || used}
                                 onClick={handleDownload}
                             >
-                                {downloader && !done ? (
-                                    <CircularProgress />
-                                ) : done || used ? (
+                                {downloader || used ? (
                                     <CheckIcon
                                         fontSize="inherit"
                                         color="success"
@@ -87,6 +85,12 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
                     </div>
                     <div className={style.buttonRow}>
                         <h2>{title}</h2>
+                        {used || downloader ? (
+                            <CheckIcon
+                                fontSize="small"
+                                color="success"
+                            />
+                        ) : null}
                     </div>
                 </>
             }

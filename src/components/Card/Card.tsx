@@ -105,7 +105,7 @@ export default function Card<T extends CardItem, S = void>({
                     : undefined
             }
             onMouseEnter={!disabled && !used ? handleExpand : undefined}
-            onMouseLeave={!disabled && !used ? handleClose : undefined}
+            onMouseLeave={handleClose}
             data-testid={`card-${card.id}`}
         >
             {expanded ? expandedContent : content}

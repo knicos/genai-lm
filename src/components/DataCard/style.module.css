@@ -1,15 +1,22 @@
-@value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
+@value primary, secondary, backgroundDark, bgOk from "@genai-fi/base/css/colours.module.css";
 
 .sampleBox {
-    background-color: #f9f9f9;
+    background-color: #ebeefc;
     position: relative;
     border-radius: 8px;
     cursor: pointer;
     height: 150px;
+    box-sizing: border-box;
+}
+
+.sampleBox.disabledBG {
+    background-color: #f0f0f0;
+    border: 2px solid bgOk;
 }
 
 .simple {
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.1) 0px,
             rgba(255, 255, 255, 0.1) 2px,
@@ -20,7 +27,8 @@
 }
 
 .normal {
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.08) 0px,
             rgba(255, 255, 255, 0.08) 2px,
@@ -31,7 +39,8 @@
 }
 
 .complex {
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.08) 0px,
             rgba(255, 255, 255, 0.08) 2px,
@@ -76,6 +85,12 @@
     padding: 0 0.5rem;
     align-items: center;
     box-sizing: border-box;
+}
+
+.buttonRow h2 {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .sizeText {
