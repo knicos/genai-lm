@@ -7,11 +7,12 @@ import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
-import { trainerSettings } from '../../state/trainer';
+import { trainerAtom, trainerSettings } from '../../state/trainer';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
     const generator = useAtomValue(rawGeneratorAtom);
+    const trainer = useAtomValue(trainerAtom);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
     const { temperature, topP, maxLength, showAttention, showProbabilities, promptMode } =
@@ -46,51 +47,52 @@ export default function ChatPrompt() {
             };
             generator.on('stop', onStop);
 
-            const state = {
-                count: 0,
-            };
-
-            if (outputText) {
-                const h = async () => {
-                    state.count++;
-                    if (state.count % 2 !== 0) return;
-                    try {
-                        if (promptRef.current.length > 0 && promptMode === 'completion') {
-                            await generator.generate([{ role: 'assistant', content: promptRef.current }], {
-                                nonConversational: true,
-                                continuation: true,
-                                maxLength: 200,
-                                temperature: 0.8,
-                                includeProbabilities: false,
-                                topP: topP > 0 ? topP : undefined,
-                            });
-                        } else {
-                            await generator.generate({
-                                nonConversational: true,
-                                maxLength: 200,
-                                temperature: 0.8,
-                                includeProbabilities: false,
-                                topP: topP > 0 ? topP : undefined,
-                            });
-                        }
-                    } catch {
-                        console.error('Auto-generation error');
-                    }
-
-                    //await wait(10);
-                };
-                model.on('trainStep', h);
-                return () => {
-                    model.off('trainStep', h);
-                };
-            }
-
             return () => {
                 generator.off('reset', onReset);
                 generator.off('start', onStart);
             };
         }
     }, [generator, model, topP, outputText, promptMode]);
+
+    useEffect(() => {
+        if (trainer && outputText && generator) {
+            const state = {
+                count: 0,
+            };
+            const h = async () => {
+                state.count++;
+                if (state.count % 2 !== 0) return;
+                try {
+                    if (promptRef.current.length > 0 && promptMode === 'completion') {
+                        await generator.generate([{ role: 'assistant', content: promptRef.current }], {
+                            nonConversational: true,
+                            continuation: true,
+                            maxLength: 200,
+                            temperature: 0.8,
+                            includeProbabilities: false,
+                            topP: topP > 0 ? topP : undefined,
+                        });
+                    } else {
+                        await generator.generate({
+                            nonConversational: true,
+                            maxLength: 200,
+                            temperature: 0.8,
+                            includeProbabilities: false,
+                            topP: topP > 0 ? topP : undefined,
+                        });
+                    }
+                } catch {
+                    console.error('Auto-generation error');
+                }
+
+                //await wait(10);
+            };
+            trainer.on('log', h);
+            return () => {
+                trainer.off('log', h);
+            };
+        }
+    }, [trainer, outputText, promptMode, topP, generator]);
 
     const doGenerate = async (maxLength: number, prompt?: string) => {
         if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {

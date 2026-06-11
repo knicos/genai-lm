@@ -34,6 +34,7 @@
             "maxLength": "Maximum output length",
             "temperature": "Temperature",
             "batchSize": "Batch Size",
+            "epochs": "Epochs",
             "learningRate": "Learning Rate",
             "showOutputText": "Show Progress Text",
             "checkpointing": "Disable Gradient Checkpointing",
