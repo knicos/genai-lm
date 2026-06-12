@@ -2,7 +2,7 @@
     "app": {
         "little": "Little",
         "languageMachine": "Language Machine",
-        "subtitle": "Create your own tiny AI chatbot by following these steps.",
+        "subtitle": "Create your own tiny AI chatbot using these starting points.",
         "startHere": "Start Here",
         "save": "Save",
         "load": "Open",
@@ -12,11 +12,11 @@
         "saveSave": "Save",
         "saveCancel": "Cancel",
         "workflow": {
-            "model_desc": "Choose the size and shape of your mathematical model of language.",
-            "data_desc": "Add and process text data into numbers for your model to learn from.",
-            "pretrain_desc": "Train your model to learn the structure of language from your data.",
-            "finetune_desc": "Give your model conversational capabilities, personality and style.",
-            "deployment_desc": "Deploy your model and share it with others."
+            "empty_desc": "Design your model structure and start from scratch.",
+            "base_desc": "Use a base model and adapt it to a new task with your data.",
+            "complete_desc": "Cover all the stages in making a chatbot.",
+            "finetune_desc": "Adjust the style and personality of an existing model.",
+            "advanced_desc": "Access additional settings and features for advanced use."
         },
         "settings": {
             "title": "Settings",
@@ -107,8 +107,12 @@
     },
     "workflow": {
         "model": "Model",
+        "empty": "Empty Model",
+        "base": "Base Model",
+        "complete": "Entire Workflow",
+        "advanced": "Advanced Workflow",
         "data": "Data",
-        "pretrain": "Pre-training",
+        "pretrain": "Training",
         "finetune": "Fine-tuning",
         "deployment": "Deployment"
     },
@@ -132,7 +136,7 @@
         "dropHint": "Drop files here...",
         "ok": "OK",
         "samples": "Samples",
-        "search": "Datasets",
+        "search": "Library",
         "downloading": "Downloading {{count}} file(s)",
         "load": "Load",
         "errors": {
@@ -152,6 +156,9 @@
         "upToDate": "Model is ready to use.",
         "help": "Building a model will allocate resources and assign random numbers to the parameters.",
         "exceedsSizeLimit": "The model has too many parameters."
+    },
+    "foundation": {
+        "title": "Base Models"
     },
     "model": {
         "parameters": "Parameters",
@@ -178,7 +185,7 @@
         "visualisation": {
             "next": "Next"
         },
-        "preTraining": "Pre-Training",
+        "preTraining": "Training",
         "defaultName": "Your Model",
         "includeAll": "Include different architectures",
         "noModelsFound": "No models found",
@@ -193,13 +200,14 @@
         "downloading": "Downloading model...",
         "training": "Training model...",
         "busy": "Model working...",
+        "noModel": "No model",
         "error": "Model broke",
         "parametersHelp": "The total number of numeric parameters in the model.",
         "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token.",
         "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed."
     },
     "training": {
-        "title": "Pre-Training",
+        "title": "Training",
         "samples": "Samples",
         "tokens": "Tokens",
         "start": "Train",
@@ -244,8 +252,8 @@
         "title": "Generation",
         "generate": "Generate",
         "promptPlaceholder": "Optional prompt...",
-        "startPrompt": "Test the pre-trained model",
-        "startChatPrompt": "Try chatting with it now.",
+        "startPrompt": "Test the trained model",
+        "startChatPrompt": "Try your tuned model.",
         "settingsTooltip": "Generator Settings",
         "settings": "Settings",
         "pause": "Pause",

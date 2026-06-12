@@ -112,7 +112,7 @@ export default function ModelState() {
         [model]
     );
 
-    const spin = (status !== 'ready' && status !== 'awaitingTokens') || downloader;
+    const spin = (model && status !== 'ready' && status !== 'awaitingTokens') || downloader;
 
     return (
         <Help
@@ -161,7 +161,7 @@ export default function ModelState() {
                             </div>
                         )}
                     </div>
-                    {!spin && (
+                    {!spin && model && (
                         <div className={style.nameStatusGroup}>
                             <ModelName
                                 title={title}
@@ -173,9 +173,10 @@ export default function ModelState() {
                         </div>
                     )}
                     {downloader && <div className={style.statusMessage}>{t('model.downloading')}</div>}
-                    {status === 'loading' && !downloader && (
+                    {model && status === 'loading' && !downloader && (
                         <div className={style.statusMessage}>{t('model.loading')}</div>
                     )}
+                    {!model && !downloader && <div className={style.statusMessage}>{t('model.noModel')}</div>}
                     {status === 'training' && !downloader && (
                         <div className={style.statusMessage}>{t('model.training')}</div>
                     )}

@@ -23,15 +23,15 @@ export function useChangePathString({ flow, sidepanel, preserveSearch, preserveH
         const segments = pathname.split('/').filter(Boolean);
 
         if (flow) {
-            segments[1] = flow;
+            segments[2] = flow;
         }
         if (sidepanel !== undefined) {
             if (sidepanel === null) {
-                segments.splice(2, 1);
-            } else if (segments.length < 3) {
+                segments.splice(3, 1);
+            } else if (segments.length < 4) {
                 segments.push(sidepanel);
             } else {
-                segments[2] = sidepanel;
+                segments[3] = sidepanel;
             }
         }
 
@@ -68,15 +68,15 @@ export function useChangePath() {
             const segments = pathname.split('/').filter(Boolean);
 
             if (flow) {
-                segments[1] = flow;
+                segments[2] = flow;
             }
             if (sidepanel !== undefined) {
                 if (sidepanel === null) {
-                    segments.splice(2, 1);
-                } else if (segments.length < 3) {
+                    segments.splice(3, 1);
+                } else if (segments.length < 4) {
                     segments.push(sidepanel);
                 } else {
-                    segments[2] = sidepanel;
+                    segments[3] = sidepanel;
                 }
             }
 

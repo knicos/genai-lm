@@ -249,7 +249,7 @@
     padding-left: 2rem;
     padding-right: 2rem;
     box-sizing: border-box;
-    min-width: 80vw;
+    min-width: min(70vw, 1000px);
     display: grid;
     gap: 3rem;
     justify-content: center;

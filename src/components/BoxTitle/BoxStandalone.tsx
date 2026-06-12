@@ -39,7 +39,7 @@ export default function BoxStandalone({
     return (
         <div
             ref={ref}
-            className={`${boxstyle.box} ${fullWidth ? boxstyle.fullWidth : ''} ${className || ''}`}
+            className={`${className ? className : boxstyle.box} ${fullWidth ? boxstyle.fullWidth : ''}`}
             data-active={active ? 'true' : 'false'}
             style={style}
         >

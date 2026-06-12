@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { TrainingLogEntry } from '@genai-fi/nanogpt';
+import { tasks, tokensFromTasks, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -17,17 +17,22 @@ import useWakeLock from '../../hooks/wakeLock';
 import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router-dom';
-import { Switch, Tooltip } from '@mui/material';
+import { LinearProgress, Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
-import { dataEntries, dataTokens } from '../../state/data';
+import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { set } from 'idb-keyval';
+import { createDatasetFromEntries } from '../../utilities/dataset';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
-export default function TextTraining() {
+interface Props {
+    autoTokenise?: boolean;
+}
+
+export default function TextTraining({ autoTokenise = false }: Props) {
     const { t } = useTranslation();
     const [trainer, setTrainer] = useAtom(trainerAtom);
     const [tokens, setTokens] = useState<number | undefined>(undefined);
@@ -36,7 +41,7 @@ export default function TextTraining() {
     const [needsTraining, setNeedsTraining] = useState(true);
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
-    const dataset = useAtomValue(dataTokens);
+    const [dataset, setDataset] = useAtom(dataTokens);
     const entries = useAtomValue(dataEntries);
     const saveCheckpoints = useAtomValue(modelSaveCheckpoints);
     const [settings, setSettings] = useAtom(trainerSettings);
@@ -46,7 +51,8 @@ export default function TextTraining() {
     const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
-    const [preparing, setPreparing] = useState(false);
+    const [preparing, setPreparing] = useState<string | null>(null);
+    const datasetId = useAtomValue(datasetIdAtom);
 
     useWakeLock(training);
 
@@ -130,12 +136,29 @@ export default function TextTraining() {
             });
             return;
         }
+
+        let datasetTokens = dataset?.tokens;
+
         if (!dataset || dataset.tokens.length === 0) {
-            setMessage({
-                notice: t('training.errors.noData'),
-                level: 'warning',
-            });
-            return;
+            if (autoTokenise) {
+                setPreparing(t('training.tokenising'));
+                const conversations = await createDatasetFromEntries(entries);
+                const task = new tasks.ConversationTask(conversations);
+
+                if (!model.tokeniser.trained) {
+                    await model.tokeniser.train(conversations, undefined, datasetId);
+                }
+
+                const newTokens = await tokensFromTasks([task], model.tokeniser);
+                setDataset({ tokens: newTokens, tokeniserId: model.tokeniser.id, datasetId });
+                datasetTokens = newTokens;
+            } else {
+                setMessage({
+                    notice: t('training.errors.noData'),
+                    level: 'warning',
+                });
+                return;
+            }
         }
 
         if (training && trainer) {
@@ -143,7 +166,7 @@ export default function TextTraining() {
             return;
         }
 
-        if (model && dataset) {
+        if (model && datasetTokens && datasetTokens.length > 0) {
             if (!model.loaded) {
                 setMessage({
                     notice: t('training.errors.notReady'),
@@ -152,8 +175,14 @@ export default function TextTraining() {
                 return;
             }
             if (!model.tokeniser.trained) {
-                throw new Error('Model tokeniser is not trained.');
+                setMessage({
+                    notice: t('training.errors.tokeniserNotTrained'),
+                    level: 'warning',
+                });
+                return;
             }
+
+            setPreparing(t('training.preparingTrainer'));
 
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
@@ -187,9 +216,9 @@ export default function TextTraining() {
             if (shouldPrepare) {
                 try {
                     //const task = new tasks.PretrainingTask(dataset);
-                    setPreparing(true);
-                    await currentTrainer.prepare(dataset.tokens, entries);
-                    setPreparing(false);
+                    setPreparing(t('training.preparingData'));
+                    await currentTrainer.prepare(datasetTokens, entries);
+                    setPreparing(null);
                 } catch (err) {
                     console.error('Error preparing training', err);
                     setMessage({
@@ -200,6 +229,8 @@ export default function TextTraining() {
                     setDone(true);
                     return;
                 }
+            } else {
+                setPreparing(null);
             }
 
             setNeedsTraining(false);
@@ -284,14 +315,17 @@ export default function TextTraining() {
                         </div>
                     </div>
                     <div className={style.buttonBox}>
-                        <Button
-                            disabled={!done && !training}
-                            variant="contained"
-                            startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
-                            onClick={() => startTraining()}
-                        >
-                            {done ? t('training.start') : t('training.stop')}
-                        </Button>
+                        {preparing && <LinearProgress sx={{ width: '100%' }} />}
+                        {!preparing && (
+                            <Button
+                                disabled={!done && !training}
+                                variant="contained"
+                                startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
+                                onClick={() => startTraining()}
+                            >
+                                {done ? t('training.start') : t('training.stop')}
+                            </Button>
+                        )}
                         <Tooltip
                             title={t('training.autoOutput')}
                             arrow

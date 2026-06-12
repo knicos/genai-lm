@@ -7,7 +7,7 @@ import { observe } from 'jotai-effect';
 import { store } from './store';
 import { set, get, del } from 'idb-keyval';
 import EE from 'eventemitter3';
-import { modelAtom } from './model';
+// import { modelAtom } from './model';
 
 type DataEntryEvents = 'loading' | 'loaded' | 'error';
 
@@ -269,12 +269,19 @@ observe((get) => {
     }
 }, store);
 
-observe((get, set) => {
+/*observe((get, set) => {
     const model = get(modelAtom);
     if (model) {
         set(dataTokens, null);
     }
 }, store);
+
+observe((get, set) => {
+    const entries = get(dataEntries);
+    if (entries.length > 0) {
+        set(dataTokens, null);
+    }
+}, store);*/
 
 export const dataTokensReady = atom<boolean>((get) => {
     const tokens = get(dataTokens);

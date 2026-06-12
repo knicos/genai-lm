@@ -21,6 +21,10 @@
     z-index: 2000 !important;
     max-width: 350px;
     width: 350px;
+    box-shadow: 2px 2px 4px #a4acbb;
+    overflow: hidden;
+    animation: fadein 0.5s 1;
+    position: relative;
 }
 
 .modelThread :global .MuiOutlinedInput-root {

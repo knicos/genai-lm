@@ -31,7 +31,7 @@ export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
     const listRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState(0);
-    const { flow } = useParams();
+    const { flow, variant } = useParams();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [hoveredItem, setHoveredItem] = useState<WorkflowItem | null>(null);
 
@@ -88,7 +88,7 @@ export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
                 {items.map((item, ix) => (
                     <Fragment key={item.id}>
                         <Link
-                            to={`/workspace/${item.id}${sidepanel ? `/${sidepanel}` : ''}`}
+                            to={`/workspace/${variant}/${item.id}${sidepanel ? `/${sidepanel}` : ''}`}
                             className={`${style.item} ${flow === item.id ? style.selected : ''} ${style[item.status]}`}
                             style={disabled ? { pointerEvents: 'none', opacity: 0.5 } : undefined}
                             aria-disabled={disabled}

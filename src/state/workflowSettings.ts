@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 export type WorkflowSteps =
+    | 'architecture'
     | 'model'
     | 'data'
     | 'tokeniser'
@@ -13,7 +14,7 @@ export type WorkflowSteps =
     | 'share';
 
 const DEFAULT_STEPS: WorkflowSteps[] = [
-    'model',
+    'architecture',
     'data',
     'tokeniser',
     'tokenise',
@@ -33,6 +34,7 @@ export const workflowStages = atom<Set<WorkflowStage>>((get) => {
     const steps = get(workflowSteps);
     const stages = new Set<WorkflowStage>();
     if (steps.has('model')) stages.add('model');
+    if (steps.has('architecture')) stages.add('model');
     if (steps.has('data') || steps.has('tokeniser') || steps.has('tokenise')) stages.add('data');
     if (steps.has('trainer') || steps.has('pretrain-output')) stages.add('pretrain');
     if (steps.has('finetune') || steps.has('conversations')) stages.add('finetune');

@@ -1,11 +1,32 @@
 import { useTranslation } from 'react-i18next';
 import style from './home.module.css';
 import Step from './Step';
-import useWorkflowItems from '../../hooks/useWorkflowItems';
+
+const TEMPLATES = [
+    {
+        variant: 'empty',
+        step: 'model',
+    },
+    {
+        variant: 'base',
+        step: 'model',
+    },
+    {
+        variant: 'finetune',
+        step: 'model',
+    },
+    {
+        variant: 'complete',
+        step: 'model',
+    },
+    {
+        variant: 'advanced',
+        step: 'model',
+    },
+];
 
 export default function Home() {
     const { t } = useTranslation();
-    const workflowItems = useWorkflowItems();
 
     return (
         <div className={style.homeContainer}>
@@ -25,13 +46,13 @@ export default function Home() {
                 </div>
             </div>
             <div className={style.cards}>
-                {workflowItems.map((item, index) => (
+                {TEMPLATES.map((item, index) => (
                     <Step
-                        description={t(`app.workflow.${item.id}_desc`)}
+                        flow={item.step}
+                        description={t(`app.workflow.${item.variant}_desc`)}
                         step={index + 1}
-                        id={item.id}
-                        status={item.status}
-                        key={item.id}
+                        id={item.variant}
+                        key={item.variant}
                     />
                 ))}
             </div>

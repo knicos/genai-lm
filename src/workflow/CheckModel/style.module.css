@@ -4,6 +4,7 @@
     /*justify-content: space-between;*/
     color: #333;
     flex-direction: column;
+    user-select: none;
 }
 
 .status {

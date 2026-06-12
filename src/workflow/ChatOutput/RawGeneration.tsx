@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
@@ -12,7 +12,7 @@ import { conversationDataAtom } from '../../state/data';
 
 export default function ChatConversation() {
     const model = useAtomValue(loadedModelAtom);
-    const [generator, setGenerator] = useAtom(rawGeneratorAtom);
+    const generator = useAtomValue(rawGeneratorAtom);
     const setConversationLog = useSetAtom(conversationDataAtom);
     const [text, setText] = useState<Conversation[]>([]);
     const status = useModelStatus(model ?? undefined);
@@ -24,11 +24,9 @@ export default function ChatConversation() {
 
     useEffect(() => {
         if (model) {
-            const generator = model.generator();
-            setGenerator(generator);
             setText([]);
         }
-    }, [model, setGenerator]);
+    }, [model]);
 
     useEffect(() => {
         if (generator) {

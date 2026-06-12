@@ -4,10 +4,36 @@ import { atomWithStorage } from 'jotai/utils';
 import { observe } from 'jotai-effect';
 import { store } from './store';
 import Downloader from '../utilities/downloader';
+import logger from '../utilities/logger';
 
 export const modelDownloadAtom = atom<Downloader | null>(null);
 
 export const modelAtom = atom<TeachableLLM | null>(null);
+
+observe((get, set) => {
+    const downloader = get(modelDownloadAtom);
+    if (downloader) {
+        const onEnd = (file: File) => {
+            set(modelDownloadAtom, null);
+            const newModel = TeachableLLM.loadModel(file, { sourceURL: downloader.url });
+            set(modelAtom, (old) => {
+                if (old) {
+                    old.dispose();
+                }
+                return newModel;
+            });
+        };
+        const onCancel = () => {
+            set(modelDownloadAtom, null);
+        };
+        downloader.on('end', onEnd);
+        downloader.on('cancel', onCancel);
+        return () => {
+            downloader.off('end', onEnd);
+            downloader.off('cancel', onCancel);
+        };
+    }
+}, store);
 
 export const loadedModelAtom = atom<TeachableLLM | null>(null);
 
@@ -40,6 +66,13 @@ observe((get, set) => {
                 ...config,
             });
             set(loadedModelAtom, model);
+
+            logger.log({
+                action: 'model_loaded',
+                name: model.meta.name,
+                id: model.meta.id,
+                params: model.getNumParams(),
+            });
         };
         model.on('loaded', h);
         return () => {

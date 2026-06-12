@@ -94,6 +94,11 @@ export const routes = createRoutesFromElements(
         <Route
             path="workspace/:flow"
             lazy={() => import('./views/Workspace')}
+        />
+
+        <Route
+            path="workspace/:variant/:flow"
+            lazy={() => import('./views/Workspace')}
         >
             <Route
                 path="generator-settings"

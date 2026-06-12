@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
 import { Conversation } from '@genai-fi/nanogpt';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { conversationGeneratorAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import ChatMenu from './ChatMenu';
@@ -10,18 +10,16 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ChatConversation() {
     const model = useAtomValue(loadedModelAtom);
-    const [generator, setGenerator] = useAtom(conversationGeneratorAtom);
+    const generator = useAtomValue(conversationGeneratorAtom);
     const [text, setText] = useState<Conversation[]>([]);
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (model) {
-            const generator = model.generator();
-            setGenerator(generator);
             setText([]);
         }
-    }, [model, setGenerator]);
+    }, [model]);
 
     useEffect(() => {
         if (generator) {

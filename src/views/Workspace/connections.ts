@@ -18,6 +18,22 @@ export const CONNECTIONS: IConnection[] = [
         startOffset: 0.5,
     },
     {
+        start: 'foundation',
+        end: 'textData',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: 0.0,
+        startOffset: 0.2,
+    },
+    {
+        start: 'foundation',
+        end: 'tuneData',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: 0.0,
+        startOffset: 0.2,
+    },
+    {
         start: 'textData',
         end: 'tokeniser',
         startPoint: 'right',
@@ -39,6 +55,14 @@ export const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
         startOffset: 0.2,
+    },
+    {
+        start: 'textData',
+        end: 'trainer',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: -0.2,
+        startOffset: -0.6,
     },
     {
         start: 'tokeniseData',
