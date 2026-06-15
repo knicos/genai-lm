@@ -407,10 +407,17 @@
     },
     "sharing": {
         "title": "Sharing",
-        "start": "Share",
-        "stop": "Stop Sharing",
-        "settings": "Settings",
-        "users": "Users"
+        "titlePre": "Sharing Pre-trained",
+        "titleLoRA": "Sharing Tuned Model",
+        "noLoRA": "No tuning",
+        "enable": "Allow Chat",
+        "copyLink": "Copy Link",
+        "download": "Download",
+        "allowRecord": "Record conversations",
+        "option1": "Allow Chat",
+        "option1_desc": "Allow others to chat with your model in real-time. You can share a link or QR code to let others connect and talk with your model.",
+        "option2": "Download Model",
+        "option2_desc": "Download a ZIP file containing your model that can be shared and loaded by others."
     },
     "deploy": {
         "actions": {

@@ -8,9 +8,10 @@ interface Props {
     widget: string;
     onClick: () => void;
     style?: CSSProperties;
+    light?: boolean;
 }
 
-export function BoxButton({ label, icon, widget, onClick, style }: Props) {
+export function BoxButton({ label, icon, widget, onClick, style, light }: Props) {
     const ref = useRef<HTMLDivElement>(null);
     const workflowContext = useWorkflowContext();
 
@@ -22,7 +23,7 @@ export function BoxButton({ label, icon, widget, onClick, style }: Props) {
 
     return (
         <div
-            className={styleModule.boxButton}
+            className={`${styleModule.boxButton} ${light ? styleModule.light : ''}`}
             data-widget={widget}
             onClick={onClick}
             ref={ref}

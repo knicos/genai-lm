@@ -1,5 +1,3 @@
-@value secondary from "@genai-fi/base/css/colours.module.css";
-
 .userContainer {
     align-self: flex-end;
     max-width: 70%;
@@ -117,7 +115,7 @@
 }
 
 .cursor.active {
-    background-color: secondary;
+    background-color: var(--secondary);
     animation: unset;
 }
 

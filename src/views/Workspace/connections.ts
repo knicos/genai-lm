@@ -114,7 +114,14 @@ export const CONNECTIONS: IConnection[] = [
         end: 'inference-visualize',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: -0.2,
+        startOffset: 0.0,
+    },
+    {
+        start: 'chatOutput',
+        end: 'sharing-raw',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0.0,
     },
     {
         start: 'tuneData',
@@ -126,7 +133,7 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'finetuner',
-        end: 'sharing',
+        end: 'conversationOutput',
         startPoint: 'right',
         endPoint: 'left',
         startOffset: -0.2,
@@ -140,10 +147,10 @@ export const CONNECTIONS: IConnection[] = [
         startOffset: 0,
     },
     {
-        start: 'sharing',
-        end: 'conversationOutput',
+        start: 'conversationOutput',
+        end: 'sharing',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.6,
+        startOffset: 0.3,
     },
 ];

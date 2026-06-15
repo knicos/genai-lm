@@ -11,6 +11,7 @@ import RawGeneration from '../../../workflow/ChatOutput/RawGeneration';
 import RawPrompt from '../../../workflow/Prompt/RawPrompt';
 import { useAtomValue } from 'jotai';
 import { workflowSteps } from '../../../state/workflowSettings';
+import Sharing from '../../../workflow/Sharing/Sharing';
 
 interface Props {
     observer: IntersectionObserver;
@@ -65,6 +66,7 @@ export default function PretrainFrame({ observer, scrollFrame }: Props) {
                         })
                     }
                 />
+                {steps.has('share') && <Sharing />}
             </div>
         </Frame>
     );

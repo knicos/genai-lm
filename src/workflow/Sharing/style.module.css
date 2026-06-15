@@ -1,11 +1,56 @@
+.container {
+    display: flex;
+    gap: 1rem;
+}
+
 .qr {
     display: flex;
-    align-self: center;
+    flex-direction: column;
+    align-self: flex-start;
     justify-content: center;
+    align-items: center;
     margin: 2rem 0;
 }
 
 .qr.disabled {
     opacity: 0.1;
     pointer-events: none;
+}
+
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.shareOption {
+    position: relative;
+    padding-left: 4rem;
+    max-width: 300px;
+    font-size: 0.9rem;
+}
+
+.optionNumber {
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: var(--secondary);
+    color: white;
+    width: 3rem;
+    height: 3rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+}
+
+.loraBadge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
 }

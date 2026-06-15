@@ -1,16 +1,22 @@
 import { usePeerData } from '@genai-fi/base/hooks/peer';
 import { EventProtocol } from './events';
 import { Connection } from '@genai-fi/base';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom } from '../../state/model';
 import { v4 as uuidv4 } from 'uuid';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatManager from './ChatManager';
+import { allowRecordAtom, conversationDataAtom } from '../../state/data';
 
 export default function ChatProtocol() {
     //const code = useAtomValue(sessionCode);
     const model = useAtomValue(modelAtom);
     const [manager, setManager] = useState<ChatManager | null>(null);
+    const allowRecord = useAtomValue(allowRecordAtom);
+    const recordRef = useRef(allowRecord);
+    const setConversations = useSetAtom(conversationDataAtom);
+
+    recordRef.current = allowRecord;
 
     useEffect(() => {
         if (model) {
@@ -32,6 +38,16 @@ export default function ChatProtocol() {
                     conversationId,
                     data.input,
                     (id, message, completed) => {
+                        if (completed && recordRef.current) {
+                            setConversations(async (prev) => {
+                                const initialConvo = manager.getConversation(id);
+                                const priorConvo = await prev;
+                                if (priorConvo.includes(initialConvo)) {
+                                    return [...priorConvo];
+                                }
+                                return [...priorConvo, initialConvo];
+                            });
+                        }
                         if (data.stream || completed) {
                             conn.send({
                                 event: 'response',
@@ -43,7 +59,8 @@ export default function ChatProtocol() {
                     },
                     (_, error) => {
                         conn.send({ event: 'error', message: error });
-                    }
+                    },
+                    data.loRA
                 );
             } else {
                 console.warn('Model not ready, cannot generate response');

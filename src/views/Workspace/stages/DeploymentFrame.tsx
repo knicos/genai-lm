@@ -1,3 +1,5 @@
+import { useAtomValue } from 'jotai';
+import { workflowSteps } from '../../../state/workflowSettings';
 import ChatConversation from '../../../workflow/ChatOutput/ChatConversation';
 import ChatPrompt from '../../../workflow/Prompt/ChatPrompt';
 import Sharing from '../../../workflow/Sharing/Sharing';
@@ -10,17 +12,19 @@ interface Props {
 }
 
 export default function DeploymentFrame({ observer, scrollFrame }: Props) {
+    const steps = useAtomValue(workflowSteps);
+
     return (
         <Frame
             name="deployment"
             observer={observer}
             scroll={scrollFrame === 'deployment'}
         >
-            <Sharing />
             <FullSizeGroup widget="conversationOutput">
                 <ChatConversation />
                 <ChatPrompt />
             </FullSizeGroup>
+            {steps.has('share') && <Sharing withLoRA />}
         </Frame>
     );
 }

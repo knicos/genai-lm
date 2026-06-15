@@ -295,3 +295,5 @@ export const conversationDataAtom = atomWithStorage<Conversation[][]>(
     initialValue,
     createIndexedDbStorage<Conversation[][]>()
 );
+
+export const allowRecordAtom = atom<boolean>(false);

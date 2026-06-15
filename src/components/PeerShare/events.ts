@@ -6,6 +6,7 @@ export interface ChatEvent extends PeerEvent {
     input: Conversation[] | string;
     conversation?: string; // Optional conversation ID for context management
     stream?: boolean; // Optional flag to indicate if the response should be streamed
+    loRA?: string; // Optional LoRA identifier for model tuning
 }
 
 export interface ResponseEvent extends PeerEvent {

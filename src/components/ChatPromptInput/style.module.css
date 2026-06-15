@@ -1,5 +1,3 @@
-@value primary, primaryLight from "@genai-fi/base/css/colours.module.css";
-
 .shell {
     display: flex;
     align-items: center;
@@ -31,7 +29,7 @@
     font-size: 1rem;
     line-height: 1.5;
     background: transparent;
-    color: #111;
+    color: black;
     min-height: auto;
     display: block;
 }
@@ -42,7 +40,7 @@
 
 .sendButton {
     border: none;
-    background: primary;
+    background: var(--primary);
     color: #fff;
     width: 36px;
     height: 36px;
@@ -60,7 +58,7 @@
 }
 
 .sendButton:disabled {
-    background: primaryLight;
+    background: var(--primary-light);
     opacity: 0.35;
     color: white;
 }

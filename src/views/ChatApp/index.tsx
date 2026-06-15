@@ -24,9 +24,10 @@ export function Component() {
                 <div className={style.status}>
                     <ConnectionStatus
                         api={import.meta.env.VITE_APP_PEER_URL}
-                        checkURL={import.meta.env.VITE_APP_API}
                         appName="lm"
                         visibility={0}
+                        noCheck
+                        noUserMedia
                     />
                 </div>
                 <Page />

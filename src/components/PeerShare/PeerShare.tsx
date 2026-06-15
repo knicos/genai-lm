@@ -19,9 +19,10 @@ export default function PeerShare() {
             <div className={style.status}>
                 <ConnectionStatus
                     api={import.meta.env.VITE_APP_PEER_URL}
-                    checkURL={import.meta.env.VITE_APP_API}
+                    checkURL={import.meta.env.VITE_APP_PEER_URL}
                     appName="lm"
                     visibility={0}
+                    noUserMedia
                 />
             </div>
             <ChatProtocol />

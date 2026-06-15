@@ -38,7 +38,7 @@ export const workflowStages = atom<Set<WorkflowStage>>((get) => {
     if (steps.has('data') || steps.has('tokeniser') || steps.has('tokenise')) stages.add('data');
     if (steps.has('trainer') || steps.has('pretrain-output')) stages.add('pretrain');
     if (steps.has('finetune') || steps.has('conversations')) stages.add('finetune');
-    if (steps.has('generator') || steps.has('share')) stages.add('deployment');
+    if (steps.has('generator')) stages.add('deployment');
 
     return stages;
 });

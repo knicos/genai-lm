@@ -1,5 +1,3 @@
-@value primary, secondary, backgroundDark from "@genai-fi/base/css/colours.module.css";
-
 .dataCard {
     display: flex;
     flex-direction: column;

@@ -7,6 +7,7 @@ import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { useTranslation } from 'react-i18next';
 import { usePeerSender } from '@genai-fi/base/hooks/peer';
 import { EventProtocol } from '../../components/PeerShare/events';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Page() {
     const { t } = useTranslation();
@@ -15,10 +16,12 @@ export default function Page() {
     const [hasGenerated, setHasGenerated] = useState(false);
     const send = usePeerSender<EventProtocol>();
     const [conversationId, setConversationId] = useState<string | null>(null);
+    const [params] = useSearchParams();
 
     return (
         <>
             <ChatClientProtocol
+                loRA={params.get('lora') ?? undefined}
                 conversation={conversation}
                 onIdChange={setConversationId}
                 onResponse={(response, completed) => {

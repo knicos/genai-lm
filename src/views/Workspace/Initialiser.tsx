@@ -106,6 +106,7 @@ export default function Initialiser() {
             steps.add('data');
             steps.add('trainer');
             steps.add('pretrain-output');
+            steps.add('share');
             setWorkflowSteps(steps);
             setDevMode(false);
             setCompact(false);
@@ -115,6 +116,7 @@ export default function Initialiser() {
             steps.add('conversations');
             steps.add('finetune');
             steps.add('generator');
+            steps.add('share');
             setWorkflowSteps(steps);
             setDevMode(false);
             setCompact(false);
@@ -129,6 +131,7 @@ export default function Initialiser() {
             steps.add('conversations');
             steps.add('finetune');
             steps.add('generator');
+            steps.add('share');
             setWorkflowSteps(steps);
             setDevMode(false);
             setCompact(false);
@@ -143,6 +146,7 @@ export default function Initialiser() {
             steps.add('conversations');
             steps.add('finetune');
             steps.add('generator');
+            steps.add('share');
             setWorkflowSteps(steps);
             setDevMode(true);
             setCompact(true);

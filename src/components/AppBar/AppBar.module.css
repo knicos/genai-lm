@@ -1,5 +1,3 @@
-@value primary from "@genai-fi/base/css/colours.module.css";
-
 .buttonBar {
     display: flex;
     flex-grow: 1;
@@ -28,7 +26,7 @@
 }
 
 .logo {
-    background: primary;
+    background: var(--primary);
     /*padding-left: 0.5rem;
     padding-right: 0.5rem;*/
     gap: 0.8rem;
