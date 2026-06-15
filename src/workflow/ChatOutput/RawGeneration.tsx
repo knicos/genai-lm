@@ -61,6 +61,7 @@ export default function ChatConversation() {
                 generator.dispose();
                 if (animationFrameRef.current !== -1) {
                     cancelAnimationFrame(animationFrameRef.current);
+                    animationFrameRef.current = -1;
                 }
             };
         }

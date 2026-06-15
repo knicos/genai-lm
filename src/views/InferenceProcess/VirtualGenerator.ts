@@ -6,7 +6,7 @@ interface ExtendedConversation extends Conversation {
 }
 
 export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | 'reset'> implements IGenerator {
-    public model: TeachableLLM;
+    //public model: TeachableLLM;
     public generator: IGenerator;
     private embeddingsData: { name: string; tensor: number[][] }[][] = [];
     private probabilitiesData: number[][][] = [];
@@ -18,10 +18,21 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | '
     private stepFn?: () => Promise<void>;
     private resolveGenerate?: (conversation: Conversation[]) => void;
 
-    constructor(model: TeachableLLM) {
+    constructor(generator: IGenerator | TeachableLLM) {
         super();
-        this.model = model;
-        this.generator = model.generator();
+        if (generator instanceof TeachableLLM) {
+            this.generator = generator.generator();
+        } else {
+            this.generator = generator;
+            this.generator.removeAllListeners();
+            this.embeddingsData = this.generator.getEmbeddingsData();
+            this.probabilitiesData = this.generator.getProbabilitiesData();
+            this.attentionData = this.generator.getAttentionData();
+            this.lastLoss = this.generator.getLastLoss();
+            this.tokens = this.generator.getTokens();
+            this.conversation = this.generator.getConversation();
+            this.lastMultinomialRand = this.generator.getLastMultinomialRand();
+        }
     }
 
     async step(prompt: Conversation[], options?: IGenerateOptions): Promise<Conversation[]>;
@@ -93,6 +104,7 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | '
             this.resolveGenerate(this.generator.getConversation());
             this.resolveGenerate = undefined;
         }
+        this.emit('stop');
     }
 
     // Begin next token but delay commit.
@@ -103,9 +115,8 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | '
     }
 
     stop(): void {
-        this.terminate();
         this.generator.stop();
-        this.emit('stop');
+        this.terminate();
     }
 
     getConversation() {
@@ -137,8 +148,10 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | '
     }
 
     dispose() {
-        this.generator.dispose();
+        this.stop();
+        //this.generator.dispose();
         this.removeAllListeners();
+        this.generator.removeAllListeners();
     }
 
     reset() {

@@ -5,16 +5,17 @@ import { useEffect, useMemo, useState } from 'react';
 import ModelControls, { AnimationStep } from './ModelControls';
 import { rawGeneratorAtom } from '../../state/generator';
 import VirtualGenerator from './VirtualGenerator';
-import { resetGeneratorFactory, setGeneratorFactory } from '../../utilities/generatorFactory';
 import { Inference } from './Inference';
 import { Training } from './Training';
 import { trainerAtom } from '../../state/trainer';
 import { inferenceSteps, trainingSteps } from './animationSteps';
 import useQueryState from '../../hooks/useQueryState';
+import useModelStatus from '../../hooks/useModelStatus';
 
 export function Component() {
     const { t } = useTranslation();
     const model = useAtomValue(loadedModelAtom);
+    const modelStatus = useModelStatus(model ?? undefined);
     const [generator, setGenerator] = useAtom(rawGeneratorAtom);
     const trainer = useAtomValue(trainerAtom);
     const [visMode, setVisMode] = useQueryState<'training' | 'inference'>('vismode', 'inference');
@@ -22,27 +23,28 @@ export function Component() {
 
     // Hook into the generator
     useEffect(() => {
-        setGeneratorFactory((model) => {
-            return new VirtualGenerator(model);
-        });
+        if (visMode === 'training') return;
+        if (!model) return;
+
         setGenerator((old) => {
-            if (old && model && model.loaded) {
-                old.dispose();
-                const virtualGen = new VirtualGenerator(model);
-
-                virtualGen.on('start', () => {
-                    setVisMode('inference');
-                });
-
-                return virtualGen;
+            if (old) {
+                return new VirtualGenerator(old);
             }
-            return old;
+            return new VirtualGenerator(model);
         });
 
         return () => {
-            resetGeneratorFactory();
+            setGenerator((old) => {
+                if (old instanceof VirtualGenerator) {
+                    const gen = old.generator;
+                    old.dispose();
+                    return gen;
+                } else {
+                    return old;
+                }
+            });
         };
-    }, [model, setGenerator, setVisMode]);
+    }, [model, setGenerator, visMode]);
 
     const steps = useMemo<AnimationStep[]>(() => {
         if (!model) return [];
@@ -73,7 +75,7 @@ export function Component() {
         <div className="sidePanel">
             <h2>{t('tools.trainingProcess')}</h2>
             <ModelControls
-                disabled={!ready}
+                disabled={!ready || modelStatus === 'training' || modelStatus === 'busy'}
                 steps={steps}
                 onStepChange={setStep}
                 generator={generator}

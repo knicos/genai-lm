@@ -28,8 +28,8 @@ export default function ChatPrompt() {
     const disable = status === 'training';
 
     useEffect(() => {
-        setHasGenerated(false);
         if (model && generator) {
+            setHasGenerated(generator.getConversation().length > 0);
             const onReset = () => {
                 setHasGenerated(false);
             };
@@ -51,6 +51,8 @@ export default function ChatPrompt() {
                 generator.off('reset', onReset);
                 generator.off('start', onStart);
             };
+        } else {
+            setHasGenerated(false);
         }
     }, [generator, model, topP, outputText, promptMode]);
 

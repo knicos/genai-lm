@@ -205,9 +205,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
             const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
 
-            // setEpochs(0);
-            await wait(200);
-
             logger.log({ action: 'training_started', modelSize, totalTokens, batchSize });
 
             model.enableProfiler = advanced;
@@ -236,6 +233,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             setNeedsTraining(false);
 
             setTrainer(currentTrainer);
+            await wait(200);
             currentTrainer
                 .train()
                 .then(async () => {
