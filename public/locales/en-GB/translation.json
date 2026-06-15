@@ -181,6 +181,7 @@
         "samples": "{{samples}} samples",
         "embeddingSize": "Hidden size of {{size}}",
         "modelHint": "Select or upload a model.",
+        "uploadModel": "Upload a model ZIP file",
         "languageModel": "Model Name",
         "visualisation": {
             "next": "Next"

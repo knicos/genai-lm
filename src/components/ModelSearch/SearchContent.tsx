@@ -9,19 +9,22 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
+    Tooltip,
 } from '@mui/material';
-import { useCallback, useMemo, useState } from 'react';
-import { ExtendedConfig, modelDownloadAtom } from '../../state/model';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ExtendedConfig, modelAtom, modelDownloadAtom } from '../../state/model';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import { ModelCardItem } from '../ModelCard/type';
 import { RowSet } from '../CardRow/CardRow';
 import { configMatch } from './manifest';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import Downloader from '../../utilities/downloader';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
 import ModelCard from '../ModelCard/ModelCard';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { del } from 'idb-keyval';
 
 interface Props {
     model?: TeachableLLM;
@@ -34,6 +37,7 @@ interface Props {
     lang: string;
     limitToModelArchitecture?: boolean;
     onClose?: () => void;
+    allowFileOpen?: boolean;
 }
 
 export default function SearchContent({
@@ -47,10 +51,13 @@ export default function SearchContent({
     lang,
     limitToModelArchitecture,
     onClose,
+    allowFileOpen,
 }: Props) {
     const { t } = useTranslation();
     const [download, setDownload] = useAtom(modelDownloadAtom);
     const [includeAll, setIncludeAll] = useState(true);
+    const fileRef = useRef<HTMLInputElement>(null);
+    const setModel = useSetAtom(modelAtom);
     const selectedSet =
         model && model.meta.id ? new Set([model.meta.id]) : config && config.id ? new Set([config.id]) : undefined;
 
@@ -113,8 +120,39 @@ export default function SearchContent({
         [model, onModel, onConfig, setDownload]
     );
 
+    const openFile = useCallback(
+        (file: File) => {
+            //setIsLoading(true);
+            setModel((old) => {
+                if (old) {
+                    old.dispose();
+                }
+                del('model_checkpoint');
+                const model = TeachableLLM.loadModel(file);
+                model.meta.trained = true;
+                /*waitModelLoaded(model).then(() => {
+                        setIsLoading(false);
+                    });*/
+                return model;
+            });
+        },
+        [setModel]
+    );
+
     return (
         <>
+            <input
+                type="file"
+                accept=".zip"
+                ref={fileRef}
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        openFile(file);
+                    }
+                }}
+            />
             <div className={style.headerBar}>
                 {langs.length > 0 && !download && (
                     <FormControl size="small">
@@ -148,6 +186,19 @@ export default function SearchContent({
 
                 {download && <DownloadProgress downloads={download} />}
                 <div style={{ flexGrow: 1 }} />
+                {allowFileOpen && (
+                    <Tooltip
+                        title={t('model.uploadModel')}
+                        arrow
+                    >
+                        <IconButton
+                            color="secondary"
+                            onClick={() => fileRef.current?.click()}
+                        >
+                            <UploadFileIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
+                )}
                 {onClose && (
                     <IconButton
                         onClick={() => {

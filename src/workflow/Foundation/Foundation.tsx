@@ -1,10 +1,9 @@
 import { useAtomValue } from 'jotai';
 import Box from '../../components/BoxTitle/Box';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { modelAtom } from '../../state/model';
+import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import useModelLoaded from '../../hooks/useModelLoaded';
 import SearchContent from '../../components/ModelSearch/SearchContent';
 import { useEffect, useState } from 'react';
 import { ModelCardItem } from '../../components/ModelCard/type';
@@ -15,8 +14,7 @@ import { groupByCategory } from '../../components/ModelSearch/grouping';
 
 export default function Foundation() {
     const { t } = useTranslation();
-    const model = useAtomValue(modelAtom);
-    const ready = useModelLoaded(model ?? undefined);
+    const model = useAtomValue(loadedModelAtom);
     const { i18n } = useTranslation();
     const [lang, setLang] = useState(i18n.language.split('-')[0]);
     const [langs, setLangs] = useState<{ code: string; name: string }[]>([]);
@@ -31,19 +29,19 @@ export default function Foundation() {
                 setLangs(Object.entries(data.languages).map(([code, name]) => ({ code, name })));
             })
             .catch(() => setDataRows([]));
-    }, [lang, model]);
+    }, [lang]);
 
     return (
         <Box
             widget="foundation"
-            active={ready}
+            active={model !== null}
             style={{ maxWidth: '1000px', maxHeight: '80%' }}
             disableHiding
         >
             <div className={style.container}>
                 <BoxTitle
                     title={t('foundation.title')}
-                    status={'done'}
+                    status={model ? 'done' : 'waiting'}
                 />
                 <div className={style.content}>
                     <SearchContent
@@ -51,6 +49,7 @@ export default function Foundation() {
                         langs={langs}
                         lang={lang}
                         setLang={setLang}
+                        allowFileOpen
                     />
                 </div>
             </div>

@@ -71,7 +71,7 @@ export default function CardRow<T extends CardItem, S = void>({
     return (
         <div className={style.dataCardRow}>
             <h1>{title}</h1>
-            <div className={numVisible > 1 ? style.container : style.columnContainer}>
+            <div className={style.container}>
                 <ul ref={listRef}>
                     {cards.map((card, ix) => (
                         <li key={card.id}>
