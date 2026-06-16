@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { dataTokens } from '../../state/data';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
@@ -13,6 +13,7 @@ import InfoPanel from '../../workflow/TextData/InfoPanel';
 import { AnimationStep, AnimationStepName } from './ModelControls';
 import { reduceAttention } from './attention';
 import DataBox from './DataBox';
+import { trainerAtom } from '../../state/trainer';
 
 interface Props {
     model: TeachableLLM | null;
@@ -30,6 +31,26 @@ export function Training({ model, step, loaded }: Props) {
     const [attention, setAttention] = useState<number[][]>([]);
     const [warn] = useState<boolean>(false);
     const stepRef = useRef<AnimationStepName>('none');
+    const trainer = useAtomValue(trainerAtom);
+    const [isTraining, setIsTraining] = useState(false);
+
+    useEffect(() => {
+        if (trainer) {
+            const hStart = () => {
+                setIsTraining(true);
+            };
+            const hEnd = () => {
+                setIsTraining(false);
+            };
+            trainer.on('start', hStart);
+            trainer.on('stop', hEnd);
+
+            return () => {
+                trainer.off('start', hStart);
+                trainer.off('stop', hEnd);
+            };
+        }
+    }, [trainer]);
 
     const loadNext = async () => {
         if (!model || !loaded) return [];
@@ -170,6 +191,11 @@ export function Training({ model, step, loaded }: Props) {
                     model={model}
                     updating={step?.name === 'updating'}
                 />
+            )}
+            {!isTraining && (
+                <div className={style.hint}>
+                    <span>{t('tools.trainingHint')}</span>
+                </div>
             )}
         </>
     );

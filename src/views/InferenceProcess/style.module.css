@@ -61,3 +61,40 @@
 .modelLabel h3 {
     margin: 0;
 }
+
+.inferenceContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.hint {
+    position: absolute;
+    top: 0;
+    left: -1rem;
+    right: -1rem;
+    bottom: -1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.header h2 {
+    margin-right: 2rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+}

@@ -27,3 +27,8 @@
     background-color: var(--primary);
     color: white;
 }
+
+.container:disabled label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -5,16 +5,21 @@ interface Props {
     setMode: (mode: boolean) => void;
     startLabel: string;
     endLabel: string;
+    disabled?: boolean;
 }
 
-export default function ModeSwitch({ mode, setMode, startLabel, endLabel }: Props) {
+export default function ModeSwitch({ mode, setMode, startLabel, endLabel, disabled }: Props) {
     return (
-        <fieldset className={style.container}>
+        <fieldset
+            className={style.container}
+            disabled={disabled}
+        >
             <label
                 htmlFor="mode-start"
                 className={!mode ? style.active : ''}
             >
                 <input
+                    disabled={disabled}
                     id="mode-start"
                     type="radio"
                     name="mode"
@@ -29,6 +34,7 @@ export default function ModeSwitch({ mode, setMode, startLabel, endLabel }: Prop
                 className={mode ? style.active : ''}
             >
                 <input
+                    disabled={disabled}
                     id="mode-end"
                     type="radio"
                     name="mode"

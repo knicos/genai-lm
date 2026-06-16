@@ -156,6 +156,12 @@ export default class VirtualGenerator extends EE<'start' | 'stop' | 'tokens' | '
 
     reset() {
         this.generator.reset();
+        this.embeddingsData = [];
+        this.probabilitiesData = [];
+        this.attentionData = [];
+        this.lastLoss = null;
+        this.tokens = [];
+        this.conversation = [];
         this.emit('reset');
     }
 }

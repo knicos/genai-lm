@@ -11,6 +11,9 @@ import { trainerAtom } from '../../state/trainer';
 import { inferenceSteps, trainingSteps } from './animationSteps';
 import useQueryState from '../../hooks/useQueryState';
 import useModelStatus from '../../hooks/useModelStatus';
+import ModeSwitch from '../../components/ModeSwitch/ModeSwitch';
+import { FormControl } from '@mui/material';
+import style from './style.module.css';
 
 export function Component() {
     const { t } = useTranslation();
@@ -73,29 +76,40 @@ export function Component() {
 
     return (
         <div className="sidePanel">
-            <h2>{t('tools.trainingProcess')}</h2>
-            <ModelControls
-                disabled={!ready || modelStatus === 'training' || modelStatus === 'busy'}
-                steps={steps}
-                onStepChange={setStep}
-                generator={generator}
-                visMode={visMode}
-                setVisMode={setVisMode}
-            />
-            {visMode === 'inference' ? (
-                <Inference
+            <header className={style.header}>
+                <h2>{t('tools.trainingProcess')}</h2>
+                <FormControl>
+                    <ModeSwitch
+                        mode={visMode === 'inference'}
+                        setMode={(mode: boolean) => setVisMode(mode ? 'inference' : 'training')}
+                        startLabel={t('app.settings.trainingVis')}
+                        endLabel={t('app.settings.inferenceVis')}
+                        disabled={modelStatus !== 'ready'}
+                    />
+                </FormControl>
+            </header>
+            <div className={style.inferenceContainer}>
+                <ModelControls
+                    disabled={!ready || modelStatus === 'training' || modelStatus === 'busy'}
+                    steps={steps}
+                    onStepChange={setStep}
                     generator={generator}
-                    step={step}
-                    model={model}
-                    loaded={true}
                 />
-            ) : (
-                <Training
-                    model={model}
-                    loaded={true}
-                    step={step}
-                />
-            )}
+                {visMode === 'inference' ? (
+                    <Inference
+                        generator={generator}
+                        step={step}
+                        model={model}
+                        loaded={true}
+                    />
+                ) : (
+                    <Training
+                        model={model}
+                        loaded={true}
+                        step={step}
+                    />
+                )}
+            </div>
         </div>
     );
 }

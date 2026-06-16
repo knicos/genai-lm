@@ -30,6 +30,7 @@ export function Inference({ generator, step, model, loaded }: Props) {
     const [multinomialRand, setMultinomialRand] = useState<number | null>(null);
     const [warn] = useState<boolean>(false);
     const stepRef = useRef<AnimationStepName>('none');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const virtualGenerator = generator instanceof VirtualGenerator ? generator : null;
 
@@ -84,8 +85,20 @@ export function Inference({ generator, step, model, loaded }: Props) {
                 setText(text);
             };
             generator.on('tokens', handleUpdate);
+
+            const handleStart = () => {
+                setIsGenerating(true);
+            };
+            const handleEnd = () => {
+                setIsGenerating(false);
+            };
+            generator.on('start', handleStart);
+            generator.on('stop', handleEnd);
+
             return () => {
                 generator.off('tokens', handleUpdate);
+                generator.off('start', handleStart);
+                generator.off('stop', handleEnd);
             };
         }
     }, [generator]);
@@ -150,6 +163,11 @@ export function Inference({ generator, step, model, loaded }: Props) {
                         committed && nextToken.current ? model.tokeniser.getVocab()[nextToken.current] : undefined
                     }
                 />
+            )}
+            {!isGenerating && (
+                <div className={style.hint}>
+                    <span>{t('tools.inferenceHint')}</span>
+                </div>
             )}
         </>
     );

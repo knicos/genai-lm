@@ -329,6 +329,8 @@
             "accuracyHelp": "Accuracy is the percentage of predictions that were correct.",
             "lossHelp": "Loss is a measure of how wrong the model's predictions were. It refers to the loss of information."
         },
+        "inferenceHint": "Start generating text to see the animated visualisation of how it works.",
+        "trainingHint": "Start training to see the animated visualisation of how training works.",
         "modelPredicting": "Predicting...",
         "modelUpdating": "Updating parameters...",
         "modelComplete": "Training step complete",
