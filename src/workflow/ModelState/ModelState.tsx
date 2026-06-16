@@ -13,11 +13,9 @@ import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
-import { IconButton, Popover } from '@mui/material';
 import ModelName from './ModelName';
 import ModelStage from './ModelStage';
 // import useModelLoaded from '../../utilities/useModelLoaded';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import useModelStatus from '../../hooks/useModelStatus';
 import { Spinner } from '@genai-fi/base';
 import { del } from 'idb-keyval';
@@ -33,7 +31,6 @@ export default function ModelState() {
     //const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [title, setTitle] = useState(model?.meta.name || '');
-    const [hideMenu, setHideMenu] = useState(true);
     const anchorRef = useRef<HTMLDivElement>(null);
     const downloader = useAtomValue(modelDownloadAtom);
 
@@ -146,10 +143,7 @@ export default function ModelState() {
                     className={style.container}
                     ref={anchorRef}
                 >
-                    <div
-                        className={style.icon}
-                        onClick={() => !modelBusy && setHideMenu((h) => !h)}
-                    >
+                    <div className={style.icon}>
                         {!spin && <ModelIcon model={model ?? undefined} />}
                         {spin && (
                             <div className={style.loadingIcon}>
@@ -183,51 +177,23 @@ export default function ModelState() {
                         <div className={style.statusMessage}>{t('model.busy')}</div>
                     )}
                     {status === 'error' && !downloader && <div className={style.statusMessage}>{t('model.error')}</div>}
-                    <IconButton
+
+                    <ModelMenu
                         disabled={modelBusy}
-                        color="inherit"
-                        onClick={() => !modelBusy && setHideMenu((h) => !h)}
-                        sx={{ marginLeft: 'auto' }}
-                    >
-                        <MoreVertIcon
-                            color="inherit"
-                            fontSize="large"
-                        />
-                    </IconButton>
-                    <Popover
-                        open={!hideMenu}
-                        onClose={() => setHideMenu(true)}
-                        anchorEl={anchorRef.current}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'center',
+                        onUpload={() => {
+                            fileRef.current?.click();
                         }}
-                        transformOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'center',
+                        onSearch={() => {
+                            setShowSearch(true);
                         }}
-                        className={style.popover}
-                    >
-                        <ModelMenu
-                            disabled={modelBusy}
-                            onUpload={() => {
-                                fileRef.current?.click();
-                                setHideMenu(true);
-                            }}
-                            onSearch={() => {
-                                setShowSearch(true);
-                                setHideMenu(true);
-                            }}
-                            onDownload={
-                                model
-                                    ? () => {
-                                          doSave(model?.meta.name || 'model');
-                                          setHideMenu(true);
-                                      }
-                                    : undefined
-                            }
-                        />
-                    </Popover>
+                        onDownload={
+                            model
+                                ? () => {
+                                      doSave(model?.meta.name || 'model');
+                                  }
+                                : undefined
+                        }
+                    />
                 </div>
             </BoxStandalone>
         </Help>

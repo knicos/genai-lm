@@ -65,16 +65,8 @@
 }
 
 .modelMenu {
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 2rem;
-    background-color: white;
-    box-shadow: 2px 2px 4px #a4acbb;
-    padding: 0.5rem 1rem;
-    margin: 10px;
-    border-radius: 6px;
+    color: white;
+    font-size: 2rem;
 }
 
 .headerBar {
