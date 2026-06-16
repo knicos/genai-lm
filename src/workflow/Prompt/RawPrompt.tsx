@@ -65,7 +65,7 @@ export default function ChatPrompt() {
                 state.count++;
                 if (state.count % 2 !== 0) return;
                 try {
-                    if (promptRef.current.length > 0 && promptMode === 'completion') {
+                    if (promptRef.current.length > 0) {
                         await generator.generate([{ role: 'assistant', content: promptRef.current }], {
                             nonConversational: true,
                             continuation: true,

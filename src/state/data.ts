@@ -14,6 +14,7 @@ type DataEntryEvents = 'loading' | 'loaded' | 'error';
 export class DataEntry implements DatasetMetadata {
     readonly id: string;
     readonly name: string;
+    public conversational = false;
     readonly source?: 'file' | 'input' | 'search';
     private _content: Conversation[][] | null = null;
     private _lazy: (() => Promise<Conversation[][]>) | null = null;
@@ -49,6 +50,7 @@ export class DataEntry implements DatasetMetadata {
                     loadTextData(file)
                         .then((data) => {
                             this._content = data;
+                            this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                             this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                             this.storeInIndexedDB();
                             this.ee.emit('loaded');
@@ -61,6 +63,7 @@ export class DataEntry implements DatasetMetadata {
             this._lazy = content;
         } else if (Array.isArray(content)) {
             this._content = content;
+            this.conversational = content.some((conv) => conv[0]?.role !== 'text');
             this._size = content.reduce((acc, curr) => acc + curr.length, 0);
             if (source === 'file' || source === 'input') {
                 this.storeInIndexedDB();
@@ -99,6 +102,7 @@ export class DataEntry implements DatasetMetadata {
     set content(value: Conversation[][]) {
         this._content = value;
         this._size = value.reduce((acc, curr) => acc + curr.length, 0);
+        this.conversational = value.some((conv) => conv[0]?.role !== 'text');
     }
 
     get content(): Promise<Conversation[][]> {
@@ -109,6 +113,7 @@ export class DataEntry implements DatasetMetadata {
                 this.ee.emit('loading');
                 this._promise = this._lazy().then((data) => {
                     this._content = data;
+                    this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                     this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                     this.storeInIndexedDB();
                     this.ee.emit('loaded');
@@ -149,6 +154,7 @@ export class DataEntry implements DatasetMetadata {
             this.ee.emit('loading');
             this._promise = this._lazy().then((data) => {
                 this._content = data;
+                this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                 this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                 this.storeInIndexedDB();
                 this.ee.emit('loaded');

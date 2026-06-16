@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import { useEffect, useState } from 'react';
-import useModelPhase from '../../hooks/useModelPhase';
+import useModelPhase from '../../hooks/useModelMode';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';

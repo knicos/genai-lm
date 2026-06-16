@@ -5,11 +5,15 @@ import style from './style.module.css';
 import { generatorSettings } from '../../state/generator';
 import { uiDeveloperMode } from '../../state/uiState';
 import Help from '../../components/Help/Help';
+import { loadedModelAtom } from '../../state/model';
+import useModelMode from '../../hooks/useModelMode';
 
 export function Component() {
     const { t } = useTranslation();
     const devMode = useAtomValue(uiDeveloperMode);
     const [settings, setSettings] = useAtom(generatorSettings);
+    const model = useAtomValue(loadedModelAtom);
+    const mode = useModelMode(model ?? undefined);
     const { temperature, topP, maxLength } = settings;
 
     return (
@@ -36,6 +40,26 @@ export function Component() {
                     step={0.1}
                     valueLabelDisplay="auto"
                 />
+            </FormControl>
+            <FormControl sx={{ marginTop: '1rem' }}>
+                <InputLabel id="prompt-mode-label">{t('app.settings.promptMode')}</InputLabel>
+                <Select
+                    label={t('app.settings.promptMode')}
+                    labelId="prompt-mode-label"
+                    value={settings.promptMode}
+                    onChange={(e: SelectChangeEvent) =>
+                        setSettings({
+                            ...settings,
+                            promptMode: e.target.value as 'none' | 'completion' | 'conversation',
+                        })
+                    }
+                >
+                    <MenuItem value="none">{t('app.settings.promptModeNone')}</MenuItem>
+                    <MenuItem value="completion">{t('app.settings.promptModeCompletion')}</MenuItem>
+                    {mode === 'conversational' && (
+                        <MenuItem value="conversation">{t('app.settings.promptModeConversation')}</MenuItem>
+                    )}
+                </Select>
             </FormControl>
             {devMode && (
                 <>
@@ -72,24 +96,6 @@ export function Component() {
                             step={1000}
                             valueLabelDisplay="auto"
                         />
-                    </FormControl>
-                    <FormControl sx={{ marginTop: '1rem' }}>
-                        <InputLabel id="prompt-mode-label">{t('app.settings.promptMode')}</InputLabel>
-                        <Select
-                            label={t('app.settings.promptMode')}
-                            labelId="prompt-mode-label"
-                            value={settings.promptMode}
-                            onChange={(e: SelectChangeEvent) =>
-                                setSettings({
-                                    ...settings,
-                                    promptMode: e.target.value as 'none' | 'completion' | 'conversation',
-                                })
-                            }
-                        >
-                            <MenuItem value="none">{t('app.settings.promptModeNone')}</MenuItem>
-                            <MenuItem value="completion">{t('app.settings.promptModeCompletion')}</MenuItem>
-                            <MenuItem value="conversation">{t('app.settings.promptModeConversation')}</MenuItem>
-                        </Select>
                     </FormControl>
                 </>
             )}

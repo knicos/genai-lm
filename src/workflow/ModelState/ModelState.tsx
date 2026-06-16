@@ -84,6 +84,7 @@ export default function ModelState() {
             const h = () => {
                 logger.log({ action: 'model_loaded', model: model.meta });
                 setDone(true);
+                setTitle(model.meta.name || '');
             };
             model.on('loaded', h);
 
@@ -92,8 +93,6 @@ export default function ModelState() {
                 logger.error({ errorString: String(error), userAgent: navigator.userAgent });
             };
             model.on('error', eh);
-
-            setTitle(model.meta.name || '');
 
             return () => {
                 model.off('loaded', h);

@@ -88,7 +88,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             // Check for existing progress
             const lastLog = trainer.log[trainer.log.length - 1];
             if (lastLog) {
-                console.log('Resuming training from existing progress', lastLog);
                 setTokens(lastLog.totalTokens);
                 setTrainingProgress(lastLog);
             } else {

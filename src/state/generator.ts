@@ -69,6 +69,20 @@ observe((get, set) => {
             }
             return model.generator();
         });
+
+        const modeChange = () => {
+            const newMode = model.mode;
+            set(generatorSettings, (old) => ({
+                ...old,
+                promptMode: newMode === 'conversational' ? 'conversation' : 'completion',
+            }));
+        };
+        model.on('mode', modeChange);
+        modeChange();
+
+        return () => {
+            model.off('mode', modeChange);
+        };
     } else {
         set(rawGeneratorAtom, null);
         set(conversationGeneratorAtom, null);

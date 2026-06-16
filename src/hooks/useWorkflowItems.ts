@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
-import { modelAtom } from '../state/model';
+import { loadedModelAtom } from '../state/model';
 import useModelLoaded from './useModelLoaded';
-import useModelPhase from './useModelPhase';
+import useModelMode from './useModelMode';
 import { dataTokens } from '../state/data';
 import { workflowStages } from '../state/workflowSettings';
 
@@ -13,16 +13,16 @@ interface Item {
 }
 
 export default function useWorkflowItems(): Item[] {
-    const model = useAtomValue(modelAtom);
+    const model = useAtomValue(loadedModelAtom);
     const loaded = useModelLoaded(model ?? undefined);
-    const phase = useModelPhase(model ?? undefined);
+    const phase = useModelMode(model ?? undefined);
     const preData = useAtomValue(dataTokens);
     const stages = useAtomValue(workflowStages);
 
     const step1 = loaded;
     const step2 = preData && preData.tokens.length > 0;
-    const step3 = step1 && step2 && phase === 'pretrained';
-    const step4 = step1 && step2 && phase === 'finetuned';
+    const step3 = step1 && step2 && phase !== 'untrained';
+    const step4 = step3 && model?.hasLoRA();
 
     const items: Item[] = [];
     if (stages.has('model')) {

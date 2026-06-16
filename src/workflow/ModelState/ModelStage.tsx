@@ -11,23 +11,23 @@ interface Props {
 
 export default function ModelStage({ model }: Props) {
     const ready = useModelLoaded(model ?? undefined);
-    const [phase, setPhase] = useState(model?.phase || 'untrained');
+    const [phase, setPhase] = useState(model?.mode || 'untrained');
 
     useEffect(() => {
         if (model && ready) {
             const h = () => {
-                setPhase(model.phase);
+                setPhase(model.mode);
             };
-            model.on('phase', h);
+            model.on('mode', h);
             return () => {
-                model.off('phase', h);
+                model.off('mode', h);
             };
         }
     }, [model, ready]);
 
     const stage4 = ready && model && model.hasLoRA();
-    const stage3 = stage4 || (ready && phase === 'finetuned');
-    const stage2 = stage3 || (ready && phase === 'pretrained');
+    const stage3 = stage4 || (ready && phase === 'conversational');
+    const stage2 = stage3 || (ready && phase === 'completion');
     const stage1 = stage2 || (ready && phase === 'untrained');
 
     return (

@@ -15,7 +15,7 @@ function calculateExtraIcon(model: TeachableLLM | undefined): ExtraIcon {
     if (model.status === 'training') return 'hourglass';
     if (model.status === 'busy') return 'hourglass';
     if (model.hasLoRA()) return 'puzzle';
-    if (model.phase === 'untrained') return 'untrained';
+    if (model.mode === 'untrained') return 'untrained';
     else return 'trained';
 }
 
@@ -35,13 +35,13 @@ export default function ModelIcon({ model, noExtraIcon }: Props) {
                 setExtraIcon(newIcon);
             };
             model.on('status', h);
-            model.on('phase', h);
+            model.on('mode', h);
             model.on('changeLoRA', h);
             h();
 
             return () => {
                 model.off('status', h);
-                model.off('phase', h);
+                model.off('mode', h);
                 model.off('changeLoRA', h);
             };
         }
