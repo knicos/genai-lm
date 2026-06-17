@@ -87,8 +87,13 @@ export default function CheckModel() {
                                     if (old) {
                                         old.dispose();
                                     }
+                                    const canReuseTokeniser = old && architecture.vocabSize === old.config.vocabSize;
                                     const newModel = TeachableLLM.create(
-                                        architecture.vocabSize <= 256 ? 'char' : 'bpe',
+                                        canReuseTokeniser
+                                            ? old.tokeniser
+                                            : architecture.vocabSize <= 256
+                                              ? 'char'
+                                              : 'bpe',
                                         architecture
                                     );
                                     if (old) {
