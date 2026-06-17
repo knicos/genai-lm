@@ -36,6 +36,7 @@
             "batchSize": "Batch Size",
             "epochs": "Epochs",
             "learningRate": "Learning Rate",
+            "minLearningRate": "Minimum Learning Rate",
             "showOutputText": "Show Progress Text",
             "checkpointing": "Disable Gradient Checkpointing",
             "showXAI": "Show XAI",

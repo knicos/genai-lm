@@ -62,7 +62,15 @@ export function Component() {
                 <Slider
                     aria-labelledby="learningRate-label"
                     value={settings.learningRate}
-                    onChange={(_, value) => setSettings({ ...settings, learningRate: value as number })}
+                    onChange={(_, value) =>
+                        setSettings({
+                            ...settings,
+                            learningRate: value as number,
+                            minLearningRate: settings.minLearningRate
+                                ? Math.min(settings.minLearningRate, (value as number) * 0.1)
+                                : undefined,
+                        })
+                    }
                     min={0.00001}
                     max={0.001}
                     step={0.00001}
@@ -78,6 +86,39 @@ export function Component() {
                 <>
                     <div className={style.spacer} />
                     <h3>{t('app.settings.developerOptions')}</h3>
+                    <FormControl
+                        className={style.sliderControl}
+                        sx={{ marginBottom: '2rem' }}
+                    >
+                        <div
+                            id="minLearningRate-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.minLearningRate')}
+                        </div>
+                        <Slider
+                            aria-labelledby="minLearningRate-label"
+                            value={settings.minLearningRate}
+                            onChange={(_, value) =>
+                                setSettings({
+                                    ...settings,
+                                    learningRate: settings.learningRate
+                                        ? Math.max(settings.learningRate, (value as number) * 10)
+                                        : undefined,
+                                    minLearningRate: value as number,
+                                })
+                            }
+                            min={0.000001}
+                            max={0.0001}
+                            step={0.000001}
+                            valueLabelDisplay="auto"
+                            marks={[
+                                { value: 0.000001, label: '1e-6' },
+                                { value: 0.00002, label: '2e-5' },
+                                { value: 0.0001, label: '1e-4' },
+                            ]}
+                        />
+                    </FormControl>
                     <FormControl>
                         <FormControlLabel
                             control={

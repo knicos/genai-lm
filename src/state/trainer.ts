@@ -16,6 +16,7 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         batchSize: 16,
         maxEpochs: 2,
         learningRate: 1e-3,
+        minLearningRate: 1e-4,
         outputText: true,
         disableCheckpointing: false,
         mixedPrecision: true,
