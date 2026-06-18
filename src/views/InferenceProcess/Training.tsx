@@ -45,6 +45,8 @@ export function Training({ model, step, loaded }: Props) {
             trainer.on('start', hStart);
             trainer.on('stop', hEnd);
 
+            setIsTraining(trainer.isTraining);
+
             return () => {
                 trainer.off('start', hStart);
                 trainer.off('stop', hEnd);

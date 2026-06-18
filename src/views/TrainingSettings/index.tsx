@@ -16,6 +16,29 @@ export function Component() {
             <h2>{t('app.settings.training')}</h2>
             <FormControl className={style.sliderControl}>
                 <div
+                    id="epochs-label"
+                    className={style.label}
+                >
+                    <Help
+                        message={t('app.settings.epochsHelp')}
+                        inplace
+                        dark
+                    >
+                        {t('app.settings.epochs')}
+                    </Help>
+                </div>
+                <Slider
+                    aria-labelledby="epochs-label"
+                    value={settings.maxEpochs}
+                    onChange={(_, value) => setSettings({ ...settings, maxEpochs: value as number })}
+                    min={1}
+                    max={10}
+                    step={1}
+                    valueLabelDisplay="auto"
+                />
+            </FormControl>
+            <FormControl className={style.sliderControl}>
+                <div
                     id="batch-label"
                     className={style.label}
                 >

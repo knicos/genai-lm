@@ -67,6 +67,7 @@
 .modelMenu {
     color: white;
     font-size: 2rem;
+    margin-left: auto;
 }
 
 .headerBar {

@@ -117,7 +117,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer]);
+    }, [model]);
 
     // Check if training and validation datasets need updating
     useEffect(() => {

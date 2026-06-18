@@ -35,6 +35,7 @@
             "temperature": "Temperature",
             "batchSize": "Batch Size",
             "epochs": "Epochs",
+            "epochsHelp": "Maximum number of times to loop through the entire training data. One epoch is one time through the data.",
             "learningRate": "Learning Rate",
             "minLearningRate": "Minimum Learning Rate",
             "showOutputText": "Show Progress Text",
