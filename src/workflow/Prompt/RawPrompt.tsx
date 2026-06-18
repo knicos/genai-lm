@@ -75,8 +75,9 @@ export default function ChatPrompt() {
                             topP: topP > 0 ? topP : undefined,
                         });
                     } else {
+                        const isConversational = trainer.model.metaData.mode === 'conversational';
                         await generator.generate({
-                            nonConversational: true,
+                            nonConversational: !isConversational,
                             maxLength: 200,
                             temperature: 0.8,
                             includeProbabilities: false,
@@ -117,7 +118,7 @@ export default function ChatPrompt() {
         //const currentText = generator.getConversation();
 
         if (prompt && prompt.length > 0) {
-            text.push({ role: promptMode === 'conversation' ? 'user' : 'assistant', content: prompt ?? '' });
+            text.push({ role: promptMode === 'conversation' ? 'user' : 'text', content: prompt ?? '' });
         }
 
         const options = {
@@ -160,7 +161,10 @@ export default function ChatPrompt() {
         >
             {!hasGenerated && <h2>{t('generator.startPrompt')}</h2>}
             <ChatPromptInput
-                onSend={(prompt) => doGenerate(maxLength, prompt)}
+                onSend={(prompt) => {
+                    promptRef.current = '';
+                    doGenerate(maxLength, prompt);
+                }}
                 onChange={(value) => {
                     promptRef.current = value;
                 }}
