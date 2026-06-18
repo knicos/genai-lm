@@ -5,7 +5,6 @@ import ModelMenu from './ModelMenu';
 import { useRef, useState } from 'react';
 import Tools from './Tools';
 import { modelAtom, modelConfigAtom } from '../../state/model';
-import SearchUntrained from './SearchUntrained';
 import Architecture, { ArchitectureRef } from '../../components/Architecture/Architecture';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
@@ -13,6 +12,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import Help from '../../components/Help/Help';
 import { useTranslation } from 'react-i18next';
+import ModelSearch from '../../components/ModelSearch/ModelSearch';
 
 export default function ModelDesign() {
     const { t } = useTranslation();
@@ -32,7 +32,8 @@ export default function ModelDesign() {
             style={{ width: '40rem' }}
         >
             {showSearch && (
-                <SearchUntrained
+                <ModelSearch
+                    trained={false}
                     onClose={() => setShowSearch(false)}
                     onConfig={(newConfig) => {
                         setConfig(newConfig);

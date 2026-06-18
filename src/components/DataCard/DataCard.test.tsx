@@ -11,15 +11,17 @@ describe('DataCard', () => {
                 card={{
                     id: 'card1',
                     title: 'Card 1',
-                    sample: 'SampleText',
+                    sampleContent: 'SampleText',
                     size: 10,
                     url: '',
-                    originURL: '',
                     mime: 'text/plain',
-                    lang: 'en',
-                    complexity: 'simple',
-                    instruct: false,
-                    author: '',
+                    language: 'en',
+                    complexity: 'low',
+                    conversational: false,
+                    restricted: false,
+                    modality: 'text',
+                    tags: ['tag1', 'tag2'],
+                    rating: 0,
                 }}
             />
         );

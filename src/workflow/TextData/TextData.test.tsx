@@ -78,6 +78,33 @@ describe('TextData', () => {
         const user = userEvent.setup();
         const dataCB = vi.fn();
 
+        // Mock fetch
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                json: () => {
+                    return Promise.resolve({
+                        datasets: [
+                            {
+                                id: 'movie-15minutes',
+                                title: 'Movie 15 Minutes',
+                                tags: ['Movies'],
+                                size: 15,
+                                complexity: 'low',
+                                url: 'https://example.com/movie-15minutes',
+                                mime: 'text/plain',
+                                language: 'en',
+                                sampleContent: 'Sample movie data...',
+                                conversational: false,
+                                restricted: false,
+                                modality: 'text',
+                                rating: 0,
+                            },
+                        ],
+                    });
+                },
+            })
+        ) as unknown as typeof fetch;
+
         render(
             <DndProvider backend={HTML5Backend}>
                 <JotaiObserver

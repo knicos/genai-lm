@@ -4,15 +4,7 @@ import ModelSearch from './ModelSearch';
 
 describe('ModelSearch', () => {
     it('renders', ({ expect }) => {
-        render(
-            <ModelSearch
-                onClose={() => {}}
-                dataRows={[]}
-                langs={[]}
-                setLang={() => {}}
-                lang="en-GB"
-            />
-        );
+        render(<ModelSearch onClose={() => {}} />);
         expect(document.body).toBeInTheDocument();
     });
 });

@@ -1,6 +1,5 @@
 import { MouseEvent, useState } from 'react';
 import style from './style.module.css';
-import { ModelCardItem } from './type';
 import Card from '../Card/Card';
 import { CircularProgress, IconButton } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -9,28 +8,29 @@ import ModelInfo from '../ModelInfo/ModelInfo';
 import Downloader from '../../utilities/downloader';
 import SampleWriter from '../DataCard/SampleWriter';
 import ParameterGrid from './NumberGrid';
+import { ModelManifestEntry } from '../../state/model';
 
 interface Props {
-    onSelect: (card: ModelCardItem, downloader?: Downloader) => void;
+    onSelect: (card: ModelManifestEntry, downloader?: Downloader) => void;
     onHighlight: (id: string, close?: boolean) => void;
     highlighted?: boolean;
     disabled?: boolean;
     used?: boolean;
-    card: ModelCardItem;
+    card: ModelManifestEntry;
 }
 
 export default function ModelCard({ onSelect, onHighlight, used, card, highlighted, disabled }: Props) {
     const [downloader, setDownloader] = useState<Downloader | null>(null);
     const [done, setDone] = useState(false);
 
-    const { name, parameters } = card;
+    const { title, size } = card;
 
-    const fontSize = Math.max(0.7, Math.log(parameters) / Math.log(40));
-    const hasTrainingStats = !!card.trainingStats && card.trained;
+    const fontSize = Math.max(0.7, Math.log(size) / Math.log(40));
+    const hasTrainingStats = false;
 
     const handleCreateModel = () => {
         if (card.url) {
-            const newDownload = Downloader.downloadFile(card.id, card.url, card.name, 'application/zip');
+            const newDownload = Downloader.downloadFile(card.id, card.url, card.title, 'application/zip');
             setDownloader(newDownload);
             newDownload.on('end', () => {
                 setDone(true);
@@ -51,7 +51,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
 
     const isNone = card.id === 'none';
 
-    const density = parameters < 3 ? 'small' : parameters < 8 ? 'medium' : parameters < 20 ? 'large' : 'xlarge';
+    const density = size < 3 ? 'small' : size < 8 ? 'medium' : size < 20 ? 'large' : 'xlarge';
 
     return (
         <Card
@@ -67,7 +67,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                     <div
                         className={`${style.sampleBox} ${isNone ? style.noneCard : card.trained ? style.trained : style.untrained} ${style[density]}`}
                     >
-                        {card.example && <SampleWriter sample={card.example} />}
+                        {card.sampleContent && <SampleWriter sample={card.sampleContent} />}
                         {!isNone && (
                             <div className={style.sizeIcon}>
                                 <IconButton
@@ -91,21 +91,20 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                 </IconButton>
                             </div>
                         )}
-                        {!card.example && (
+                        {!card.sampleContent && (
                             <ParameterGrid
                                 density={density}
                                 seed={card.id}
-                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(size + 10) / 3))}
                             />
                         )}
                         <div className={style.infoContainer}>
                             {!isNone && (
                                 <ModelInfo
                                     config={card.config || {}}
-                                    tokeniser={card.tokeniser || 'char'}
+                                    tokeniser={(card.config?.vocabSize || 0) > 256 ? 'bpe' : 'char'}
                                     showTokens={!hasTrainingStats}
                                     showLayers={!hasTrainingStats}
-                                    trainingStats={hasTrainingStats ? card.trainingStats : undefined}
                                     showDuration={hasTrainingStats}
                                     showSamples={hasTrainingStats}
                                 />
@@ -113,7 +112,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                         </div>
                     </div>
                     <div className={style.buttonRow}>
-                        <h2>{card.name}</h2>
+                        <h2>{card.title}</h2>
                     </div>
                 </>
             }
@@ -130,12 +129,12 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                     : style.untrained
                         } ${style[density]}`}
                     >
-                        {card.example && <div className={style.sampleText}>{card.example}</div>}
-                        {!card.example && (
+                        {card.sampleContent && <SampleWriter sample={card.sampleContent} />}
+                        {!card.sampleContent && (
                             <ParameterGrid
                                 density={density}
                                 seed={card.id}
-                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(parameters + 10) / 3))}
+                                fillScale={Math.max(0.8, Math.min(1.2, Math.log10(size + 10) / 3))}
                             />
                         )}
                         {!isNone && (
@@ -143,16 +142,16 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                 className={style.sizeText}
                                 style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2.3}rem` }}
                             >
-                                {parameters >= 1000
-                                    ? `${Math.round(parameters / 1000)}B`
-                                    : parameters >= 1
-                                      ? `${Math.round(parameters)}M`
-                                      : `${parameters * 1000}K`}
+                                {size >= 1000
+                                    ? `${Math.round(size / 1000)}B`
+                                    : size >= 1
+                                      ? `${Math.round(size)}M`
+                                      : `${size * 1000}K`}
                             </div>
                         )}
                     </div>
                     <div className={style.buttonRow}>
-                        <h2>{name}</h2>
+                        <h2>{title}</h2>
                     </div>
                 </>
             }

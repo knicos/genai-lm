@@ -7,18 +7,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import useModelBusy from '../../hooks/useModelBusy';
 import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
-//import waitModelLoaded from '../../utilities/waitModelLoaded';
 import { modelAtom, modelDownloadAtom } from '../../state/model';
-import SearchPretrained from './SearchPretrained';
 import ModelIcon from '../../icons/ModelIcon';
 import Help from '../../components/Help/Help';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import ModelName from './ModelName';
 import ModelStage from './ModelStage';
-// import useModelLoaded from '../../utilities/useModelLoaded';
 import useModelStatus from '../../hooks/useModelStatus';
 import { Spinner } from '@genai-fi/base';
 import { del } from 'idb-keyval';
+import ModelSearch from '../../components/ModelSearch/ModelSearch';
 
 export default function ModelState() {
     const { t } = useTranslation();
@@ -28,7 +26,6 @@ export default function ModelState() {
     const [done, setDone] = useState(false);
     const busy = useModelBusy(model ?? undefined);
     const [saving, setSaving] = useState(false);
-    //const [isLoading, setIsLoading] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
     const [title, setTitle] = useState(model?.meta.name || '');
     const anchorRef = useRef<HTMLDivElement>(null);
@@ -133,7 +130,8 @@ export default function ModelState() {
                     }}
                 />
                 {showSearch && (
-                    <SearchPretrained
+                    <ModelSearch
+                        trained={true}
                         onClose={() => setShowSearch(false)}
                         onModel={setModel}
                         model={model ?? undefined}

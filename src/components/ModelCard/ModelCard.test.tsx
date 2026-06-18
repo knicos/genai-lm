@@ -10,11 +10,16 @@ describe('ModelCard', () => {
                 onHighlight={() => {}}
                 card={{
                     id: 'card1',
-                    name: 'Card 1',
-                    example: 'SampleText',
-                    parameters: 10,
+                    title: 'Card 1',
+                    sampleContent: 'SampleText',
+                    size: 10,
                     url: '',
                     trained: true,
+                    language: 'en',
+                    conversational: false,
+                    restricted: false,
+                    tags: ['tag1', 'tag2'],
+                    rating: 0,
                 }}
             />
         );

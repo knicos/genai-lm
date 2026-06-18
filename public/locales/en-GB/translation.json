@@ -147,7 +147,12 @@
         "characters": "{{chars}} characters",
         "loadingMoreDocuments": "Loading more documents...",
         "missingFile": "File not available",
-        "missingData": "Data not found"
+        "missingData": "Data not found",
+        "sort": "Sort by",
+        "sortSmallest": "Smallest",
+        "sortLargest": "Largest",
+        "sortSimple": "Simplest",
+        "sortComplex": "Most Complex"
     },
     "checkmodel": {
         "title": "Build Model",

@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import style from './style.module.css';
 import Downloader from '../../utilities/downloader';
-import { DataCardItem } from './type';
 import Card from '../Card/Card';
 import SampleWriter from './SampleWriter';
 import { IconButton } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
+import { DataManifestEntry } from '../../state/data';
 
 interface Props {
-    onSelect: (card: DataCardItem, downloader?: Downloader) => void;
+    onSelect: (card: DataManifestEntry, downloader?: Downloader) => void;
     onHighlight: (id: string, close?: boolean) => void;
     highlighted?: boolean;
     disabled?: boolean;
     used?: boolean;
-    card: DataCardItem;
+    card: DataManifestEntry;
 }
 
 export default function DataCard({ onSelect, onHighlight, used, card, highlighted, disabled }: Props) {
     const [downloader, setDownloader] = useState<Downloader | null>(null);
     const [done, setDone] = useState(false);
 
-    const { title, sample, complexity, size } = card;
+    const { title, sampleContent, complexity, size } = card;
 
     const fontSize = Math.max(0.7, Math.log(size) / Math.log(20));
 
@@ -45,7 +45,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
             expandedContent={
                 <>
                     <div className={`${style.sampleBox} ${style[card.complexity]}`}>
-                        <SampleWriter sample={sample} />
+                        <SampleWriter sample={sampleContent || ''} />
                         <div className={style.sizeIcon}>
                             <IconButton
                                 color="secondary"
@@ -58,7 +58,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
                                         color="success"
                                     />
                                 ) : (
-                                    <DownloadIcon fontSize="inherit" />
+                                    <AddIcon fontSize="inherit" />
                                 )}
                             </IconButton>
                         </div>
@@ -71,7 +71,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
             content={
                 <>
                     <div className={`${style.sampleBox} ${downloader || used ? style.disabledBG : style[complexity]}`}>
-                        <div className={style.sampleText}>{sample}</div>
+                        <div className={style.sampleText}>{sampleContent || ''}</div>
                         <div
                             className={style.sizeText}
                             style={{

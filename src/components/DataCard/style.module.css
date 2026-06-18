@@ -14,7 +14,7 @@
     border: 2px solid bgOk;
 }
 
-.simple {
+.low {
     background:
         repeating-linear-gradient(
             135deg,
@@ -26,7 +26,7 @@
         linear-gradient(135deg, #c7ebc7 0%, #ace0c2 50%, #7ddac5 100%);
 }
 
-.normal {
+.medium {
     background:
         repeating-linear-gradient(
             135deg,
@@ -38,7 +38,7 @@
         linear-gradient(135deg, #cce3ff 0%, #c7d9e9 50%, #b1bce5 100%);
 }
 
-.complex {
+.high {
     background:
         repeating-linear-gradient(
             135deg,

@@ -203,30 +203,6 @@ export default function TextData() {
                             onClose={() => setShowSearch(false)}
                             downloads={[]}
                             onDownload={(downloader) => {
-                                /*setDownloads((prev) => [...prev, downloader]);
-                                downloader.on('error', () => {
-                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
-                                    setMessage({
-                                        level: 'error',
-                                        notice: t('data.errors.downloadLoadError'),
-                                    });
-                                });
-                                downloader.on('cancel', () => {
-                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
-                                });
-                                downloader.on('end', async (file) => {
-                                    logger.log({ action: 'download_completed', name: file.name });
-                                    try {
-                                        const text = loadTextData(file, { maxSize: 200000000 });
-                                        await handleTextLoad(downloader.id, file.name, await text, 'search', setData);
-                                    } catch {
-                                        setMessage({
-                                            level: 'error',
-                                            notice: t('data.errors.downloadLoadError'),
-                                        });
-                                    }
-                                    setDownloads((prev) => prev.filter((d) => d !== downloader));
-                                });*/
                                 setData((prev) => [
                                     ...prev,
                                     new DataEntry(downloader.id, downloader.name, downloader, 'search'),

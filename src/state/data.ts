@@ -7,7 +7,54 @@ import { observe } from 'jotai-effect';
 import { store } from './store';
 import { set, get, del } from 'idb-keyval';
 import EE from 'eventemitter3';
-// import { modelAtom } from './model';
+import { uiDeveloperMode } from './uiState';
+
+export interface DataManifestEntry {
+    id: string;
+    title: string;
+    url: string;
+    language: string;
+    conversational: boolean;
+    complexity: 'low' | 'medium' | 'high';
+    mime: string;
+    restricted: boolean;
+    size: number;
+    modality: 'text';
+    rating: number;
+    sampleContent?: string;
+    tags: string[];
+}
+
+interface DataManifest {
+    datasets: DataManifestEntry[];
+}
+
+export const dataManifestLanguage = atom<string>('en');
+
+export const dataManifest = atom(async (get) => {
+    const lang = get(dataManifestLanguage);
+    const isDev = get(uiDeveloperMode);
+    const response = await fetch(`${import.meta.env.VITE_APP_API}/datasets?lang=${lang}`);
+    const data: DataManifest = await response.json();
+
+    const tags = new Map<string, DataManifestEntry[]>();
+    data.datasets.forEach((entry) => {
+        if (entry.restricted && !isDev) {
+            return;
+        }
+        entry.tags.forEach((tag) => {
+            if (!tags.has(tag)) {
+                tags.set(tag, []);
+            }
+            tags.get(tag)?.push(entry);
+        });
+    });
+
+    return Array.from(tags.entries()).map(([name, datasets]) => ({
+        title: name,
+        cards: datasets,
+    }));
+});
 
 type DataEntryEvents = 'loading' | 'loaded' | 'error';
 

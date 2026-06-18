@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@mui/material';
 import { TeachableLLM } from '@genai-fi/nanogpt';
-import { RowSet } from '../CardRow/CardRow';
-import { ModelCardItem } from '../ModelCard/type';
 import { ExtendedConfig } from '../../state/model';
-import SearchContent from './SearchContent';
+import SearchDiagContent from './SearchDiagContent';
 
 interface Props {
     model?: TeachableLLM;
@@ -12,14 +10,11 @@ interface Props {
     config?: ExtendedConfig;
     onConfig?: (config: ExtendedConfig) => void;
     onClose: () => void;
-    dataRows: RowSet<ModelCardItem>[];
-    langs: { code: string; name: string }[];
-    setLang: (lang: string) => void;
-    lang: string;
-    limitToModelArchitecture?: boolean;
+    trained?: boolean;
+    allowFileOpen?: boolean;
 }
 
-export default function ModelSearch({ onClose, ...props }: Props) {
+export default function ModelSearch({ trained, allowFileOpen, onClose, ...props }: Props) {
     const [open, setOpen] = useState(true);
 
     useEffect(() => {
@@ -40,9 +35,11 @@ export default function ModelSearch({ onClose, ...props }: Props) {
             sx={{ '& .MuiPaper-root': { margin: '0', borderRadius: '0' } }}
         >
             <DialogContent sx={{ padding: '0' }}>
-                <SearchContent
-                    {...props}
+                <SearchDiagContent
+                    trained={trained}
+                    allowFileOpen={allowFileOpen}
                     onClose={() => setOpen(false)}
+                    {...props}
                 />
             </DialogContent>
         </Dialog>
