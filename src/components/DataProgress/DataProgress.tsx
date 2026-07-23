@@ -42,7 +42,7 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             >
                 <div
                     className={style.targetContainer}
-                    style={{ left: `calc(60% - 10px)` }}
+                    style={{ left: `calc(60% + 10px)` }}
                 >
                     <div
                         className={style.target}

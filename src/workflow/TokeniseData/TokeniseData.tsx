@@ -16,6 +16,9 @@ import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
+import { Alert } from '@mui/material';
+
+const CHINCHILLA_OPTIMISATION_RATIO = 20.0;
 
 export default function TokeniseData() {
     const { t } = useTranslation();
@@ -31,6 +34,9 @@ export default function TokeniseData() {
     const [message, setMessage] = useState<Notice | null>(null);
 
     const tokenCount = _tokenCount === 0 ? tokens?.tokens.length || 0 : _tokenCount;
+    const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
+    const hasTooManyTokens = tokenCount > desiredTokens * 1.1;
+    const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;
 
     return (
         <HelpBox
@@ -51,13 +57,25 @@ export default function TokeniseData() {
                     <div className={style.progressBox}>
                         <DataProgress
                             samplesProcessed={tokenCount}
-                            desiredSamples={ready ? (model?.getNumParams() || 0) * 2 : 0}
+                            desiredSamples={desiredTokens}
                         />
                         <ProgressBox
                             totalSamples={tokenCount}
                             label={t('tokeniseData.tokens')}
                         />
                     </div>
+                    <Alert
+                        severity={tokenising ? 'info' : hasEnoughTokens ? 'success' : 'warning'}
+                        sx={{ marginTop: '1rem' }}
+                    >
+                        {tokenising
+                            ? t('tokeniseData.busy')
+                            : hasEnoughTokens
+                              ? t('tokeniseData.enoughTokens')
+                              : hasTooManyTokens
+                                ? t('tokeniseData.tooManyTokens')
+                                : t('tokeniseData.notEnoughTokens')}
+                    </Alert>
                     <div className={style.buttonBox}>
                         <Button
                             disabled={tokenising}

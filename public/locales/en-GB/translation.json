@@ -382,7 +382,11 @@
         "noModel": "No model selected",
         "notTrained": "No vocabulary.",
         "showNumbers": "Show token numbers",
+        "enoughTokens": "You have enough tokens",
+        "notEnoughTokens": "There should be more tokens",
+        "tooManyTokens": "You have more tokens than needed",
         "progressHelp": "Target number of tokens needed.",
+        "busy": "Converting to tokens...",
         "help": "Your text data needs to be split into the numeric tokens that the mathematical model can work with. Larger models need more tokens so the progress bar shows how many you may need."
     },
     "instruct": {
