@@ -226,6 +226,7 @@
         "Wh": "Wh",
         "kWh": "kWh",
         "remaining": "Remaining",
+        "epochs": "Epoch",
         "settings": "Settings",
         "loss": "Loss",
         "valLoss": "Validation Loss",

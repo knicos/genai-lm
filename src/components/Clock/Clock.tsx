@@ -20,7 +20,7 @@ export default function Clock({ duration, totalDuration, remaining, message, ini
     const deviceCap = useAtomValue(deviceCapabilities);
     const [mode, setMode] = useState<'time' | 'energy'>(initialMode || 'energy');
 
-    const progress = totalDuration > 0 ? Math.min(duration / totalDuration, 1) : 0;
+    const progress = totalDuration > 0 ? duration / totalDuration : 0;
 
     const radius = 100;
 
@@ -36,7 +36,7 @@ export default function Clock({ duration, totalDuration, remaining, message, ini
         <Circle
             radius={radius}
             progress={progress}
-            color="rgba(76, 175, 80, 0.6)"
+            color={['rgba(76, 175, 80, 0.6)', 'var(--darker-yellow)', 'var(--darker-red)']}
             onClick={() => setMode(mode === 'time' ? 'energy' : 'time')}
         >
             {!message && (
@@ -74,14 +74,21 @@ export default function Clock({ duration, totalDuration, remaining, message, ini
                         </div>
                     )}
                     <div className={style.remainingTime}>
-                        {mode === 'time' && <Remaining remaining={remaining} />}
-                        {mode === 'energy' && (
+                        {progress <= 1 && mode === 'time' && <Remaining remaining={remaining} />}
+                        {progress <= 1 && mode === 'energy' && (
                             <NumberBox
                                 value={powerRemaining > 1e3 ? powerRemaining / 1000 : powerRemaining}
                                 unit={t(powerRemaining > 1e3 ? 'training.kWh' : 'training.Wh')}
                                 label={t('training.remaining')}
                                 flip
                                 fixed={1}
+                            />
+                        )}
+                        {progress > 1 && (
+                            <NumberBox
+                                value={Math.floor(progress) + 1}
+                                label={t('training.epochs')}
+                                flip
                             />
                         )}
                     </div>

@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react';
 interface Props extends PropsWithChildren {
     radius: number;
     progress: number;
-    color?: string;
+    color?: string | string[];
     animated?: boolean;
     dark?: boolean;
     onClick?: () => void;
@@ -15,7 +15,10 @@ export default function Circle({ radius, children, progress, color, animated, da
     const stroke = 8;
     const normalizedRadius = radius - stroke / 2;
     const circumference = 2 * Math.PI * normalizedRadius;
-    const offset = circumference * (1 - progress);
+    const colourIndex = Math.min((Array.isArray(color) ? color.length : 1) - 1, Math.floor(progress));
+
+    const adjustedProgress = progress - Math.floor(progress);
+    const offset = circumference * (1 - adjustedProgress);
 
     return (
         <div
@@ -34,8 +37,26 @@ export default function Circle({ radius, children, progress, color, animated, da
                     cx={radius}
                     cy={radius}
                 />
+                {Array.isArray(color) && colourIndex > 0 && (
+                    <circle
+                        stroke={color[colourIndex - 1]}
+                        fill="none"
+                        strokeWidth={stroke}
+                        r={normalizedRadius}
+                        cx={radius}
+                        cy={radius}
+                    />
+                )}
                 <circle
-                    stroke={color || (dark ? theme.dark.success : theme.light.success)}
+                    stroke={
+                        color
+                            ? Array.isArray(color)
+                                ? color[colourIndex]
+                                : color
+                            : dark
+                              ? theme.dark.success
+                              : theme.light.success
+                    }
                     fill="none"
                     strokeWidth={stroke}
                     strokeLinecap="round"
