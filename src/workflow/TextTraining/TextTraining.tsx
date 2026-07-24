@@ -52,6 +52,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [preparing, setPreparing] = useState<string | null>(null);
+    const [stopping, setStopping] = useState(false);
     const datasetId = useAtomValue(datasetIdAtom);
 
     useWakeLock(training);
@@ -85,6 +86,11 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             };
             trainer.on('log', h);
 
+            const hDone = () => {
+                setStopping(false);
+            };
+            trainer.on('stop', hDone);
+
             // Check for existing progress
             const lastLog = trainer.log[trainer.log.length - 1];
             if (lastLog) {
@@ -97,6 +103,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
             return () => {
                 trainer.off('log', h);
+                trainer.off('stop', hDone);
             };
         } else {
             setTokens(0);
@@ -162,6 +169,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
         if (training && trainer) {
             trainer.stop();
+            setStopping(true);
             return;
         }
 
@@ -282,6 +290,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     <BoxTitle
                         title={t('training.title')}
                         onSettings={() => navigate('training-settings')}
+                        disableSettings={training}
                         status={
                             !done
                                 ? 'busy'
@@ -315,12 +324,12 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                         {preparing && <LinearProgress sx={{ width: '100%' }} />}
                         {!preparing && (
                             <Button
-                                disabled={!done && !training}
+                                disabled={(!done && !training) || stopping}
                                 variant="contained"
                                 startIcon={done ? <ModelTrainingIcon /> : <PauseIcon />}
                                 onClick={() => startTraining()}
                             >
-                                {done ? t('training.start') : t('training.stop')}
+                                {done ? t('training.start') : stopping ? t('training.stopping') : t('training.stop')}
                             </Button>
                         )}
                         <Tooltip

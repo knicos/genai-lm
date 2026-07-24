@@ -13,6 +13,7 @@ import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
+import { trainingAnimation } from '../../state/animations';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
@@ -26,6 +27,7 @@ export default function Tokeniser() {
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
     const [count, setCount] = useState(0);
+    const istraining = useAtomValue(trainingAnimation);
 
     const isTrained = model?.loaded && model.tokeniser.trained;
 
@@ -50,6 +52,7 @@ export default function Tokeniser() {
             <BoxStandalone
                 style={{ width: '250px', minHeight: '200px' }}
                 active={dataset !== null && dataset.length > 0}
+                disabled={istraining}
             >
                 <div className={style.container}>
                     <BoxTitle

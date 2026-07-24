@@ -17,6 +17,7 @@ import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
+import { trainingAnimation } from '../../state/animations';
 
 const CHINCHILLA_OPTIMISATION_RATIO = 20.0;
 
@@ -32,6 +33,7 @@ export default function TokeniseData() {
     const [_tokenCount, setTokenCount] = useState(0);
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
+    const istraining = useAtomValue(trainingAnimation);
 
     const tokenCount = _tokenCount === 0 ? tokens?.tokens.length || 0 : _tokenCount;
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
@@ -48,6 +50,7 @@ export default function TokeniseData() {
             <BoxStandalone
                 style={{ width: '290px', minHeight: '200px' }}
                 active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
+                disabled={istraining}
             >
                 <div className={style.container}>
                     <BoxTitle

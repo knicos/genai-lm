@@ -27,6 +27,7 @@ interface Props {
     startIcon?: ReactNode;
     setTitle?: (title: string) => void;
     onSettings?: () => void;
+    disableSettings?: boolean;
 }
 
 export default function BoxTitle({
@@ -39,6 +40,7 @@ export default function BoxTitle({
     placeholder,
     startIcon,
     onSettings,
+    disableSettings,
 }: Props) {
     const { t } = useTranslation();
     const { width } = useWindowSize();
@@ -122,6 +124,7 @@ export default function BoxTitle({
                         aria-label={t('widget.aria.settings')}
                         size="small"
                         color="primary"
+                        disabled={disableSettings}
                     >
                         <TuneIcon fontSize="medium" />
                     </IconButton>

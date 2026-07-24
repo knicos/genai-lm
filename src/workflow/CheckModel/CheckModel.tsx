@@ -13,6 +13,7 @@ import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import RestoreIcon from '@mui/icons-material/Restore';
+import { trainingAnimation } from '../../state/animations';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -34,6 +35,7 @@ export default function CheckModel() {
     const architecture = useAtomValue(modelConfigAtom);
     const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
     const [message, setMessage] = useState<Notice | null>(null);
+    const istraining = useAtomValue(trainingAnimation);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
     const paramCount = estimateParameterCount(architecture);
@@ -48,6 +50,7 @@ export default function CheckModel() {
             <BoxStandalone
                 style={{ minWidth: '290px', minHeight: '100px' }}
                 active={ready}
+                disabled={istraining}
             >
                 <div className={style.container}>
                     <BoxTitle

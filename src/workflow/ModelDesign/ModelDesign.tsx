@@ -13,6 +13,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import Help from '../../components/Help/Help';
 import { useTranslation } from 'react-i18next';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
+import { trainingAnimation } from '../../state/animations';
 
 export default function ModelDesign() {
     const { t } = useTranslation();
@@ -22,6 +23,7 @@ export default function ModelDesign() {
     const navigate = useNavigate();
     const archRef = useRef<ArchitectureRef>(null);
     const model = useAtomValue(modelAtom);
+    const istraining = useAtomValue(trainingAnimation);
 
     return (
         <Box
@@ -30,6 +32,7 @@ export default function ModelDesign() {
             className={style.modelThread}
             fullWidth
             style={{ width: '40rem' }}
+            disabled={istraining}
         >
             {showSearch && (
                 <ModelSearch

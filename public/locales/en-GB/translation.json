@@ -220,6 +220,7 @@
         "tokens": "Tokens",
         "start": "Train",
         "stop": "Pause",
+        "stopping": "Stopping...",
         "hours": "Hr",
         "minutes": "Min",
         "seconds": "Sec",

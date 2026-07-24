@@ -40,6 +40,7 @@ export default function ModelMenu({ onSearch, onDownload, onUpload, disabled }: 
                 onClick={handleClick}
                 size="large"
                 color="inherit"
+                disabled={disabled}
             >
                 <MoreVertIcon fontSize="large" />
             </IconButton>
