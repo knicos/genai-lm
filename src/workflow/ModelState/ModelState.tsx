@@ -15,8 +15,8 @@ import ModelName from './ModelName';
 import ModelStage from './ModelStage';
 import useModelStatus from '../../hooks/useModelStatus';
 import { Spinner } from '@genai-fi/base';
-import { del } from 'idb-keyval';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
+import { setCheckpoint } from '../../utilities/db';
 
 export default function ModelState() {
     const { t } = useTranslation();
@@ -58,7 +58,7 @@ export default function ModelState() {
                 if (old) {
                     old.dispose();
                 }
-                del('model_checkpoint');
+                setCheckpoint(file);
                 const model = TeachableLLM.loadModel(file);
                 model.meta.trained = true;
                 /*waitModelLoaded(model).then(() => {

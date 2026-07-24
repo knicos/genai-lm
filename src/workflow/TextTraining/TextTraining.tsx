@@ -23,8 +23,8 @@ import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
 import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
-import { set } from 'idb-keyval';
 import { createDatasetFromEntries } from '../../utilities/dataset';
+import { setCheckpoint } from '../../utilities/db';
 
 const CHECKPT_THRESHOLD = 3_000_000;
 
@@ -256,7 +256,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                                 includeOptimizer: true,
                             });
                             const file = new File([blob], `model_checkpoint.zip`, { type: 'application/zip' });
-                            await set('model_checkpoint', file);
+                            await setCheckpoint(file);
                         } catch (err) {
                             console.error('Error saving checkpoint', err);
                         }

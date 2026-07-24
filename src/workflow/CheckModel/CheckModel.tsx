@@ -14,6 +14,8 @@ import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { trainingAnimation } from '../../state/animations';
+import { deleteCheckpoint } from '../../utilities/db';
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -36,10 +38,29 @@ export default function CheckModel() {
     const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
     const paramCount = estimateParameterCount(architecture);
     const exceedsSizeLimit = paramCount > sizeLimit;
+
+    const resetModel = () => {
+        setModel((old) => {
+            if (old) {
+                old.dispose();
+            }
+            const canReuseTokeniser = old && architecture.vocabSize === old.config.vocabSize;
+            const newModel = TeachableLLM.create(
+                canReuseTokeniser ? old.tokeniser : architecture.vocabSize <= 256 ? 'char' : 'bpe',
+                architecture
+            );
+            if (old) {
+                newModel.meta.name = old.meta.name;
+            }
+            deleteCheckpoint();
+            return newModel;
+        });
+    };
 
     return (
         <HelpBox
@@ -86,24 +107,11 @@ export default function CheckModel() {
                                     });
                                     return;
                                 }
-                                setModel((old) => {
-                                    if (old) {
-                                        old.dispose();
-                                    }
-                                    const canReuseTokeniser = old && architecture.vocabSize === old.config.vocabSize;
-                                    const newModel = TeachableLLM.create(
-                                        canReuseTokeniser
-                                            ? old.tokeniser
-                                            : architecture.vocabSize <= 256
-                                              ? 'char'
-                                              : 'bpe',
-                                        architecture
-                                    );
-                                    if (old) {
-                                        newModel.meta.name = old.meta.name;
-                                    }
-                                    return newModel;
-                                });
+                                if (model && ready && model.mode !== 'untrained') {
+                                    setShowConfirm(true);
+                                    return;
+                                }
+                                resetModel();
                             }}
                         >
                             {t(isUpToDate ? 'checkmodel.refresh' : 'checkmodel.start')}
@@ -115,6 +123,17 @@ export default function CheckModel() {
                             onClose={() => setMessage(null)}
                         />
                     )}
+                    <ConfirmDialog
+                        open={showConfirm}
+                        title={t('checkmodel.confirm.title')}
+                        message={t('checkmodel.confirm.message')}
+                        confirmText={t(isUpToDate ? 'checkmodel.refresh' : 'checkmodel.start')}
+                        onConfirm={() => {
+                            resetModel();
+                            setShowConfirm(false);
+                        }}
+                        onCancel={() => setShowConfirm(false)}
+                    />
                 </div>
             </BoxStandalone>
         </HelpBox>

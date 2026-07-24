@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom, modelConfigAtom } from '../../state/model';
@@ -6,12 +6,15 @@ import { createEntriesFromManifest, dataEntries, dataTokens } from '../../state/
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FlowType } from '../../hooks/useChangePath';
-import { get, del } from 'idb-keyval';
 import { workflowSteps, WorkflowSteps } from '../../state/workflowSettings';
 import { uiCompactMode, uiDeveloperMode } from '../../state/uiState';
 import { initializeLogger } from '../../utilities/logger';
+import { deleteData, getData, getCheckpoint, deleteCheckpoint } from '../../utilities/db';
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 
 type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced';
+
+const INIT_COMPLETE_KEY = 'init_complete';
 
 export default function Initialiser() {
     const { t } = useTranslation();
@@ -25,6 +28,7 @@ export default function Initialiser() {
     const setDevMode = useSetAtom(uiDeveloperMode);
     const setCompact = useSetAtom(uiCompactMode);
     const [params] = useSearchParams();
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const pageLog = useRef(new Set<string>());
 
@@ -34,34 +38,34 @@ export default function Initialiser() {
         newModel.meta.name = t('model.defaultName');
         newModel.meta.trained = false;
         setModel(newModel);
-        del('dataTokens_tokens');
-        del('dataTokens_tokeniserId');
-        del('dataTokens_datasetId');
+        await deleteData();
     };
 
-    const initialise = async () => {
-        const checkpoint = await get('model_checkpoint');
+    const doInit = async () => {
+        window.sessionStorage.setItem(INIT_COMPLETE_KEY, 'true');
+
+        const checkpoint = await getCheckpoint();
 
         if (checkpoint) {
             const newModel = TeachableLLM.loadModel(checkpoint as File);
             setModel(newModel);
 
-            const existingTokens: Uint16Array | undefined = await get('dataTokens_tokens');
-            const existingTokeniserId: string | undefined = await get('dataTokens_tokeniserId');
-            const existingDatasetId: string | undefined = await get('dataTokens_datasetId');
+            const existingData = await getData();
 
             newModel.on('loaded', () => {
-                if (existingTokens && existingTokeniserId === newModel.tokeniser.id && existingDatasetId) {
+                if (
+                    existingData?.tokens &&
+                    existingData.tokeniserId === newModel.tokeniser.id &&
+                    existingData.datasetId
+                ) {
                     setDataTokens({
-                        tokens: existingTokens,
-                        tokeniserId: existingTokeniserId,
-                        datasetId: existingDatasetId,
+                        tokens: existingData.tokens,
+                        tokeniserId: existingData.tokeniserId,
+                        datasetId: existingData.datasetId,
                     });
                 } else {
                     setDataTokens(null);
-                    del('dataTokens_tokens');
-                    del('dataTokens_tokeniserId');
-                    del('dataTokens_datasetId');
+                    deleteData();
                 }
 
                 if (newModel.meta.pretrainingData) {
@@ -79,6 +83,18 @@ export default function Initialiser() {
                 console.error('Failed to build model', e);
             });
         }
+    };
+
+    const initialise = async () => {
+        const checkpoint = await getCheckpoint();
+        const hasInitAlready = window.sessionStorage.getItem(INIT_COMPLETE_KEY) === 'true';
+
+        if (checkpoint && !hasInitAlready) {
+            setShowConfirm(true);
+            return;
+        }
+
+        await doInit();
     };
 
     if (pageLog.current.size === 0 && flow !== 'home') {
@@ -178,5 +194,22 @@ export default function Initialiser() {
         }
     }, [modelParam, loadModelById]);*/
 
-    return null;
+    return (
+        <ConfirmDialog
+            open={showConfirm}
+            title={t('app.confirmLoad.title')}
+            message={t('app.confirmLoad.message')}
+            confirmText={t('app.confirmLoad.confirm')}
+            onConfirm={() => {
+                doInit();
+                setShowConfirm(false);
+            }}
+            onCancel={() => {
+                deleteCheckpoint().then(() => {
+                    doInit();
+                });
+                setShowConfirm(false);
+            }}
+        />
+    );
 }

@@ -6,11 +6,17 @@
         "startHere": "Start Here",
         "save": "Save",
         "load": "Open",
+        "cancel": "Cancel",
         "saveTitle": "Save Model",
         "saveMessage": "Enter a name for your model:",
         "saveName": "Model Name",
         "saveSave": "Save",
         "saveCancel": "Cancel",
+        "confirmLoad": {
+            "title": "Continue Session",
+            "message": "A previous session was found. Do you want to load that model?",
+            "confirm": "Load"
+        },
         "workflow": {
             "empty_desc": "Design your model structure and start from scratch.",
             "base_desc": "Use a base model and adapt it to a new task with your data.",
@@ -162,7 +168,11 @@
         "outdated": "The model needs to be rebuilt",
         "upToDate": "Model is ready to use.",
         "help": "Building a model will allocate resources and assign random numbers to the parameters.",
-        "exceedsSizeLimit": "The model has too many parameters."
+        "exceedsSizeLimit": "The model has too many parameters.",
+        "confirm": {
+            "title": "Rebuild Model",
+            "message": "Any training of the current model will be lost. Are you sure you want to rebuild the model?"
+        }
     },
     "foundation": {
         "title": "Base Models"

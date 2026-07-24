@@ -9,10 +9,10 @@ import { SortType } from '../../workflow/TextData/TextSearchListing';
 import { useAtom, useSetAtom } from 'jotai';
 import { Spinner } from '@genai-fi/base';
 import { LANGS } from '../AppBar/langs';
-import { del } from 'idb-keyval';
 import SearchTrained from './SearchTrained';
 import SearchUntrained from './SearchUntrained';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { setCheckpoint } from '../../utilities/db';
 
 interface Props {
     model?: TeachableLLM;
@@ -38,7 +38,7 @@ export default function SearchDiagContent({ trained, allowFileOpen, onClose, ...
                 if (old) {
                     old.dispose();
                 }
-                del('model_checkpoint');
+                setCheckpoint(file);
                 const model = TeachableLLM.loadModel(file);
                 model.meta.trained = true;
                 /*waitModelLoaded(model).then(() => {

@@ -322,20 +322,6 @@ observe((get) => {
     }
 }, store);
 
-/*observe((get, set) => {
-    const model = get(modelAtom);
-    if (model) {
-        set(dataTokens, null);
-    }
-}, store);
-
-observe((get, set) => {
-    const entries = get(dataEntries);
-    if (entries.length > 0) {
-        set(dataTokens, null);
-    }
-}, store);*/
-
 export const dataTokensReady = atom<boolean>((get) => {
     const tokens = get(dataTokens);
     return tokens !== null && tokens.tokens.length > 0;
