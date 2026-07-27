@@ -1,4 +1,4 @@
-import { VerticalButton } from '@genai-fi/base';
+import { VerticalButton, Help } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import TuneIcon from '@mui/icons-material/Tune';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -9,7 +9,6 @@ import { estimateParameterCount } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
 import { modelConfigAtom, modelSizeLimit } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
-import Help from '../../components/Help/Help';
 import WarningIcon from '@mui/icons-material/Warning';
 
 interface Props {

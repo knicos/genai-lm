@@ -5,7 +5,8 @@ import ChatPrompt from '../../../workflow/Prompt/ChatPrompt';
 import Sharing from '../../../workflow/Sharing/Sharing';
 import Frame from '../Frame';
 import FullSizeGroup from '../FullSizeGroup';
-
+import style from '../style.module.css';
+import { useTranslation } from 'react-i18next';
 interface Props {
     observer: IntersectionObserver;
     scrollFrame: string;
@@ -13,6 +14,7 @@ interface Props {
 
 export default function DeploymentFrame({ observer, scrollFrame }: Props) {
     const steps = useAtomValue(workflowSteps);
+    const { t } = useTranslation();
 
     return (
         <Frame
@@ -20,10 +22,13 @@ export default function DeploymentFrame({ observer, scrollFrame }: Props) {
             observer={observer}
             scroll={scrollFrame === 'deployment'}
         >
-            <FullSizeGroup widget="conversationOutput">
-                <ChatConversation />
-                <ChatPrompt />
-            </FullSizeGroup>
+            <div className={style.titleColumn}>
+                <h3>{t('generator.title')}</h3>
+                <FullSizeGroup widget="conversationOutput">
+                    <ChatConversation />
+                    <ChatPrompt />
+                </FullSizeGroup>
+            </div>
             {steps.has('share') && <Sharing withLoRA />}
         </Frame>
     );

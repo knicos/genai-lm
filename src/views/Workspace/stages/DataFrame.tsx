@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useChangePath } from '../../../hooks/useChangePath';
 import { workflowSteps } from '../../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
+import { Help } from '@genai-fi/base';
 
 interface Props {
     observer: IntersectionObserver;
@@ -29,7 +30,15 @@ export default function DataFrame({ observer, scrollFrame }: Props) {
             observer={observer}
             scroll={scrollFrame === 'data'}
         >
-            <TextData />
+            <div className={style.titleColumn}>
+                <Help
+                    message={t('data.help')}
+                    inplace
+                >
+                    <h3>{t('data.title')}</h3>
+                </Help>
+                <TextData />
+            </div>
             {hasTokenStep && (
                 <div
                     data-widget="container"

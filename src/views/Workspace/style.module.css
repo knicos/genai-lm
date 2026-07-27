@@ -251,7 +251,7 @@
     box-sizing: border-box;
     min-width: min(70vw, 1000px);
     display: grid;
-    gap: 3rem;
+    gap: 4rem;
     justify-content: center;
     align-items: center;
     height: 100%;
@@ -266,4 +266,16 @@
 .loading {
     width: 80vw;
     height: 100%;
+}
+
+.titleColumn {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 2rem);
+}
+
+.titleColumn h3 {
+    margin: 0;
+    color: #444;
+    font-size: 1.2rem;
 }

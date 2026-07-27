@@ -22,7 +22,10 @@
             "base_desc": "Use a base model and adapt it to a new task with your data.",
             "complete_desc": "Cover all the stages in making a chatbot.",
             "finetune_desc": "Adjust the style and personality of an existing model.",
-            "advanced_desc": "Access additional settings and features for advanced use."
+            "advanced_desc": "Access additional settings and features for advanced use.",
+            "model_desc": "Select your model size and shape.",
+            "data_desc": "Add your own text data for the model to learn from.",
+            "pretrain_desc": "Train the model to learn from your data."
         },
         "settings": {
             "title": "Settings",
@@ -159,7 +162,8 @@
         "sortSmallest": "Smallest",
         "sortLargest": "Largest",
         "sortSimple": "Simplest",
-        "sortComplex": "Most Complex"
+        "sortComplex": "Most Complex",
+        "help": "A language model learns from example text. The more text you provide, the better it can learn. You can write your own text, upload files or use our dataset library."
     },
     "checkmodel": {
         "title": "Build Model",
@@ -222,7 +226,8 @@
         "error": "Model broke",
         "parametersHelp": "The total number of numeric parameters in the model.",
         "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token.",
-        "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed."
+        "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed.",
+        "archHelp": "Select the size and shape of your language model before training it."
     },
     "training": {
         "title": "Training",

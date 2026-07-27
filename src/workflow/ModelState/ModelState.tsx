@@ -9,12 +9,11 @@ import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
 import { modelAtom, modelDownloadAtom } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
-import Help from '../../components/Help/Help';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import ModelName from './ModelName';
 import ModelStage from './ModelStage';
 import useModelStatus from '../../hooks/useModelStatus';
-import { Spinner } from '@genai-fi/base';
+import { Spinner, Help } from '@genai-fi/base';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
 import { setCheckpoint } from '../../utilities/db';
 

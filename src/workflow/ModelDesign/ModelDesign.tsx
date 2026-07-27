@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
 import { trainingAnimation } from '../../state/animations';

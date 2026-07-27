@@ -22,7 +22,10 @@ export default function FinetuneFrame({ observer, scrollFrame }: Props) {
             observer={observer}
             scroll={scrollFrame === 'finetune'}
         >
-            <InstructData />
+            <div className={style.titleColumn}>
+                <h3>{t('instruct.title')}</h3>
+                <InstructData />
+            </div>
             <TuneTraining />
             <div className={style.buttongroup}>
                 <BoxButton

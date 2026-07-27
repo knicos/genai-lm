@@ -49,10 +49,13 @@ export default function PretrainFrame({ observer, scrollFrame }: Props) {
                     }
                 />
             </div>
-            <FullSizeGroup widget="chatOutput">
-                <RawGeneration />
-                <RawPrompt />
-            </FullSizeGroup>
+            <div className={style.titleColumn}>
+                <h3>{t('generator.title')}</h3>
+                <FullSizeGroup widget="chatOutput">
+                    <RawGeneration />
+                    <RawPrompt />
+                </FullSizeGroup>
+            </div>
             <div className={style.buttongroup}>
                 <BoxButton
                     style={{ marginBottom: '70px' }}

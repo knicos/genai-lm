@@ -4,6 +4,9 @@ import Frame from '../Frame';
 import Foundation from '../../../workflow/Foundation/Foundation';
 import { useAtomValue } from 'jotai';
 import { workflowSteps } from '../../../state/workflowSettings';
+import style from '../style.module.css';
+import { useTranslation } from 'react-i18next';
+import { Help } from '@genai-fi/base';
 
 interface Props {
     observer: IntersectionObserver;
@@ -12,6 +15,7 @@ interface Props {
 
 export default function ModelFrame({ observer, scrollFrame }: Props) {
     const steps = useAtomValue(workflowSteps);
+    const { t } = useTranslation();
 
     return (
         <Frame
@@ -19,8 +23,16 @@ export default function ModelFrame({ observer, scrollFrame }: Props) {
             observer={observer}
             scroll={scrollFrame === 'model'}
         >
-            {steps.has('architecture') && <ModelDesign />}
-            {steps.has('model') && <Foundation />}
+            <div className={style.titleColumn}>
+                <Help
+                    message={t('model.archHelp')}
+                    inplace
+                >
+                    <h3>{t('model.title')}</h3>
+                </Help>
+                {steps.has('architecture') && <ModelDesign />}
+                {steps.has('model') && <Foundation />}
+            </div>
             {steps.has('architecture') && <CheckModel />}
         </Frame>
     );

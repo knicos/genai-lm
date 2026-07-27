@@ -4,7 +4,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { generatorSettings } from '../../state/generator';
 import { uiDeveloperMode } from '../../state/uiState';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 import { loadedModelAtom } from '../../state/model';
 import useModelMode from '../../hooks/useModelMode';
 

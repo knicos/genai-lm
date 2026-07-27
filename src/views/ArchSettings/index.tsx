@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 import style from './style.module.css';
 import { modelConfigAtom, modelSizeLimit } from '../../state/model';
-import Help from '../../components/Help/Help';
+import { Help } from '@genai-fi/base';
 
 export function Component() {
     const { t } = useTranslation();
