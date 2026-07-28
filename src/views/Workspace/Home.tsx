@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import style from './home.module.css';
 import Step from './Step';
+import { HomeBanner, Privacy } from '@genai-fi/base';
 
 const TEMPLATES = [
     {
@@ -25,26 +26,25 @@ const TEMPLATES = [
     },
 ];
 
+const gitTag = typeof __GIT_TAG__ !== 'undefined' ? __GIT_TAG__ : 'unknown';
+
 export default function Home() {
     const { t } = useTranslation();
 
     return (
         <div className={style.homeContainer}>
-            <div className={style.header}>
-                <img
-                    src="/logo192.png"
-                    alt="GenAI logo"
-                    width={192}
-                    height={192}
-                />
-                <div className={style.headerColumn}>
-                    <h1>
+            <HomeBanner
+                title={
+                    <>
                         <div className={style.little}>{t('app.little')}</div>
                         {t('app.languageMachine')}
-                    </h1>
-                    <h2>{t('app.subtitle')}</h2>
-                </div>
-            </div>
+                    </>
+                }
+                subtitle={t('app.subtitle')}
+                logoUrl="/logo192.png"
+                githubUrl="https://github.com/knicos/genai-lm"
+                githubLabel={t('app.githubText')}
+            />
             <div className={style.cards}>
                 {TEMPLATES.map((item, index) => (
                     <Step
@@ -56,6 +56,11 @@ export default function Home() {
                     />
                 ))}
             </div>
+            <Privacy
+                position="bottomLeft"
+                appName="lm"
+                tag={gitTag || 'notag'}
+            />
         </div>
     );
 }

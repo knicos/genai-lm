@@ -106,7 +106,7 @@ export function Component() {
                 hideTitle
                 sidepanel={location.pathname.split('/')[4]}
             />
-            <div
+            <main
                 className={style.mainContainer}
                 style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
             >
@@ -155,7 +155,7 @@ export function Component() {
                         <Outlet />
                     </SidePanel>
                 </ThemeProvider>
-            </div>
+            </main>
             <SettingsDialog />
         </>
     );

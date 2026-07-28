@@ -15,6 +15,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import logger from './utilities/logger';
 import { store } from './state/store';
+import About from './views/About/About';
 
 interface RouterError {
     status: number;
@@ -74,6 +75,10 @@ export const routes = createRoutesFromElements(
                     to="/workspace/home"
                 />
             }
+        />
+        <Route
+            path="about"
+            element={<About />}
         />
 
         <Route
