@@ -172,6 +172,7 @@ export default function ChatPrompt() {
                 generating={generate}
                 onStop={() => generator?.stop()}
                 noPrompt={promptMode === 'none'}
+                placeholder={t('deploy.placeholder')}
             />
             {messages && (
                 <BoxNotice

@@ -271,7 +271,10 @@
 .titleColumn {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 2rem);
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 1rem;
 }
 
 .titleColumn h3 {

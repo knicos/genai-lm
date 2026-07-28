@@ -23,16 +23,18 @@ export default function ModelFrame({ observer, scrollFrame }: Props) {
             observer={observer}
             scroll={scrollFrame === 'model'}
         >
-            <div className={style.titleColumn}>
-                <Help
-                    message={t('model.archHelp')}
-                    inplace
-                >
-                    <h3>{t('model.title')}</h3>
-                </Help>
-                {steps.has('architecture') && <ModelDesign />}
-                {steps.has('model') && <Foundation />}
-            </div>
+            {steps.has('architecture') && (
+                <div className={style.titleColumn}>
+                    <Help
+                        message={t('model.archHelp')}
+                        inplace
+                    >
+                        <h3>{t('model.title')}</h3>
+                    </Help>
+                    {steps.has('architecture') && <ModelDesign />}
+                </div>
+            )}
+            {steps.has('model') && <Foundation />}
             {steps.has('architecture') && <CheckModel />}
         </Frame>
     );

@@ -106,6 +106,7 @@ export default function ChatPrompt() {
                 disabled={disable}
                 generating={generate}
                 onStop={() => generator?.stop()}
+                placeholder={t('deploy.placeholder')}
             />
             {messages && (
                 <BoxNotice

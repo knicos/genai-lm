@@ -5,6 +5,10 @@
             "rewrite": "index.html"
         },
         {
+            "route": "/about*",
+            "rewrite": "index.html"
+        },
+        {
             "route": "/app*",
             "rewrite": "index.html"
         }
