@@ -154,3 +154,5 @@ export const modelReady = atom<boolean>((get) => {
 export const modelLoRAName = atom<string | null>(null);
 
 export const modelSaveCheckpoints = atomWithStorage<boolean>('modelSaveCheckpoints', true);
+
+export const modelQuantizeSave = atomWithStorage<boolean>('modelQuantizeSave', true);

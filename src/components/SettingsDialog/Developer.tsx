@@ -11,6 +11,7 @@ import {
     deviceDisableSubgroups,
 } from '../../state/device';
 import { uiDeveloperMode } from '../../state/uiState';
+import { modelQuantizeSave } from '../../state/model';
 
 export default function DeveloperSettings() {
     const { t } = useTranslation();
@@ -18,6 +19,7 @@ export default function DeveloperSettings() {
     const [developerMode, setDeveloperMode] = useAtom(uiDeveloperMode);
     const [lowPowerMode, setLowPowerMode] = useAtom(deviceLowPower);
     const [disableSubgroups, setDisableSubgroups] = useAtom(deviceDisableSubgroups);
+    const [quantize, setQuantize] = useAtom(modelQuantizeSave);
     const hasWebGPU = useAtomValue(deviceHasWebGPU);
     const hasWebGL = useAtomValue(deviceHasWebGL);
     const capabilities = useAtomValue(deviceCapabilities);
@@ -61,6 +63,15 @@ export default function DeveloperSettings() {
                         />
                     }
                     label={t('app.settings.disableSubgroups')}
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={quantize}
+                            onChange={(_, checked) => setQuantize(checked)}
+                        />
+                    }
+                    label={t('app.settings.quantizeSave')}
                 />
                 <div>
                     <div>WebGL: {hasWebGL ? 'Available' : 'Not Available'}</div>

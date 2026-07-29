@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import useModelBusy from '../../hooks/useModelBusy';
 import { saveAs } from 'file-saver';
 import logger from '../../utilities/logger';
-import { modelAtom, modelDownloadAtom } from '../../state/model';
+import { modelAtom, modelDownloadAtom, modelQuantizeSave } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import ModelName from './ModelName';
@@ -29,6 +29,7 @@ export default function ModelState() {
     const [title, setTitle] = useState(model?.meta.name || '');
     const anchorRef = useRef<HTMLDivElement>(null);
     const downloader = useAtomValue(modelDownloadAtom);
+    const quantize = useAtomValue(modelQuantizeSave);
 
     // Prevent double loading issues
     const modelRef = useRef<TeachableLLM | undefined>(model);
@@ -38,7 +39,7 @@ export default function ModelState() {
         (name: string) => {
             setSaving(true);
             model
-                ?.saveModel({ name })
+                ?.saveModel({ name, quantize: quantize ? 'F16' : 'none' })
                 .then((blob) => {
                     setSaving(false);
                     saveAs(blob, `${name}.zip`);
@@ -47,7 +48,7 @@ export default function ModelState() {
                     console.error('Error saving model:', e);
                 });
         },
-        [model]
+        [model, quantize]
     );
 
     const openFile = useCallback(

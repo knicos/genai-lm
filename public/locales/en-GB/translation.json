@@ -144,7 +144,8 @@
             "promptMode": "Prompt Mode",
             "promptModeNone": "None",
             "promptModeCompletion": "Completion",
-            "promptModeConversation": "Conversation"
+            "promptModeConversation": "Conversation",
+            "quantizeSave": "Quantize Model on Save"
         },
         "close": "Close",
         "ok": "OK",
