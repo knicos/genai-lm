@@ -6,5 +6,5 @@ export default function useContent(entry: DataEntry) {
         entry.load();
     }, [entry]);
 
-    return entry.syncContent;
+    return entry.content;
 }

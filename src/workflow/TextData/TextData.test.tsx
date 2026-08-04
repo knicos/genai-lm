@@ -79,7 +79,7 @@ describe('TextData', () => {
         const dataCB = vi.fn();
 
         // Mock fetch
-        global.fetch = vi.fn(() =>
+        globalThis.fetch = vi.fn(() =>
             Promise.resolve({
                 json: () => {
                     return Promise.resolve({

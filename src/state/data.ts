@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import Downloader from '../utilities/downloader';
-import { Conversation, DatasetMetadata, generateDatasetID, loadTextData } from '@genai-fi/nanogpt';
+import { Conversation, DatasetMetadata, generateDatasetID, loadTextData, ConversationStream } from '@genai-fi/nanogpt';
 import { atomWithStorage } from 'jotai/utils';
 import { createIndexedDbStorage } from './storage';
 import { observe } from 'jotai-effect';
@@ -8,6 +8,9 @@ import { store } from './store';
 import { set, get, del } from 'idb-keyval';
 import EE from 'eventemitter3';
 import { uiDeveloperMode } from './uiState';
+import { firstConversation } from '../utilities/conversation';
+import { MemoryConversationStream } from '@genai-fi/nanogpt';
+import { IDBTokenManifest } from '../utilities/db';
 
 export interface DataManifestEntry {
     id: string;
@@ -63,9 +66,10 @@ export class DataEntry implements DatasetMetadata {
     readonly name: string;
     public conversational = false;
     readonly source?: 'file' | 'input' | 'search';
+    private _stream: ConversationStream | null = null;
     private _content: Conversation[][] | null = null;
     private _lazy: (() => Promise<Conversation[][]>) | null = null;
-    private _promise: Promise<Conversation[][]> | null = null;
+    private _promise: Promise<void> | null = null;
     private _downloader: Downloader | null = null;
     private _size: number | null = null;
     private ee = new EE<DataEntryEvents>();
@@ -73,7 +77,7 @@ export class DataEntry implements DatasetMetadata {
     constructor(
         id: string,
         name: string,
-        content?: Conversation[][] | (() => Promise<Conversation[][]>) | Downloader,
+        content?: Conversation[][] | (() => Promise<Conversation[][]>) | Downloader | ConversationStream,
         source?: 'file' | 'input' | 'search'
     ) {
         this.id = id;
@@ -96,12 +100,13 @@ export class DataEntry implements DatasetMetadata {
                 this._downloader.on('end', (file) => {
                     loadTextData(file)
                         .then((data) => {
-                            this._content = data;
-                            this.conversational = data.some((conv) => conv[0]?.role !== 'text');
-                            this._size = data.reduce((acc, curr) => acc + curr.length, 0);
-                            this.storeInIndexedDB();
-                            this.ee.emit('loaded');
-                            resolve(data);
+                            this._stream = data;
+                            firstConversation(data).then((conversation) => {
+                                this.conversational = conversation.some((part) => part.role !== 'text');
+                                this.storeInIndexedDB();
+                                this.ee.emit('loaded');
+                                resolve();
+                            });
                         })
                         .catch(reject);
                 });
@@ -109,12 +114,15 @@ export class DataEntry implements DatasetMetadata {
         } else if (typeof content === 'function') {
             this._lazy = content;
         } else if (Array.isArray(content)) {
+            this._stream = new MemoryConversationStream(content);
             this._content = content;
             this.conversational = content.some((conv) => conv[0]?.role !== 'text');
             this._size = content.reduce((acc, curr) => acc + curr.length, 0);
             if (source === 'file' || source === 'input') {
                 this.storeInIndexedDB();
             }
+        } else {
+            this._stream = content || null;
         }
     }
 
@@ -130,44 +138,58 @@ export class DataEntry implements DatasetMetadata {
         return this._size;
     }
 
-    get length() {
-        return this._content ? this._content.length : 0;
-    }
-
     get downloader() {
         return this._downloader;
     }
 
-    get syncContent(): Conversation[][] | null {
+    get invalid() {
+        return !this._stream && !this._lazy && !this._downloader;
+    }
+
+    get content(): Conversation[][] | null {
         return this._content;
     }
 
-    get invalid() {
-        return !this._content && !this._lazy && !this._downloader;
-    }
-
-    set content(value: Conversation[][]) {
+    set content(value: Conversation[][] | null) {
+        if (this._content === null) {
+            throw new Error('Cannot set content on a DataEntry that was not initialized with content');
+        }
         this._content = value;
-        this._size = value.reduce((acc, curr) => acc + curr.length, 0);
-        this.conversational = value.some((conv) => conv[0]?.role !== 'text');
+        this._stream = value ? new MemoryConversationStream(value) : null;
     }
 
-    get content(): Promise<Conversation[][]> {
-        if (this._content) {
-            return Promise.resolve(this._content);
+    set stream(value: Conversation[][] | ConversationStream | null) {
+        if (Array.isArray(value)) {
+            this._stream = new MemoryConversationStream(value);
+            this._size = value.reduce((acc, curr) => acc + curr.length, 0);
+            this.conversational = value.some((conv) => conv[0]?.role !== 'text');
+        } else {
+            this._stream = value;
+            this._size = 0;
+            this.conversational = false;
+        }
+    }
+
+    get stream(): Promise<ConversationStream> {
+        if (this._stream) {
+            return Promise.resolve(this._stream);
         } else if (this._lazy) {
             if (!this._promise) {
                 this.ee.emit('loading');
                 this._promise = this._lazy().then((data) => {
-                    this._content = data;
+                    this._stream = new MemoryConversationStream(data);
                     this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                     this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                     this.storeInIndexedDB();
                     this.ee.emit('loaded');
-                    return data;
                 });
             }
-            return this._promise;
+            return this._promise.then(() => {
+                if (!this._stream) {
+                    throw new Error('Content not loaded');
+                }
+                return this._stream;
+            });
         } else if (this._downloader) {
             if (!this._promise) {
                 throw new Error('Downloader promise not initialized');
@@ -175,14 +197,19 @@ export class DataEntry implements DatasetMetadata {
             if (!this._downloader.downloading) {
                 this._downloader.start();
             }
-            return this._promise;
+            return this._promise.then(() => {
+                if (!this._stream) {
+                    throw new Error('Content not loaded');
+                }
+                return this._stream;
+            });
         } else {
-            return Promise.resolve([]);
+            return Promise.resolve(new MemoryConversationStream([]));
         }
     }
 
     get hasLoaded(): boolean {
-        return this._content !== null;
+        return this._stream !== null;
     }
 
     get isLoading(): boolean {
@@ -190,22 +217,21 @@ export class DataEntry implements DatasetMetadata {
     }
 
     get canLoad(): boolean {
-        return this._downloader !== null || this._lazy !== null || this._content !== null;
+        return this._downloader !== null || this._lazy !== null || this._stream !== null;
     }
 
     public async load() {
-        if (this._content) {
-            return this._content;
+        if (this._stream) {
+            return this._stream;
         }
         if (this._lazy && !this._promise) {
             this.ee.emit('loading');
             this._promise = this._lazy().then((data) => {
-                this._content = data;
+                this._stream = new MemoryConversationStream(data);
                 this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                 this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                 this.storeInIndexedDB();
                 this.ee.emit('loaded');
-                return data;
             });
             return this._promise;
         } else if (this._downloader) {
@@ -219,7 +245,7 @@ export class DataEntry implements DatasetMetadata {
     }
 
     public dispose() {
-        this._content = null;
+        this._stream = null;
         this._lazy = null;
         this._promise = null;
         if (this._downloader) {
@@ -237,10 +263,11 @@ export class DataEntry implements DatasetMetadata {
         try {
             await set(`dataitem_${this.id}_source`, this.source);
             if (this.source === 'file' || this.source === 'input') {
-                const { quota, usage } = await navigator.storage.estimate();
+                // Don't store files. They might be too large and risk sharing data with others.
+                /*const { quota, usage } = await navigator.storage.estimate();
                 if (quota !== undefined && usage !== undefined && quota - usage > (this._size || 0) * 2) {
                     await set(`dataitem_${this.id}_content`, this._content);
-                }
+                }*/
             } else {
                 await set(`dataitem_${this.id}_url`, this._downloader?.url);
                 await set(`dataitem_${this.id}_type`, this._downloader?.type);
@@ -300,7 +327,7 @@ export const dataReady = atom<boolean>((get) => {
 export const downloadsAtom = atom<Downloader[]>([]);
 
 export interface DataTokens {
-    tokens: Uint16Array;
+    tokens: Uint16Array[];
     tokeniserId: string;
     datasetId: string;
 }
@@ -312,9 +339,15 @@ observe((get) => {
     if (dataset) {
         navigator.storage.estimate().then(({ quota, usage }) => {
             if (quota !== undefined && usage !== undefined && quota - usage > dataset.tokens.length * 2 * 1.5) {
-                set('dataTokens_tokens', dataset.tokens);
-                set('dataTokens_tokeniserId', dataset.tokeniserId);
-                set('dataTokens_datasetId', dataset.datasetId);
+                const manifest: IDBTokenManifest = {
+                    tokeniserId: dataset.tokeniserId,
+                    datasetId: dataset.datasetId,
+                    shards: dataset.tokens.length,
+                };
+                set('dataTokens_manifest', manifest);
+                for (let i = 0; i < dataset.tokens.length; i++) {
+                    set(`dataTokens_shard_${i}`, dataset.tokens[i]);
+                }
             }
         });
     } else {

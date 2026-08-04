@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { dataTokens } from '../../state/data';
 import { useEffect, useRef, useState } from 'react';
-import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
+import { Conversation, sliceUint16Shards, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
 import style from './style.module.css';
@@ -61,22 +61,18 @@ export function Training({ model, step, loaded }: Props) {
         }
         if (!dataset) return [];
 
-        const vocab = model.tokeniser.getVocab();
-        const largestToken = Math.max(1, vocab[vocab.length - 1].length);
-        const totalDatasetLength = dataset.tokens.length;
-        const sliceSize = Math.floor((model.config.blockSize + 1) * largestToken * 1.5);
+        const totalDatasetLength = dataset.tokens.reduce((acc, shard) => acc + shard.length, 0);
+        const sliceSize = model.config.blockSize + 1;
         // eslint-disable-next-line react-hooks/purity
         const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
-        const newTokens = dataset.tokens.slice(randomStart, randomStart + sliceSize);
-
-        //const sampleText = model.tokeniser.decode(newTokens);
+        const newTokens = sliceUint16Shards(dataset.tokens, randomStart, randomStart + sliceSize);
         const slicedTokens = newTokens.slice(0, model.config.blockSize);
         const decodedText = model.tokeniser.decode(slicedTokens);
-        const actualNextToken = newTokens[slicedTokens.length] || 0;
+        const actualNextToken = newTokens[model.config.blockSize] || 0;
 
         nextToken.current = actualNextToken;
-        const newText: Conversation[] = [{ role: 'assistant', content: decodedText }];
-        setTokens(Array.from(newTokens));
+        const newText: Conversation[] = [{ role: 'text', content: decodedText }];
+        setTokens(Array.from(slicedTokens));
         setPredictions([]);
         return newText;
     };
@@ -99,7 +95,7 @@ export function Training({ model, step, loaded }: Props) {
             continuation: true,
         });
         const probsData = generator.getProbabilitiesData();
-        const top = probsData && probsData[0] ? topP(probsData[0], 0.9) : [];
+        const top = probsData && probsData[0] ? topP(probsData[0], 0.8) : [];
 
         const attentionData = generator.getAttentionData();
         setAttention(reduceAttention(attentionData[0]));

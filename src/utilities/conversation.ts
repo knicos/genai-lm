@@ -1,4 +1,4 @@
-import { Conversation } from '@genai-fi/nanogpt';
+import { Conversation, ConversationStream } from '@genai-fi/nanogpt';
 
 export function flattenConversation(conversation: Conversation[]): string {
     return conversation.map((part) => part.content).join('\n\n');
@@ -23,4 +23,10 @@ export function sequencesToConversation(sequences: string[], mode: 'assistant' |
             return conversation;
         });
     }
+}
+
+export async function firstConversation(stream: ConversationStream): Promise<Conversation[]> {
+    const cursor = stream.cursor();
+    const conversation = await cursor.next();
+    return conversation ? conversation : [];
 }

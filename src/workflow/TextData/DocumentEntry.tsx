@@ -6,13 +6,14 @@ import { IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Button } from '@genai-fi/base';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
-import useContent from '../../hooks/useContent';
 import useDataEntryStatus from '../../hooks/useDataEntryStatus';
+import { Conversation } from '@genai-fi/nanogpt';
 
 export interface DocRef {
     key: string;
     entryIndex: number;
     contentIndex: number;
+    content: Conversation[];
 }
 
 interface Props {
@@ -24,10 +25,9 @@ export default function DocumentEntry({ data, doc }: Props) {
     const { t } = useTranslation();
     const [editing, setEditing] = useState(false);
     const entry = data;
-    const content = useContent(entry);
     useDataEntryStatus(entry);
-    const conversation = content?.[doc.contentIndex] ?? null;
-    const text = content?.[doc.contentIndex]?.[0]?.content || '';
+    const conversation = doc.content ?? null;
+    const text = conversation?.[0]?.content || '';
     const [draft, setDraft] = useState<string>(text);
     if (!conversation) return null;
     if (!entry) return null;
@@ -41,7 +41,7 @@ export default function DocumentEntry({ data, doc }: Props) {
         >
             <header className={style.header}>
                 <h4 className={style.title}>
-                    {content && content.length > 1 ? `${entry.name} (${doc.contentIndex + 1})` : entry.name}
+                    {conversation && conversation.length > 1 ? `${entry.name} (${doc.contentIndex + 1})` : entry.name}
                 </h4>
                 <span className={style.meta}>{t('data.characters', { chars: text.length.toLocaleString() })}</span>
             </header>
@@ -86,8 +86,8 @@ export default function DocumentEntry({ data, doc }: Props) {
                                 <Button
                                     variant="contained"
                                     onClick={() => {
-                                        if (entry && content) {
-                                            content[doc.contentIndex][0].content = draft;
+                                        if (entry && conversation) {
+                                            conversation[0].content = draft;
                                         }
                                         // onUpdate();
                                         setEditing(false);

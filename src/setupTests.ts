@@ -10,6 +10,7 @@ declare global {
 
 Element.prototype.scrollTo = () => {};
 Element.prototype.scrollIntoView = () => {};
+Element.prototype.scroll = () => {};
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 

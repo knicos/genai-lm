@@ -3,6 +3,7 @@ import { DataEntry } from '../../state/data';
 import style from './ProgressiveDocumentFeed.module.css';
 import { useTranslation } from 'react-i18next';
 import DocumentEntry from './DocumentEntry';
+import { ConversationCursor, Conversation } from '@genai-fi/nanogpt';
 
 interface Props {
     data: DataEntry | DataEntry[];
@@ -13,6 +14,7 @@ interface Props {
 
 interface Cursor {
     entryIndex: number;
+    cursor: ConversationCursor | null;
     contentIndex: number;
 }
 
@@ -20,49 +22,59 @@ interface DocRef {
     key: string;
     entryIndex: number;
     contentIndex: number;
+    content: Conversation[];
 }
 
-function normalizeCursor(data: DataEntry[], cursor: Cursor): Cursor {
-    let { entryIndex, contentIndex } = cursor;
+async function nextDoc(data: DataEntry[], cursor: Cursor): Promise<Conversation[] | null> {
+    while (cursor.entryIndex < data.length) {
+        if (cursor.cursor === null) {
+            cursor.cursor = (await data[cursor.entryIndex].stream).cursor();
+            cursor.contentIndex = 0;
+        } else {
+            cursor.contentIndex += 1;
+        }
 
-    while (entryIndex < data.length) {
-        const len = data[entryIndex]?.length ?? 0;
-        if (contentIndex < len) return { entryIndex, contentIndex };
-        entryIndex += 1;
-        contentIndex = 0;
+        const next = await cursor.cursor.next();
+        if (next) {
+            return next;
+        } else {
+            cursor.entryIndex += 1;
+            cursor.cursor = null;
+        }
     }
 
-    return { entryIndex: data.length, contentIndex: 0 };
+    return null;
 }
 
-function takeNextDocs(data: DataEntry[], start: Cursor, count: number) {
+async function takeNextDocs(data: DataEntry[], start: Cursor, count: number) {
     const docs: DocRef[] = [];
-    let cursor = normalizeCursor(data, start);
+    let hasMore = true;
 
-    while (docs.length < count && cursor.entryIndex < data.length) {
-        const entry = data[cursor.entryIndex];
+    while (docs.length < count) {
+        const next = await nextDoc(data, start);
+        if (!next) {
+            hasMore = false;
+            break;
+        }
+
+        const entryId = data[start.entryIndex].id;
 
         docs.push({
-            key: `${entry.id}-${cursor.contentIndex}`,
-            entryIndex: cursor.entryIndex,
-            contentIndex: cursor.contentIndex,
-        });
-
-        cursor = normalizeCursor(data, {
-            entryIndex: cursor.entryIndex,
-            contentIndex: cursor.contentIndex + 1,
+            key: `${entryId}-${start.contentIndex}`,
+            entryIndex: start.entryIndex,
+            contentIndex: start.contentIndex,
+            content: next,
         });
     }
 
-    const hasMore = normalizeCursor(data, cursor).entryIndex < data.length;
-    return { docs, nextCursor: cursor, hasMore };
+    return { docs, nextCursor: start, hasMore };
 }
 
 export default function ProgressiveDocumentFeed({ data, initialCount = 8, step = 6, rootMargin = '800px' }: Props) {
     const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const sentinelRef = useRef<HTMLDivElement>(null);
-    const cursorRef = useRef<Cursor>({ entryIndex: 0, contentIndex: 0 });
+    const cursorRef = useRef<Cursor>({ entryIndex: 0, cursor: null, contentIndex: 0 });
     const loadingRef = useRef(false);
 
     const [visibleDocs, setVisibleDocs] = useState<DocRef[]>([]);
@@ -76,8 +88,8 @@ export default function ProgressiveDocumentFeed({ data, initialCount = 8, step =
             loadingRef.current = true;
             const dataArray = Array.isArray(data) ? data : [data];
 
-            requestAnimationFrame(() => {
-                const { docs, nextCursor, hasMore: more } = takeNextDocs(dataArray, cursorRef.current, count);
+            requestAnimationFrame(async () => {
+                const { docs, nextCursor, hasMore: more } = await takeNextDocs(dataArray, cursorRef.current, count);
 
                 cursorRef.current = nextCursor;
                 setVisibleDocs((prev) => (replace ? docs : [...prev, ...docs]));
@@ -91,10 +103,10 @@ export default function ProgressiveDocumentFeed({ data, initialCount = 8, step =
     // Reset and seed when data changes (safe for edits/deletes/appends)
     useEffect(() => {
         const dataArray = Array.isArray(data) ? data : [data];
-        cursorRef.current = { entryIndex: 0, contentIndex: 0 };
+        cursorRef.current = { entryIndex: 0, cursor: null, contentIndex: 0 };
         setVisibleDocs([]);
 
-        const start = normalizeCursor(dataArray, cursorRef.current);
+        const start = { entryIndex: 0, cursor: null, contentIndex: 0 };
         const canLoad = start.entryIndex < dataArray.length;
         setHasMore(canLoad);
 

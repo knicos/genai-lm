@@ -3,10 +3,10 @@ import { TextField } from '@mui/material';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { conversationDataAtom, dataEntries } from '../../state/data';
-import InstructGenerator from '../../utilities/InstructGenerator';
-import { Conversation } from '@genai-fi/nanogpt';
+// import InstructGenerator from '../../utilities/InstructGenerator';
+// import { Conversation } from '@genai-fi/nanogpt';
 import { useEffect, useState } from 'react';
-import { createDatasetFromEntries } from '../../utilities/dataset';
+// import { createDatasetFromEntries } from '../../utilities/dataset';
 
 export function Component() {
     const { t } = useTranslation();
@@ -17,7 +17,7 @@ export function Component() {
 
     useEffect(() => {
         if (generating) {
-            const generator = new InstructGenerator();
+            /*const generator = new InstructGenerator();
             console.log('Starting instruction generation...');
             generator.on('conversation', (convo: Conversation[]) => {
                 console.log('New conversation generated:', convo);
@@ -49,7 +49,7 @@ export function Component() {
                 });
             return () => {
                 generator.stop();
-            };
+            };*/
         }
     }, [generating, dataset, setConversations, prompt]);
 

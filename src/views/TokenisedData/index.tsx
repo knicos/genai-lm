@@ -9,6 +9,7 @@ import { theme } from '../../theme';
 import { uiDeveloperMode } from '../../state/uiState';
 import DownloadIcon from '@mui/icons-material/Download';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { sliceUint16Shards } from '@genai-fi/nanogpt';
 
 const BLOCK_SIZE = 200;
 const STEP = 10; // offset step for wheel/keys
@@ -28,10 +29,9 @@ export function Component() {
 
     const clampedSliceIndex = Math.min(sliceIndex, maxStart);
 
-    const slicedData = useMemo(
-        () => Array.from(data?.tokens.slice(clampedSliceIndex, clampedSliceIndex + BLOCK_SIZE) ?? []),
-        [data, clampedSliceIndex]
-    );
+    const slicedData = useMemo(() => {
+        return data ? Array.from(sliceUint16Shards(data?.tokens, clampedSliceIndex, BLOCK_SIZE)) : [];
+    }, [data, clampedSliceIndex]);
 
     const tokens = useMemo(
         () => slicedData.map((v: number) => ({ label: tokeniser?.decode([v]) ?? '', value: v })),
@@ -115,7 +115,7 @@ export function Component() {
                         color="secondary"
                         onClick={() => {
                             if (data) {
-                                const blob = new Blob([data.tokens.buffer as ArrayBuffer], {
+                                const blob = new Blob([data.tokens[0].buffer as ArrayBuffer], {
                                     type: 'application/octet-stream',
                                 });
                                 const url = URL.createObjectURL(blob);
@@ -142,7 +142,7 @@ export function Component() {
                                     reader.onload = () => {
                                         const arrayBuffer = reader.result as ArrayBuffer;
                                         const uint16Array = new Uint16Array(arrayBuffer);
-                                        setData({ tokens: uint16Array, tokeniserId: '', datasetId: '' });
+                                        setData({ tokens: [uint16Array], tokeniserId: '', datasetId: '' });
                                     };
                                     reader.readAsArrayBuffer(file);
                                 }

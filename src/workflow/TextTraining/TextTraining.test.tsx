@@ -2,7 +2,14 @@ import { describe, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TextTraining from './TextTraining';
-import { CharTokeniser, Conversation, tasks, tokensFromTasks, type TeachableLLM } from '@genai-fi/nanogpt';
+import {
+    CharTokeniser,
+    MemoryConversationStream,
+    ConversationStream,
+    tasks,
+    tokensFromTasks,
+    type TeachableLLM,
+} from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
 import { createStore } from 'jotai';
 import { loadedModelAtom } from '../../state/model';
@@ -12,8 +19,8 @@ import { WorkflowLayout } from '@genai-fi/base';
 
 vi.mock('react-router-dom');
 
-function textToConversations(texts: string[]): Conversation[][] {
-    return texts.map((text) => [{ role: 'text', content: text }]);
+function textToConversations(texts: string[]): ConversationStream[] {
+    return [new MemoryConversationStream(texts.map((text) => [{ role: 'text', content: text }]))];
 }
 
 describe('TextTraining', () => {

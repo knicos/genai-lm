@@ -1,6 +1,6 @@
 import { Dispatch, RefObject, useRef, useState } from 'react';
 import style from './style.module.css';
-import { Conversation, loadTextData } from '@genai-fi/nanogpt';
+import { ConversationStream, Conversation, loadTextData } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
 import DataListing from './DataListing';
@@ -29,7 +29,7 @@ interface DragObject {
 async function handleTextLoad(
     id: string,
     name: string,
-    text: Conversation[][],
+    text: ConversationStream | Conversation[][],
     source: 'file' | 'input' | 'search',
     setData: Dispatch<React.SetStateAction<DataEntry[]>>
 ) {
@@ -157,7 +157,7 @@ export default function TextData() {
                     />
 
                     <ProgressiveDocumentFeed
-                        data={selected >= 0 ? data[selected] : data}
+                        data={selected >= 0 ? data[selected] : []}
                         initialCount={8}
                         step={6}
                         rootMargin="800px"
@@ -166,7 +166,7 @@ export default function TextData() {
                         <TextInput
                             initialText={
                                 selectedItem && selectedItem.source === 'input'
-                                    ? selectedItem.syncContent?.[0][0].content
+                                    ? selectedItem.content?.[0][0].content
                                     : undefined
                             }
                             onClose={() => setShowInput(false)}

@@ -35,7 +35,8 @@ export default function TokeniseData() {
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
 
-    const tokenCount = _tokenCount === 0 ? tokens?.tokens.length || 0 : _tokenCount;
+    const tokenCount =
+        _tokenCount === 0 ? tokens?.tokens.reduce((acc, shard) => acc + shard.length, 0) || 0 : _tokenCount;
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
     const hasTooManyTokens = tokenCount > desiredTokens * 1.1;
     const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;

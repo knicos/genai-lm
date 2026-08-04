@@ -59,10 +59,10 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
     const canTrain = !!model && !!dataset && dataset.tokens.length > 0 && status !== 'loading' && status !== 'busy';
 
-    const progress = trainingProgress && dataset ? trainingProgress.totalTokens / dataset.tokens.length : 0;
+    const totalTokens = dataset ? dataset.tokens.reduce((sum, shard) => sum + shard.length, 0) : 0;
+    const progress = trainingProgress && dataset ? trainingProgress.totalTokens / totalTokens : 0;
     const remaining =
         trainingProgress && progress > 0 ? trainingProgress.duration / progress - trainingProgress.duration : 0;
-    const totalTokens = dataset ? dataset.tokens.length : 0;
 
     useEffect(() => {
         setTrainingAnimation(training);

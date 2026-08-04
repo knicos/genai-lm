@@ -12,16 +12,30 @@ export async function deleteCheckpoint() {
     await del('model_checkpoint');
 }
 
-export async function getData() {
-    const existingTokens: Uint16Array | undefined = await get('dataTokens_tokens');
-    const existingTokeniserId: string | undefined = await get('dataTokens_tokeniserId');
-    const existingDatasetId: string | undefined = await get('dataTokens_datasetId');
+export interface IDBTokenManifest {
+    tokeniserId: string;
+    datasetId: string;
+    shards: number;
+}
 
-    if (existingTokens && existingTokeniserId && existingDatasetId) {
+export async function getData() {
+    const manifest: IDBTokenManifest | undefined = await get('dataTokens_manifest');
+    if (!manifest) {
+        return null;
+    }
+    const existingTokens: Uint16Array[] | undefined = [];
+    for (let i = 0; i < manifest.shards; i++) {
+        const shard: Uint16Array | undefined = await get(`dataTokens_shard_${i}`);
+        if (shard) {
+            existingTokens.push(shard);
+        }
+    }
+
+    if (existingTokens.length === manifest.shards) {
         return {
             tokens: existingTokens,
-            tokeniserId: existingTokeniserId,
-            datasetId: existingDatasetId,
+            tokeniserId: manifest.tokeniserId,
+            datasetId: manifest.datasetId,
         };
     }
 
@@ -29,7 +43,11 @@ export async function getData() {
 }
 
 export async function deleteData() {
-    await del('dataTokens_tokens');
-    await del('dataTokens_tokeniserId');
-    await del('dataTokens_datasetId');
+    const manifest: IDBTokenManifest | undefined = await get('dataTokens_manifest');
+    if (manifest) {
+        for (let i = 0; i < manifest.shards; i++) {
+            await del(`dataTokens_shard_${i}`);
+        }
+        await del('dataTokens_manifest');
+    }
 }
