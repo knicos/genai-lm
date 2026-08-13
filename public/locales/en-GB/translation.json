@@ -464,7 +464,8 @@
         "addLoRA": "Add Tuning",
         "noLoRA": "No tuning",
         "loraName": "Tuning Name",
-        "stopTraining": "Stop Tuning"
+        "stopTraining": "Stop Tuning",
+        "uploadError": "This file could not be loaded, please check it is the correct type."
     },
     "conversation": {
         "userPlaceholder": "Write a message...",

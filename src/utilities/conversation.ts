@@ -26,7 +26,10 @@ export function sequencesToConversation(sequences: string[], mode: 'assistant' |
 }
 
 export async function firstConversation(stream: ConversationStream): Promise<Conversation[]> {
-    const cursor = stream.cursor();
-    const conversation = await cursor.next();
-    return conversation ? conversation : [];
+    let conversation: Conversation[] = [];
+    const cursor = await stream.step((conv) => {
+        conversation = conv;
+    });
+    await cursor();
+    return conversation;
 }

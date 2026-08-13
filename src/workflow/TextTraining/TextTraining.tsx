@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { tasks, tokensFromTasks, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { tokensFromStreams, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { LinearProgress, Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
-import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
+import { dataEntries, datasetIdAtom, dataTokens, validationTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
@@ -42,6 +42,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const [dataset, setDataset] = useAtom(dataTokens);
+    const [validation, setValidationTokens] = useAtom(validationTokens);
     const entries = useAtomValue(dataEntries);
     const saveCheckpoints = useAtomValue(modelSaveCheckpoints);
     const [settings, setSettings] = useAtom(trainerSettings);
@@ -57,9 +58,10 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
     useWakeLock(training);
 
-    const canTrain = !!model && !!dataset && dataset.tokens.length > 0 && status !== 'loading' && status !== 'busy';
+    const canTrain =
+        !!model && !!dataset && dataset.tokens.getTokenCount() > 0 && status !== 'loading' && status !== 'busy';
 
-    const totalTokens = dataset ? dataset.tokens.reduce((sum, shard) => sum + shard.length, 0) : 0;
+    const totalTokens = dataset ? dataset.tokens.getTokenCount() : 0;
     const progress = trainingProgress && dataset ? trainingProgress.totalTokens / totalTokens : 0;
     const remaining =
         trainingProgress && progress > 0 ? trainingProgress.duration / progress - trainingProgress.duration : 0;
@@ -128,7 +130,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
     // Check if training and validation datasets need updating
     useEffect(() => {
-        if (dataset && dataset.tokens.length > 0) {
+        if (dataset && dataset.tokens.getShardCount() > 0) {
             setNeedsTraining(true);
             setMessage(null);
         }
@@ -144,20 +146,31 @@ export default function TextTraining({ autoTokenise = false }: Props) {
         }
 
         let datasetTokens = dataset?.tokens;
+        let validationTokens = validation?.tokens;
 
-        if (!dataset || dataset.tokens.length === 0) {
+        if (!dataset || dataset.tokens.getShardCount() === 0 || dataset.tokeniserId !== model.tokeniser.id) {
             if (autoTokenise) {
                 setPreparing(t('training.tokenising'));
                 const conversations = await createDatasetFromEntries(entries);
-                const task = new tasks.ConversationTask(conversations);
 
                 if (!model.tokeniser.trained) {
                     await model.tokeniser.train(conversations, undefined, datasetId);
                 }
 
-                const newTokens = await tokensFromTasks([task], model.tokeniser);
-                setDataset({ tokens: newTokens, tokeniserId: model.tokeniser.id, datasetId });
-                datasetTokens = newTokens;
+                const newTokens = await tokensFromStreams(conversations, model.tokeniser, {
+                    validationSplit: 0.1,
+                });
+                setDataset({ tokens: newTokens.trainingTokens, tokeniserId: model.tokeniser.id, datasetId });
+                datasetTokens = newTokens.trainingTokens;
+
+                if (newTokens.validationTokens) {
+                    setValidationTokens({
+                        tokens: newTokens.validationTokens,
+                        tokeniserId: model.tokeniser.id,
+                        datasetId,
+                    });
+                    validationTokens = newTokens.validationTokens;
+                }
             } else {
                 setMessage({
                     notice: t('training.errors.noData'),
@@ -173,7 +186,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             return;
         }
 
-        if (model && datasetTokens && datasetTokens.length > 0) {
+        if (model && datasetTokens && datasetTokens.getShardCount() > 0) {
             if (!model.loaded) {
                 setMessage({
                     notice: t('training.errors.notReady'),
@@ -221,7 +234,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 try {
                     //const task = new tasks.PretrainingTask(dataset);
                     setPreparing(t('training.preparingData'));
-                    await currentTrainer.prepare(datasetTokens, entries);
+                    await currentTrainer.prepare(datasetTokens, validationTokens, entries);
                     setPreparing(null);
                 } catch (err) {
                     console.error('Error preparing training', err);
@@ -280,11 +293,11 @@ export default function TextTraining({ autoTokenise = false }: Props) {
         <HelpBox
             message={t('training.help')}
             widget="trainer"
-            active={!!model || (!!dataset && dataset.tokens.length > 0)}
+            active={!!model || (!!dataset && dataset.tokens.getShardCount() > 0)}
         >
             <BoxStandalone
                 style={{ width: '300px', minHeight: '360px' }}
-                active={!!model || (!!dataset && dataset.tokens.length > 0)}
+                active={!!model || (!!dataset && dataset.tokens.getShardCount() > 0)}
             >
                 <div className={style.container}>
                     <BoxTitle

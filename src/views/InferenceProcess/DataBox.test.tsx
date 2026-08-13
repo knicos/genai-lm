@@ -5,11 +5,14 @@ import { MemoryRouter } from 'react-router-dom';
 import TestWrapper from '../../utilities/TestWrapper';
 import DataBox from './DataBox';
 import { dataTokens } from '../../state/data';
+import { TokenStore } from '@genai-fi/nanogpt';
 
 function renderDataBox(inferenceMode = false, tokenCount = 0) {
     const store = createStore();
     store.set(dataTokens, {
-        tokens: [new Uint16Array(tokenCount)],
+        tokens: {
+            getTokenCount: () => tokenCount,
+        } as TokenStore,
         tokeniserId: 'tok',
         datasetId: 'data',
     });

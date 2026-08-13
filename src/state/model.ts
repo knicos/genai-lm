@@ -144,7 +144,7 @@ observe((get, set) => {
 
 // TODO: Test this empircally.
 // Units are millions.
-export const modelSizeLimit = atom<number>(4);
+export const modelSizeLimit = atom<number>(10);
 
 export const modelReady = atom<boolean>((get) => {
     const model = get(modelAtom);

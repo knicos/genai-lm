@@ -1,13 +1,12 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { datasetIdAtom, dataTokens, dataTokensReady, dataEntries } from '../../state/data';
+import { datasetIdAtom, dataTokens, dataTokensReady, dataEntries, validationTokens } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import { useState } from 'react';
-import { tasks, tokensFromTasks } from '@genai-fi/nanogpt';
 import DataProgress from '../../components/DataProgress/DataProgress';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import ProgressBox from '../TextData/ProgressBox';
@@ -18,6 +17,7 @@ import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
 import { trainingAnimation } from '../../state/animations';
+import { tokensFromStreams } from '@genai-fi/nanogpt';
 
 const CHINCHILLA_OPTIMISATION_RATIO = 20.0;
 
@@ -29,14 +29,14 @@ export default function TokeniseData() {
     const dataset = useAtomValue(dataEntries);
     const datasetId = useAtomValue(datasetIdAtom);
     const [tokens, setTokens] = useAtom(dataTokens);
+    const setValidationTokens = useSetAtom(validationTokens);
     const [tokenising, setTokenising] = useState(false);
     const [_tokenCount, setTokenCount] = useState(0);
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
 
-    const tokenCount =
-        _tokenCount === 0 ? tokens?.tokens.reduce((acc, shard) => acc + shard.length, 0) || 0 : _tokenCount;
+    const tokenCount = _tokenCount === 0 ? tokens?.tokens.getTokenCount() || 0 : _tokenCount;
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
     const hasTooManyTokens = tokenCount > desiredTokens * 1.1;
     const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;
@@ -91,11 +91,29 @@ export default function TokeniseData() {
                                     setTokenCount(0);
                                     setTokens(null);
 
-                                    const task = new tasks.ConversationTask(await createDatasetFromEntries(dataset));
-                                    return tokensFromTasks([task], model.tokeniser, (tokens: number) => {
-                                        setTokenCount(tokens);
+                                    const task = await createDatasetFromEntries(dataset);
+                                    return tokensFromStreams(task, model.tokeniser, {
+                                        cb: (tokens: number) => {
+                                            setTokenCount(tokens);
+                                        },
+                                        validationSplit: 0.1,
                                     }).then((newTokens) => {
-                                        setTokens({ tokens: newTokens, tokeniserId: model.tokeniser.id, datasetId });
+                                        setTokens({
+                                            tokens: newTokens.trainingTokens,
+                                            tokeniserId: model.tokeniser.id,
+                                            datasetId,
+                                        });
+                                        if (newTokens.validationTokens) {
+                                            console.log(
+                                                'Setting validation tokens',
+                                                newTokens.validationTokens.getTokenCount()
+                                            );
+                                            setValidationTokens({
+                                                tokens: newTokens.validationTokens,
+                                                tokeniserId: model.tokeniser.id,
+                                                datasetId,
+                                            });
+                                        }
                                         setTokenCount(0);
                                         setTokenising(false);
                                     });

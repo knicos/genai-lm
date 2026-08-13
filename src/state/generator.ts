@@ -74,7 +74,11 @@ observe((get, set) => {
             const newMode = model.mode;
             set(generatorSettings, (old) => ({
                 ...old,
-                promptMode: newMode === 'conversational' ? 'conversation' : 'completion',
+                promptMode: (newMode === 'conversational'
+                    ? 'conversation'
+                    : old.promptMode === 'none'
+                      ? 'none'
+                      : 'completion') as 'none' | 'completion' | 'conversation',
             }));
         };
         model.on('mode', modeChange);

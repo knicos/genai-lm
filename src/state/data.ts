@@ -1,16 +1,22 @@
 import { atom } from 'jotai';
 import Downloader from '../utilities/downloader';
-import { Conversation, DatasetMetadata, generateDatasetID, loadTextData, ConversationStream } from '@genai-fi/nanogpt';
+import {
+    Conversation,
+    DatasetMetadata,
+    generateDatasetID,
+    loadTextData,
+    ConversationStream,
+    TokenStore,
+} from '@genai-fi/nanogpt';
 import { atomWithStorage } from 'jotai/utils';
-import { createIndexedDbStorage } from './storage';
-import { observe } from 'jotai-effect';
-import { store } from './store';
-import { set, get, del } from 'idb-keyval';
+import { createOPFSStorage, set, get, del } from './storage';
 import EE from 'eventemitter3';
 import { uiDeveloperMode } from './uiState';
 import { firstConversation } from '../utilities/conversation';
 import { MemoryConversationStream } from '@genai-fi/nanogpt';
-import { IDBTokenManifest } from '../utilities/db';
+import { setData } from '../utilities/db';
+import { observe } from 'jotai-effect';
+import { store } from './store';
 
 export interface DataManifestEntry {
     id: string;
@@ -261,7 +267,7 @@ export class DataEntry implements DatasetMetadata {
 
     private async storeInIndexedDB() {
         try {
-            await set(`dataitem_${this.id}_source`, this.source);
+            set(`dataitem_${this.id}_source`, this.source ?? null);
             if (this.source === 'file' || this.source === 'input') {
                 // Don't store files. They might be too large and risk sharing data with others.
                 /*const { quota, usage } = await navigator.storage.estimate();
@@ -269,8 +275,8 @@ export class DataEntry implements DatasetMetadata {
                     await set(`dataitem_${this.id}_content`, this._content);
                 }*/
             } else {
-                await set(`dataitem_${this.id}_url`, this._downloader?.url);
-                await set(`dataitem_${this.id}_type`, this._downloader?.type);
+                set(`dataitem_${this.id}_url`, this._downloader?.url ?? null);
+                set(`dataitem_${this.id}_type`, this._downloader?.type ?? null);
             }
         } catch (e) {
             console.warn('Failed to store data entry in IndexedDB', e);
@@ -281,16 +287,16 @@ export class DataEntry implements DatasetMetadata {
 export async function createEntriesFromManifest(manifest: DatasetMetadata[]): Promise<DataEntry[]> {
     return Promise.all(
         manifest.map(async (item) => {
-            const storedSource: 'file' | 'input' | 'search' | undefined = await get(`dataitem_${item.id}_source`);
+            const storedSource: 'file' | 'input' | 'search' | null = await get(`dataitem_${item.id}_source`);
             if (storedSource) {
                 if (storedSource === 'file' || storedSource === 'input') {
-                    const storedContent: Conversation[][] | undefined = await get(`dataitem_${item.id}_content`);
+                    const storedContent: Conversation[][] | null = await get(`dataitem_${item.id}_content`);
                     if (storedContent) {
                         return new DataEntry(item.id, item.name, storedContent, storedSource);
                     }
                 } else if (storedSource === 'search') {
-                    const storedUrl: string | undefined = await get(`dataitem_${item.id}_url`);
-                    const storedType: string | undefined = await get(`dataitem_${item.id}_type`);
+                    const storedUrl: string | null = await get(`dataitem_${item.id}_url`);
+                    const storedType: string | null = await get(`dataitem_${item.id}_type`);
                     if (storedUrl && storedType) {
                         const downloader = new Downloader(item.id, storedUrl, item.name, storedType);
                         return new DataEntry(item.id, item.name, downloader, storedSource);
@@ -327,29 +333,18 @@ export const dataReady = atom<boolean>((get) => {
 export const downloadsAtom = atom<Downloader[]>([]);
 
 export interface DataTokens {
-    tokens: Uint16Array[];
+    tokens: TokenStore;
     tokeniserId: string;
     datasetId: string;
 }
 
 export const dataTokens = atom<DataTokens | null>(null);
+export const validationTokens = atom<DataTokens | null>(null);
 
 observe((get) => {
     const dataset = get(dataTokens);
     if (dataset) {
-        navigator.storage.estimate().then(({ quota, usage }) => {
-            if (quota !== undefined && usage !== undefined && quota - usage > dataset.tokens.length * 2 * 1.5) {
-                const manifest: IDBTokenManifest = {
-                    tokeniserId: dataset.tokeniserId,
-                    datasetId: dataset.datasetId,
-                    shards: dataset.tokens.length,
-                };
-                set('dataTokens_manifest', manifest);
-                for (let i = 0; i < dataset.tokens.length; i++) {
-                    set(`dataTokens_shard_${i}`, dataset.tokens[i]);
-                }
-            }
-        });
+        setData(dataset.tokeniserId, dataset.datasetId);
     } else {
         // del('dataTokens');
     }
@@ -357,7 +352,7 @@ observe((get) => {
 
 export const dataTokensReady = atom<boolean>((get) => {
     const tokens = get(dataTokens);
-    return tokens !== null && tokens.tokens.length > 0;
+    return tokens !== null && tokens.tokens.getTokenCount() > 0;
 });
 
 // Fine-tuning
@@ -365,7 +360,7 @@ const initialValue: Conversation[][] = [];
 export const conversationDataAtom = atomWithStorage<Conversation[][]>(
     'conversationData',
     initialValue,
-    createIndexedDbStorage<Conversation[][]>()
+    createOPFSStorage<Conversation[][]>()
 );
 
 export const allowRecordAtom = atom<boolean>(false);

@@ -6,8 +6,7 @@ import {
     CharTokeniser,
     MemoryConversationStream,
     ConversationStream,
-    tasks,
-    tokensFromTasks,
+    tokensFromStreams,
     type TeachableLLM,
 } from '@genai-fi/nanogpt';
 import EE from 'eventemitter3';
@@ -62,9 +61,9 @@ describe('TextTraining', () => {
 
         store.set(loadedModelAtom, mockModel);
 
-        const task = new tasks.PretrainingTask(dataset);
-        const tokens = await tokensFromTasks([task], tokeniser);
-        store.set(dataTokens, { tokens, tokeniserId: '', datasetId: '' });
+        const task = new MemoryConversationStream(dataset.map((text) => [{ role: 'text', content: text }]));
+        const tokens = await tokensFromStreams([task], tokeniser);
+        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: '', datasetId: '' });
 
         render(
             <TestWrapper initializeState={store}>
@@ -108,6 +107,7 @@ describe('TextTraining', () => {
             })),
             tokeniser: {
                 trained: true,
+                id: 'test-tokeniser',
             },
             model: {
                 log: [],
@@ -123,10 +123,10 @@ describe('TextTraining', () => {
 
         const dataset = ['some test text'];
         const tokeniser = new CharTokeniser(100);
-        await tokeniser.train(textToConversations(dataset));
-        const task = new tasks.PretrainingTask(dataset);
-        const tokens = await tokensFromTasks([task], tokeniser);
-        store.set(dataTokens, { tokens, tokeniserId: '', datasetId: '' });
+        const streams = textToConversations(dataset);
+        await tokeniser.train(streams);
+        const tokens = await tokensFromStreams(streams, tokeniser);
+        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: 'test-tokeniser', datasetId: '' });
 
         render(
             <TestWrapper initializeState={store}>

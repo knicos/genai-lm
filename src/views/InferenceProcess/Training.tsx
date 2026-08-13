@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { dataTokens } from '../../state/data';
 import { useEffect, useRef, useState } from 'react';
-import { Conversation, sliceUint16Shards, TeachableLLM, topP } from '@genai-fi/nanogpt';
+import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
 import style from './style.module.css';
@@ -61,11 +61,11 @@ export function Training({ model, step, loaded }: Props) {
         }
         if (!dataset) return [];
 
-        const totalDatasetLength = dataset.tokens.reduce((acc, shard) => acc + shard.length, 0);
+        const totalDatasetLength = dataset.tokens.getTokenCount();
         const sliceSize = model.config.blockSize + 1;
         // eslint-disable-next-line react-hooks/purity
         const randomStart = Math.floor(Math.random() * Math.max(1, totalDatasetLength - sliceSize));
-        const newTokens = sliceUint16Shards(dataset.tokens, randomStart, randomStart + sliceSize);
+        const newTokens = await dataset.tokens.slice(randomStart, randomStart + sliceSize);
         const slicedTokens = newTokens.slice(0, model.config.blockSize);
         const decodedText = model.tokeniser.decode(slicedTokens);
         const actualNextToken = newTokens[model.config.blockSize] || 0;

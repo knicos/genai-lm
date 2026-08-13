@@ -1,7 +1,7 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { tasks, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { MemoryConversationStream, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
@@ -167,7 +167,7 @@ export default function TuneTraining() {
 
             if (shouldPrepare) {
                 try {
-                    const task = new tasks.ConversationTask(conversations);
+                    const task = new MemoryConversationStream(conversations);
                     console.log('Preparing trainer with task', conversations);
                     //setPreparing(true);
                     await currentTrainer.prepare([task]);

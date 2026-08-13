@@ -10,12 +10,14 @@ import ConversationDisplay from '../../components/ConversationDisplay/Conversati
 import { Conversation } from '@genai-fi/nanogpt';
 import { saveAs } from 'file-saver';
 import { useNavigate } from 'react-router-dom';
+import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 export default function InstructData() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [conversations, setConversations] = useAtom(conversationDataAtom);
     const [selected, setSelected] = useState<number>(0);
+    const [message, setMessage] = useState<Notice | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     const disable = false;
     const done = conversations.length > 1;
@@ -58,7 +60,10 @@ export default function InstructData() {
                                         setConversations(data);
                                         setSelected(0);
                                     } else {
-                                        alert(t('instruct.uploadError'));
+                                        setMessage({
+                                            level: 'error',
+                                            notice: t('instruct.uploadError'),
+                                        });
                                     }
                                     return;
                                 }
@@ -68,10 +73,16 @@ export default function InstructData() {
                                         setConversations(data);
                                         setSelected(0);
                                     } else {
-                                        alert(t('instruct.uploadError'));
+                                        setMessage({
+                                            level: 'error',
+                                            notice: t('instruct.uploadError'),
+                                        });
                                     }
                                 } catch {
-                                    alert(t('instruct.uploadError'));
+                                    setMessage({
+                                        level: 'error',
+                                        notice: t('instruct.uploadError'),
+                                    });
                                 }
                             }
                         }
@@ -116,6 +127,12 @@ export default function InstructData() {
                         />
                     </div>
                 </div>
+                {message && (
+                    <BoxNotice
+                        notice={message}
+                        onClose={() => setMessage(null)}
+                    />
+                )}
             </div>
         </Box>
     );

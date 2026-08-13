@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { TeachableLLM, createTokenStore } from '@genai-fi/nanogpt';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom, modelConfigAtom } from '../../state/model';
-import { createEntriesFromManifest, dataEntries, dataTokens } from '../../state/data';
+import { createEntriesFromManifest, dataEntries, dataTokens, validationTokens } from '../../state/data';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FlowType } from '../../hooks/useChangePath';
@@ -23,6 +23,7 @@ export default function Initialiser() {
     const setModel = useSetAtom(modelAtom);
     const { flow, variant } = useParams() as { flow: FlowType; variant: VariantType };
     const setDataTokens = useSetAtom(dataTokens);
+    const setValidationTokens = useSetAtom(validationTokens);
     const setDataEntries = useSetAtom(dataEntries);
     const setWorkflowSteps = useSetAtom(workflowSteps);
     const setDevMode = useSetAtom(uiDeveloperMode);
@@ -52,19 +53,31 @@ export default function Initialiser() {
 
             const existingData = await getData();
 
-            newModel.on('loaded', () => {
-                if (
-                    existingData?.tokens &&
-                    existingData.tokeniserId === newModel.tokeniser.id &&
-                    existingData.datasetId
-                ) {
+            newModel.on('loaded', async () => {
+                console.log('Model loaded.', existingData, newModel.tokeniser.id);
+                if (existingData?.tokeniserId === newModel.tokeniser.id && existingData.datasetId) {
                     setDataTokens({
-                        tokens: existingData.tokens,
+                        tokens: await createTokenStore(
+                            'training-tokens',
+                            existingData.tokeniserId,
+                            existingData.datasetId
+                        ),
+                        tokeniserId: existingData.tokeniserId,
+                        datasetId: existingData.datasetId,
+                    });
+                    setValidationTokens({
+                        tokens: await createTokenStore(
+                            'validation-tokens',
+                            existingData.tokeniserId,
+                            existingData.datasetId
+                        ),
                         tokeniserId: existingData.tokeniserId,
                         datasetId: existingData.datasetId,
                     });
                 } else {
                     setDataTokens(null);
+                    setValidationTokens(null);
+                    console.warn('Tokeniser ID mismatch or missing dataset. Clearing data tokens.');
                     deleteData();
                 }
 

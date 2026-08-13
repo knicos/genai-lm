@@ -2,14 +2,13 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, FormControlLabel, IconButton, Slider, Switch } from '@mui/material';
 import { dataTokens } from '../../state/data';
 import { theme } from '../../theme';
 import { uiDeveloperMode } from '../../state/uiState';
 import DownloadIcon from '@mui/icons-material/Download';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import { sliceUint16Shards } from '@genai-fi/nanogpt';
 
 const BLOCK_SIZE = 200;
 const STEP = 10; // offset step for wheel/keys
@@ -17,20 +16,26 @@ const STEP = 10; // offset step for wheel/keys
 export function Component() {
     const { t } = useTranslation();
     const model = useAtomValue(loadedModelAtom);
-    const [data, setData] = useAtom(dataTokens);
+    const [data] = useAtom(dataTokens);
     const [showNumbers, setShowNumbers] = useState(false);
     const [sliceIndex, setSliceIndex] = useState(0);
     const [selectedToken, setSelectedToken] = useState<number>(-1);
     const devMode = useAtomValue(uiDeveloperMode);
+    const [slicedData, setSlicedData] = useState<number[]>([]);
 
     const tokeniser = model?.tokeniser;
-    const dataLength = data?.tokens.length ?? 0;
+    const dataLength = data?.tokens.getTokenCount() ?? 0;
     const maxStart = Math.max(0, dataLength - BLOCK_SIZE);
 
     const clampedSliceIndex = Math.min(sliceIndex, maxStart);
 
-    const slicedData = useMemo(() => {
-        return data ? Array.from(sliceUint16Shards(data?.tokens, clampedSliceIndex, BLOCK_SIZE)) : [];
+    useEffect(() => {
+        (async () => {
+            const sliced = data
+                ? Array.from(await data.tokens.slice(clampedSliceIndex, clampedSliceIndex + BLOCK_SIZE))
+                : [];
+            setSlicedData(sliced);
+        })();
     }, [data, clampedSliceIndex]);
 
     const tokens = useMemo(
@@ -115,7 +120,7 @@ export function Component() {
                         color="secondary"
                         onClick={() => {
                             if (data) {
-                                const blob = new Blob([data.tokens[0].buffer as ArrayBuffer], {
+                                /*const blob = new Blob([data.tokens[0].buffer as ArrayBuffer], {
                                     type: 'application/octet-stream',
                                 });
                                 const url = URL.createObjectURL(blob);
@@ -123,7 +128,7 @@ export function Component() {
                                 a.href = url;
                                 a.download = 'data.bin';
                                 a.click();
-                                URL.revokeObjectURL(url);
+                                URL.revokeObjectURL(url);*/
                             }
                         }}
                     >
@@ -138,13 +143,13 @@ export function Component() {
                             input.onchange = (e) => {
                                 const file = (e.target as HTMLInputElement).files?.[0];
                                 if (file) {
-                                    const reader = new FileReader();
+                                    /*const reader = new FileReader();
                                     reader.onload = () => {
                                         const arrayBuffer = reader.result as ArrayBuffer;
                                         const uint16Array = new Uint16Array(arrayBuffer);
                                         setData({ tokens: [uint16Array], tokeniserId: '', datasetId: '' });
                                     };
-                                    reader.readAsArrayBuffer(file);
+                                    reader.readAsArrayBuffer(file);*/
                                 }
                             };
                             input.click();

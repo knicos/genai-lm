@@ -20,7 +20,7 @@ export default function useWorkflowItems(): Item[] {
     const stages = useAtomValue(workflowStages);
 
     const step1 = loaded;
-    const step2 = preData && preData.tokens.length > 0;
+    const step2 = preData && preData.tokens.getTokenCount() > 0;
     const step3 = step1 && step2 && phase !== 'untrained';
     const step4 = step3 && model?.hasLoRA();
 

@@ -14,7 +14,7 @@ import logger from '../../utilities/logger';
 import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useAtom, useAtomValue } from 'jotai';
-import { dataEntries, DataEntry, dataReady } from '../../state/data';
+import { dataEntries, DataEntry } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
 import ProgressiveDocumentFeed from './ProgressiveDocumentFeed';
 
@@ -49,7 +49,6 @@ export default function TextData() {
     //const [downloads, setDownloads] = useAtom(downloadsAtom);
     const status = useModelStatus(model ?? undefined);
     const [message, setMessage] = useState<Notice | null>(null);
-    const done = useAtomValue(dataReady);
 
     const disable = status === 'training' || status === 'busy';
 
@@ -119,7 +118,7 @@ export default function TextData() {
         <Box
             widget="textData"
             style={{ flexGrow: 1, width: '40rem' }}
-            active={done}
+            active={!!model}
             disabled={disable}
             fullWidth
         >
@@ -157,7 +156,7 @@ export default function TextData() {
                     />
 
                     <ProgressiveDocumentFeed
-                        data={selected >= 0 ? data[selected] : []}
+                        data={selected >= 0 ? data[selected] : null}
                         initialCount={8}
                         step={6}
                         rootMargin="800px"

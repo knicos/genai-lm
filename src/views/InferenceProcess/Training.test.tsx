@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { Training } from './Training';
 import { dataTokens } from '../../state/data';
 import { trainerAtom } from '../../state/trainer';
+import { TokenStore } from '@genai-fi/nanogpt';
 
 function createModel() {
     const generator = {
@@ -51,9 +52,11 @@ describe('Training', () => {
         expect(screen.getByText('tools.modelMissingHint')).toBeInTheDocument();
     });
 
-    it('renders visual elements when ready', ({ expect }) => {
+    it('renders visual elements when ready', async ({ expect }) => {
         const store = createStore();
-        store.set(dataTokens, { tokens: [new Uint16Array([1, 2, 3, 4])], tokeniserId: 'tok', datasetId: 'ds' });
+        const tokenStore = new TokenStore('tok', 'ds');
+        tokenStore.appendShard(new Uint16Array([1, 2, 3, 4]));
+        store.set(dataTokens, { tokens: tokenStore, tokeniserId: 'tok', datasetId: 'ds' });
         store.set(trainerAtom, createTrainer() as never);
 
         render(
@@ -70,12 +73,16 @@ describe('Training', () => {
 
         expect(screen.getAllByText(/tools.model/).length).toBeGreaterThan(0);
         expect(screen.getByText('training.predictionsHeader')).toBeInTheDocument();
+
+        await tokenStore.dispose();
     });
 
-    it('subscribes to trainer start/stop events', ({ expect }) => {
+    it('subscribes to trainer start/stop events', async ({ expect }) => {
         const trainer = createTrainer();
         const store = createStore();
-        store.set(dataTokens, { tokens: [new Uint16Array([1, 2, 3, 4])], tokeniserId: 'tok', datasetId: 'ds' });
+        const tokenStore = new TokenStore('tok', 'ds');
+        tokenStore.appendShard(new Uint16Array([1, 2, 3, 4]));
+        store.set(dataTokens, { tokens: tokenStore, tokeniserId: 'tok', datasetId: 'ds' });
         store.set(trainerAtom, trainer as never);
 
         render(
@@ -92,5 +99,7 @@ describe('Training', () => {
 
         expect(trainer.on).toHaveBeenCalledWith('start', expect.any(Function));
         expect(trainer.on).toHaveBeenCalledWith('stop', expect.any(Function));
+
+        await tokenStore.dispose();
     });
 });
