@@ -22,3 +22,17 @@
 .progress {
     margin: 1rem;
 }
+
+.progressBox {
+    display: flex;
+    align-items: center;
+    margin-right: 1.5rem;
+    margin-top: 1rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+    align-self: stretch;
+}
+
+.progressBox :global .MuiLinearProgress-bar {
+    transition: none;
+}

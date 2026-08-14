@@ -60,8 +60,8 @@ export default function TokeniseData() {
                     />
                     <div className={style.progressBox}>
                         <DataProgress
-                            samplesProcessed={tokenCount}
-                            desiredSamples={desiredTokens}
+                            value={tokenCount}
+                            desired={desiredTokens}
                         />
                         <ProgressBox
                             totalSamples={tokenCount}

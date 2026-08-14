@@ -8,19 +8,20 @@ import { useTranslation } from 'react-i18next';
 const TARGET = 0.4;
 
 interface Props {
-    samplesProcessed: number;
-    desiredSamples: number;
+    value: number;
+    desired?: number;
+    max?: number;
 }
 
-export default function DataProgress({ samplesProcessed, desiredSamples }: Props) {
+export default function DataProgress({ value, desired, max }: Props) {
     const { t } = useTranslation();
-    const progress = Math.min(100, (samplesProcessed / (desiredSamples + TARGET * desiredSamples)) * 100);
+    const progress = Math.min(100, (value / (desired ? desired + TARGET * desired : max ? max : 100)) * 100);
 
     return (
         <div
             className={style.container}
             role="progressbar"
-            aria-valuenow={samplesProcessed}
+            aria-valuenow={value}
             aria-valuemin={0}
             aria-valuemax={120}
             aria-label="Data Progress"
@@ -30,29 +31,31 @@ export default function DataProgress({ samplesProcessed, desiredSamples }: Props
             <div
                 className={style.progress}
                 style={{
-                    width: `${desiredSamples > 0 ? progress : 0}%`,
+                    width: `${progress}%`,
                     backgroundColor: qualityToColor(progress / 100),
                 }}
                 data-testid="progress-blob"
             />
 
-            <Tooltip
-                arrow
-                title={t('tokeniseData.progressHelp')}
-            >
-                <div
-                    className={style.targetContainer}
-                    style={{ left: `calc(60% + 10px)` }}
+            {desired !== undefined && (
+                <Tooltip
+                    arrow
+                    title={t('tokeniseData.progressHelp')}
                 >
                     <div
-                        className={style.target}
-                        data-testid="target-icon"
+                        className={style.targetContainer}
+                        style={{ left: `calc(60% + 10px)` }}
                     >
-                        <StarIcon fontSize="small" />
+                        <div
+                            className={style.target}
+                            data-testid="target-icon"
+                        >
+                            <StarIcon fontSize="small" />
+                        </div>
+                        <div className={style.targetLabel}>{prettyNumber(desired, t)}</div>
                     </div>
-                    <div className={style.targetLabel}>{prettyNumber(desiredSamples, t)}</div>
-                </div>
-            </Tooltip>
+                </Tooltip>
+            )}
         </div>
     );
 }

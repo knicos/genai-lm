@@ -6,8 +6,8 @@ describe('DataProgress', () => {
     it('shows empty progress', async ({ expect }) => {
         render(
             <DataProgress
-                samplesProcessed={0}
-                desiredSamples={0}
+                value={0}
+                desired={0}
             />
         );
 
@@ -18,8 +18,8 @@ describe('DataProgress', () => {
     it('shows the correct target', async ({ expect }) => {
         render(
             <DataProgress
-                samplesProcessed={0}
-                desiredSamples={10}
+                value={0}
+                desired={10}
             />
         );
 
@@ -30,8 +30,8 @@ describe('DataProgress', () => {
     it('shows correct progress', async ({ expect }) => {
         render(
             <DataProgress
-                samplesProcessed={5}
-                desiredSamples={10}
+                value={5}
+                desired={10}
             />
         );
 

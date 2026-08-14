@@ -9,6 +9,7 @@
     box-sizing: border-box;
     max-width: calc(100% - 2rem);
     padding: 0;
+    background-color: rgba(0, 130, 151, 0.03);
 }
 
 .item:hover {

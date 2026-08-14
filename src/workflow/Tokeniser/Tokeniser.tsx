@@ -14,6 +14,8 @@ import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { trainingAnimation } from '../../state/animations';
+import ProgressBox from '../TextData/ProgressBox';
+import DataProgress from '../../components/DataProgress/DataProgress';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
@@ -50,7 +52,7 @@ export default function Tokeniser() {
             active={dataset !== null && dataset.length > 0}
         >
             <BoxStandalone
-                style={{ width: '250px', minHeight: '200px' }}
+                style={{ width: '250px', minHeight: '180px' }}
                 active={dataset !== null && dataset.length > 0}
                 disabled={istraining}
             >
@@ -59,29 +61,22 @@ export default function Tokeniser() {
                         title={t('tokeniser.title')}
                         status={done ? 'done' : 'waiting'}
                     />
+                    <div className={style.progressBox}>
+                        <DataProgress
+                            value={count}
+                            max={model?.config?.vocabSize ?? 0}
+                        />
+                        <ProgressBox
+                            totalSamples={count}
+                            label={t('tokeniseData.tokens')}
+                        />
+                    </div>
                     {invalid && isTrained && !tokenising && (
                         <Alert
                             sx={{ margin: '1rem 1rem 0 1rem' }}
                             severity="warning"
                         >
                             {t(phase === 'untrained' ? 'tokeniser.invalidWarning' : 'tokeniser.trainedWarning')}
-                        </Alert>
-                    )}
-                    {!isTrained && !tokenising && (
-                        <Alert
-                            sx={{ margin: '1rem 1rem 0 1rem' }}
-                            severity="info"
-                        >
-                            {t('tokeniser.notTrained')}
-                        </Alert>
-                    )}
-                    {tokenising && <div className={style.progress}>{t('tokeniser.tokenising', { size: count })}</div>}
-                    {!invalid && isTrained && !tokenising && (
-                        <Alert
-                            sx={{ margin: '1rem 1rem 0 1rem' }}
-                            severity="success"
-                        >
-                            {t('tokeniser.trained', { size: model?.tokeniser.vocabSize || 0 })}
                         </Alert>
                     )}
                     <div className={style.buttonBox}>
@@ -91,6 +86,8 @@ export default function Tokeniser() {
                             startIcon={<ConstructionIcon />}
                             onClick={async () => {
                                 if (model && dataset && dataset.length > 0) {
+                                    setCount(0);
+                                    setDone(false);
                                     setTokenising(true);
                                     const data = await createDatasetFromEntries(dataset);
                                     model?.tokeniser
@@ -103,7 +100,9 @@ export default function Tokeniser() {
                                         )
                                         .then(() => {
                                             setTokenising(false);
+                                            setDone(true);
                                             setTokens(null);
+                                            setCount(model?.tokeniser.vocabSize ?? 0);
                                         })
                                         .catch((e) => {
                                             console.error(e);

@@ -12,7 +12,7 @@
     height: 4px;
     background-color: rgba(0, 130, 151, 0.1);
     margin: 0 2px;
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 .progress {
@@ -23,8 +23,9 @@
     height: 8px;
     background-color: var(--primary);
     transition: width 0.2s ease;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    /*border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;*/
+    border-radius: 4px;
 }
 
 .targetContainer {
