@@ -37,6 +37,11 @@
     font-size: 0.9rem;
 }
 
+.chartContainer {
+    background: #333;
+    border-radius: 6px;
+}
+
 .chartContainer :global .MuiChartsAxis-line {
     stroke: #ccc;
 }

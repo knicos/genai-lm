@@ -1,6 +1,7 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Slider } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Slider, Switch } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
+import { useState } from 'react';
 import style from './style.module.css';
 import { generatorSettings } from '../../state/generator';
 import { uiDeveloperMode } from '../../state/uiState';
@@ -11,15 +12,18 @@ import useModelMode from '../../hooks/useModelMode';
 export function Component() {
     const { t } = useTranslation();
     const devMode = useAtomValue(uiDeveloperMode);
+    const [advanced, setAdvanced] = useState<boolean>(false);
     const [settings, setSettings] = useAtom(generatorSettings);
     const model = useAtomValue(loadedModelAtom);
     const mode = useModelMode(model ?? undefined);
     const { temperature, topP, maxLength } = settings;
 
+    const showDev = devMode || advanced;
+
     return (
         <div className="sidePanel">
             <h2>{t('app.settings.generator')}</h2>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <div
                     id="temperature-label"
                     className={style.label}
@@ -27,6 +31,7 @@ export function Component() {
                     <Help
                         message={t('app.settings.temperatureHelp')}
                         inplace
+                        dark
                     >
                         {t('app.settings.temperature')}
                     </Help>
@@ -41,7 +46,7 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl sx={{ marginTop: '2rem' }}>
                 <InputLabel id="prompt-mode-label">{t('app.settings.promptMode')}</InputLabel>
                 <Select
                     label={t('app.settings.promptMode')}
@@ -61,9 +66,19 @@ export function Component() {
                     )}
                 </Select>
             </FormControl>
-            {devMode && (
+            <div className={style.spacer} />
+            <div className={style.developerOptions}>
+                <h3>{t('app.settings.developerOptions')}</h3>
+                {!devMode && (
+                    <Switch
+                        value={advanced}
+                        onChange={(_, checked) => setAdvanced(checked)}
+                    />
+                )}
+            </div>
+            {showDev && (
                 <>
-                    <FormControl sx={{ marginTop: '1rem' }}>
+                    <FormControl className={style.sliderControl}>
                         <div
                             id="topp-label"
                             className={style.label}
@@ -80,7 +95,7 @@ export function Component() {
                             valueLabelDisplay="auto"
                         />
                     </FormControl>
-                    <FormControl sx={{ marginTop: '1rem' }}>
+                    <FormControl className={style.sliderControl}>
                         <div
                             id="maxlength-label"
                             className={style.label}

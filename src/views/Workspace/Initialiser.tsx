@@ -11,6 +11,7 @@ import { uiCompactMode, uiDeveloperMode } from '../../state/uiState';
 import { initializeLogger } from '../../utilities/logger';
 import { deleteData, getData, getCheckpoint, deleteCheckpoint } from '../../utilities/db';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
+import { trainingModeAtom } from '../../state/trainer';
 
 type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced';
 
@@ -28,6 +29,7 @@ export default function Initialiser() {
     const setWorkflowSteps = useSetAtom(workflowSteps);
     const setDevMode = useSetAtom(uiDeveloperMode);
     const setCompact = useSetAtom(uiCompactMode);
+    const setTrainingMode = useSetAtom(trainingModeAtom);
     const [params] = useSearchParams();
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -127,8 +129,9 @@ export default function Initialiser() {
             steps.add('trainer');
             steps.add('pretrain-output');
             setWorkflowSteps(steps);
-            setDevMode(false);
+            //setDevMode(false);
             setCompact(false);
+            setTrainingMode('pretrain');
         } else if (variant === 'base') {
             const steps = new Set<WorkflowSteps>();
             steps.add('model');
@@ -137,8 +140,9 @@ export default function Initialiser() {
             steps.add('pretrain-output');
             steps.add('share');
             setWorkflowSteps(steps);
-            setDevMode(false);
+            //setDevMode(false);
             setCompact(false);
+            setTrainingMode('partial');
         } else if (variant === 'finetune') {
             const steps = new Set<WorkflowSteps>();
             steps.add('model');
@@ -147,8 +151,9 @@ export default function Initialiser() {
             steps.add('generator');
             steps.add('share');
             setWorkflowSteps(steps);
-            setDevMode(false);
+            //setDevMode(false);
             setCompact(false);
+            setTrainingMode('lora');
         } else if (variant === 'complete') {
             const steps = new Set<WorkflowSteps>();
             steps.add('architecture');
@@ -162,8 +167,9 @@ export default function Initialiser() {
             steps.add('generator');
             steps.add('share');
             setWorkflowSteps(steps);
-            setDevMode(false);
+            //setDevMode(false);
             setCompact(false);
+            setTrainingMode('pretrain');
         } else if (variant === 'advanced') {
             const steps = new Set<WorkflowSteps>();
             steps.add('architecture');
@@ -179,8 +185,9 @@ export default function Initialiser() {
             setWorkflowSteps(steps);
             setDevMode(true);
             setCompact(true);
+            setTrainingMode('pretrain');
         }
-    }, [variant, setWorkflowSteps, setDevMode, setCompact]);
+    }, [variant, setWorkflowSteps, setDevMode, setCompact, setTrainingMode]);
 
     useEffect(() => {
         const token = params.get('t');

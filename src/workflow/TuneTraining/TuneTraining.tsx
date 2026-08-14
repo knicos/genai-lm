@@ -219,7 +219,7 @@ export default function TuneTraining() {
             <div className={style.container}>
                 <BoxTitle
                     title={t('finetune.title')}
-                    onSettings={() => navigate('tuning-settings')}
+                    onSettings={() => navigate('training-settings')}
                     status={
                         !done ? 'busy' : needsTraining && canTrain ? 'waiting' : !needsTraining ? 'done' : 'disabled'
                     }

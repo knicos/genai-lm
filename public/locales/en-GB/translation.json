@@ -145,7 +145,19 @@
             "promptModeNone": "None",
             "promptModeCompletion": "Completion",
             "promptModeConversation": "Conversation",
-            "quantizeSave": "Quantize Model on Save"
+            "quantizeSave": "Quantize Model on Save",
+            "layerLimits": "Trained layers",
+            "help": {
+                "layerLimits": "How many of the last model layers should be trained. Fewer is faster but may not learn as well. The other layers are locked so they cannot change.",
+                "checkpointing": "Using gradient checkpointing reduces memory usage but slows down training because it must recalculate values instead of saving them.",
+                "mixedPrecision": "Reduces training precision from 32-bit to 16-bit to save memory and time. May not always be supported and could reduce model quality.",
+                "layerDrop": "Randomly drops entire layers during training to improve generalization. The model cannot rely on any one layer to make predictions.",
+                "dropout": "Randomly drops individual parameters during training to improve generalization.",
+                "warmupSteps": "Gradually increases the learning rate for the first few steps to avoid instability when starting from random weights.",
+                "decayEpochs": "Reduce the learning rate slowly over the specified number of epochs to improve convergence. Learns fast at the start but then finds smaller improvements as it goes.",
+                "weightDecay": "Adds a penalty to large parameter values to prevent overfitting.",
+                "gradClipping": "Limits the size of gradients to prevent exploding gradients during training. One bad step can ruin the model so this keeps it under control."
+            }
         },
         "close": "Close",
         "ok": "OK",

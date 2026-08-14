@@ -1,5 +1,5 @@
 .label {
-    margin-top: 1rem;
+    margin-top: 0;
 }
 
 .spacer {
@@ -9,6 +9,9 @@
 
 .sliderControl {
     margin-top: 1rem;
+    background: #333;
+    padding: 1.5rem;
+    border-radius: 6px;
 }
 
 .optimizerFieldset {
@@ -32,4 +35,10 @@
     margin: 0;
     min-width: 150px;
     flex-grow: 1;
+}
+
+.developerOptions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }

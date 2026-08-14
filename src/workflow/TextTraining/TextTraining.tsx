@@ -9,7 +9,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
 import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { trainerAtom, trainerSettings } from '../../state/trainer';
+import { pftSettings, trainerAtom, trainerSettings, trainingModeAtom } from '../../state/trainer';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
@@ -55,6 +55,8 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const [preparing, setPreparing] = useState<string | null>(null);
     const [stopping, setStopping] = useState(false);
     const datasetId = useAtomValue(datasetIdAtom);
+    const trainingMode = useAtomValue(trainingModeAtom);
+    const partialSettings = useAtomValue(pftSettings);
 
     useWakeLock(training);
 
@@ -204,10 +206,22 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
             setPreparing(t('training.preparingTrainer'));
 
+            const realSettings = trainingMode === 'partial' ? partialSettings : settings;
+
             const modelSize = model.getNumParams();
             const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-            settings.gradientCheckpointing = useCheckpointing;
-            const currentTrainer = model.trainer('pretraining', settings);
+            realSettings.gradientCheckpointing = useCheckpointing;
+
+            // Partial fine tune, limit the variables to the last layers and the embedding layer
+            if (realSettings.limitLayers !== undefined && realSettings.limitLayers > 0) {
+                realSettings.trainableWeights = ['token_embedding'];
+                for (let i = 0; i < realSettings.limitLayers; i++) {
+                    realSettings.trainableWeights.push(`block_${model.config.nLayer - 1 - i}_*`);
+                }
+            } else {
+                realSettings.trainableWeights = undefined;
+            }
+            const currentTrainer = model.trainer('pretraining', realSettings);
 
             if (training) {
                 currentTrainer.stop();

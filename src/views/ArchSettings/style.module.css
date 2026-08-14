@@ -1,0 +1,12 @@
+.sliderControl {
+    margin-top: 1rem;
+    background: #333;
+    padding: 1.5rem;
+    border-radius: 6px;
+}
+
+.developerOptions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}

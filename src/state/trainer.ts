@@ -6,9 +6,10 @@ import { observe } from 'jotai-effect';
 import { modelAtom } from './model';
 import { store } from './store';
 
-interface TrainingSettings extends TrainingOptions {
+export interface TrainingSettings extends TrainingOptions {
     outputText: boolean;
     disableCheckpointing: boolean;
+    limitLayers?: number;
 }
 export const trainerSettings = atomWithStorage<TrainingSettings>(
     'trainerSettings',
@@ -33,6 +34,33 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
     },
     storage
 );
+
+export const pftSettings = atomWithStorage<TrainingSettings>(
+    'pftSettings',
+    {
+        batchSize: 16,
+        maxEpochs: 1,
+        learningRate: 1e-4,
+        minLearningRate: 1e-4,
+        outputText: false,
+        disableCheckpointing: false,
+        mixedPrecision: true,
+        warmupSteps: 100,
+        decayEpochs: 1,
+        weightDecay: 0.1,
+        sftMode: 'full',
+        logInterval: 40,
+        metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
+        orthoGrad: false,
+        dropout: 0.1,
+        layerDrop: 0.0,
+        labelSmoothing: 0.0,
+        limitLayers: 2,
+    },
+    storage
+);
+
+export const trainingModeAtom = atom<'pretrain' | 'partial' | 'lora'>('pretrain');
 
 type Trainer = ReturnType<TeachableLLM['trainer']>;
 export const trainerAtom = atom<Trainer | null>(null);

@@ -1,8 +1,21 @@
 .label {
-    margin-top: 1rem;
+    margin-top: 0;
 }
 
 .spacer {
     width: 100%;
     min-height: 1rem;
+}
+
+.sliderControl {
+    margin-top: 1rem;
+    background: #333;
+    padding: 1.5rem;
+    border-radius: 6px;
+}
+
+.developerOptions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }

@@ -16,10 +16,11 @@ export function Component() {
         <div className="sidePanel">
             <h2>{t('app.settings.arch')}</h2>
 
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <Help
                     message={t('app.settings.contextHelp')}
                     inplace
+                    dark
                 >
                     <div
                         id="blockSize-label"
@@ -38,10 +39,11 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <Help
                     message={t('app.settings.mlpFactorHelp')}
                     inplace
+                    dark
                 >
                     <div
                         id="mlpFactor-label"
@@ -60,10 +62,11 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <Help
                     message={t('app.settings.headsHelp')}
                     inplace
+                    dark
                 >
                     <div
                         id="heads-label"
@@ -82,7 +85,7 @@ export function Component() {
                     valueLabelDisplay="auto"
                 />
             </FormControl>
-            <FormControl sx={{ marginTop: '1rem' }}>
+            <FormControl className={style.sliderControl}>
                 <div
                     id="size-label"
                     className={style.label}
