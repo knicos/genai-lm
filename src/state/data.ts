@@ -9,7 +9,7 @@ import {
     TokenStore,
 } from '@genai-fi/nanogpt';
 import { atomWithStorage } from 'jotai/utils';
-import { createOPFSStorage, set, get, del } from './storage';
+import { createOPFSStorage, set, get, del, storage } from './storage';
 import EE from 'eventemitter3';
 import { uiDeveloperMode } from './uiState';
 import { firstConversation } from '../utilities/conversation';
@@ -364,3 +364,17 @@ export const conversationDataAtom = atomWithStorage<Conversation[][]>(
 );
 
 export const allowRecordAtom = atom<boolean>(false);
+
+interface TokeniseSettings {
+    validationSplit: number;
+    saveToOPFS: boolean;
+}
+
+export const tokeniseSettingsAtom = atomWithStorage<TokeniseSettings>(
+    'tokeniseSettings',
+    {
+        validationSplit: 0.1,
+        saveToOPFS: true,
+    },
+    storage
+);

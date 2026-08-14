@@ -110,6 +110,10 @@ export const routes = createRoutesFromElements(
                 lazy={() => import('./views/GeneratorSettings')}
             />
             <Route
+                path="tokenise-settings"
+                lazy={() => import('./views/TokeniseSettings')}
+            />
+            <Route
                 path="training-settings"
                 lazy={() => import('./views/TrainingSettings')}
             />

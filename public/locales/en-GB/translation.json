@@ -147,6 +147,9 @@
             "promptModeConversation": "Conversation",
             "quantizeSave": "Quantize Model on Save",
             "layerLimits": "Trained layers",
+            "tokenise": "Tokenise Settings",
+            "validationSplit": "Validation Split",
+            "saveToOPFS": "Use disk storage for tokens",
             "help": {
                 "layerLimits": "How many of the last model layers should be trained. Fewer is faster but may not learn as well. The other layers are locked so they cannot change.",
                 "checkpointing": "Using gradient checkpointing reduces memory usage but slows down training because it must recalculate values instead of saving them.",
@@ -156,7 +159,9 @@
                 "warmupSteps": "Gradually increases the learning rate for the first few steps to avoid instability when starting from random weights.",
                 "decayEpochs": "Reduce the learning rate slowly over the specified number of epochs to improve convergence. Learns fast at the start but then finds smaller improvements as it goes.",
                 "weightDecay": "Adds a penalty to large parameter values to prevent overfitting.",
-                "gradClipping": "Limits the size of gradients to prevent exploding gradients during training. One bad step can ruin the model so this keeps it under control."
+                "gradClipping": "Limits the size of gradients to prevent exploding gradients during training. One bad step can ruin the model so this keeps it under control.",
+                "validationSplit": "A portion of the training data is set aside to test how well the model is learning. This validation data is not shown to the model during training so it cannot cheat.",
+                "saveToOPFS": "Use disk storage for tokens instead of memory. Useful for large datasets but could potentially be a privacy concern."
             }
         },
         "close": "Close",
@@ -460,6 +465,7 @@
         "notEnoughTokens": "There should be more tokens",
         "tooManyTokens": "You have more tokens than needed",
         "progressHelp": "Target number of tokens needed.",
+        "deleteAll": "Delete All Tokens",
         "busy": "Converting to tokens...",
         "help": "Your text data needs to be split into the numeric tokens that the mathematical model can work with. Larger models need more tokens so the progress bar shows how many you may need."
     },

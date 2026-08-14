@@ -1,6 +1,13 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
-import { datasetIdAtom, dataTokens, dataTokensReady, dataEntries, validationTokens } from '../../state/data';
+import {
+    datasetIdAtom,
+    dataTokens,
+    dataTokensReady,
+    dataEntries,
+    validationTokens,
+    tokeniseSettingsAtom,
+} from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +25,13 @@ import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
 import { trainingAnimation } from '../../state/animations';
 import { tokensFromStreams } from '@genai-fi/nanogpt';
+import { useNavigate } from 'react-router-dom';
 
 const CHINCHILLA_OPTIMISATION_RATIO = 20.0;
 
 export default function TokeniseData() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ready = useModelLoaded(model ?? undefined);
@@ -35,6 +44,7 @@ export default function TokeniseData() {
     const done = useAtomValue(dataTokensReady);
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
+    const settings = useAtomValue(tokeniseSettingsAtom);
 
     const tokenCount = _tokenCount === 0 ? tokens?.tokens.getTokenCount() || 0 : _tokenCount;
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
@@ -57,6 +67,7 @@ export default function TokeniseData() {
                     <BoxTitle
                         title={t('tokeniseData.title')}
                         status={done ? 'done' : 'waiting'}
+                        onSettings={() => navigate('tokenise-settings')}
                     />
                     <div className={style.progressBox}>
                         <DataProgress
@@ -96,7 +107,9 @@ export default function TokeniseData() {
                                         cb: (tokens: number) => {
                                             setTokenCount(tokens);
                                         },
-                                        validationSplit: 0.1,
+                                        validationSplit: settings.validationSplit,
+                                        noOPFS: !settings.saveToOPFS,
+                                        validationSeed: 44,
                                     }).then((newTokens) => {
                                         setTokens({
                                             tokens: newTokens.trainingTokens,
@@ -104,10 +117,6 @@ export default function TokeniseData() {
                                             datasetId,
                                         });
                                         if (newTokens.validationTokens) {
-                                            console.log(
-                                                'Setting validation tokens',
-                                                newTokens.validationTokens.getTokenCount()
-                                            );
                                             setValidationTokens({
                                                 tokens: newTokens.validationTokens,
                                                 tokeniserId: model.tokeniser.id,
