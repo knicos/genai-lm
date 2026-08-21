@@ -54,10 +54,9 @@ export default function Initialiser() {
             const newModel = TeachableLLM.loadModel(checkpoint as File);
             setModel(newModel);
 
-            const existingData = await getData();
+            const existingData = getData();
 
             newModel.on('loaded', async () => {
-                console.log('Model loaded.', existingData, newModel.tokeniser.id);
                 if (existingData?.tokeniserId === newModel.tokeniser.id && existingData.datasetId) {
                     setDataTokens({
                         tokens: await createTokenStore(

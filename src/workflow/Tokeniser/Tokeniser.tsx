@@ -24,7 +24,7 @@ export default function Tokeniser() {
     const dataset = useAtomValue(dataEntries);
     const datasetId = useAtomValue(datasetIdAtom);
     const [tokenising, setTokenising] = useState(false);
-    const [done, setDone] = useState(model?.loaded && model.tokeniser.trained);
+    const [done, setDone] = useState(model?.tokeniser.trained ?? false);
     const phase = useModelPhase(model ?? undefined);
     const setTokens = useSetAtom(dataTokens);
     const [message, setMessage] = useState<Notice | null>(null);
@@ -36,10 +36,16 @@ export default function Tokeniser() {
     const invalid = isTrained && datasetId !== model.tokeniser.datasetID;
 
     useEffect(() => {
+        if (!model) {
+            setDone(false);
+            setCount(0);
+        }
         const h = () => {
-            setDone(model?.loaded && model.tokeniser.trained);
+            setDone(model?.tokeniser.trained ?? false);
         };
         model?.on('status', h);
+        setCount(model?.tokeniser.vocabSize ?? 0);
+        setDone(model?.tokeniser.trained ?? false);
         return () => {
             model?.off('status', h);
         };
