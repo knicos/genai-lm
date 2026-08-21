@@ -2,19 +2,15 @@ import { describe, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createStore } from 'jotai';
 import { Provider } from 'jotai';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { Training } from './Training';
 import { dataTokens } from '../../state/data';
-import { trainerAtom } from '../../state/trainer';
-import { TokenStore } from '@genai-fi/nanogpt';
+import { trainerJobIdAtom } from '../../state/trainer';
+import { tokenise, TeachableLLM } from '@genai-fi/nanogpt';
 
 function createModel() {
     const generator = {
-        generate: vi.fn(async () => []),
-        getProbabilitiesData: vi.fn(() => [[0.7, 0.2, 0.1]]),
-        getAttentionData: vi.fn(() => [[[[0.1, 0.9]]]]),
-        getEmbeddingsData: vi.fn(() => [[{ name: 'block_output_0', tensor: [[0.1, 0.9]] }]]),
-        getLastLoss: vi.fn(() => 1.23),
+        create: vi.fn(async () => []),
         dispose: vi.fn(),
     };
 
@@ -25,16 +21,17 @@ function createModel() {
             decode: vi.fn(() => 'ab'),
             getVocab: vi.fn(() => ['a', 'b', 'c']),
         },
-        generator: vi.fn(() => generator),
-    } as never;
-}
-
-function createTrainer() {
-    return {
-        isTraining: false,
-        on: vi.fn(),
-        off: vi.fn(),
-    };
+        responses: vi.fn(() => generator),
+        training: {
+            on: vi.fn(),
+            off: vi.fn(),
+            getJob: vi.fn(async () => ({
+                id: 'test-job',
+                state: 'running',
+            })),
+            breakpoints: vi.fn(),
+        },
+    } as unknown as TeachableLLM;
 }
 
 describe('Training', () => {
@@ -54,10 +51,9 @@ describe('Training', () => {
 
     it('renders visual elements when ready', async ({ expect }) => {
         const store = createStore();
-        const tokenStore = new TokenStore('tok', 'ds');
+        const tokenStore = new tokenise.TokenStore('tok', 'ds');
         tokenStore.appendShard(new Uint16Array([1, 2, 3, 4]));
         store.set(dataTokens, { tokens: tokenStore, tokeniserId: 'tok', datasetId: 'ds' });
-        store.set(trainerAtom, createTrainer() as never);
 
         render(
             <MemoryRouter>
@@ -78,18 +74,18 @@ describe('Training', () => {
     });
 
     it('subscribes to trainer start/stop events', async ({ expect }) => {
-        const trainer = createTrainer();
+        const model = createModel();
         const store = createStore();
-        const tokenStore = new TokenStore('tok', 'ds');
+        const tokenStore = new tokenise.TokenStore('tok', 'ds');
         tokenStore.appendShard(new Uint16Array([1, 2, 3, 4]));
         store.set(dataTokens, { tokens: tokenStore, tokeniserId: 'tok', datasetId: 'ds' });
-        store.set(trainerAtom, trainer as never);
+        store.set(trainerJobIdAtom, 'test-job');
 
         render(
             <MemoryRouter>
                 <Provider store={store}>
                     <Training
-                        model={createModel()}
+                        model={model}
                         loaded
                         step={{ name: 'predict', layer: 0, index: 2 }}
                     />
@@ -97,8 +93,8 @@ describe('Training', () => {
             </MemoryRouter>
         );
 
-        expect(trainer.on).toHaveBeenCalledWith('start', expect.any(Function));
-        expect(trainer.on).toHaveBeenCalledWith('stop', expect.any(Function));
+        await vi.waitFor(() => expect(model.training.on).toHaveBeenCalledWith('running', expect.any(Function)));
+        await vi.waitFor(() => expect(model.training.on).toHaveBeenCalledWith('completed', expect.any(Function)));
 
         await tokenStore.dispose();
     });

@@ -1,10 +1,11 @@
 import { atomWithStorage } from 'jotai/utils';
 import { storage } from './storage';
 import { atom } from 'jotai';
-import { TeachableLLM, TrainingOptions } from '@genai-fi/nanogpt';
+import { TrainingOptions } from '@genai-fi/nanogpt';
 import { observe } from 'jotai-effect';
 import { modelAtom } from './model';
 import { store } from './store';
+import { dataTokens } from './data';
 
 export interface TrainingSettings extends TrainingOptions {
     outputText: boolean;
@@ -14,6 +15,7 @@ export interface TrainingSettings extends TrainingOptions {
 export const trainerSettings = atomWithStorage<TrainingSettings>(
     'trainerSettings',
     {
+        method: { type: 'pretraining' },
         batchSize: 16,
         maxEpochs: 2,
         learningRate: 1e-3,
@@ -24,7 +26,6 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         warmupSteps: 100,
         decayEpochs: 2,
         weightDecay: 0.1,
-        sftMode: 'full',
         logInterval: 40,
         metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
         orthoGrad: false,
@@ -38,6 +39,7 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
 export const pftSettings = atomWithStorage<TrainingSettings>(
     'pftSettings',
     {
+        method: { type: 'pretraining' },
         batchSize: 16,
         maxEpochs: 1,
         learningRate: 1e-4,
@@ -48,7 +50,6 @@ export const pftSettings = atomWithStorage<TrainingSettings>(
         warmupSteps: 100,
         decayEpochs: 1,
         weightDecay: 0.1,
-        sftMode: 'full',
         logInterval: 40,
         metrics: ['perplexity', 'gradientNorm', 'memoryUsage', 'accuracy'],
         orthoGrad: false,
@@ -61,35 +62,47 @@ export const pftSettings = atomWithStorage<TrainingSettings>(
 );
 
 export const trainingModeAtom = atom<'pretrain' | 'partial' | 'lora'>('pretrain');
-
-type Trainer = ReturnType<TeachableLLM['trainer']>;
-export const trainerAtom = atom<Trainer | null>(null);
+export const trainerJobIdAtom = atom<string | null>(null);
 
 // Make sure trainer matches model
 observe((get, set) => {
     const model = get(modelAtom);
     if (model) {
-        const h = () => {
-            const currentTrainer = model.currentTrainer;
-            set(trainerAtom, currentTrainer);
+        set(trainerJobIdAtom, null);
 
-            if (model.meta.pretrainingSettings) {
-                set(trainerSettings, (prev) => ({
-                    ...prev,
-                    ...model.meta.pretrainingSettings,
-                }));
+        const h = () => {
+            const job = model.training.getPretrainingJob();
+            if (job) {
+                set(trainerJobIdAtom, job.id);
+            } else {
+                set(trainerJobIdAtom, null);
             }
         };
         model.on('loaded', h);
+
         return () => {
             model.off('loaded', h);
         };
     }
 }, store);
 
+// Make sure the trainer resets if dataset changes
+observe((get, set) => {
+    const dataset = get(dataTokens);
+    const model = get(modelAtom);
+    const id = get(trainerJobIdAtom);
+    if (model && id && dataset) {
+        const job = model.training.getJob(id);
+        if (job && job.datasetId && job.datasetId !== dataset.datasetId) {
+            set(trainerJobIdAtom, null);
+        }
+    }
+}, store);
+
 export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',
     {
+        method: { type: 'supervised', supervised: 'lora' },
         batchSize: 8,
         maxEpochs: 2,
         learningRate: 1e-3,
@@ -101,7 +114,6 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
             alpha: 8,
             variables: ['*'],
         },
-        sftMode: 'lora',
         warmupSteps: 100,
         decayEpochs: 1,
         weightDecay: 0.1,
@@ -118,14 +130,14 @@ export const tunerSettings = atomWithStorage<TrainingSettings>(
     storage
 );
 
-export const tunerAtom = atom<Trainer | null>(null);
+export const tunerJobIdAtom = atom<string | null>(null);
 
 // Make sure tuner resets on LoRA change
 observe((get, set) => {
     const model = get(modelAtom);
     if (model) {
         const h = () => {
-            set(tunerAtom, null);
+            set(tunerJobIdAtom, null);
         };
         model.on('changeLoRA', h);
         return () => {

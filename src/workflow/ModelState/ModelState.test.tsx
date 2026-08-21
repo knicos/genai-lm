@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { createStore } from 'jotai';
 import { describe, it, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { WorkflowLayout } from '@genai-fi/base';
 import TestWrapper from '../../utilities/TestWrapper';
 import { modelAtom, modelDownloadAtom } from '../../state/model';

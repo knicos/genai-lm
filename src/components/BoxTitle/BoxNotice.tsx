@@ -2,8 +2,8 @@ import { IconButton } from '@mui/material';
 import style from './style.module.css';
 import CloseIcon from '@mui/icons-material/Close';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import InfoOutlineIcon from '@mui/icons-material/InfoOutlined';
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 

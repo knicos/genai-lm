@@ -7,7 +7,7 @@ import { useAtomValue } from 'jotai';
 import { dataTokens } from '../../state/data';
 import prettyNumber from '../../utilities/prettyNumber';
 import { useChangePathString } from '../../hooks/useChangePath';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const DATA_RADIUS = 72 / 2;
 

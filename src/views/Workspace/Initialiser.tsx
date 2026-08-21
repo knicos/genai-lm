@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { TeachableLLM, createTokenStore } from '@genai-fi/nanogpt';
+import { TeachableLLM, tokenise } from '@genai-fi/nanogpt';
+const { createTokenStore } = tokenise;
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom, modelConfigAtom } from '../../state/model';
 import { createEntriesFromManifest, dataEntries, dataTokens, validationTokens } from '../../state/data';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { FlowType } from '../../hooks/useChangePath';
 import { workflowSteps, WorkflowSteps } from '../../state/workflowSettings';

@@ -1,6 +1,6 @@
 import { IconButton } from '@mui/material';
 import style from './lora.module.css';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import ExtensionOffIcon from '@mui/icons-material/ExtensionOff';
 

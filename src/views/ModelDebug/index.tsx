@@ -1,20 +1,19 @@
 import { useAtomValue } from 'jotai';
 import { modelAtom } from '../../state/model';
-import { checks, TeachableLLM, TensorStatistics } from '@genai-fi/nanogpt';
+import { TensorStatistics } from '@genai-fi/nanogpt';
 import { BusyButton } from '@genai-fi/base';
 import { useState } from 'react';
 import useModelLoaded from '../../hooks/useModelLoaded';
-import { squeezeArray } from '../../utilities/arrays';
+//import { squeezeArray } from '../../utilities/arrays';
 
-async function debugModel(model: TeachableLLM) {
+/*async function debugModel(model: TeachableLLM) {
     // Generate text with logits output
-    const generator = model.generator();
-    await generator.generate({
-        embeddings: 'all',
+    const response = await model.responses.create({
+        outputHiddenStates: 'all',
         maxLength: 50,
     });
 
-    const logitsData = generator.getEmbeddingsData()[0];
+    const logitsData = response.output[response.output.length - 1]._output[0].logits;
 
     // Create stats on logits
     const statsPromise = logitsData.map((stepLogits: { name: string; tensor: number[][] }) =>
@@ -25,7 +24,7 @@ async function debugModel(model: TeachableLLM) {
         name: logitsData[index].name,
         ...stat,
     }));
-}
+}*/
 
 interface NamedTensorStatistics extends TensorStatistics {
     name: string;
@@ -34,7 +33,7 @@ interface NamedTensorStatistics extends TensorStatistics {
 export function Component() {
     const model = useAtomValue(modelAtom);
     const [running, setRunning] = useState(false);
-    const [stats, setStats] = useState<NamedTensorStatistics[]>([]);
+    const [stats] = useState<NamedTensorStatistics[]>([]);
     const ready = useModelLoaded(model ?? undefined);
 
     return (
@@ -47,10 +46,10 @@ export function Component() {
                 color="primary"
                 onClick={() => {
                     if (!model) return;
-                    debugModel(model).then((stats) => {
+                    /* debugModel(model).then((stats) => {
                         setStats(stats);
                         setRunning(false);
-                    });
+                    });*/
                     setRunning(true);
                 }}
             >

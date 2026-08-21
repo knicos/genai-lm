@@ -6,7 +6,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
-import { Outlet, useLocation, useOutlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useOutlet, useParams } from 'react-router';
 import logger from '../../utilities/logger';
 import { uiShowSidePanel } from '../../state/uiState';
 import useOrientation from '../../hooks/useOrientation';

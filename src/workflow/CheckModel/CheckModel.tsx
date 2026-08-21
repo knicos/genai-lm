@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../hooks/useModelLoaded';
-import { estimateParameterCount, GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
+import { utilities, GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
 import { useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
@@ -41,7 +41,7 @@ export default function CheckModel() {
     const [showConfirm, setShowConfirm] = useState(false);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
-    const paramCount = estimateParameterCount(architecture);
+    const paramCount = utilities.estimateParameterCount(architecture);
     const exceedsSizeLimit = paramCount > sizeLimit;
 
     const resetModel = () => {

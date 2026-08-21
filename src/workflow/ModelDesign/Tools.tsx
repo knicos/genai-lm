@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CardView from '../../components/CardView/CardView';
 import ToolCard from '../../components/ToolCard/ToolCard';
 import { ToolCardItem } from '../../components/ToolCard/type';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { useAtomValue } from 'jotai';
 import { uiDeveloperMode } from '../../state/uiState';
 

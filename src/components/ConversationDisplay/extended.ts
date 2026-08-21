@@ -2,6 +2,8 @@ import { Conversation } from '@genai-fi/nanogpt';
 
 interface ExtendedBase {
     _completed?: boolean;
+    confidence?: number[];
+    tokens?: string[];
 }
 
 export type ExtendedMessage = Conversation & ExtendedBase;

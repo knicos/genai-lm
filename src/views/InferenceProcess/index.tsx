@@ -1,72 +1,70 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { loadedModelAtom } from '../../state/model';
 import { useEffect, useMemo, useState } from 'react';
 import ModelControls, { AnimationStep } from './ModelControls';
-import { rawGeneratorAtom } from '../../state/generator';
-import VirtualGenerator from './VirtualGenerator';
 import { Inference } from './Inference';
 import { Training } from './Training';
-import { trainerAtom } from '../../state/trainer';
+import { trainerJobIdAtom } from '../../state/trainer';
 import { inferenceSteps, trainingSteps } from './animationSteps';
 import useQueryState from '../../hooks/useQueryState';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModeSwitch from '../../components/ModeSwitch/ModeSwitch';
 import { FormControl } from '@mui/material';
 import style from './style.module.css';
+import { generatorSettings, rawGenerationIDAtom } from '../../state/generator';
 
 export function Component() {
     const { t } = useTranslation();
     const model = useAtomValue(loadedModelAtom);
     const modelStatus = useModelStatus(model ?? undefined);
-    const [generator, setGenerator] = useAtom(rawGeneratorAtom);
-    const trainer = useAtomValue(trainerAtom);
+    const id = useAtomValue(rawGenerationIDAtom);
+    const trainerJobId = useAtomValue(trainerJobIdAtom);
     const [visMode, setVisMode] = useQueryState<'training' | 'inference'>('vismode', 'inference');
     const [step, setStep] = useState<AnimationStep | null>(null);
-
-    // Hook into the generator
-    useEffect(() => {
-        if (visMode === 'training') return;
-        if (!model) return;
-
-        setGenerator((old) => {
-            if (old) {
-                return new VirtualGenerator(old);
-            }
-            return new VirtualGenerator(model);
-        });
-
-        return () => {
-            setGenerator((old) => {
-                if (old instanceof VirtualGenerator) {
-                    const gen = old.generator;
-                    old.dispose();
-                    return gen;
-                } else {
-                    return old;
-                }
-            });
-        };
-    }, [model, setGenerator, visMode]);
+    const setGeneratorSettings = useSetAtom(generatorSettings);
 
     const steps = useMemo<AnimationStep[]>(() => {
         if (!model) return [];
         return visMode === 'inference' ? inferenceSteps(model.config) : trainingSteps(model.config);
     }, [model, visMode]);
 
+    useEffect(() => {
+        setGeneratorSettings((prev) => ({
+            ...prev,
+            outputAttention: true,
+            outputScores: true,
+            outputHiddenStates: 'softmax',
+            outputMultinomial: true,
+            highlightMode: 'none',
+        }));
+
+        return () => {
+            setGeneratorSettings((prev) => ({
+                ...prev,
+                outputAttention: false,
+                outputScores: false,
+                outputHiddenStates: undefined,
+                outputMultinomial: false,
+                highlightMode: 'none',
+            }));
+        };
+    }, [setGeneratorSettings]);
+
     // Hook into the trainer
     useEffect(() => {
-        if (trainer) {
+        if (model && trainerJobId) {
             const hStart = () => {
                 setVisMode('training');
             };
-            trainer.on('start', hStart);
+
+            model.training.on('running', hStart);
 
             return () => {
-                trainer.off('start', hStart);
+                model.training.off('running', hStart);
             };
         }
-    }, [trainer, steps, setVisMode]);
+    }, [model, trainerJobId, steps, setVisMode]);
 
     useEffect(() => {
         setStep(steps[0] ?? null);
@@ -93,11 +91,12 @@ export function Component() {
                     disabled={!ready || modelStatus === 'training' || modelStatus === 'busy'}
                     steps={steps}
                     onStepChange={setStep}
-                    generator={generator}
+                    model={model}
+                    responseId={id}
                 />
                 {visMode === 'inference' ? (
                     <Inference
-                        generator={generator}
+                        responseId={id}
                         step={step}
                         model={model}
                         loaded={true}

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 export type FlowType = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment' | 'home';
 

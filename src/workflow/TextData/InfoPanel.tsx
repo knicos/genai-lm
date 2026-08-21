@@ -1,7 +1,7 @@
 import style from './InfoPanel.module.css';
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
-import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
+import InfoOutlineIcon from '@mui/icons-material/InfoOutlined';
 
 interface Props {
     show?: boolean;

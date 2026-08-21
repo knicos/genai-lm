@@ -1,19 +1,11 @@
 import { atom } from 'jotai';
 import Downloader from '../utilities/downloader';
-import {
-    Conversation,
-    DatasetMetadata,
-    generateDatasetID,
-    loadTextData,
-    ConversationStream,
-    TokenStore,
-} from '@genai-fi/nanogpt';
+import { Conversation, DatasetMetadata, ConversationStream, data as dataModule, tokenise } from '@genai-fi/nanogpt';
 import { atomWithStorage } from 'jotai/utils';
 import { createOPFSStorage, set, get, del, storage } from './storage';
 import EE from 'eventemitter3';
 import { uiDeveloperMode } from './uiState';
 import { firstConversation } from '../utilities/conversation';
-import { MemoryConversationStream } from '@genai-fi/nanogpt';
 import { setData } from '../utilities/db';
 import { observe } from 'jotai-effect';
 import { store } from './store';
@@ -43,26 +35,30 @@ export const dataManifestLanguage = atom<string>('en');
 export const dataManifest = atom(async (get) => {
     const lang = get(dataManifestLanguage);
     const isDev = get(uiDeveloperMode);
-    const response = await fetch(`${import.meta.env.VITE_APP_API}/datasets?lang=${lang}`);
-    const data: DataManifest = await response.json();
+    try {
+        const response = await fetch(`${import.meta.env.VITE_APP_API}/datasets?lang=${lang}`);
+        const data: DataManifest = await response.json();
 
-    const tags = new Map<string, DataManifestEntry[]>();
-    data.datasets.forEach((entry) => {
-        if (entry.restricted && !isDev) {
-            return;
-        }
-        entry.tags.forEach((tag) => {
-            if (!tags.has(tag)) {
-                tags.set(tag, []);
+        const tags = new Map<string, DataManifestEntry[]>();
+        data.datasets.forEach((entry) => {
+            if (entry.restricted && !isDev) {
+                return;
             }
-            tags.get(tag)?.push(entry);
+            entry.tags.forEach((tag) => {
+                if (!tags.has(tag)) {
+                    tags.set(tag, []);
+                }
+                tags.get(tag)?.push(entry);
+            });
         });
-    });
 
-    return Array.from(tags.entries()).map(([name, datasets]) => ({
-        title: name,
-        cards: datasets,
-    }));
+        return Array.from(tags.entries()).map(([name, datasets]) => ({
+            title: name,
+            cards: datasets,
+        }));
+    } catch {
+        return null;
+    }
 });
 
 type DataEntryEvents = 'loading' | 'loaded' | 'error';
@@ -104,7 +100,8 @@ export class DataEntry implements DatasetMetadata {
                     this.ee.emit('loading');
                 });
                 this._downloader.on('end', (file) => {
-                    loadTextData(file)
+                    dataModule
+                        .loadTextData(file)
                         .then((data) => {
                             this._stream = data;
                             firstConversation(data).then((conversation) => {
@@ -120,7 +117,7 @@ export class DataEntry implements DatasetMetadata {
         } else if (typeof content === 'function') {
             this._lazy = content;
         } else if (Array.isArray(content)) {
-            this._stream = new MemoryConversationStream(content);
+            this._stream = new dataModule.MemoryConversationStream(content);
             this._content = content;
             this.conversational = content.some((conv) => conv[0]?.role !== 'text');
             this._size = content.reduce((acc, curr) => acc + curr.length, 0);
@@ -161,12 +158,12 @@ export class DataEntry implements DatasetMetadata {
             throw new Error('Cannot set content on a DataEntry that was not initialized with content');
         }
         this._content = value;
-        this._stream = value ? new MemoryConversationStream(value) : null;
+        this._stream = value ? new dataModule.MemoryConversationStream(value) : null;
     }
 
     set stream(value: Conversation[][] | ConversationStream | null) {
         if (Array.isArray(value)) {
-            this._stream = new MemoryConversationStream(value);
+            this._stream = new dataModule.MemoryConversationStream(value);
             this._size = value.reduce((acc, curr) => acc + curr.length, 0);
             this.conversational = value.some((conv) => conv[0]?.role !== 'text');
         } else {
@@ -183,7 +180,7 @@ export class DataEntry implements DatasetMetadata {
             if (!this._promise) {
                 this.ee.emit('loading');
                 this._promise = this._lazy().then((data) => {
-                    this._stream = new MemoryConversationStream(data);
+                    this._stream = new dataModule.MemoryConversationStream(data);
                     this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                     this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                     this.storeInIndexedDB();
@@ -210,7 +207,7 @@ export class DataEntry implements DatasetMetadata {
                 return this._stream;
             });
         } else {
-            return Promise.resolve(new MemoryConversationStream([]));
+            return Promise.resolve(new dataModule.MemoryConversationStream([]));
         }
     }
 
@@ -233,7 +230,7 @@ export class DataEntry implements DatasetMetadata {
         if (this._lazy && !this._promise) {
             this.ee.emit('loading');
             this._promise = this._lazy().then((data) => {
-                this._stream = new MemoryConversationStream(data);
+                this._stream = new dataModule.MemoryConversationStream(data);
                 this.conversational = data.some((conv) => conv[0]?.role !== 'text');
                 this._size = data.reduce((acc, curr) => acc + curr.length, 0);
                 this.storeInIndexedDB();
@@ -319,7 +316,7 @@ export interface DataEntryOld extends DatasetMetadata {
 
 export const dataEntries = atom<DataEntry[]>([]);
 
-export const datasetIdAtom = atom<string>((get) => generateDatasetID(get(dataEntries)));
+export const datasetIdAtom = atom<string>((get) => dataModule.generateDatasetID(get(dataEntries)));
 
 export const tokeniserInvalid = atom<boolean>(false);
 
@@ -333,7 +330,7 @@ export const dataReady = atom<boolean>((get) => {
 export const downloadsAtom = atom<Downloader[]>([]);
 
 export interface DataTokens {
-    tokens: TokenStore;
+    tokens: tokenise.TokenStore;
     tokeniserId: string;
     datasetId: string;
 }

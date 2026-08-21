@@ -1,21 +1,19 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { MemoryConversationStream, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { ITrainingJob, data as dataModule, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
-import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { tunerSettings, tunerAtom } from '../../state/trainer';
+import { tunerSettings, tunerJobIdAtom } from '../../state/trainer';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import useWakeLock from '../../hooks/wakeLock';
-import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import { conversationDataAtom } from '../../state/data';
@@ -25,7 +23,7 @@ const CHECKPT_THRESHOLD = 3_000_000;
 
 export default function TuneTraining() {
     const { t } = useTranslation();
-    const [trainer, setTrainer] = useAtom(tunerAtom);
+    const [trainerJobId, setTrainerJobId] = useAtom(tunerJobIdAtom);
     const [currentStep, setStep] = useState<number>(0);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
@@ -36,7 +34,6 @@ export default function TuneTraining() {
     const settings = useAtomValue(tunerSettings);
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
-    const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [totalSamples, setTotalSamples] = useState(0);
@@ -52,8 +49,11 @@ export default function TuneTraining() {
     }, [training, setTrainingAnimation]);
 
     useEffect(() => {
-        if (trainer) {
-            const h = async (log: TrainingLogEntry) => {
+        if (model && trainerJobId) {
+            const h = async (job: ITrainingJob) => {
+                if (job.id !== trainerJobId) return;
+                const log = job.history ? (job.history[job.history.length - 1] as TrainingLogEntry) : null;
+                if (!log) return;
                 setStep(log.step);
 
                 if (log.step % 100 === 0) {
@@ -66,17 +66,17 @@ export default function TuneTraining() {
                     });
                 }
             };
-            trainer.on('log', h);
+            model.training.on('progress', h);
             return () => {
-                trainer.off('log', h);
+                model.training.off('progress', h);
             };
         }
-    }, [trainer]);
+    }, [model, trainerJobId]);
 
     useEffect(() => {
         if (model) {
             setMessage(null);
-            setTrainer(null);
+            setTrainerJobId(null);
             const h = () => {
                 setNeedsTraining(true);
                 model.off('loaded', h);
@@ -86,7 +86,7 @@ export default function TuneTraining() {
                 model.off('loaded', h);
             };
         }
-    }, [model, setTrainer]);
+    }, [model, setTrainerJobId]);
 
     useEffect(() => {
         if (conversations && conversations.length > 0) {
@@ -96,8 +96,8 @@ export default function TuneTraining() {
     }, [conversations]);
 
     const startTraining = async () => {
-        if (training) {
-            trainer?.stop();
+        if (trainerJobId && model) {
+            model?.training.cancel(trainerJobId);
             setTraining(false);
             return;
         }
@@ -146,67 +146,60 @@ export default function TuneTraining() {
             }
             settings.loraName = selectedLoRA ?? undefined;
 
-            const currentTrainer = model.trainer('sft', settings);
-
-            if (!done) {
-                // already training
-                return;
-            }
-
-            setTraining(true);
-            setDone(false);
-
-            const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
-
-            setStep(0);
-            await wait(200);
-
-            logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
-
-            model.enableProfiler = advanced;
-
-            if (shouldPrepare) {
-                try {
-                    const task = new MemoryConversationStream(conversations);
-                    console.log('Preparing trainer with task', conversations);
-                    //setPreparing(true);
-                    await currentTrainer.prepare([task]);
-                    //setPreparing(false);
-                    setTotalSamples(conversations.length);
-                } catch (err) {
-                    console.error('Error preparing training', err);
-                    setMessage({
-                        notice: t('training.errors.preparation'),
-                        level: 'warning',
-                    });
-                    setTraining(false);
-                    setDone(true);
-                    return;
-                }
-            }
-
-            setNeedsTraining(false);
-
-            setTrainer(currentTrainer);
-            currentTrainer
-                .train()
-                .then(() => {
+            const errorHandler = (id: string, err: Error) => {
+                if (id === trainerJobId) {
                     setDone(true);
                     setTraining(false);
-                    logger.log({ action: 'training_stopped' });
-                })
-                .catch((err) => {
-                    setDone(true);
-                    setTraining(false);
-                    console.error('Error during training', err);
                     logger.error({ action: 'training_error', message: err.message });
-                    currentTrainer.stop();
-                    currentTrainer.reset();
+                    model.training.off('error', errorHandler);
                     setMessage({
                         notice: t('training.errors.trainingFailed'),
                         level: 'error',
                     });
+                }
+            };
+            model.training.on('error', errorHandler);
+
+            const doneHandler = async (jobId: string) => {
+                if (jobId === trainerJobId) {
+                    setDone(true);
+                    setTraining(false);
+                    logger.log({ action: 'training_stopped' });
+                    model.training.off('completed', doneHandler);
+                    model.training.off('error', errorHandler);
+                }
+            };
+            model.training.on('completed', doneHandler);
+
+            try {
+                const job = trainerJobId
+                    ? model.training.getJob(trainerJobId)
+                    : await model.training.job(settings, new dataModule.MemoryConversationStream(conversations), [
+                          { id: 'conversations_log', name: 'Conversations Log', conversational: true },
+                      ]);
+
+                if (!job) {
+                    return;
+                }
+
+                setTotalSamples(job.totalTokens);
+
+                setTraining(true);
+                setDone(false);
+
+                setStep(0);
+
+                logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
+
+                setNeedsTraining(false);
+                setTrainerJobId(job.id);
+            } catch (err) {
+                console.error('Error starting training', err);
+                setMessage({
+                    notice: t('training.errors.trainingFailed'),
+                    level: 'error',
                 });
+            }
         }
     };
 
@@ -229,8 +222,8 @@ export default function TuneTraining() {
                     selected={selectedLoRA}
                     onSelect={setSelectedLoRA}
                     onStop={() => {
-                        if (training) {
-                            trainer?.stop();
+                        if (training && trainerJobId && model) {
+                            model.training.cancel(trainerJobId);
                         }
                     }}
                     progress={training ? currentStep / ((settings.epochSteps || 1) * (settings.maxEpochs || 1)) : null}

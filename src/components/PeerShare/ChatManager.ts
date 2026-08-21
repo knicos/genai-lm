@@ -1,4 +1,4 @@
-import { Conversation, TeachableLLM } from '@genai-fi/nanogpt';
+import { Conversation, TeachableLLM, IGeneratorResponse } from '@genai-fi/nanogpt';
 
 interface ChatQueue {
     id: string;
@@ -72,36 +72,41 @@ export default class ChatManager {
         const { id, input, onUpdate, onError } = q;
 
         try {
-            const generator = this.model.generator();
-            let step = 0;
-
-            generator.on('tokens', () => {
-                step++;
-                if (step % 5 !== 0) return; // Throttle updates to every 5 tokens
-                const convo = generator.getConversation();
-                const lastMessage = convo[convo.length - 1];
-
-                if (q.active === false) {
-                    generator.stop();
-                    onUpdate(id, lastMessage.content, true);
-                } else {
-                    onUpdate(id, lastMessage.content, false);
-                }
-            });
-
-            const response = await generator.generate(
-                Array.isArray(input) ? input : [{ role: 'user', content: input }],
+            const generator = await this.model.responses.create(
                 {
+                    input: Array.isArray(input) ? input : [{ role: 'user', content: input }],
                     maxLength: 1000,
                     topP: 0.9,
                     temperature: 0.8,
                     loraName: q.loRA,
+                    background: true,
+                },
+                (output: IGeneratorResponse) => {
+                    step++;
+                    if (step % 5 !== 0) return; // Throttle updates to every 5 tokens
+                    const convo = output.output || [];
+                    const lastMessage = convo[convo.length - 1];
+
+                    if (q.active === false) {
+                        this.model.responses.cancel(output.id);
+                        onUpdate(id, lastMessage.content, true);
+                    } else {
+                        onUpdate(id, lastMessage.content, false);
+                    }
                 }
             );
+            let step = 0;
 
-            this.appendConversation(id, response[response.length - 1].content);
-            onUpdate(id, response[response.length - 1].content, true);
-            generator.dispose();
+            const doneHandler = (id: string) => {
+                if (id === generator.id) {
+                    this.model.responses.off('done', doneHandler);
+                    const lastMessage = generator.output?.[generator.output.length - 1];
+                    this.appendConversation(id, lastMessage?.content || '');
+                    onUpdate(id, lastMessage?.content || '', true);
+                }
+            };
+
+            this.model.responses.on('done', doneHandler);
         } catch (error) {
             console.error('Error processing conversation:', error);
             onError(id, 'An error occurred while generating the response.');

@@ -1,20 +1,13 @@
 import { atomWithStorage } from 'jotai/utils';
 import { storage } from './storage';
-import { IGenerator } from '@genai-fi/nanogpt';
-import { atom } from 'jotai';
 import { observe } from 'jotai-effect';
 import { store } from './store';
 import { loadedModelAtom } from './model';
+import type { GeneratorConversation, IGenerateOptions } from '@genai-fi/nanogpt';
+import { atom } from 'jotai';
 
-export interface GeneratorSettings {
-    temperature: number;
-    topK: number;
-    topP: number;
-    maxLength: number;
-    showAttention: boolean;
-    attentionBlock: number;
-    attentionHead: number;
-    showProbabilities: boolean;
+export interface GeneratorSettings extends IGenerateOptions {
+    highlightMode: 'none' | 'confidence' | 'probability' | 'attention';
     promptMode: 'none' | 'completion' | 'conversation';
 }
 
@@ -25,11 +18,9 @@ export const generatorSettings = atomWithStorage<GeneratorSettings>(
         topK: 10,
         topP: 0.9,
         maxLength: 40000,
-        showAttention: false,
-        attentionBlock: 5,
-        attentionHead: 0,
-        showProbabilities: false,
+        outputConfidence: true,
         promptMode: 'completion',
+        highlightMode: 'none',
     },
     storage
 );
@@ -41,35 +32,20 @@ export const chatSettings = atomWithStorage<GeneratorSettings>(
         topK: 10,
         topP: 0.9,
         maxLength: 40000,
-        showAttention: false,
-        attentionBlock: 5,
-        attentionHead: 0,
-        showProbabilities: false,
         promptMode: 'conversation',
+        highlightMode: 'none',
     },
     storage
 );
 
-export const rawGeneratorAtom = atom<IGenerator | null>(null);
-export const conversationGeneratorAtom = atom<IGenerator | null>(null);
+export const rawGeneratedTextAtom = atom<GeneratorConversation[]>([]);
+export const rawGenerationIDAtom = atom<string | null>(null);
+export const conversationGeneratedAtom = atom<GeneratorConversation[]>([]);
+export const conversationIDAtom = atom<string | null>(null);
 
 observe((get, set) => {
     const model = get(loadedModelAtom);
     if (model) {
-        set(rawGeneratorAtom, (old) => {
-            if (old) {
-                old.dispose();
-            }
-            return model.generator();
-        });
-
-        set(conversationGeneratorAtom, (old) => {
-            if (old) {
-                old.dispose();
-            }
-            return model.generator();
-        });
-
         const modeChange = () => {
             const newMode = model.mode;
             set(generatorSettings, (old) => ({
@@ -87,8 +63,5 @@ observe((get, set) => {
         return () => {
             model.off('mode', modeChange);
         };
-    } else {
-        set(rawGeneratorAtom, null);
-        set(conversationGeneratorAtom, null);
     }
 }, store);

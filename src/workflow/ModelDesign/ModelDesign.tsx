@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import Tools from './Tools';
 import { modelAtom, modelConfigAtom } from '../../state/model';
 import Architecture, { ArchitectureRef } from '../../components/Architecture/Architecture';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { IconButton } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';

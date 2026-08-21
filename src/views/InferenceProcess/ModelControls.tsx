@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './controls.module.css';
 import { FormControl, IconButton, Slider } from '@mui/material';
-import { IGenerator } from '@genai-fi/nanogpt';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
-import { trainerAtom } from '../../state/trainer';
+import { trainerJobIdAtom } from '../../state/trainer';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -25,17 +25,18 @@ interface Props {
     steps: AnimationStep[];
     disabled?: boolean;
     onStepChange: IncrementFunction;
-    generator: IGenerator | null;
+    model: TeachableLLM | null;
+    responseId: string | null;
 }
 
-export default function ModelControls({ steps, onStepChange, generator }: Props) {
+export default function ModelControls({ steps, onStepChange, model, responseId }: Props) {
     const { t } = useTranslation();
     const [speed, setSpeed] = useState(4);
     const [paused, setPaused] = useState(false);
     const playRef = useRef<{ resolve?: () => void; interval?: number; paused: boolean; takeStep: boolean } | null>(
         null
     );
-    const trainer = useAtomValue(trainerAtom);
+    const trainerJobId = useAtomValue(trainerJobIdAtom);
     const speedRef = useRef(speed);
 
     speedRef.current = speed;
@@ -118,51 +119,55 @@ export default function ModelControls({ steps, onStepChange, generator }: Props)
         };
     }, [onStepChange, steps]);
 
-    const doStop = useCallback(() => {
-        if (playRef.current) {
-            if (playRef.current.interval) {
-                clearTimeout(playRef.current.interval);
+    const doStop = useCallback(
+        (id: string | null) => {
+            if (id !== responseId && id !== null) return;
+            if (playRef.current) {
+                if (playRef.current.interval) {
+                    clearTimeout(playRef.current.interval);
+                }
+                if (playRef.current.resolve) {
+                    playRef.current.resolve();
+                }
+                playRef.current = null;
             }
-            if (playRef.current.resolve) {
-                playRef.current.resolve();
-            }
-            playRef.current = null;
-        }
-    }, []);
+        },
+        [responseId]
+    );
 
     // Hook into the trainer
     useEffect(() => {
-        if (trainer) {
-            const hStep = () => {
-                return new Promise<void>((resolve) => {
-                    doStart();
-                    if (playRef.current) {
-                        playRef.current.resolve = resolve;
-                    }
-                });
+        if (model && trainerJobId) {
+            const pauseHandler = (jobId: string) => {
+                if (jobId !== trainerJobId) return;
+                doStart();
+                if (playRef.current) {
+                    playRef.current.resolve = () => {
+                        model.training.resume(trainerJobId);
+                    };
+                }
             };
-            trainer.on('log', hStep);
+            model.training.on('paused', pauseHandler);
 
             return () => {
-                trainer.off('log', hStep);
-                doStop();
+                model.training.off('paused', pauseHandler);
+                doStop(null);
             };
         }
-    }, [trainer, doStop, doStart]);
+    }, [model, trainerJobId, doStop, doStart]);
 
     useEffect(() => {
-        if (generator) {
-            const hStart = doStart;
+        if (model && responseId) {
             const hStop = doStop;
-            generator.on('start', hStart);
-            generator.on('stop', hStop);
+
+            doStart();
+            model.responses.on('done', hStop);
 
             return () => {
-                generator.off('start', hStart);
-                generator.off('stop', hStop);
+                model.responses.off('done', hStop);
             };
         }
-    }, [generator, doStart, doStop]);
+    }, [model, doStart, doStop, responseId]);
 
     return (
         <div className={style.container}>

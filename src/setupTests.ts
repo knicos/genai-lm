@@ -2,7 +2,7 @@ import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
-localStorage.setItem('deviceMemory', '0');
+window.localStorage?.setItem('deviceMemory', '0');
 
 declare global {
     var IS_REACT_ACT_ENVIRONMENT: boolean;

@@ -24,6 +24,7 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: ['./src/setupTests.ts', '@vitest/web-worker'],
         clearMocks: true,
+        execArgv: ['--no-webstorage'],
         coverage: {
             provider: 'v8',
             reporter: ['cobertura', 'html'],

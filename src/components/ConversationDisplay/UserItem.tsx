@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@genai-fi/base';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import ReplayIcon from '@mui/icons-material/Replay';
 
 interface Props {

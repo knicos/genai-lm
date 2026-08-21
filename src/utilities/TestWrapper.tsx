@@ -1,5 +1,5 @@
 import React from 'react';
-//import { BrowserRouter } from 'react-router-dom';
+//import { BrowserRouter } from 'react-router';
 import { createStore, Provider } from 'jotai';
 
 interface Props extends React.PropsWithChildren {

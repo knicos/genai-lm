@@ -1,6 +1,6 @@
 import { IconButton } from '@mui/material';
 import InfoPop from '../InfoPop/InfoPop';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlined';
 import { CSSProperties, MouseEvent, PropsWithChildren, useState } from 'react';
 import style from './style.module.css';
 

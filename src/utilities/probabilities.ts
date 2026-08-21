@@ -1,4 +1,4 @@
-import { CharTokeniser } from '@genai-fi/nanogpt';
+import { tokenise } from '@genai-fi/nanogpt';
 
 export interface ProbabilityItem {
     index: number;
@@ -80,7 +80,7 @@ export function createProbabilities(
 export function createTopKTokens(
     probabilities: number[],
     k: number,
-    tokeniser: CharTokeniser
+    tokeniser: tokenise.CharTokeniser
 ): { token: string; probability: number }[] {
     const tokenProbabilities = probabilities.map((prob, idx) => ({
         token: tokeniser.vocab[idx],

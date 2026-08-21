@@ -86,6 +86,8 @@ export async function setOPFS<T>(key: string, newValue: T) {
     const writable = await handle.createWritable();
     await writable.write(JSON.stringify(newValue));
     await writable.close();
+
+    //console.log('setOPFS', key, newValue);
 }
 
 export async function delOPFS(key: string) {

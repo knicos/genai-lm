@@ -1,8 +1,7 @@
 import { describe, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { Inference } from './Inference';
-import VirtualGenerator from './VirtualGenerator';
 
 function createModel() {
     return {
@@ -13,30 +12,16 @@ function createModel() {
             decode: vi.fn(() => 'ab'),
             getVocab: vi.fn(() => ['a', 'b', 'c']),
         },
+        responses: {
+            create: vi.fn(async () => ({
+                output: [],
+            })),
+            on: vi.fn(),
+            off: vi.fn(),
+            hook: vi.fn(),
+            resume: vi.fn(),
+        },
     } as never;
-}
-
-function createVirtualGenerator() {
-    const generator = {
-        getProbabilitiesData: vi.fn(() => [[[0.7, 0.2, 0.1]]]),
-        getAttentionData: vi.fn(() => [[[[[0.1, 0.9]]]]]),
-        getEmbeddingsData: vi.fn(() => [[{ name: 'block_output_0', tensor: [[0.1, 0.9]] }]]),
-        getTokens: vi.fn(() => [0, 1]),
-        getLastMultinomialRand: vi.fn(() => 0.5),
-        getLastLoss: vi.fn(() => 0.1),
-        getConversation: vi.fn(() => [{ role: 'text', content: 'ab' }]),
-        on: vi.fn(),
-        off: vi.fn(),
-        removeAllListeners: vi.fn(),
-        stop: vi.fn(),
-        dispose: vi.fn(),
-        reset: vi.fn(),
-    } as never;
-
-    const vg = new VirtualGenerator(generator);
-    vg.next = vi.fn(async () => {});
-    vg.finishStep = vi.fn();
-    return vg;
 }
 
 describe('Inference', () => {
@@ -44,7 +29,7 @@ describe('Inference', () => {
         render(
             <MemoryRouter>
                 <Inference
-                    generator={null}
+                    responseId={null}
                     model={null}
                     loaded={false}
                     step={null}
@@ -57,12 +42,11 @@ describe('Inference', () => {
 
     it('renders visual components when model is ready', ({ expect }) => {
         const model = createModel();
-        const generator = createVirtualGenerator();
 
         render(
             <MemoryRouter>
                 <Inference
-                    generator={generator as never}
+                    responseId="test-response1"
                     model={model}
                     loaded
                     step={{ name: 'predict', layer: 0, index: 2 }}
@@ -74,9 +58,8 @@ describe('Inference', () => {
         expect(screen.getByText('training.predictionsHeader')).toBeInTheDocument();
     });
 
-    it('runs next step on virtual generator', async ({ expect }) => {
+    /*it('runs next step on virtual generator', async ({ expect }) => {
         const model = createModel();
-        const generator = createVirtualGenerator();
 
         render(
             <MemoryRouter>
@@ -90,5 +73,5 @@ describe('Inference', () => {
         );
 
         await waitFor(() => expect(generator.next).toHaveBeenCalled());
-    });
+    });*/
 });

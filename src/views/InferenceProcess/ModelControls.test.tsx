@@ -2,7 +2,7 @@ import { describe, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ModelControls, { type AnimationStep } from './ModelControls';
-import EE from 'eventemitter3';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 
 const steps: AnimationStep[] = [
     { name: 'next', layer: -1, index: 0 },
@@ -10,13 +10,35 @@ const steps: AnimationStep[] = [
     { name: 'done', layer: 0, index: 2 },
 ];
 
+function createModel() {
+    return {
+        config: { nLayer: 2, blockSize: 2 },
+        tokeniser: {
+            trained: true,
+            decode: vi.fn(() => 'ab'),
+            getVocab: vi.fn(() => ['a', 'b', 'c']),
+        },
+        training: {
+            on: vi.fn(),
+            off: vi.fn(),
+        },
+        responses: {
+            on: vi.fn(),
+            off: vi.fn(),
+            hook: vi.fn(),
+            resume: vi.fn(),
+        },
+    } as unknown as TeachableLLM;
+}
+
 describe('ModelControls', () => {
     it('renders controls and speed slider', ({ expect }) => {
         render(
             <ModelControls
+                model={createModel()}
                 steps={steps}
                 onStepChange={() => {}}
-                generator={null}
+                responseId="test-response1"
             />
         );
 
@@ -29,9 +51,10 @@ describe('ModelControls', () => {
         const user = userEvent.setup();
         render(
             <ModelControls
+                model={createModel()}
                 steps={steps}
                 onStepChange={() => {}}
-                generator={null}
+                responseId="test-response1"
             />
         );
 
@@ -41,23 +64,20 @@ describe('ModelControls', () => {
     });
 
     it('subscribes to generator start/stop events', ({ expect }) => {
-        const on = vi.fn();
-        const off = vi.fn();
-        const generator = { on, off } as unknown as EE;
-
+        const model = createModel();
+        const { on, off } = model.responses;
         const { unmount } = render(
             <ModelControls
+                model={model}
                 steps={steps}
                 onStepChange={() => {}}
-                generator={generator as never}
+                responseId="test-response1"
             />
         );
 
-        expect(on).toHaveBeenCalledWith('start', expect.any(Function));
-        expect(on).toHaveBeenCalledWith('stop', expect.any(Function));
+        expect(on).toHaveBeenCalledWith('done', expect.any(Function));
 
         unmount();
-        expect(off).toHaveBeenCalledWith('start', expect.any(Function));
-        expect(off).toHaveBeenCalledWith('stop', expect.any(Function));
+        expect(off).toHaveBeenCalledWith('done', expect.any(Function));
     });
 });

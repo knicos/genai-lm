@@ -9,7 +9,7 @@ import ConversationList from './ConversationList';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import { Conversation } from '@genai-fi/nanogpt';
 import { saveAs } from 'file-saver';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 export default function InstructData() {

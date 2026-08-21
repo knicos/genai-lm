@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { dataTokens } from '../../state/data';
 import { useEffect, useRef, useState } from 'react';
-import { Conversation, TeachableLLM, topP } from '@genai-fi/nanogpt';
+import { Conversation, TeachableLLM } from '@genai-fi/nanogpt';
 import Predictions from './Predictions';
 import SampleBox from './SampleBox';
 import style from './style.module.css';
@@ -11,9 +11,9 @@ import ModelBox from './ModelBox';
 import ModelLines from './ModelLines';
 import InfoPanel from '../../workflow/TextData/InfoPanel';
 import { AnimationStep, AnimationStepName } from './ModelControls';
-import { reduceAttention } from './attention';
 import DataBox from './DataBox';
-import { trainerAtom } from '../../state/trainer';
+import { trainerJobIdAtom } from '../../state/trainer';
+import { splitResponse } from './utilities';
 
 interface Props {
     model: TeachableLLM | null;
@@ -29,30 +29,44 @@ export function Training({ model, step, loaded }: Props) {
     const nextToken = useRef<number | null>(null);
     const [loss, setLoss] = useState<number | null>(null);
     const [attention, setAttention] = useState<number[][]>([]);
-    const [warn] = useState<boolean>(false);
     const stepRef = useRef<AnimationStepName>('none');
-    const trainer = useAtomValue(trainerAtom);
+    const trainerJobId = useAtomValue(trainerJobIdAtom);
     const [isTraining, setIsTraining] = useState(false);
 
     useEffect(() => {
-        if (trainer) {
-            const hStart = () => {
-                setIsTraining(true);
-            };
-            const hEnd = () => {
-                setIsTraining(false);
-            };
-            trainer.on('start', hStart);
-            trainer.on('stop', hEnd);
+        if (trainerJobId && model) {
+            const job = model.training.getJob(trainerJobId);
 
-            setIsTraining(trainer.isTraining);
+            const hStart = (id: string) => {
+                if (id === trainerJobId) {
+                    setIsTraining(true);
+                }
+            };
+            const hEnd = (id: string) => {
+                if (id === trainerJobId && job) {
+                    setIsTraining(job.state === 'running' || job.state === 'paused');
+                }
+            };
+            model.training.on('running', hStart);
+            model.training.on('completed', hEnd);
+            model.training.on('cancelled', hEnd);
+
+            if (job) {
+                model.training.breakpoints(job.id, true);
+            }
+
+            setIsTraining(job?.state === 'running');
 
             return () => {
-                trainer.off('start', hStart);
-                trainer.off('stop', hEnd);
+                model.training.off('running', hStart);
+                model.training.off('completed', hEnd);
+                model.training.off('cancelled', hEnd);
+                if (job) {
+                    model.training.breakpoints(job.id, false);
+                }
             };
         }
-    }, [trainer]);
+    }, [model, trainerJobId]);
 
     const loadNext = async () => {
         if (!model || !loaded) return [];
@@ -81,36 +95,26 @@ export function Training({ model, step, loaded }: Props) {
         if (!model || !loaded) return;
         if (text.length === 0) return;
         if (text[0].content.length === 0) return;
-        const generator = model.generator();
 
-        await generator.generate(text, {
+        const response = await model.responses.create({
+            input: text,
             maxLength: 1,
-            includeProbabilities: true,
-            attentionScores: true,
-            embeddings: 'softmax',
+            outputScores: true,
+            outputAttention: true,
+            outputHiddenStates: 'softmax',
+            outputLoss: true,
+            outputScore: true,
             temperature: 0.8,
             topP: 0.9,
             targets: [nextToken.current ?? 0],
             nonConversational: true,
             continuation: true,
         });
-        const probsData = generator.getProbabilitiesData();
-        const top = probsData && probsData[0] ? topP(probsData[0], 0.8) : [];
 
-        const attentionData = generator.getAttentionData();
-        setAttention(reduceAttention(attentionData[0]));
-
-        const embeddingData = generator
-            .getEmbeddingsData()[0]
-            .filter((e) => e.name.startsWith('block_output_'))
-            .map((e) => e.tensor[0]);
-
-        embeddingData[embeddingData.length - 1] = top;
-
-        setLoss(generator.getLastLoss());
-
-        setPredictions(embeddingData);
-        generator.dispose();
+        const split = splitResponse(response);
+        setAttention(split.attention);
+        setLoss(split.loss);
+        setPredictions(split.predictions);
     };
 
     if (model && loaded && step && stepRef.current !== step?.name) {
@@ -157,7 +161,7 @@ export function Training({ model, step, loaded }: Props) {
                 )}
                 <InfoPanel
                     show={!ready}
-                    severity={warn ? 'warning' : 'info'}
+                    severity={'info'}
                     message={t('tools.modelMissingHint')}
                     dark
                 />

@@ -7,7 +7,7 @@ import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { useTranslation } from 'react-i18next';
 import { usePeerSender } from '@genai-fi/base/hooks/peer';
 import { EventProtocol } from '../../components/PeerShare/events';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 export default function Page() {
     const { t } = useTranslation();

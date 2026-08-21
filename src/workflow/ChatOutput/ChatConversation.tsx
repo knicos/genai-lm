@@ -1,40 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useAtom } from 'jotai';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
-import { Conversation } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
-import { conversationGeneratorAtom } from '../../state/generator';
+import { conversationGeneratedAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import ChatMenu from './ChatMenu';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function ChatConversation() {
     const model = useAtomValue(loadedModelAtom);
-    const generator = useAtomValue(conversationGeneratorAtom);
-    const [text, setText] = useState<Conversation[]>([]);
+    const [output, setOutput] = useAtom(conversationGeneratedAtom);
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (model) {
-            setText([]);
+            setOutput([]);
         }
-    }, [model]);
-
-    useEffect(() => {
-        if (generator) {
-            const h = () => {
-                const convo = generator.getConversation().slice();
-                setText(convo);
-            };
-            generator.on('tokens', h);
-            h();
-            return () => {
-                generator.off('tokens', h);
-                generator.dispose();
-            };
-        }
-    }, [generator]);
+    }, [model, setOutput]);
 
     return (
         <div
@@ -45,17 +29,13 @@ export default function ChatConversation() {
         >
             <ChatMenu
                 onReset={() => {
-                    if (generator) {
-                        generator.stop();
-                        generator.reset();
-                    }
-                    setText([]);
+                    setOutput([]);
                 }}
                 onShowSettings={() => {
                     navigate('generator-settings');
                 }}
             />
-            <ConversationDisplay conversation={text} />
+            <ConversationDisplay conversation={output} />
         </div>
     );
 }

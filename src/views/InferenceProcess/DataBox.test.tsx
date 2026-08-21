@@ -1,18 +1,18 @@
 import { describe, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createStore } from 'jotai';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import TestWrapper from '../../utilities/TestWrapper';
 import DataBox from './DataBox';
 import { dataTokens } from '../../state/data';
-import { TokenStore } from '@genai-fi/nanogpt';
+import { tokenise } from '@genai-fi/nanogpt';
 
 function renderDataBox(inferenceMode = false, tokenCount = 0) {
     const store = createStore();
     store.set(dataTokens, {
         tokens: {
             getTokenCount: () => tokenCount,
-        } as TokenStore,
+        } as tokenise.TokenStore,
         tokeniserId: 'tok',
         datasetId: 'data',
     });

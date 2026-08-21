@@ -1,32 +1,27 @@
 import { Button } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
-import { tokensFromStreams, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { ITrainingJob, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import useModelStatus from '../../hooks/useModelStatus';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import PauseIcon from '@mui/icons-material/Pause';
 import { useTranslation } from 'react-i18next';
-import { wait } from '../../utilities/wait';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { pftSettings, trainerAtom, trainerSettings, trainingModeAtom } from '../../state/trainer';
+import { pftSettings, trainerJobIdAtom, trainerSettings, trainingModeAtom } from '../../state/trainer';
 import NumberBox from '../../components/NumberBox/NumberBox';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../hooks/wakeLock';
-import { evaluatorAdvanced } from '../../state/evaluatorSettings';
 import logger from '../../utilities/logger';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { LinearProgress, Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
 import { dataEntries, datasetIdAtom, dataTokens, validationTokens } from '../../state/data';
 import HelpBox from '../../components/Help/HelpBox';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
-import { createDatasetFromEntries } from '../../utilities/dataset';
-import { setCheckpoint } from '../../utilities/db';
-
-const CHECKPT_THRESHOLD = 3_000_000;
+import { autoTokeniseData, configureModelForTraining, saveCheckpoint } from './utilities';
 
 interface Props {
     autoTokenise?: boolean;
@@ -34,7 +29,7 @@ interface Props {
 
 export default function TextTraining({ autoTokenise = false }: Props) {
     const { t } = useTranslation();
-    const [trainer, setTrainer] = useAtom(trainerAtom);
+    const [trainerJobId, setTrainerJobId] = useAtom(trainerJobIdAtom);
     const [tokens, setTokens] = useState<number | undefined>(undefined);
     const [done, setDone] = useState(true);
     const [training, setTraining] = useState(false);
@@ -49,7 +44,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [trainingProgress, setTrainingProgress] = useState<TrainingLogEntry | null>(null);
-    const advanced = useAtomValue(evaluatorAdvanced);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
     const [preparing, setPreparing] = useState<string | null>(null);
@@ -74,29 +68,31 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
     // Event to update training progress
     useEffect(() => {
-        if (trainer) {
-            const h = async (log: TrainingLogEntry) => {
-                setTokens(log.totalTokens);
-                setTrainingProgress(log);
-                if (log.step % 100 === 0) {
-                    logger.log({
-                        action: 'training_step',
-                        step: log.step,
-                        loss: log.trainingMetrics.loss,
-                        tokensPerSecond: log.tokensPerSecond,
-                        validationLoss: log.validationMetrics?.loss,
-                    });
+        if (model && trainerJobId) {
+            const h = (job: ITrainingJob) => {
+                if (job.id !== trainerJobId) return;
+                if (job.history) {
+                    const log = job.history[job.history.length - 1];
+                    setTrainingProgress(log);
+                    if (log) {
+                        setTokens(log.totalTokens);
+                    }
+                    if (log.step % 100 === 0) {
+                        logger.log({
+                            action: 'training_step',
+                            step: log.step,
+                            loss: log.trainingMetrics.loss,
+                            tokensPerSecond: log.tokensPerSecond,
+                            validationLoss: log.validationMetrics?.loss,
+                        });
+                    }
                 }
             };
-            trainer.on('log', h);
-
-            const hDone = () => {
-                setStopping(false);
-            };
-            trainer.on('stop', hDone);
+            model.training.on('progress', h);
 
             // Check for existing progress
-            const lastLog = trainer.log[trainer.log.length - 1];
+            const job = model.training.getJob(trainerJobId);
+            const lastLog = job?.history?.[job.history.length - 1];
             if (lastLog) {
                 setTokens(lastLog.totalTokens);
                 setTrainingProgress(lastLog);
@@ -106,14 +102,13 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             }
 
             return () => {
-                trainer.off('log', h);
-                trainer.off('stop', hDone);
+                model.training.off('progress', h);
             };
         } else {
             setTokens(0);
             setTrainingProgress(null);
         }
-    }, [trainer]);
+    }, [model, trainerJobId]);
 
     // Reset if model changes
     useEffect(() => {
@@ -153,25 +148,22 @@ export default function TextTraining({ autoTokenise = false }: Props) {
         if (!dataset || dataset.tokens.getShardCount() === 0 || dataset.tokeniserId !== model.tokeniser.id) {
             if (autoTokenise) {
                 setPreparing(t('training.tokenising'));
-                const conversations = await createDatasetFromEntries(entries);
+                try {
+                    const newTokens = await autoTokeniseData(entries, model, datasetId);
+                    setDataset(newTokens.trainingTokens);
+                    datasetTokens = newTokens.trainingTokens.tokens;
 
-                if (!model.tokeniser.trained) {
-                    await model.tokeniser.train(conversations, undefined, datasetId);
-                }
-
-                const newTokens = await tokensFromStreams(conversations, model.tokeniser, {
-                    validationSplit: 0.1,
-                });
-                setDataset({ tokens: newTokens.trainingTokens, tokeniserId: model.tokeniser.id, datasetId });
-                datasetTokens = newTokens.trainingTokens;
-
-                if (newTokens.validationTokens) {
-                    setValidationTokens({
-                        tokens: newTokens.validationTokens,
-                        tokeniserId: model.tokeniser.id,
-                        datasetId,
+                    if (newTokens.validationTokens) {
+                        setValidationTokens(newTokens.validationTokens);
+                        validationTokens = newTokens.validationTokens.tokens;
+                    }
+                } catch (error) {
+                    console.error('Error tokenising data', error);
+                    setMessage({
+                        notice: t('training.errors.tokenisationFailed'),
+                        level: 'error',
                     });
-                    validationTokens = newTokens.validationTokens;
+                    return;
                 }
             } else {
                 setMessage({
@@ -182,10 +174,17 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             }
         }
 
-        if (training && trainer) {
-            trainer.stop();
-            setStopping(true);
-            return;
+        if (trainerJobId) {
+            const job = model.training.getJob(trainerJobId);
+            if (job) {
+                if (job.state === 'running' || job.state === 'paused' || job.state === 'pausing') {
+                    setStopping(true);
+                    model.training.cancel(trainerJobId);
+                    return;
+                } else if (job.state !== 'completed' && job.state !== 'cancelled') {
+                    return;
+                }
+            }
         }
 
         if (model && datasetTokens && datasetTokens.getShardCount() > 0) {
@@ -204,102 +203,76 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 return;
             }
 
-            setPreparing(t('training.preparingTrainer'));
+            setPreparing(t('training.preparing'));
 
             const realSettings = trainingMode === 'partial' ? partialSettings : settings;
-
-            const modelSize = model.getNumParams();
-            const useCheckpointing = modelSize > CHECKPT_THRESHOLD && !settings.disableCheckpointing;
-            realSettings.gradientCheckpointing = useCheckpointing;
-
-            // Partial fine tune, limit the variables to the last layers and the embedding layer
-            if (realSettings.limitLayers !== undefined && realSettings.limitLayers > 0) {
-                realSettings.trainableWeights = ['token_embedding'];
-                for (let i = 0; i < realSettings.limitLayers; i++) {
-                    realSettings.trainableWeights.push(`block_${model.config.nLayer - 1 - i}_*`);
-                }
-            } else {
-                realSettings.trainableWeights = undefined;
+            if (trainerJobId) {
+                realSettings.previous_job_id = trainerJobId;
             }
-            const currentTrainer = model.trainer('pretraining', realSettings);
+            configureModelForTraining(model, realSettings);
 
-            if (training) {
-                currentTrainer.stop();
-                setTraining(false);
-                return;
-            }
+            try {
+                const job = await model.training.job(realSettings, datasetTokens, entries, validationTokens);
 
-            if (!done) {
-                // already training
-                return;
-            }
-
-            setTraining(true);
-            setDone(false);
-
-            const shouldPrepare = needsTraining || !currentTrainer.isPrepared();
-
-            logger.log({ action: 'training_started', modelSize, totalTokens, batchSize });
-
-            model.enableProfiler = advanced;
-            //currentTrainer.options.metrics = advanced ? ['gradientNorm', 'accuracy'] : undefined;
-
-            if (shouldPrepare) {
-                try {
-                    //const task = new tasks.PretrainingTask(dataset);
-                    setPreparing(t('training.preparingData'));
-                    await currentTrainer.prepare(datasetTokens, validationTokens, entries);
+                if (!job) {
                     setPreparing(null);
-                } catch (err) {
-                    console.error('Error preparing training', err);
                     setMessage({
-                        notice: t('training.errors.preparation'),
+                        notice: t('training.errors.noJob'),
                         level: 'warning',
                     });
-                    setTraining(false);
-                    setDone(true);
                     return;
                 }
-            } else {
-                setPreparing(null);
-            }
 
-            setNeedsTraining(false);
-
-            setTrainer(currentTrainer);
-            await wait(200);
-            currentTrainer
-                .train()
-                .then(async () => {
-                    setDone(true);
-                    setTraining(false);
-                    logger.log({ action: 'training_stopped' });
-
-                    if (saveCheckpoints) {
-                        try {
-                            // Save checkpoint
-                            const blob = await model.saveModel({
-                                name: model.meta.name ?? 'model_checkpoint',
-                                includeOptimizer: true,
-                            });
-                            const file = new File([blob], `model_checkpoint.zip`, { type: 'application/zip' });
-                            await setCheckpoint(file);
-                        } catch (err) {
-                            console.error('Error saving checkpoint', err);
-                        }
+                const errorHandler = (id: string, err: Error) => {
+                    if (id === job.id) {
+                        setDone(true);
+                        setTraining(false);
+                        logger.error({ action: 'training_error', message: err.message });
+                        model.training.off('error', errorHandler);
+                        setMessage({
+                            notice: t('training.errors.trainingFailed'),
+                            level: 'error',
+                        });
                     }
-                })
-                .catch((err) => {
-                    setDone(true);
-                    setTraining(false);
-                    logger.error({ action: 'training_error', message: err.message });
-                    currentTrainer.stop();
-                    currentTrainer.reset();
-                    setMessage({
-                        notice: t('training.errors.trainingFailed'),
-                        level: 'error',
-                    });
+                };
+                model.training.on('error', errorHandler);
+
+                const doneHandler = async (jobId: string) => {
+                    if (jobId === job.id) {
+                        setDone(true);
+                        setTraining(false);
+                        setStopping(false);
+                        logger.log({ action: 'training_stopped' });
+
+                        if (saveCheckpoints) {
+                            await saveCheckpoint(model);
+                        }
+                        model.training.off('completed', doneHandler);
+                        model.training.off('cancelled', doneHandler);
+                        model.training.off('error', errorHandler);
+                    }
+                };
+                model.training.on('completed', doneHandler);
+                model.training.on('cancelled', doneHandler);
+
+                setPreparing(null);
+
+                setTraining(true);
+                setDone(false);
+                setNeedsTraining(false);
+
+                logger.log({ action: 'training_started', modelSize: model.getNumParams(), totalTokens, batchSize });
+
+                setTrainerJobId(job.id);
+            } catch (err) {
+                console.error('Error preparing training', err);
+                setMessage({
+                    notice: t('training.errors.preparation'),
+                    level: 'warning',
                 });
+                setTraining(false);
+                setDone(true);
+            }
         }
     };
 
@@ -333,7 +306,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                             duration={trainingProgress?.duration || 0}
                             totalDuration={trainingProgress ? trainingProgress.duration + remaining : 0}
                             remaining={Math.max(0, remaining)}
-                            message={preparing ? t('training.preparing') : undefined}
+                            message={preparing ? preparing : undefined}
                         />
                         <div className={style.stats}>
                             <NumberBox

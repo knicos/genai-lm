@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom } from '../../state/model';
-import { TensorStatistics, TrainingLogEntry } from '@genai-fi/nanogpt';
+import { TensorStatistics, ITrainingJob } from '@genai-fi/nanogpt';
 import { useEffect, useState } from 'react';
 import { trainerSettings } from '../../state/trainer';
 
@@ -26,15 +26,19 @@ export function Component() {
 
     useEffect(() => {
         if (model) {
-            const h = (log: TrainingLogEntry) => {
+            const h = (job: ITrainingJob) => {
+                if (!job.history || job.history.length === 0) {
+                    return;
+                }
+                const log = job.history[job.history.length - 1];
                 if (log.gradientMetrics) {
                     setStats(log.gradientMetrics);
                 }
             };
-            model.on('trainStep', h);
+            model.training.on('progress', h);
 
             return () => {
-                model.off('trainStep', h);
+                model.training.off('progress', h);
             };
         }
     }, [model]);

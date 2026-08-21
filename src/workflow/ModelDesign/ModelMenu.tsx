@@ -5,7 +5,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import prettyNumber from '../../utilities/prettyNumber';
 import style from './style.module.css';
-import { estimateParameterCount } from '@genai-fi/nanogpt';
+import { utilities } from '@genai-fi/nanogpt';
 import { useAtomValue } from 'jotai';
 import { modelConfigAtom, modelSizeLimit } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
@@ -22,7 +22,7 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
     const { t } = useTranslation();
     const arch = useAtomValue(modelConfigAtom);
     const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
-    const estimated = estimateParameterCount(arch);
+    const estimated = utilities.estimateParameterCount(arch);
 
     return (
         <BoxMenu>

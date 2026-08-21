@@ -11,7 +11,7 @@ import {
 } from '../../state/device';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { selectBackend } from '@genai-fi/nanogpt';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 import { getDeviceInfo } from './probe';
 import logger from '../../utilities/logger';
 
@@ -28,7 +28,7 @@ export default function DeviceProbe() {
     useEffect(() => {
         getDeviceInfo(lowPowerMode).then(async ({ hasWebGPU, hasWebGL1, hasWebGL2, deviceCapabilities: devCap }) => {
             if (hasWebGPU) {
-                await selectBackend('webgpu', {
+                await TeachableLLM.selectBackend('webgpu', {
                     powerPreference: lowPowerMode ? 'low-power' : 'high-performance',
                     disableSubgroups: subgroupsDisabled,
                 });

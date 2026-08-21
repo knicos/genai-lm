@@ -2,25 +2,32 @@ import UserItem from './UserItem';
 import AssistantItem from './AssistantItem';
 import style from './style.module.css';
 import { useReducer } from 'react';
-import { ExtendedConversation } from './extended';
+
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { GeneratorConversation } from '@genai-fi/nanogpt';
 
 interface Props {
-    conversation?: ExtendedConversation[];
+    conversation?: GeneratorConversation[];
     editable?: boolean;
+    highlightMode?: 'none' | 'confidence' | 'score';
     onRetry?: (index: number) => void;
 }
 
-export default function ConversationDisplay({ conversation, onRetry, editable = false }: Props) {
+export default function ConversationDisplay({
+    conversation,
+    onRetry,
+    editable = false,
+    highlightMode = 'none',
+}: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const { t } = useTranslation();
 
     return (
         <div className={style.conversationList}>
             {conversation?.map((part, index) =>
-                part.role === 'user' || part.role === 'auto_user' ? (
+                part.role === 'user' ? (
                     <UserItem
                         key={index}
                         index={index}
@@ -45,6 +52,7 @@ export default function ConversationDisplay({ conversation, onRetry, editable = 
                         active={!editable && index === conversation.length - 1}
                         busy={!part._completed}
                         editable={editable}
+                        highlightMode={highlightMode}
                         onDelete={
                             editable
                                 ? () => {

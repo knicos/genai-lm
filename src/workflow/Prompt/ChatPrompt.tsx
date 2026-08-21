@@ -1,22 +1,22 @@
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import style from './style.module.css';
-import { conversationGeneratorAtom, generatorSettings } from '../../state/generator';
-import { useEffect, useRef, useState } from 'react';
+import { conversationGeneratedAtom, generatorSettings } from '../../state/generator';
+import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
-import { IGenerateOptions } from '@genai-fi/nanogpt';
+import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
-    const generator = useAtomValue(conversationGeneratorAtom);
+    const setOutput = useSetAtom(conversationGeneratedAtom);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
-    const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
+    const settings = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
-    const busyRef = useRef<boolean>(false);
+    const busyRef = useRef<string | null>(null);
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ref = useRef<HTMLDivElement>(null);
@@ -24,21 +24,8 @@ export default function ChatPrompt() {
 
     const disable = status === 'training';
 
-    useEffect(() => {
-        setHasGenerated(false);
-        if (generator) {
-            const h = () => {
-                setHasGenerated(false);
-            };
-            generator.on('reset', h);
-            return () => {
-                generator.off('reset', h);
-            };
-        }
-    }, [generator]);
-
     const doGenerate = async (maxLength: number, prompt?: string) => {
-        if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+        if (!model || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
             setMessage({
                 level: 'warning',
                 notice: t('generator.errors.modelNotReady'),
@@ -46,14 +33,14 @@ export default function ChatPrompt() {
             return;
         }
         if (busyRef.current) {
-            generator.stop();
+            model.responses.cancel(busyRef.current);
             return;
         }
-        busyRef.current = true;
+
         if (maxLength > 1) setGenerate(true);
         setHasGenerated(true);
 
-        const text = generator.getConversation();
+        const text: GeneratorConversation[] = [];
 
         //const currentText = generator.getConversation();
 
@@ -61,35 +48,56 @@ export default function ChatPrompt() {
             text.push({ role: 'user', content: prompt ?? '' });
         }
 
+        const filteredText = text.filter((part) => part.content.trim().length > 0);
+
         const options: IGenerateOptions = {
-            maxLength: model?.config.blockSize ? Math.min(maxLength, model.config.blockSize * 4) : maxLength,
-            temperature,
-            attentionScores: showAttention,
-            includeProbabilities: showProbabilities,
-            topP: topP > 0 ? topP : undefined,
+            ...settings,
+            maxLength: model?.config.blockSize
+                ? Math.min(settings.maxLength ?? 0, model.config.blockSize * 4)
+                : maxLength,
             noCache: false,
             nonConversational: false,
             loraName: loraName ?? undefined,
+            input: filteredText.length === 0 ? undefined : filteredText,
+            background: true,
         };
 
-        const filteredText = text.filter((part) => part.content.trim().length > 0);
+        const doneHandler = (id: string) => {
+            if (busyRef.current === id) {
+                busyRef.current = null;
+                setGenerate(false);
+                model.responses.off('done', doneHandler);
+            }
+        };
+
+        const convoRef = { current: [] as GeneratorConversation[] };
+        const animationFrameRef = { current: -1 };
+
+        const h = (output: IGeneratorResponse) => {
+            const convo = output.output ?? [];
+            //setText(convo);
+            convoRef.current = convo;
+
+            if (animationFrameRef.current === -1) {
+                animationFrameRef.current = requestAnimationFrame(() => {
+                    setOutput(convoRef.current.slice());
+
+                    animationFrameRef.current = -1;
+                });
+            }
+        };
 
         try {
-            if (filteredText.length === 0) {
-                await generator.generate(options);
-            } else {
-                await generator.generate(filteredText, options);
-            }
-
-            setGenerate(false);
-            busyRef.current = false;
+            model.responses.on('done', doneHandler);
+            const response = await model.responses.create(options, h);
+            busyRef.current = response.id;
         } catch {
             setMessage({
                 level: 'error',
                 notice: t('generator.errors.generationError'),
             });
             setGenerate(false);
-            busyRef.current = false;
+            busyRef.current = null;
         }
     };
 
@@ -102,10 +110,10 @@ export default function ChatPrompt() {
         >
             {!hasGenerated && <h2>{t('generator.startChatPrompt')}</h2>}
             <ChatPromptInput
-                onSend={(prompt) => doGenerate(maxLength, prompt)}
+                onSend={(prompt) => doGenerate(settings.maxLength ?? 1, prompt)}
                 disabled={disable}
                 generating={generate}
-                onStop={() => generator?.stop()}
+                onStop={() => model && busyRef.current && model.responses.cancel(busyRef.current)}
                 placeholder={t('deploy.placeholder')}
             />
             {messages && (

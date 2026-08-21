@@ -1,34 +1,37 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import style from './style.module.css';
-import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
-import { useEffect, useRef, useState } from 'react';
+import { generatorSettings, rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
+import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
-import { trainerAtom, trainerSettings } from '../../state/trainer';
+// import { trainerAtom, trainerSettings } from '../../state/trainer';
+import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
+import { conversationDataAtom } from '../../state/data';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
-    const generator = useAtomValue(rawGeneratorAtom);
-    const trainer = useAtomValue(trainerAtom);
+    const setOutput = useSetAtom(rawGeneratedTextAtom);
+    const [id, setID] = useAtom(rawGenerationIDAtom);
+    //const trainer = useAtomValue(trainerAtom);
     const [generate, setGenerate] = useState(false);
     const [hasGenerated, setHasGenerated] = useState(false);
-    const { temperature, topP, maxLength, showAttention, showProbabilities, promptMode } =
-        useAtomValue(generatorSettings);
+    const settings = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
-    const busyRef = useRef<boolean>(false);
+    const busyRef = useRef<string | null>(null);
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ref = useRef<HTMLDivElement>(null);
-    const outputText = useAtomValue(trainerSettings).outputText;
+    //const outputText = useAtomValue(trainerSettings).outputText;
     const promptRef = useRef<string>('');
+    const setConversationLog = useSetAtom(conversationDataAtom);
 
     const disable = status === 'training';
 
-    useEffect(() => {
-        if (model && generator) {
+    /*useEffect(() => {
+        if (model) {
             setHasGenerated(generator.getConversation().length > 0);
             const onReset = () => {
                 setHasGenerated(false);
@@ -54,9 +57,10 @@ export default function ChatPrompt() {
         } else {
             setHasGenerated(false);
         }
-    }, [generator, model, topP, outputText, promptMode]);
+    }, [generator, model, topP, outputText, promptMode]);*/
 
-    useEffect(() => {
+    // FIX
+    /*useEffect(() => {
         if (trainer && outputText && generator) {
             const state = {
                 count: 0,
@@ -95,10 +99,10 @@ export default function ChatPrompt() {
                 trainer.off('log', h);
             };
         }
-    }, [trainer, outputText, promptMode, topP, generator]);
+    }, [trainer, outputText, promptMode, topP, generator]);*/
 
     const doGenerate = async (maxLength: number, prompt?: string) => {
-        if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+        if (!model || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
             setMessage({
                 level: 'warning',
                 notice: t('generator.errors.modelNotReady'),
@@ -106,50 +110,78 @@ export default function ChatPrompt() {
             return;
         }
         if (busyRef.current) {
-            generator.stop();
+            model.responses.cancel(busyRef.current);
             return;
         }
-        busyRef.current = true;
         if (maxLength > 1) setGenerate(true);
         setHasGenerated(true);
 
-        const text = generator.getConversation();
+        const text: GeneratorConversation[] = [];
 
-        //const currentText = generator.getConversation();
+        const promptMode = settings.promptMode;
 
         if (prompt && prompt.length > 0) {
             text.push({ role: promptMode === 'conversation' ? 'user' : 'text', content: prompt ?? '' });
         }
 
-        const options = {
-            maxLength,
-            temperature,
-            attentionScores: showAttention,
-            includeProbabilities: showProbabilities,
-            topP: topP > 0 ? topP : undefined,
-            noCache: false,
-            nonConversational: promptMode !== 'conversation',
-            continuation: !!prompt && prompt.length > 0 && promptMode === 'completion',
-        };
-
         const filteredText = promptMode === 'none' ? [] : text.filter((part) => part.content.trim().length > 0);
 
-        try {
-            if (filteredText.length === 0) {
-                await generator.generate(options);
-            } else {
-                await generator.generate(filteredText, options);
-            }
+        const options: IGenerateOptions = {
+            ...settings,
+            noCache: false,
+            nonConversational: promptMode !== 'conversation',
+            continuation: promptMode === 'none' || (!!prompt && prompt.length > 0 && promptMode === 'completion'),
+            input: filteredText.length > 0 ? filteredText : undefined,
+            background: true,
+            previous_response_id: id ?? undefined,
+        };
 
-            setGenerate(false);
-            busyRef.current = false;
+        const doneHandler = (id: string) => {
+            if (busyRef.current === id) {
+                busyRef.current = null;
+                setGenerate(false);
+                model.responses.off('done', doneHandler);
+
+                setConversationLog(async (prev) => {
+                    const convo = model.responses.getResponse(id)?.output ?? [];
+                    const data = await prev;
+                    if (data.includes(convo)) {
+                        return [...data];
+                    }
+                    return [...data, convo];
+                });
+            }
+        };
+
+        const convoRef = { current: [] as GeneratorConversation[] };
+        const animationFrameRef = { current: -1 };
+
+        const h = (output: IGeneratorResponse) => {
+            const convo = output.output ?? [];
+            //setText(convo);
+            convoRef.current = convo;
+
+            if (animationFrameRef.current === -1) {
+                animationFrameRef.current = requestAnimationFrame(() => {
+                    setOutput(convoRef.current.slice());
+
+                    animationFrameRef.current = -1;
+                });
+            }
+        };
+
+        try {
+            model.responses.on('done', doneHandler);
+            const response = await model.responses.create(options, h);
+            busyRef.current = response.id;
+            setID(response.id);
         } catch {
             setMessage({
                 level: 'error',
                 notice: t('generator.errors.generationError'),
             });
             setGenerate(false);
-            busyRef.current = false;
+            busyRef.current = null;
         }
     };
 
@@ -163,15 +195,15 @@ export default function ChatPrompt() {
             <ChatPromptInput
                 onSend={(prompt) => {
                     promptRef.current = '';
-                    doGenerate(maxLength, prompt);
+                    doGenerate(settings.maxLength ?? 1, prompt);
                 }}
                 onChange={(value) => {
                     promptRef.current = value;
                 }}
                 disabled={disable}
                 generating={generate}
-                onStop={() => generator?.stop()}
-                noPrompt={promptMode === 'none'}
+                onStop={() => model && busyRef.current && model.responses.cancel(busyRef.current)}
+                noPrompt={settings.promptMode === 'none'}
                 placeholder={t('deploy.placeholder')}
             />
             {messages && (

@@ -1,5 +1,5 @@
 import { describe, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import DownloadProgress from './DownloadProgress';
 import Downloader from '../../utilities/downloader';
 import EE from 'eventemitter3';
@@ -34,8 +34,8 @@ describe('DownloadProgress', () => {
         expect(screen.getByText('data.downloading')).toBeInTheDocument();
         expect(screen.getByTestId('progress-bar')).toHaveAttribute('aria-valuenow', '0');
 
-        downloader.setLoaded(50);
+        downloader.setLoaded(51);
 
-        await waitFor(() => expect(screen.getByTestId('progress-bar')).toHaveAttribute('aria-valuenow', '50'));
+        await vi.waitFor(() => expect(screen.getByTestId('progress-bar')).toHaveAttribute('aria-valuenow', '51'));
     });
 });

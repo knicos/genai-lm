@@ -1,6 +1,6 @@
 import { Dispatch, RefObject, useRef, useState } from 'react';
 import style from './style.module.css';
-import { ConversationStream, Conversation, loadTextData } from '@genai-fi/nanogpt';
+import { ConversationStream, Conversation, data as dataModule } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import TextInput from './TextInput';
 import DataListing from './DataListing';
@@ -68,7 +68,7 @@ export default function TextData() {
                     logger.log({ action: 'dropped_files', count: items.files.length });
                     try {
                         for (const file of items.files) {
-                            const text = await loadTextData(file, { maxSize: 200000000 });
+                            const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                         }
                     } catch (error) {
@@ -222,7 +222,7 @@ export default function TextData() {
                             const file = e.target.files[0];
                             setBusy(true);
                             logger.log({ action: 'file_input_selected', name: file.name });
-                            const text = await loadTextData(file, { maxSize: 200000000 });
+                            const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                             setBusy(false);
                         }

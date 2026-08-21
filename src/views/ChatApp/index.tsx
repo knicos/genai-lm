@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { Peer } from '@genai-fi/base/hooks/peer';
 import { useAtomValue } from 'jotai';
 import { sessionCode } from '../../state/share';

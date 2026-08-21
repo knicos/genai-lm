@@ -1,96 +1,53 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
-import { Conversation } from '@genai-fi/nanogpt';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { generatorSettings, rawGeneratorAtom } from '../../state/generator';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { generatorSettings } from '../../state/generator';
+import { useState } from 'react';
+import { rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
-import { useNavigate } from 'react-router-dom';
-import { conversationDataAtom } from '../../state/data';
+import { useNavigate } from 'react-router';
 
-export default function ChatConversation() {
+export default function RawGeneration() {
     const model = useAtomValue(loadedModelAtom);
-    const generator = useAtomValue(rawGeneratorAtom);
-    const setConversationLog = useSetAtom(conversationDataAtom);
-    const [text, setText] = useState<Conversation[]>([]);
+    const [output, setOutput] = useAtom(rawGeneratedTextAtom);
+    const setID = useSetAtom(rawGenerationIDAtom);
     const status = useModelStatus(model ?? undefined);
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
-    const convoRef = useRef<Conversation[]>([]);
-    const animationFrameRef = useRef<number>(-1);
-    const { temperature, topP, maxLength, showAttention, showProbabilities } = useAtomValue(generatorSettings);
+    const responseId = useAtomValue(rawGenerationIDAtom);
+    const [highlightMode, setHighlightMode] = useState<'none' | 'confidence' | 'score'>('none');
+    const setSettings = useSetAtom(generatorSettings);
 
     useEffect(() => {
         if (model) {
-            setText([]);
+            setOutput([]);
         }
-    }, [model]);
+    }, [model, setOutput]);
 
     useEffect(() => {
-        if (generator) {
-            const h = () => {
-                const convo = generator.getConversation();
-                //setText(convo);
-                convoRef.current = convo;
-                if (animationFrameRef.current === -1) {
-                    animationFrameRef.current = requestAnimationFrame(() => {
-                        setText(convoRef.current.slice());
-                        animationFrameRef.current = -1;
-                    });
-                }
-            };
-            generator.on('tokens', h);
-            h();
-
-            const onEnd = () => {
-                setConversationLog(async (prev) => {
-                    const convo = generator.getConversation();
-                    const data = await prev;
-                    if (data.includes(convo)) {
-                        return [...data];
-                    }
-                    return [...data, convo];
-                });
-            };
-            generator.on('stop', onEnd);
-            return () => {
-                generator.off('tokens', h);
-                generator.off('stop', onEnd);
-                generator.dispose();
-                if (animationFrameRef.current !== -1) {
-                    cancelAnimationFrame(animationFrameRef.current);
-                    animationFrameRef.current = -1;
-                }
-            };
-        }
-    }, [generator, setConversationLog]);
+        setSettings((old) => ({
+            ...old,
+            outputConfidence: true,
+            outputScore: true,
+        }));
+        return () => {
+            setOutput([]);
+            setID(null);
+        };
+    }, [setSettings, setOutput, setID]);
 
     const doRetry = async (index: number) => {
-        if (!generator || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+        if (!model || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
+            return;
+        }
+        if (!responseId) {
             return;
         }
 
-        const text = generator.getConversation().slice(0, index + 1);
-        generator.reset();
-
-        const options = {
-            maxLength,
-            temperature,
-            attentionScores: showAttention,
-            includeProbabilities: showProbabilities,
-            topP: topP > 0 ? topP : undefined,
-            noCache: false,
-            nonConversational: false,
-        };
-
-        try {
-            await generator.generate(text, options);
-        } catch (e) {
-            console.error('Generation error:', e);
-            // ignore
-        }
+        model.responses.retry(responseId, index);
     };
 
     return (
@@ -102,19 +59,24 @@ export default function ChatConversation() {
         >
             <ChatMenu
                 onReset={() => {
-                    if (generator) {
-                        generator.stop();
-                        generator.reset();
-                    }
-                    setText([]);
+                    setOutput([]);
+                    setID(null);
                 }}
                 onShowSettings={() => {
                     navigate('generator-settings');
                 }}
+                onConfidence={() => {
+                    setHighlightMode((prev) => (prev !== 'confidence' ? 'confidence' : 'none'));
+                }}
+                onScore={() => {
+                    setHighlightMode((prev) => (prev !== 'score' ? 'score' : 'none'));
+                }}
+                highlightMode={highlightMode}
             />
             <ConversationDisplay
-                conversation={text}
+                conversation={output}
                 onRetry={doRetry}
+                highlightMode={highlightMode}
             />
         </div>
     );

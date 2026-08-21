@@ -3,7 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import style from './style.module.css';
 import { EvaluationMetric, evaluatorAdvanced, evaluatorMetrics } from '../../state/evaluatorSettings';
 import { useEffect, useRef, useState } from 'react';
-import { TrainingLogEntry } from '@genai-fi/nanogpt';
+import { ITrainingJob } from '@genai-fi/nanogpt';
 import { loadedModelAtom } from '../../state/model';
 import Circle from '../../components/Clock/Circle';
 import { qualityToColor } from '../../utilities/colours';
@@ -14,7 +14,7 @@ import { theme } from '../../theme';
 import { deviceCapabilities } from '../../state/device';
 import { CollapsedTrainingLog, CollapsedTrainingPoint } from '../TrainingLog/CollapsedTrainingLog';
 import { createMetric } from '../../utilities/metric';
-import { tunerAtom } from '../../state/trainer';
+import { tunerJobIdAtom } from '../../state/trainer';
 import { uiDeveloperMode } from '../../state/uiState';
 import { Help } from '@genai-fi/base';
 import prettyNumber from '../../utilities/prettyNumber';
@@ -27,8 +27,8 @@ interface AdvancedStats {
 export function Component() {
     const { t } = useTranslation();
     const model = useAtomValue(loadedModelAtom);
-    const trainer = useAtomValue(tunerAtom);
-    const trainerLog = trainer?.log;
+    const trainerJobId = useAtomValue(tunerJobIdAtom);
+    const trainerLog = model && trainerJobId ? model.training.getJob(trainerJobId)?.history : null;
     const [metric, setMetric] = useAtom(evaluatorMetrics);
 
     const [metricValue, setMetricValue] = useState<number>(0);
@@ -50,7 +50,11 @@ export function Component() {
 
     useEffect(() => {
         if (model) {
-            const h = (log: TrainingLogEntry) => {
+            const h = (job: ITrainingJob) => {
+                if (!job.history || job.history.length === 0) {
+                    return;
+                }
+                const log = job.history[job.history.length - 1];
                 const { value, percentage } = createMetric(metric, log, model.config.vocabSize);
                 setMetricValue(value);
                 setMetricPercentage(percentage);
@@ -81,10 +85,10 @@ export function Component() {
                     setHistory(aggregatorRef.current.getCollapsed());
                 }
             };
-            model.on('trainStep', h);
+            model.training.on('progress', h);
 
             return () => {
-                model.off('trainStep', h);
+                model.training.off('progress', h);
             };
         }
     }, [model, metric]);

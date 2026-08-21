@@ -24,8 +24,10 @@ import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
 import { trainingAnimation } from '../../state/animations';
-import { tokensFromStreams } from '@genai-fi/nanogpt';
-import { useNavigate } from 'react-router-dom';
+import { tokenise } from '@genai-fi/nanogpt';
+import { useNavigate } from 'react-router';
+
+const { tokensFromStreams } = tokenise;
 
 const CHINCHILLA_OPTIMISATION_RATIO = 20.0;
 

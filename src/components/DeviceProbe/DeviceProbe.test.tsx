@@ -1,11 +1,13 @@
-import { render } from '@testing-library/react';
-import { describe, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, it, vi } from 'vitest';
 import TestWrapper from '../../utilities/TestWrapper';
 import DeviceProbe from './DeviceProbe';
 
 describe('DeviceProbe', () => {
-    it('renders', ({ expect }) => {
+    it('renders', async ({ expect }) => {
         render(<DeviceProbe />, { wrapper: TestWrapper });
-        expect(document.body).toBeInTheDocument();
+        await vi.waitFor(async () => {
+            expect(await screen.findByText('deviceProbe.probing')).not.toBeInTheDocument();
+        });
     });
 });

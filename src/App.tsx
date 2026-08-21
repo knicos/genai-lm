@@ -1,4 +1,4 @@
-import React from 'react';
+import { Suspense } from 'react';
 import {
     RouterProvider,
     Route,
@@ -6,7 +6,7 @@ import {
     createRoutesFromElements,
     useRouteError,
     Navigate,
-} from 'react-router-dom';
+} from 'react-router';
 import { Provider } from 'jotai';
 import './App.css';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
@@ -172,9 +172,9 @@ function App({ router }: Props) {
             <ThemeProvider theme={theme}>
                 <Provider store={store}>
                     <DndProvider backend={HTML5Backend}>
-                        <React.Suspense fallback={'...'}>
+                        <Suspense fallback={'...'}>
                             <RouterProvider router={router || defaultRouter} />
-                        </React.Suspense>
+                        </Suspense>
                     </DndProvider>
                 </Provider>
             </ThemeProvider>

@@ -4,6 +4,9 @@ import DataCard from '../../components/DataCard/DataCard';
 import { dataManifest, DataManifestEntry } from '../../state/data';
 import Downloader from '../../utilities/downloader';
 import { useMemo } from 'react';
+import { Alert } from '@mui/material';
+import style from './style.module.css';
+import { useTranslation } from 'react-i18next';
 
 export type SortType = 'smallest' | 'largest' | 'simple' | 'complex';
 
@@ -27,9 +30,11 @@ function complexityValue(complexity: string) {
 }
 
 export default function TextSearchListing({ onDownload, selectedSet, sort }: Props) {
+    const { t } = useTranslation();
     const dataRows = useAtomValue(dataManifest);
 
     const sortedData = useMemo(() => {
+        if (!dataRows) return null;
         const sorted = dataRows.map((row) => ({
             ...row,
             cards: [...row.cards].sort((a, b) => {
@@ -70,7 +75,11 @@ export default function TextSearchListing({ onDownload, selectedSet, sort }: Pro
         return sorted;
     }, [dataRows, sort]);
 
-    return (
+    return sortedData === null ? (
+        <div className={style.errorBox}>
+            <Alert severity="error">{t('data.errors.libraryError')}</Alert>
+        </div>
+    ) : (
         <CardView<DataManifestEntry, Downloader>
             CardComponent={DataCard}
             data={sortedData}

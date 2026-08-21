@@ -1,6 +1,6 @@
 import Box from '../BoxTitle/Box';
 import BoxTitle from '../BoxTitle/BoxTitle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import NextPlanIcon from '@mui/icons-material/NextPlan';
 import { IconButton } from '@mui/material';

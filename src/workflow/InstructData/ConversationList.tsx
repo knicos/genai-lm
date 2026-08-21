@@ -6,7 +6,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useTranslation } from 'react-i18next';
 import { names } from './nameGenerator';
 import { IconButton } from '@mui/material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 
 interface Props {
     data: Conversation[][];
@@ -28,6 +28,7 @@ function RowComponent({ index, style, text, selected, onClick, onDelete }: RowCo
             style={style}
             role="button"
             onClick={() => onClick && onClick(index)}
+            data-testid={`conversation-row-${index}`}
         >
             <div className={`${styleModule.rowContent} ${selected === index ? styleModule.selected : ''}`}>
                 <div className={styleModule.icon}>
