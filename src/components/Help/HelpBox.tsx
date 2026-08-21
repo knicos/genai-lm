@@ -1,6 +1,6 @@
 import { IconButton } from '@mui/material';
 import InfoPop from '../InfoPop/InfoPop';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { CSSProperties, MouseEvent, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { useWorkflowContext } from '@genai-fi/base';

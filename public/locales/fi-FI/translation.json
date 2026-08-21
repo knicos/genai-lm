@@ -1,4 +1,41 @@
 {
+    "about": {
+        "back": "Takaisin",
+        "title": "Generation AI",
+        "privacyTitle": "Tietosuojailmoitus",
+        "privacy": [
+            "Tämä tietosuojailmoitus kertoo, miten käsittelemme henkilötietojasi, kun käytät GenAI Little Language Machine -sivustoa.",
+            "Henkilötieto tarkoittaa tietoa, josta sinut voidaan tunnistaa, kuten IP-osoite.",
+            "Lue tämä ilmoitus, jotta ymmärrät mitä tietoja keräämme, miksi keräämme niitä ja mitkä oikeutesi ovat.",
+            "Jos sinulla on kysymyksiä, ota yhteyttä rekisterinpitäjään:",
+            "**Dr. Nicolas Pope**,",
+            "**Postiosoite:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
+            "**Email:** nicolas.pope@uef.fi",
+            "**Puhelin:** +358 505 288 449.",
+            "### 1. Tietojen käsittely:",
+            "Kirjaamme IP-osoitteet.",
+            "Emme käytä seurantaan tai analytiikkaan tarkoitettuja evästeitä.",
+            "### 2. Käsittelyn tarkoitukset:",
+            "IP-osoitteiden lokitus auttaa ylläpitämään sivuston turvallisuutta.",
+            "### 3. Käsittelyn oikeusperuste:",
+            "Käsittelemme tietoja pääosin oikeutetun edun perusteella sivuston suojaamiseksi.",
+            "### 4. Oikeutettu etu:",
+            "Tavoitteena on pitää sivusto toimivana ja turvallisena.",
+            "### 5. Turvallisuus:",
+            "Suojaamme IP-osoitteet luvattomalta käytöltä.",
+            "### 6. Tietojen vastaanottajat:",
+            "Vain valtuutettu henkilöstö voi käyttää IP-osoitetta.",
+            "### 7. Tietojen siirto:",
+            "IP-osoitteita voidaan siirtää Microsoftin palvelimille GDPR:n mukaisesti.",
+            "### 8. Säilytysaika:",
+            "Säilytämme IP-osoitteita vain tarvittavan ajan, yleensä enintään 7 päivää.",
+            "### 9. Oikeutesi:",
+            "Sinulla on oikeus saada tietoa, pyytää pääsyä tietoihin, pyytää oikaisua tai poistoa sekä tehdä valitus.",
+            "### 10. Päivitykset tähän ilmoitukseen:",
+            "Voimme päivittää ilmoitusta käytäntöjen tai lakimuutosten vuoksi.",
+            "Kysymykset ja oikeuksien käyttö: nicolas.pope@uef.fi"
+        ]
+    },
     "app": {
         "little": "Pieni",
         "languageMachine": "Kielikone",
@@ -101,7 +138,25 @@
             "promptMode": "Kehotetila",
             "promptModeNone": "Ei mitään",
             "promptModeCompletion": "Täydennys",
-            "promptModeConversation": "Keskustelu"
+            "promptModeConversation": "Keskustelu",
+            "quantizeSave": "Kvantisoi malli tallennettaessa",
+            "layerLimits": "Opetettavat kerrokset",
+            "tokenise": "Tokenisoinnin asetukset",
+            "validationSplit": "Validointijako",
+            "saveToOPFS": "Käytä levytilaa tokeneille",
+            "help": {
+                "layerLimits": "Kuinka monta mallin viimeistä kerrosta opetetaan. Vähemmän on nopeampaa, mutta oppiminen voi heikentyä.",
+                "checkpointing": "Gradienttitarkistuspisteet vähentävät muistinkäyttöä, mutta hidastavat opetusta.",
+                "mixedPrecision": "Vähentää opetuksen tarkkuutta muistinkäytön ja nopeuden parantamiseksi.",
+                "layerDrop": "Pudottaa opetuksen aikana satunnaisesti kokonaisia kerroksia yleistyksen parantamiseksi.",
+                "dropout": "Pudottaa opetuksessa satunnaisia parametreja yleistyksen parantamiseksi.",
+                "warmupSteps": "Nostaa oppimisnopeutta vähitellen opetuksen alussa.",
+                "decayEpochs": "Laskee oppimisnopeutta vähitellen valittujen epookkien aikana.",
+                "weightDecay": "Lisää rangaistuksen suurille parametriarvoille ylisovittamisen estämiseksi.",
+                "gradClipping": "Rajoittaa gradienttien kokoa estääkseen epävakaat opetusaskeleet.",
+                "validationSplit": "Osa opetusdatasta varataan validointiin. Tätä dataa ei näytetä mallille opetuksen aikana.",
+                "saveToOPFS": "Tallentaa tokenit levylle muistin sijaan. Hyödyllinen isoille aineistoille."
+            }
         },
         "close": "Sulje",
         "ok": "OK",
@@ -153,7 +208,8 @@
         "load": "Lataa",
         "errors": {
             "fileLoadError": "Voit pudottaa vain tekstiä sisältäviä tiedostoja (txt, csv, pdf, docx).",
-            "downloadLoadError": "Ladatun tiedoston avaamisessa tapahtui tuntematon virhe."
+            "downloadLoadError": "Ladatun tiedoston avaamisessa tapahtui tuntematon virhe.",
+            "libraryError": "Aineistokirjastoa ei voitu ladata. Tarkista verkkoyhteys."
         },
         "characters": "{{chars}} merkkiä",
         "loadingMoreDocuments": "Ladataan lisää dokumentteja...",
@@ -257,6 +313,7 @@
         "monitor": "Seuranta",
         "visualize": "Visualisoi",
         "autoOutput": "Näytä tuloste opetuksen aikana",
+        "tokenising": "Tokenisoidaan...",
         "preparing": "Tokenisoidaan...",
         "errors": {
             "preparation": "Tarvitaan lisää opetusdataa, vähintään muutama tuhat näytettä.",
@@ -264,7 +321,9 @@
             "notReady": "Malli tai data ei ole valmis opetukseen.",
             "noData": "Lisää ensin opetusdataa.",
             "trainingFailed": "Mallin opetus epäonnistui. Päivitä sivu ja kokeile pienempää mallia tai eräkokoa.",
-            "noLoRA": "Hienosäätölaajennusta ei ole valittu."
+            "noLoRA": "Hienosäätölaajennusta ei ole valittu.",
+            "noJob": "Opetusta ei voitu käynnistää.",
+            "tokeniserNotTrained": "Tokenisoijaa ei ole opetettu."
         },
         "predictionsHeader": "Parhaat ennusteet",
         "help": "Oppimisprosessi, jossa parametreja säädetään vähitellen, kunnes malli pystyy toistamaan esimerkkidatastasi löytyviä kuvioita. Jäljellä oleva aika kertoo, kuinka kauan koko datan läpikäynti kestää.",
@@ -287,6 +346,12 @@
         "editPlaceholder": "Kirjoita valinnainen kehote tähän...",
         "reset": "Uusi keskustelu",
         "copy": "Kopioi leikepöydälle",
+        "confidence": "Luottamus",
+        "score": "Pisteet",
+        "confidenceValue": "Luottamus: {{value}}%",
+        "scoreValue": "Pisteet: {{value}}%",
+        "confidenceTooltip": "Näytä ennusteen luottamus jokaiselle tokenille",
+        "scoreTooltip": "Näytä jokaisen tokenin ennustettu todennäköisyys",
         "autoGenerateAriaLabel": "Vaihda automaattinen generointi",
         "autoGenerate": "Automaattinen generointi",
         "step": "Seuraava",
@@ -404,6 +469,7 @@
         "notEnoughTokens": "Tokeneita tarvitaan lisää",
         "tooManyTokens": "Tokeneita on enemmän kuin tarvitaan",
         "progressHelp": "Tarvittavien tokenien tavoitemäärä.",
+        "deleteAll": "Poista kaikki tokenit",
         "busy": "Muunnetaan tokeneiksi...",
         "help": "Tekstidata täytyy jakaa numeerisiksi tokeneiksi, joita matemaattinen malli voi käyttää. Suuremmat mallit tarvitsevat enemmän tokeneita, joten etenemispalkki näyttää, paljonko niitä saatat tarvita."
     },
@@ -420,7 +486,8 @@
         "addLoRA": "Lisää hienosäätö",
         "noLoRA": "Ei hienosäätöä",
         "loraName": "Hienosäädön nimi",
-        "stopTraining": "Pysäytä hienosäätö"
+        "stopTraining": "Pysäytä hienosäätö",
+        "uploadError": "Tiedostoa ei voitu ladata. Tarkista, että tiedostotyyppi on oikea."
     },
     "conversation": {
         "userPlaceholder": "Kirjoita viesti...",

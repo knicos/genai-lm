@@ -19,7 +19,7 @@ i18n.use(detector)
             escapeValue: false,
         },
         fallbackLng: 'en-GB',
-        supportedLngs: ['en-GB', 'fi-FI'],
+        supportedLngs: ['en-GB', 'fi-FI', 'ja-JP', 'sv-SE'],
         detection: {
             caches: [],
         },
