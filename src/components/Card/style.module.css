@@ -7,16 +7,17 @@
     cursor: pointer;
     transition: opacity 0.3s ease;
     user-select: none;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+    /*border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;*/
+    border-radius: 8px;
 }
 
 .dataCard:hover {
-    background-color: rgba(0, 130, 151, 0.2);
+    background-color: var(--bg-subdued2);
 }
 
 .dataCard.expanded {
-    background-color: rgba(0, 130, 151, 0.2);
+    background-color: var(--bg-subdued2);
 }
 
 .dataCard.disabled {

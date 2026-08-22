@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function SampleWriter({ sample }: Props) {
-    const [slicePointer, setSlicePointer] = useState(40);
+    const [slicePointer, setSlicePointer] = useState(30);
 
     useEffect(() => {
         const interval = setInterval(() => {

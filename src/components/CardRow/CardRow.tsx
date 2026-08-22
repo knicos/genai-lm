@@ -5,6 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export interface CardItem {
     id: string;
+    url?: string;
 }
 
 export interface RowSet<T extends CardItem = CardItem> {
@@ -78,7 +79,11 @@ export default function CardRow<T extends CardItem, S = void>({
                             <CardComponent
                                 card={card}
                                 disabled={numVisible > 1 ? ix < offset || ix >= offset + numVisible : false}
-                                used={selectedSet ? selectedSet.has(card.id) : false}
+                                used={
+                                    selectedSet
+                                        ? selectedSet.has(card.id) || (card.url ? selectedSet.has(card.url) : false)
+                                        : false
+                                }
                                 onSelect={onSelect}
                                 onHighlight={handleHighlight}
                                 highlighted={highlighted === card.id}

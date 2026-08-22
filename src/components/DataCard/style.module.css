@@ -50,7 +50,7 @@
         linear-gradient(135deg, #ddd4ff 0%, #d7c2ff 50%, #d6a1fa 100%);
 }
 
-.sampleText {
+/*.sampleText {
     overflow: hidden;
     text-overflow: ellipsis;
     height: calc(150px - 2rem);
@@ -58,18 +58,31 @@
     font-style: italic;
     margin: 1rem;
     box-sizing: border-box;
+}*/
+
+.sampleText {
+    overflow: hidden;
+    height: calc(150px - 2rem);
+    font-size: 0.9rem;
+    padding: 1rem;
+    box-sizing: border-box;
+    margin: 1rem;
+    border-radius: 6px;
+    background: white;
 }
 
 .sampleTextExpanded {
-    max-height: 150px;
+    height: calc(150px - 2rem);
     overflow: auto;
-    font-size: 1.2rem;
-    font-style: italic;
+    font-size: 0.9rem;
     padding: 1rem;
     display: flex;
     flex-direction: column-reverse;
     box-sizing: border-box;
     scrollbar-width: none;
+    margin: 1rem;
+    border-radius: 6px;
+    background: white;
 }
 
 .expandedSampleBox {

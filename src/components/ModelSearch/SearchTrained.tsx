@@ -17,7 +17,7 @@ export default function SearchContent({ model, config }: Props) {
     const dataRows = useAtomValue(trainedModelManifest);
     const setDownload = useSetAtom(modelDownloadAtom);
     const selectedSet =
-        model && model.meta.id ? new Set([model.meta.id]) : config && config.id ? new Set([config.id]) : undefined;
+        model && model.meta.url ? new Set([model.meta.url]) : config && config.id ? new Set([config.id]) : undefined;
 
     const filteredRows = useMemo(() => dataRows, [dataRows]);
 

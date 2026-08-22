@@ -26,6 +26,7 @@ export default function Foundation() {
                     <SearchDiagContent
                         trained={true}
                         allowFileOpen
+                        model={model || undefined}
                     />
                 </div>
             </div>

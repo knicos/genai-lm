@@ -129,7 +129,7 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                                     : style.untrained
                         } ${style[density]}`}
                     >
-                        {card.sampleContent && <SampleWriter sample={card.sampleContent} />}
+                        {card.sampleContent && <div className={style.sampleText}>{card.sampleContent}</div>}
                         {!card.sampleContent && (
                             <ParameterGrid
                                 density={density}

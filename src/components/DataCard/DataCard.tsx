@@ -45,7 +45,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
             expandedContent={
                 <>
                     <div className={`${style.sampleBox} ${style[card.complexity]}`}>
-                        <SampleWriter sample={sampleContent || ''} />
+                        {sampleContent && <SampleWriter sample={sampleContent || ''} />}
                         <div className={style.sizeIcon}>
                             <IconButton
                                 color="secondary"
@@ -71,7 +71,7 @@ export default function DataCard({ onSelect, onHighlight, used, card, highlighte
             content={
                 <>
                     <div className={`${style.sampleBox} ${downloader || used ? style.disabledBG : style[complexity]}`}>
-                        <div className={style.sampleText}>{sampleContent || ''}</div>
+                        {sampleContent && <div className={style.sampleText}>{sampleContent || ''}</div>}
                         <div
                             className={style.sizeText}
                             style={{
