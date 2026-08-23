@@ -39,6 +39,10 @@
     padding-left: 2rem;
     margin-left: auto;
     user-select: none;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .number {

@@ -11,7 +11,7 @@ import {
 import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@genai-fi/base';
+import { Button, Help } from '@genai-fi/base';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import { useState } from 'react';
 import DataProgress from '../../components/DataProgress/DataProgress';
@@ -19,13 +19,12 @@ import useModelLoaded from '../../hooks/useModelLoaded';
 import ProgressBox from '../TextData/ProgressBox';
 import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import HelpBox from '../../components/Help/HelpBox';
-import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
 import { trainingAnimation } from '../../state/animations';
 import { tokenise } from '@genai-fi/nanogpt';
 import { useNavigate } from 'react-router';
+import Box from '../../components/BoxTitle/Box';
 
 const { tokensFromStreams } = tokenise;
 
@@ -54,16 +53,19 @@ export default function TokeniseData() {
     const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;
 
     return (
-        <HelpBox
+        <Help
             widget="tokeniseData"
-            placement="top"
+            placement="right"
             active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
             message={t('tokeniseData.help')}
+            keepOpen
         >
-            <BoxStandalone
+            <Box
                 style={{ width: '290px', minHeight: '200px' }}
                 active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
                 disabled={istraining}
+                useParent
+                widget="tokeniseData"
             >
                 <div className={style.container}>
                     <BoxTitle
@@ -156,7 +158,7 @@ export default function TokeniseData() {
                         />
                     )}
                 </div>
-            </BoxStandalone>
-        </HelpBox>
+            </Box>
+        </Help>
     );
 }

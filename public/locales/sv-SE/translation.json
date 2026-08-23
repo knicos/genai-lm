@@ -1,41 +1,6 @@
 {
     "about": {
-        "back": "Tillbaka",
-        "title": "Generation AI",
-        "privacyTitle": "Sekretessmeddelande",
-        "privacy": [
-            "Välkommen till vårt sekretessmeddelande som förklarar hur vi hanterar dina personuppgifter när du använder GenAI Little Language Machine.",
-            "Detta meddelande beskriver kort hur vi samlar in, använder och skyddar data.",
-            "Personuppgifter kan vara information som kan identifiera dig, till exempel din IP-adress.",
-            "Läs detta meddelande för att förstå vilken data vi samlar in, varför vi gör det och vilka rättigheter du har.",
-            "Om du har frågor, kontakta ansvarig:",
-            "**Dr. Nicolas Pope**,",
-            "**Adress:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
-            "**Email:** nicolas.pope@uef.fi",
-            "**Telefon:** +358 505 288 449",
-            "### 1. Behandling av data:",
-            "Vi loggar IP-adresser.",
-            "Vi använder inte spårningscookies; innehåll visas baserat på dina inmatningar.",
-            "### 2. Syften:",
-            "IP-adresser hjälper oss att hålla webbplatsen säker och förebygga missbruk.",
-            "### 3. Rättslig grund:",
-            "Vi behandlar data främst utifrån vårt berättigade intresse att skydda webbplatsen, och ibland baserat på ditt samtycke.",
-            "### 4. Berättigade intressen:",
-            "Att upprätthålla webbplatsens säkerhet och funktion.",
-            "### 5. Säkerhet:",
-            "Vi skyddar IP-adresser mot otillåten åtkomst.",
-            "### 6. Mottagare:",
-            "Endast behörig personal kan se dina IP-adresser.",
-            "### 7. Överföringar:",
-            "IP-adresser kan överföras till Microsoft-servrar, vi följer GDPR.",
-            "### 8. Lagringstid:",
-            "Vi behåller IP-adresser så kort tid som behövs, vanligtvis upp till 7 dagar.",
-            "### 9. Dina rättigheter:",
-            "Du har rätt att få information, begära åtkomst, rättelse, radering, invända mot behandling och att lämna klagomål.",
-            "### 10. Uppdateringar:",
-            "Vi kan uppdatera detta meddelande när våra rutiner eller lagkrav ändras.",
-            "Kontakta nicolas.pope@uef.fi för frågor eller för att utöva dina rättigheter."
-        ]
+        "privacyTitle": "Sekretessmeddelande"
     },
     "app": {
         "little": "Liten",
@@ -64,7 +29,8 @@
             "advanced_desc": "Fler inställningar för avancerade användare.",
             "model_desc": "Välj modellens storlek och form.",
             "data_desc": "Lägg till textdata för modellen att lära av.",
-            "pretrain_desc": "Träna modellen med din data."
+            "pretrain_desc": "Träna modellen med din data.",
+            "deployment_desc": "Distribuera din modell så att andra kan chatta med den."
         },
         "settings": {
             "title": "Inställningar",
@@ -128,12 +94,12 @@
             "heads": "Uppmärksamhetshuvuden",
             "headsHelp": "Fler heads kan ge mer finfördelad uppmärksamhet.",
             "arch": "Arkitekturinställningar",
-            "contextHelp": "Antal token modellen kan se.",
-            "batchHelp": "Antal prover som bearbetas samtidigt.",
-            "lrHelp": "Hur snabbt parametern ändras per steg.",
+            "contextHelp": "Antalet **tidigare token** modellen kan se när den gör sina förutsägelser.",
+            "batchHelp": "Antal prover som bearbetas samtidigt för att jämna ut variation.\n\nEtt större värde kan också snabba upp träningen men kräver mer minne.",
+            "lrHelp": "Hur snabbt parametrarna justeras i varje träningssteg.\n\nFör lågt värde ger liten förändring, för högt värde kan göra inlärningen instabil.",
             "sizeLimit": "Modellstorleksgräns (miljoner)",
             "speed": "Animationshastighet",
-            "temperatureHelp": "Högre temperatur ger mer slumpmässiga svar.",
+            "temperatureHelp": "Efter en förutsägelse behöver den faktiska token väljas utifrån sannolikheter. Viss slump läggs till för större variation.\n\nEn **högre temperatur ger mer slumpmässiga utdata** eftersom den mest uppenbara nästa token väljs mer sällan.",
             "trainingVis": "Träning",
             "inferenceVis": "Generering",
             "promptMode": "Prompt-läge",
@@ -146,17 +112,17 @@
             "validationSplit": "Valideringsdel",
             "saveToOPFS": "Spara token till disk",
             "help": {
-                "layerLimits": "Hur många av de sista lagren som tränas. Färre är snabbare.",
-                "checkpointing": "Minskar minnesbehov men ökar beräkning.",
-                "mixedPrecision": "Sänker precision för att spara minne.",
+                "layerLimits": "Hur många av de sista modellagren som ska tränas. Färre går snabbare men kan lära sämre. Övriga lager låses så att de inte ändras.",
+                "checkpointing": "Gradient-checkpointing minskar minnesanvändningen men gör träningen långsammare eftersom värden måste räknas om i stället för att sparas.",
+                "mixedPrecision": "Sänker träningsprecisionen från 32-bit till 16-bit för att spara minne och tid. Stöds inte alltid och kan minska modellkvaliteten.",
                 "layerDrop": "Slumpar bort hela lager under träning.",
                 "dropout": "Slumpar bort parametrar under träning.",
                 "warmupSteps": "Ökar inlärningshastigheten långsamt i början.",
                 "decayEpochs": "Minskar inlärningshastigheten över epoker.",
                 "weightDecay": "Straffar stora vikter för att undvika överanpassning.",
-                "gradClipping": "Begränsar gradienternas storlek.",
-                "validationSplit": "Data för att testa hur väl modellen lär sig.",
-                "saveToOPFS": "Använd disk för stora datamängder."
+                "gradClipping": "Begränsar gradienternas storlek för att undvika exploderande gradienter under träning. Ett dåligt steg kan förstöra modellen, så detta håller träningen stabil.",
+                "validationSplit": "En del av träningsdatan avsätts för att testa hur väl modellen lär sig. Denna valideringsdata visas inte för modellen under träning, så den kan inte fuska.",
+                "saveToOPFS": "Använd disklagring för token i stället för minne. Bra för stora dataset, men kan vara en möjlig integritetsrisk."
             }
         },
         "close": "Stäng",
@@ -221,7 +187,7 @@
         "sortLargest": "Största",
         "sortSimple": "Enklast",
         "sortComplex": "Komplex",
-        "help": "En språkmodell lär sig från textexempel. Ju mer text, desto bättre kan den lära sig."
+        "help": "## Textdata\n\nEn språkmodell **lär sig mönster** från exempeltext. Ju mer text du ger, desto bättre kan den lära sig. Även små modeller kräver ofta **minst 30 miljoner (30M) tecken**.\n\nAnvänd **vanlig ostrukturerad text** som essäer, romaner eller artiklar utan mycket formatering eller struktur.\n\nDu kan skriva egen text, ladda upp filer eller använda vårt datasetbibliotek."
     },
     "checkmodel": {
         "title": "Bygg modell",
@@ -229,7 +195,7 @@
         "refresh": "Återställ",
         "outdated": "Modellen behöver byggas om",
         "upToDate": "Modellen är klar att använda.",
-        "help": "Byggandet av modellen reserverar resurser och sätter slumpmässiga startvärden.",
+        "help": "## Bygga modellen\n\nAtt bygga en modell allokerar minnesresurser och tilldelar slumpmässiga tal till parametrarna.\n\nOm du ändrar modellens arkitektur eller storlek måste den byggas om. En ombyggnad **förlorar all träning du gjort** eftersom parametrarna blir slumpmässiga igen.",
         "exceedsSizeLimit": "Modellen överskrider storleksgränsen.",
         "confirm": {
             "title": "Bygg om modell",
@@ -237,7 +203,8 @@
         }
     },
     "foundation": {
-        "title": "Basmodeller"
+        "title": "Basmodeller",
+        "help": "## Grundmodeller\n\nGrundmodeller är **förtränade** på stora mängder textdata och kan användas som startpunkt för din egen modell.\n\nVälj en modell som ligger nära ditt mål och justera den sedan med din egen data.\n\nAtt använda en förtränad modell sparar tid och energi eftersom den redan har lärt sig allmänna språkmönster som kan återanvändas."
     },
     "model": {
         "parameters": "Parametrar",
@@ -282,10 +249,10 @@
         "busy": "Modellen arbetar...",
         "noModel": "Ingen modell",
         "error": "Modellen har ett fel",
-        "parametersHelp": "Det totala antalet numeriska parametrar i modellen.",
-        "help": "Modellen sparar parametrar och arkitektur som justeras under träning.",
+        "parametersHelp": "Det **totala antalet numeriska parametrar** i modellen.\n\nFler parametrar gör att modellen kan lära fler mönster men kräver mer minne, tid och data för träning.",
+        "help": "## Din modell\n\nDenna ruta representerar modellen du bygger.\n\nEn modell är en **matematisk representation** av mönstren i din data. Den består av **numeriska parametrar** som justeras under träning för att lära dessa mönster.\n\nParametrar är indata till ekvationer som förutsäger nästa del i en textsekvens (till exempel ett ord eller en bokstav).",
         "visualHelp": "Diagrammet visar din modells struktur. Det finns indata, lager och utdata.",
-        "archHelp": "Välj modellens storlek och form innan träning."
+        "archHelp": "## Modellarkitektur\n\nDin modell **lagrar parametrarna** som justeras under träning och används för att förutsäga nästa token.\n\nModellens arkitektur avgör hur många parametrar den har och hur de är organiserade. Att ändra var parametrarna finns påverkar vilka mönster modellen kan lära sig."
     },
     "training": {
         "title": "Träning",
@@ -327,7 +294,7 @@
             "tokeniserNotTrained": "Tokeniseraren är inte tränad."
         },
         "predictionsHeader": "Toppförutsägelser",
-        "help": "Inlärningsprocessen där parametrarna justeras tills modellen kan återge mönster i din data.",
+        "help": "## Modellträning\n\nInlärningsprocessen där **parametrarna gradvis justeras** upp eller ned tills modellen kan återskapa mönster i din exempeldata.\n\nDu kan klicka på den cirkulära indikatorn för att växla mellan effekt och tid. Återstående tid (eller effekt) visar hur lång tid det tar att gå igenom all data.",
         "attentionHelp": "Ett kort exempel från din data som modellen försöker förutsäga.",
         "modelBoxHelp": "Varje lager bidrar till den slutliga förutsägelsen.",
         "lossBoxHelp": "Efter förutsägelsen räknas ett poäng som visar hur fel modellen var.",
@@ -359,7 +326,8 @@
         "errors": {
             "modelNotReady": "Modellen är inte redo för generering, försök igen snart.",
             "generationError": "Ett okänt fel uppstod under generering."
-        }
+        },
+        "help": "## Textgenerering\n\nEfter att modellparametrarna har tränats kan de användas för att förutsäga nästa token (**\"inferens\"**) i en textsekvens med hjälp av din prompt och tidigare förutsägelser (kallas **kontext**). Denna sekventiella process kallas **autoregressiv generering**.\n\nHur väl modellen genererar eller svarar på promptar beror på hur bra den tränats och kvaliteten på datan."
     },
     "evaluation": {
         "title": "Utvärdering",
@@ -416,9 +384,9 @@
             "validation": "Validering",
             "history": "Historia",
             "performance": "Prestanda",
-            "validationHelp": "En del av din data används för att testa hur väl modellen lär sig.",
-            "accuracyHelp": "Noggrannhet är andelen korrekta förutsägelser.",
-            "lossHelp": "Förlust visar hur fel modellens förutsägelser var."
+            "validationHelp": "## Valideringsdata\n\nEn del av din data används för att testa hur väl modellen lär sig i stället för att bara memorera.\n\nDenna valideringsdata visas inte för modellen under träning, så den kan inte fuska.",
+            "accuracyHelp": "**Noggrannhet** är andelen förutsägelser som var korrekta.",
+            "lossHelp": "**Förlust** är ett mått på hur fel modellens förutsägelser var."
         },
         "inferenceHint": "Starta generering för att se visualiseringen.",
         "trainingHint": "Starta träning för att se visualiseringen.",
@@ -453,7 +421,8 @@
         "noData": "Ingen data tillgänglig",
         "noModel": "Ingen modell vald",
         "includeSpecial": "Inkludera specialtoken",
-        "help": "Ordförrådet är en uppsättning token som modellen använder. Vi bygger det från din data."
+        "includeSpecialHelp": "Specialtoken är kontrolltoken som hjälper till att strukturera text och utdata.",
+        "help": "## Tokenordförråd\n\nOrdförrådet är en uppsättning bokstäver, ord eller delar av ord som fungerar som språkets byggstenar för modellen. Dessa byggstenar kallas **token** och får var och en **ett unikt nummer**.\n\nAtt bygga ett ordförråd innebär att bearbeta din data för att hitta de vanligaste token i texten. Eftersom ordförrådets storlek är begränsad är det viktigt att välja de bästa vanliga token."
     },
     "tokeniseData": {
         "title": "Tokenisera data",
@@ -472,7 +441,7 @@
         "progressHelp": "Målet för antalet token som behövs.",
         "deleteAll": "Radera alla token",
         "busy": "Konverterar till token...",
-        "help": "Din text måste delas upp i numeriska token som modellen kan använda. Stora modeller behöver fler token."
+        "help": "## Tokenisering\n\nDin textdata måste delas upp i numeriska token som den matematiska modellen kan arbeta med.\n\nEn förloppsindikator visar hur många token som har genererats från din data. **Större modeller behöver fler token**, så indikatorn visar också hur många som kan behövas för god träning."
     },
     "instruct": {
         "title": "Tuningdata",

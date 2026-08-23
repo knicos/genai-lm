@@ -1,40 +1,6 @@
 {
     "about": {
-        "back": "Takaisin",
-        "title": "Generation AI",
-        "privacyTitle": "Tietosuojailmoitus",
-        "privacy": [
-            "Tämä tietosuojailmoitus kertoo, miten käsittelemme henkilötietojasi, kun käytät GenAI Little Language Machine -sivustoa.",
-            "Henkilötieto tarkoittaa tietoa, josta sinut voidaan tunnistaa, kuten IP-osoite.",
-            "Lue tämä ilmoitus, jotta ymmärrät mitä tietoja keräämme, miksi keräämme niitä ja mitkä oikeutesi ovat.",
-            "Jos sinulla on kysymyksiä, ota yhteyttä rekisterinpitäjään:",
-            "**Dr. Nicolas Pope**,",
-            "**Postiosoite:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
-            "**Email:** nicolas.pope@uef.fi",
-            "**Puhelin:** +358 505 288 449.",
-            "### 1. Tietojen käsittely:",
-            "Kirjaamme IP-osoitteet.",
-            "Emme käytä seurantaan tai analytiikkaan tarkoitettuja evästeitä.",
-            "### 2. Käsittelyn tarkoitukset:",
-            "IP-osoitteiden lokitus auttaa ylläpitämään sivuston turvallisuutta.",
-            "### 3. Käsittelyn oikeusperuste:",
-            "Käsittelemme tietoja pääosin oikeutetun edun perusteella sivuston suojaamiseksi.",
-            "### 4. Oikeutettu etu:",
-            "Tavoitteena on pitää sivusto toimivana ja turvallisena.",
-            "### 5. Turvallisuus:",
-            "Suojaamme IP-osoitteet luvattomalta käytöltä.",
-            "### 6. Tietojen vastaanottajat:",
-            "Vain valtuutettu henkilöstö voi käyttää IP-osoitetta.",
-            "### 7. Tietojen siirto:",
-            "IP-osoitteita voidaan siirtää Microsoftin palvelimille GDPR:n mukaisesti.",
-            "### 8. Säilytysaika:",
-            "Säilytämme IP-osoitteita vain tarvittavan ajan, yleensä enintään 7 päivää.",
-            "### 9. Oikeutesi:",
-            "Sinulla on oikeus saada tietoa, pyytää pääsyä tietoihin, pyytää oikaisua tai poistoa sekä tehdä valitus.",
-            "### 10. Päivitykset tähän ilmoitukseen:",
-            "Voimme päivittää ilmoitusta käytäntöjen tai lakimuutosten vuoksi.",
-            "Kysymykset ja oikeuksien käyttö: nicolas.pope@uef.fi"
-        ]
+        "privacyTitle": "Tietosuojailmoitus"
     },
     "app": {
         "little": "Pieni",
@@ -63,7 +29,8 @@
             "advanced_desc": "Käytä lisäasetuksia ja ominaisuuksia edistyneeseen käyttöön.",
             "model_desc": "Valitse mallin koko ja muoto.",
             "data_desc": "Lisää omaa tekstidataa mallin oppimista varten.",
-            "pretrain_desc": "Opeta malli oppimaan datastasi."
+            "pretrain_desc": "Opeta malli oppimaan datastasi.",
+            "deployment_desc": "Julkaise mallisi, jotta muut voivat keskustella sen kanssa."
         },
         "settings": {
             "title": "Asetukset",
@@ -127,12 +94,12 @@
             "heads": "Huomiopäät",
             "headsHelp": "Muuta transformer-lohkojen huomiopäiden määrää. Useammat päät voivat auttaa mallia keskittymään samanaikaisesti syötteen eri osiin.",
             "arch": "Malliasetukset",
-            "contextHelp": "Tokenien määrä, jonka malli näkee tehdessään ennusteita.",
-            "batchHelp": "Samanaikaisesti käsiteltävien näytteiden määrä vaihtelun tasaamiseksi.",
-            "lrHelp": "Kuinka nopeasti parametreja säädetään jokaisella opetusaskeleella.",
+            "contextHelp": "Mallin näkemien **edeltävien tokenien määrä** ennusteiden tekemiseksi.",
+            "batchHelp": "Samanaikaisesti käsiteltävien näytteiden määrä vaihtelun tasaamiseksi.\n\nSuurempi arvo voi nopeuttaa opetusta, mutta vaatii enemmän muistia.",
+            "lrHelp": "Kuinka nopeasti parametreja säädetään jokaisella opetusaskeleella.\n\nLiian pieni arvo hidastaa oppimista, liian suuri voi tehdä oppimisesta epävakaata.",
             "sizeLimit": "Mallin kokoraja (miljoonaa parametria)",
             "speed": "Animaation nopeus",
-            "temperatureHelp": "Korkeampi lämpötila tuottaa satunnaisempia vastauksia, koska ilmeisintä seuraavaa tokenia valitaan harvemmin.",
+            "temperatureHelp": "Ennusteen jälkeen varsinainen token valitaan todennäköisyyksien perusteella. Mukaan lisätään satunnaisuutta monipuolisuuden lisäämiseksi.\n\n**Korkeampi lämpötila tuottaa satunnaisempaa tekstiä**, koska ilmeisintä seuraavaa tokenia valitaan harvemmin.",
             "trainingVis": "Opetus",
             "inferenceVis": "Generointi",
             "promptMode": "Kehotetila",
@@ -145,17 +112,17 @@
             "validationSplit": "Validointijako",
             "saveToOPFS": "Käytä levytilaa tokeneille",
             "help": {
-                "layerLimits": "Kuinka monta mallin viimeistä kerrosta opetetaan. Vähemmän on nopeampaa, mutta oppiminen voi heikentyä.",
-                "checkpointing": "Gradienttitarkistuspisteet vähentävät muistinkäyttöä, mutta hidastavat opetusta.",
-                "mixedPrecision": "Vähentää opetuksen tarkkuutta muistinkäytön ja nopeuden parantamiseksi.",
+                "layerLimits": "Kuinka monta mallin viimeistä kerrosta opetetaan. Vähemmän on nopeampaa, mutta oppiminen voi heikentyä. Muut kerrokset lukitaan, eivätkä ne muutu.",
+                "checkpointing": "Gradienttitarkistuspisteet vähentävät muistinkäyttöä, mutta hidastavat opetusta, koska arvoja lasketaan uudelleen tallentamisen sijaan.",
+                "mixedPrecision": "Vähentää opetuksen tarkkuuden 32-bittisestä 16-bittiseksi muistin ja ajan säästämiseksi. Kaikki laitteet eivät tue sitä, ja se voi heikentää mallin laatua.",
                 "layerDrop": "Pudottaa opetuksen aikana satunnaisesti kokonaisia kerroksia yleistyksen parantamiseksi.",
                 "dropout": "Pudottaa opetuksessa satunnaisia parametreja yleistyksen parantamiseksi.",
-                "warmupSteps": "Nostaa oppimisnopeutta vähitellen opetuksen alussa.",
-                "decayEpochs": "Laskee oppimisnopeutta vähitellen valittujen epookkien aikana.",
+                "warmupSteps": "Nostaa oppimisnopeutta vähitellen ensimmäisten askelten aikana, jotta satunnaisista alkuarvoista lähtö olisi vakaampi.",
+                "decayEpochs": "Laskee oppimisnopeutta vähitellen valittujen epookkien aikana konvergenssin parantamiseksi. Alussa opitaan nopeasti, myöhemmin tehdään pienempiä parannuksia.",
                 "weightDecay": "Lisää rangaistuksen suurille parametriarvoille ylisovittamisen estämiseksi.",
-                "gradClipping": "Rajoittaa gradienttien kokoa estääkseen epävakaat opetusaskeleet.",
-                "validationSplit": "Osa opetusdatasta varataan validointiin. Tätä dataa ei näytetä mallille opetuksen aikana.",
-                "saveToOPFS": "Tallentaa tokenit levylle muistin sijaan. Hyödyllinen isoille aineistoille."
+                "gradClipping": "Rajoittaa gradienttien kokoa estääkseen räjähtävät gradientit opetuksen aikana. Yksi huono askel voi pilata mallin, joten tällä pidetään opetus hallinnassa.",
+                "validationSplit": "Osa opetusdatasta varataan mittaamaan, kuinka hyvin malli oppii. Tätä validointidataa ei näytetä mallille opetuksen aikana, joten se ei voi huijata.",
+                "saveToOPFS": "Käytä tokenien tallennukseen levytilaa muistin sijaan. Hyödyllinen suurille aineistoille, mutta voi olla mahdollinen yksityisyysriski."
             }
         },
         "close": "Sulje",
@@ -220,7 +187,7 @@
         "sortLargest": "Suurin",
         "sortSimple": "Yksinkertaisin",
         "sortComplex": "Monimutkaisin",
-        "help": "Kielimalli oppii esimerkkitekstistä. Mitä enemmän tekstiä annat, sitä paremmin malli voi oppia. Voit kirjoittaa omaa tekstiä, ladata tiedostoja tai käyttää aineistokirjastoamme."
+        "help": "## Tekstidata\n\nKielimalli **oppii kuvioita** esimerkkitekstistä. Mitä enemmän tekstiä annat, sitä paremmin se oppii. Pienetkin mallit tarvitsevat yleensä **vähintään 30 miljoonaa (30M) merkkiä**.\n\nKäytä **pelkkää jäsentymätöntä tekstiä** kuten esseitä, romaaneja tai artikkeleita, joissa ei ole paljon muotoilua tai rakennetta.\n\nVoit kirjoittaa omaa tekstiä, ladata tiedostoja tai käyttää aineistokirjastoamme."
     },
     "checkmodel": {
         "title": "Rakenna malli",
@@ -228,7 +195,7 @@
         "refresh": "Nollaa",
         "outdated": "Malli täytyy rakentaa uudelleen",
         "upToDate": "Malli on valmis käyttöön.",
-        "help": "Mallin rakentaminen varaa resursseja ja asettaa parametreille satunnaiset arvot.",
+        "help": "## Mallin rakentaminen\n\nMallin rakentaminen varaa muistiresursseja ja asettaa parametreille satunnaiset alkuarvot.\n\nJos muutat mallin arkkitehtuuria tai kokoa, malli on rakennettava uudelleen. Uudelleenrakennus **poistaa kaiken aiemman opetuksen**, koska parametrit arvotaan uudestaan.",
         "exceedsSizeLimit": "Mallissa on liikaa parametreja.",
         "confirm": {
             "title": "Rakenna malli uudelleen",
@@ -236,7 +203,8 @@
         }
     },
     "foundation": {
-        "title": "Perusmallit"
+        "title": "Perusmallit",
+        "help": "## Perusmallit\n\nPerusmallit on **esikoulutettu** suurella tekstimäärällä, ja niitä voi käyttää oman mallin lähtökohtana.\n\nValitse tavoitteeseesi sopiva malli ja säädä sitä omalla datallasi.\n\nEsikoulutetun mallin käyttö säästää aikaa ja energiaa, koska se on jo oppinut yleisiä kielen rakenteita, joita voidaan hyödyntää uudelleen."
     },
     "model": {
         "parameters": "Parametrit",
@@ -281,10 +249,10 @@
         "busy": "Malli työskentelee...",
         "noModel": "Ei mallia",
         "error": "Mallissa tapahtui virhe",
-        "parametersHelp": "Mallin numeeristen parametrien kokonaismäärä.",
-        "help": "Malli sisältää parametrit ja arkkitehtuurin, joita säädetään opetuksen aikana ja joita käytetään seuraavan tokenin ennustamiseen.",
+        "parametersHelp": "Mallin **numeeristen parametrien kokonaismäärä**.\n\nUseammat parametrit mahdollistavat monimutkaisempien kuvioiden oppimisen, mutta vaativat enemmän muistia, aikaa ja dataa opetukseen.",
+        "help": "## Oma mallisi\n\nTämä laatikko edustaa mallia, jota olet luomassa.\n\nMalli on **matemaattinen esitys** datasi kuvioista. Se koostuu **numeerisista parametreista**, joita säädetään opetuksen aikana.\n\nParametrit ovat yhtälöiden syötteitä, joiden avulla ennustetaan seuraava tekstin osa (esimerkiksi sana tai kirjain).",
         "visualHelp": "Tämä kaavio näyttää mallin rakenteen eli arkkitehtuurin. Siinä on syötteitä, useita parametrikerroksia ja ulostulo. Voit muokata mallin muotoa muuttaaksesi parametrien määrää ja sijaintia.",
-        "archHelp": "Valitse kielimallisi koko ja muoto ennen opetusta."
+        "archHelp": "## Malliarkkitehtuuri\n\nMallisi **sisältää parametrit**, joita säädetään opetuksen aikana ja käytetään seuraavan tokenin ennustamiseen.\n\nArkkitehtuuri määrittää, kuinka paljon parametreja mallissa on ja miten ne on järjestetty. Parametrien sijainnin muuttaminen vaikuttaa siihen, millaisia kuvioita malli voi oppia."
     },
     "training": {
         "title": "Opetus",
@@ -326,7 +294,7 @@
             "tokeniserNotTrained": "Tokenisoijaa ei ole opetettu."
         },
         "predictionsHeader": "Parhaat ennusteet",
-        "help": "Oppimisprosessi, jossa parametreja säädetään vähitellen, kunnes malli pystyy toistamaan esimerkkidatastasi löytyviä kuvioita. Jäljellä oleva aika kertoo, kuinka kauan koko datan läpikäynti kestää.",
+        "help": "## Mallin opetus\n\nOppimisprosessi, jossa **parametreja säädetään vähitellen** ylös tai alas, kunnes malli pystyy toistamaan esimerkkidatastasi löytyviä kuvioita.\n\nVoit vaihtaa ympyräilmaisimesta ajan ja energiankulutuksen näkymää. Jäljellä oleva aika (tai energia) kertoo, kuinka kauan koko datan läpikäynti vielä kestää.",
         "attentionHelp": "Lyhyt esimerkki datastasi. Malli yrittää ennustaa korostetun tokenin aiemman tekstin perusteella. Esimerkki muunnetaan numeerisiksi tokeneiksi. Mallin jokainen kerros kohdistaa huomiota tekstin eri osiin.",
         "modelBoxHelp": "Mallisi jokainen kerros osallistuu lopulliseen ennusteeseen yksi kerrallaan. Kerrosten parametreja säädetään sen mukaan, kuinka hyvin ne auttoivat ennustamaan.",
         "lossBoxHelp": "Kun malli on tehnyt ennusteen, sitä verrataan oikeaan vastaukseen. Häviö mittaa, kuinka väärä ennuste oli, joten opetuksessa pyritään pienentämään tätä arvoa.",
@@ -358,7 +326,8 @@
         "errors": {
             "modelNotReady": "Malli ei ole valmis generointiin, yritä hetken kuluttua uudelleen.",
             "generationError": "Tekstin generoinnissa tapahtui tuntematon virhe."
-        }
+        },
+        "help": "## Tekstin generointi\n\nKun mallin parametrit on opetettu, niitä voidaan käyttää ennustamaan seuraava token (**\"päättely\"**) tekstijonossa hyödyntäen kehotettasi ja aiempia ennusteita (eli **kontekstia**). Tätä vaiheittaista prosessia kutsutaan **autoregressiiviseksi generoinniksi**.\n\nSe, kuinka hyvin malli generoi tai vastaa kehotteisiin, riippuu opetuksen laadusta ja datan laadusta."
     },
     "evaluation": {
         "title": "Arviointi",
@@ -415,9 +384,9 @@
             "validation": "Validointi",
             "history": "Historia",
             "performance": "Suorituskyky",
-            "validationHelp": "Osaa datastasi käytetään testaamaan, kuinka hyvin malli oppii. Tätä validointidataa ei näytetä mallille opetuksen aikana, joten se ei voi huijata.",
-            "accuracyHelp": "Tarkkuus on oikein osuneiden ennusteiden prosenttiosuus.",
-            "lossHelp": "Häviö mittaa, kuinka väärin mallin ennusteet menivät. Se kuvaa informaation menetystä."
+            "validationHelp": "## Validointidata\n\nOsa datastasi käytetään testaamaan, kuinka hyvin malli oppii eikä vain muista ulkoa.\n\nTätä validointidataa ei näytetä mallille opetuksen aikana, joten se ei voi huijata.",
+            "accuracyHelp": "**Tarkkuus** on oikein osuneiden ennusteiden prosenttiosuus.",
+            "lossHelp": "**Häviö** mittaa, kuinka väärin mallin ennusteet menivät. Se kuvaa informaation menetystä."
         },
         "inferenceHint": "Aloita tekstin generointi nähdäksesi animoidun visualisoinnin toiminnasta.",
         "trainingHint": "Aloita opetus nähdäksesi animoidun visualisoinnin opetuksen toiminnasta.",
@@ -452,7 +421,8 @@
         "noData": "Dataa ei ole saatavilla",
         "noModel": "Mallia ei ole valittu",
         "includeSpecial": "Sisällytä erikoistokenit",
-        "help": "Sanasto on kirjaimista, sanoista tai sananosista koostuva joukko, joka toimii mallin kielen rakennuspalikoina. Näitä palikoita kutsutaan tokeneiksi, ja jokaiselle annetaan yksilöllinen numero. Sanaston rakentaminen käsittelee datasi ja etsii parhaat tokenit."
+        "includeSpecialHelp": "Erikoistokenit ovat ohjaustokeneita, jotka auttavat tekstin rakenteessa ja ulostulossa.",
+        "help": "## Token-sanasto\n\nSanasto on joukko kirjaimia, sanoja tai sananosia, jotka toimivat mallin kielen rakennuspalikoina. Näitä palikoita kutsutaan **tokeneiksi**, ja jokaiselle annetaan **yksilöllinen numero**.\n\nSanaston rakentaminen käsittelee datasi ja etsii tekstistä yleisimmät tokenit. Koska sanaston koko on rajallinen, parhaiden yleisten tokenien valinta on tärkeää."
     },
     "tokeniseData": {
         "title": "Tokenisoi data",
@@ -471,7 +441,7 @@
         "progressHelp": "Tarvittavien tokenien tavoitemäärä.",
         "deleteAll": "Poista kaikki tokenit",
         "busy": "Muunnetaan tokeneiksi...",
-        "help": "Tekstidata täytyy jakaa numeerisiksi tokeneiksi, joita matemaattinen malli voi käyttää. Suuremmat mallit tarvitsevat enemmän tokeneita, joten etenemispalkki näyttää, paljonko niitä saatat tarvita."
+        "help": "## Tokenisointi\n\nTekstidata täytyy jakaa numeerisiksi tokeneiksi, joita matemaattinen malli voi käyttää.\n\nEdistymispalkki näyttää, kuinka paljon tokeneita datastasi on muodostettu. **Suuremmat mallit tarvitsevat enemmän tokeneita**, joten palkki näyttää myös, paljonko niitä voi olla tarpeen tuottaa hyvää opetusta varten."
     },
     "instruct": {
         "title": "Hienosäätödata",

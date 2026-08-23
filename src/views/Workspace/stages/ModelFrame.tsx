@@ -28,6 +28,7 @@ export default function ModelFrame({ observer, scrollFrame }: Props) {
                     <Help
                         message={t('model.archHelp')}
                         inplace
+                        keepOpen
                     >
                         <h3>{t('model.title')}</h3>
                     </Help>

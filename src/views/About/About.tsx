@@ -8,7 +8,7 @@ import { Button } from '@genai-fi/base';
 export default function About() {
     const { key } = useLocation();
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t } = useTranslation('privacy');
 
     const doReturn = useCallback(() => {
         navigate(-1);

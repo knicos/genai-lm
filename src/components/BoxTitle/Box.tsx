@@ -10,6 +10,7 @@ interface Props extends PropsWithChildren {
     className?: string;
     fullWidth?: boolean;
     disableHiding?: boolean;
+    useParent?: boolean;
 }
 
 const isTest = globalThis?.process?.env?.NODE_ENV === 'test';
@@ -23,6 +24,7 @@ export default function Box({
     children,
     fullWidth = false,
     disableHiding = false,
+    useParent = false,
 }: Props) {
     const ref = useRef<HTMLDivElement>(null);
     const [visible, setVisible] = useState(false);
@@ -30,20 +32,21 @@ export default function Box({
 
     useEffect(() => {
         if (ref.current) {
-            const remove = widget ? workflowContext.registerElement(widget, ref.current) : undefined;
+            const element = useParent ? (ref.current.parentElement ?? ref.current) : ref.current;
+            const remove = widget ? workflowContext.registerElement(widget, element) : undefined;
             const io = new IntersectionObserver(
                 ([entry]) => {
                     setVisible(entry.isIntersecting);
                 },
                 { rootMargin: '50px' }
             );
-            io.observe(ref.current);
+            io.observe(element);
             return () => {
                 io.disconnect();
                 remove?.();
             };
         }
-    }, [widget, workflowContext]);
+    }, [widget, workflowContext, useParent]);
 
     return (
         <div

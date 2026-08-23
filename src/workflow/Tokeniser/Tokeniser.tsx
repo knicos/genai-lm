@@ -4,18 +4,17 @@ import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@genai-fi/base';
+import { Button, Help } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import { useEffect, useState } from 'react';
 import useModelPhase from '../../hooks/useModelMode';
 import { Alert } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import HelpBox from '../../components/Help/HelpBox';
-import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { trainingAnimation } from '../../state/animations';
 import ProgressBox from '../TextData/ProgressBox';
 import DataProgress from '../../components/DataProgress/DataProgress';
+import Box from '../../components/BoxTitle/Box';
 
 export default function Tokeniser() {
     const { t } = useTranslation();
@@ -44,7 +43,9 @@ export default function Tokeniser() {
             setDone(model?.tokeniser.trained ?? false);
         };
         model?.on('status', h);
-        setCount(model?.tokeniser.vocabSize ?? 0);
+        if (model?.tokeniser.trained) {
+            setCount(model?.tokeniser.vocabSize ?? 0);
+        }
         setDone(model?.tokeniser.trained ?? false);
         return () => {
             model?.off('status', h);
@@ -52,15 +53,19 @@ export default function Tokeniser() {
     }, [model]);
 
     return (
-        <HelpBox
+        <Help
             widget="tokeniser"
             message={t('tokeniser.help')}
             active={dataset !== null && dataset.length > 0}
+            keepOpen
+            placement="right"
         >
-            <BoxStandalone
+            <Box
                 style={{ width: '250px', minHeight: '180px' }}
                 active={dataset !== null && dataset.length > 0}
+                widget="tokeniser"
                 disabled={istraining}
+                useParent
             >
                 <div className={style.container}>
                     <BoxTitle
@@ -141,7 +146,7 @@ export default function Tokeniser() {
                         />
                     )}
                 </div>
-            </BoxStandalone>
-        </HelpBox>
+            </Box>
+        </Help>
     );
 }

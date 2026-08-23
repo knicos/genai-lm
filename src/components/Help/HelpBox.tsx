@@ -4,6 +4,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { CSSProperties, MouseEvent, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { useWorkflowContext } from '@genai-fi/base';
+import Markdown from 'react-markdown';
 
 interface Props extends PropsWithChildren {
     message: string;
@@ -80,7 +81,7 @@ export default function HelpBox({
                 open={!!anchorEl}
                 placement={placement}
             >
-                {message}
+                <Markdown>{message}</Markdown>
             </InfoPop>
         </div>
     );

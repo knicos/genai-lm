@@ -1,4 +1,5 @@
 import { BoxButton } from '../../../components/BoxButton/BoxButton';
+import { Help } from '@genai-fi/base';
 import Frame from '../Frame';
 import TextTrainer from '../../../workflow/TextTraining/TextTraining';
 import style from '../style.module.css';
@@ -50,7 +51,13 @@ export default function PretrainFrame({ observer, scrollFrame }: Props) {
                 />
             </div>
             <div className={style.titleColumn}>
-                <h3>{t('generator.title')}</h3>
+                <Help
+                    message={t('generator.help')}
+                    inplace
+                    keepOpen
+                >
+                    <h3>{t('generator.title')}</h3>
+                </Help>
                 <FullSizeGroup widget="chatOutput">
                     <RawGeneration />
                     <RawPrompt />

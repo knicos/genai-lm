@@ -5,6 +5,7 @@ import style from './style.module.css';
 import { MouseEvent, PointerEvent, useEffect, useMemo, useState } from 'react';
 import { FormControlLabel, Switch } from '@mui/material';
 import InfoPop from '../../components/InfoPop/InfoPop';
+import { Help } from '@genai-fi/base';
 
 export function Component() {
     const { t } = useTranslation();
@@ -45,15 +46,21 @@ export function Component() {
     return (
         <div className="sidePanel">
             <h2>{t('tokeniser.title')}</h2>
-            <FormControlLabel
-                control={
-                    <Switch
-                        checked={includeSpecial}
-                        onChange={(_, checked) => setIncludeSpecial(checked)}
-                    />
-                }
-                label={t('tokeniser.includeSpecial')}
-            />
+            <Help
+                message={t('tokeniser.includeSpecialHelp')}
+                inplace
+                dark
+            >
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={includeSpecial}
+                            onChange={(_, checked) => setIncludeSpecial(checked)}
+                        />
+                    }
+                    label={t('tokeniser.includeSpecial')}
+                />
+            </Help>
             <ul className={style.vocabList}>
                 {filteredVocab.map(({ token, index }) => (
                     <li

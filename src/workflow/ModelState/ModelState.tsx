@@ -112,6 +112,7 @@ export default function ModelState() {
             message={t('model.help')}
             style={{ borderRadius: '20px' }}
             placement="top"
+            keepOpen
         >
             <BoxStandalone
                 className={style.modelThread}

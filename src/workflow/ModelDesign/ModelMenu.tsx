@@ -36,24 +36,18 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
                     {t('model.examples')}
                 </VerticalButton>
             )}
-            <div style={{ width: '1rem' }} />
             <VerticalButton
                 startIcon={<RestartAltIcon />}
                 onClick={onReset}
             >
                 {t('model.reset')}
             </VerticalButton>
-            <VerticalButton
-                startIcon={<TuneIcon />}
-                onClick={onShowSettings}
-            >
-                {t('training.settings')}
-            </VerticalButton>
 
             <div className={style.parameters}>
                 <Help
                     message={t('model.parametersHelp')}
                     inplace
+                    keepOpen
                 >
                     {estimated > sizeLimit && (
                         <WarningIcon
@@ -66,6 +60,13 @@ export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) 
                     {`${t('model.parameters')}`}
                 </Help>
             </div>
+
+            <VerticalButton
+                startIcon={<TuneIcon />}
+                onClick={onShowSettings}
+            >
+                {t('training.settings')}
+            </VerticalButton>
         </BoxMenu>
     );
 }

@@ -11,6 +11,7 @@ import { useChangePath } from '../../../hooks/useChangePath';
 import { workflowSteps } from '../../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
 import { Help } from '@genai-fi/base';
+import Markdown from 'react-markdown';
 
 interface Props {
     observer: IntersectionObserver;
@@ -32,8 +33,9 @@ export default function DataFrame({ observer, scrollFrame }: Props) {
         >
             <div className={style.titleColumn}>
                 <Help
-                    message={t('data.help')}
+                    message={<Markdown>{t('data.help')}</Markdown>}
                     inplace
+                    keepOpen
                 >
                     <h3>{t('data.title')}</h3>
                 </Help>

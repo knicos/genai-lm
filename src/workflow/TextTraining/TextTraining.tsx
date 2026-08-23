@@ -1,4 +1,4 @@
-import { Button } from '@genai-fi/base';
+import { Button, Help } from '@genai-fi/base';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import { ITrainingJob, TrainingLogEntry } from '@genai-fi/nanogpt';
@@ -19,9 +19,8 @@ import { LinearProgress, Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
 import { dataEntries, datasetIdAtom, dataTokens, validationTokens } from '../../state/data';
-import HelpBox from '../../components/Help/HelpBox';
-import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import { autoTokeniseData, configureModelForTraining, saveCheckpoint } from './utilities';
+import Box from '../../components/BoxTitle/Box';
 
 interface Props {
     autoTokenise?: boolean;
@@ -277,14 +276,18 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     };
 
     return (
-        <HelpBox
+        <Help
             message={t('training.help')}
             widget="trainer"
-            active={!!model || (!!dataset && dataset.tokens.getShardCount() > 0)}
+            active={!!model && !!dataset && dataset.tokens.getShardCount() > 0}
+            keepOpen
+            placement="right"
         >
-            <BoxStandalone
+            <Box
                 style={{ width: '300px', minHeight: '360px' }}
-                active={!!model || (!!dataset && dataset.tokens.getShardCount() > 0)}
+                active={!!model && !!dataset && dataset.tokens.getShardCount() > 0}
+                widget="trainer"
+                useParent
             >
                 <div className={style.container}>
                     <BoxTitle
@@ -353,7 +356,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                         />
                     )}
                 </div>
-            </BoxStandalone>
-        </HelpBox>
+            </Box>
+        </Help>
     );
 }

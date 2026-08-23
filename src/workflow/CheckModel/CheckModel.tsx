@@ -3,19 +3,18 @@ import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { modelAtom, modelConfigAtom, modelSizeLimit } from '../../state/model';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@genai-fi/base';
+import { Button, Help } from '@genai-fi/base';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import { utilities, GPTConfig, TeachableLLM } from '@genai-fi/nanogpt';
 import { Alert } from '@mui/material';
 import { useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
-import HelpBox from '../../components/Help/HelpBox';
-import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { trainingAnimation } from '../../state/animations';
 import { deleteCheckpoint } from '../../utilities/db';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
+import Box from '../../components/BoxTitle/Box';
 
 function isConfigEqual(a: GPTConfig, b: GPTConfig) {
     return (
@@ -63,15 +62,19 @@ export default function CheckModel() {
     };
 
     return (
-        <HelpBox
+        <Help
             message={t('checkmodel.help')}
             widget="checkmodel"
             active={ready}
+            keepOpen
+            placement="right"
         >
-            <BoxStandalone
+            <Box
                 style={{ minWidth: '290px', minHeight: '100px' }}
                 active={ready}
+                widget="checkmodel"
                 disabled={istraining}
+                useParent
             >
                 <div className={style.container}>
                     <BoxTitle
@@ -135,7 +138,7 @@ export default function CheckModel() {
                         onCancel={() => setShowConfirm(false)}
                     />
                 </div>
-            </BoxStandalone>
-        </HelpBox>
+            </Box>
+        </Help>
     );
 }

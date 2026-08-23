@@ -42,7 +42,7 @@ export function SettingsForm({ settings, setSettings }: Props) {
                     value={settings.maxEpochs}
                     onChange={(_, value) => setSettings({ ...settings, maxEpochs: value as number })}
                     min={1}
-                    max={10}
+                    max={100}
                     step={1}
                     valueLabelDisplay="auto"
                 />

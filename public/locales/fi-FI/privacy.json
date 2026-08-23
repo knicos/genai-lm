@@ -1,0 +1,39 @@
+{
+    "about": {
+        "back": "Takaisin",
+        "title": "Generation AI",
+        "privacyTitle": "Tietosuojailmoitus",
+        "privacy": [
+            "Tämä tietosuojailmoitus kertoo, miten käsittelemme henkilötietojasi, kun käytät GenAI Little Language Machine -sivustoa.",
+            "Henkilötieto tarkoittaa tietoa, josta sinut voidaan tunnistaa, kuten IP-osoite.",
+            "Lue tämä ilmoitus, jotta ymmärrät mitä tietoja keräämme, miksi keräämme niitä ja mitkä oikeutesi ovat.",
+            "Jos sinulla on kysymyksiä, ota yhteyttä rekisterinpitäjään:",
+            "**Dr. Nicolas Pope**,",
+            "**Postiosoite:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
+            "**Email:** nicolas.pope@uef.fi",
+            "**Puhelin:** +358 505 288 449.",
+            "### 1. Tietojen käsittely:",
+            "Kirjaamme IP-osoitteet.",
+            "Emme käytä seurantaan tai analytiikkaan tarkoitettuja evästeitä.",
+            "### 2. Käsittelyn tarkoitukset:",
+            "IP-osoitteiden lokitus auttaa ylläpitämään sivuston turvallisuutta.",
+            "### 3. Käsittelyn oikeusperuste:",
+            "Käsittelemme tietoja pääosin oikeutetun edun perusteella sivuston suojaamiseksi.",
+            "### 4. Oikeutettu etu:",
+            "Tavoitteena on pitää sivusto toimivana ja turvallisena.",
+            "### 5. Turvallisuus:",
+            "Suojaamme IP-osoitteet luvattomalta käytöltä.",
+            "### 6. Tietojen vastaanottajat:",
+            "Vain valtuutettu henkilöstö voi käyttää IP-osoitetta.",
+            "### 7. Tietojen siirto:",
+            "IP-osoitteita voidaan siirtää Microsoftin palvelimille GDPR:n mukaisesti.",
+            "### 8. Säilytysaika:",
+            "Säilytämme IP-osoitteita vain tarvittavan ajan, yleensä enintään 7 päivää.",
+            "### 9. Oikeutesi:",
+            "Sinulla on oikeus saada tietoa, pyytää pääsyä tietoihin, pyytää oikaisua tai poistoa sekä tehdä valitus.",
+            "### 10. Päivitykset tähän ilmoitukseen:",
+            "Voimme päivittää ilmoitusta käytäntöjen tai lakimuutosten vuoksi.",
+            "Kysymykset ja oikeuksien käyttö: nicolas.pope@uef.fi"
+        ]
+    }
+}

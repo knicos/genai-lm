@@ -1,0 +1,40 @@
+{
+    "about": {
+        "back": "Tillbaka",
+        "title": "Generation AI",
+        "privacyTitle": "Sekretessmeddelande",
+        "privacy": [
+            "Välkommen till vårt sekretessmeddelande som förklarar hur vi hanterar dina personuppgifter när du använder GenAI Little Language Machine.",
+            "Detta meddelande beskriver kort hur vi samlar in, använder och skyddar data.",
+            "Personuppgifter kan vara information som kan identifiera dig, till exempel din IP-adress.",
+            "Läs detta meddelande för att förstå vilken data vi samlar in, varför vi gör det och vilka rättigheter du har.",
+            "Om du har frågor, kontakta ansvarig:",
+            "**Dr. Nicolas Pope**,",
+            "**Adress:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
+            "**Email:** nicolas.pope@uef.fi",
+            "**Telefon:** +358 505 288 449",
+            "### 1. Behandling av data:",
+            "Vi loggar IP-adresser.",
+            "Vi använder inte spårningscookies; innehåll visas baserat på dina inmatningar.",
+            "### 2. Syften:",
+            "IP-adresser hjälper oss att hålla webbplatsen säker och förebygga missbruk.",
+            "### 3. Rättslig grund:",
+            "Vi behandlar data främst utifrån vårt berättigade intresse att skydda webbplatsen, och ibland baserat på ditt samtycke.",
+            "### 4. Berättigade intressen:",
+            "Att upprätthålla webbplatsens säkerhet och funktion.",
+            "### 5. Säkerhet:",
+            "Vi skyddar IP-adresser mot otillåten åtkomst.",
+            "### 6. Mottagare:",
+            "Endast behörig personal kan se dina IP-adresser.",
+            "### 7. Överföringar:",
+            "IP-adresser kan överföras till Microsoft-servrar, vi följer GDPR.",
+            "### 8. Lagringstid:",
+            "Vi behåller IP-adresser så kort tid som behövs, vanligtvis upp till 7 dagar.",
+            "### 9. Dina rättigheter:",
+            "Du har rätt att få information, begära åtkomst, rättelse, radering, invända mot behandling och att lämna klagomål.",
+            "### 10. Uppdateringar:",
+            "Vi kan uppdatera detta meddelande när våra rutiner eller lagkrav ändras.",
+            "Kontakta nicolas.pope@uef.fi för frågor eller för att utöva dina rättigheter."
+        ]
+    }
+}

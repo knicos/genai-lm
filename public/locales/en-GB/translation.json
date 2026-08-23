@@ -1,46 +1,6 @@
 {
     "about": {
-        "back": "Back",
-        "title": "Generation AI",
-        "privacyTitle": "Privacy Notice",
-        "privacy": [
-            "Welcome to our Privacy Notice, designed to inform you about how we handle your personal data following the General Data Protection Regulation (GDPR) when you use our website featuring the GenAI Little Language Machine tool.",
-            "To make the subject matter of this notice clearer, let us define some terms from the GDPR. The \"controller\" refers to us, as we decide how and why your personal data is used, which also makes us responsible for protecting your personal data. \"Personal data\" includes any information that can identify you directly or indirectly, like your IP address. \"Processing\" covers all actions done with your data, such as collecting, storing, using, and deleting it.",
-            "It is important to read this notice to understand what data we collect from you, why we collect it, what we do with it, and what rights you have regarding your data.",
-            "If you have any questions about this notice, please reach out to the controller:",
-            "**Dr. Nicolas Pope**,",
-            "**Postal address:** University of Eastern Finland, Länsikatu 15, 80110 Joensuu, Finland.",
-            "**Email:** nicolas.pope@uef.fi",
-            "**Phone:** +358 505 288 449.",
-            "### 1. Data Processing Activity:",
-            "We log IP addresses.",
-            "However, we do not use cookies for tracking or analytics; instead, we provide content based solely on your inputs.",
-            "### 2. Purposes of Processing:",
-            "Logging IP addresses helps maintain website integrity and security by identifying and preventing malicious activities.",
-            "### 3. Legal Basis for Processing:",
-            "Primarily, we process IP addresses for security reasons, based on our legitimate interest in protecting our website and data as per Article 6(1)(f) GDPR. Again, we may also process data based on your consent under Article 6(1)(a) GDPR if you would like to exercise your right to access your logged IP address. In addition, we may process your personal data if we are instructed to do so by a competent court under Article 6(1)(c).",
-            "### 4. Legitimate Interests Pursued:",
-            "Our goal is to keep the website running by maintaining website integrity, and security, and preventing abuse.",
-            "### 5. Security:",
-            "We implement security measures to protect your IP addresses from unlawful access or damage. Your IP addresses are encrypted during any subsequent transfer.",
-            "### 6. Data Recipients:",
-            "Only authorized website personnel can access your IP address for security and maintenance purposes.",
-            "### 7. Data Transfers:",
-            "IP addresses may be transferred to Microsoft servers, but we ensure GDPR compliance for data protection.",
-            "### 8. Storage Limitation:",
-            "We keep IP addresses only as long as necessary, typically up to 7 days, unless required by law.",
-            "### 9. Your Rights:",
-            "Under GDPR, you have rights including",
-            "* Right to be informed: In addition to informing, you about processing purposes, retention periods, and to whom your data is shared, you have the right to be informed on how we collect. We collect your IP address when you visit our website.",
-            "* Right to access: you can request a copy of your logged IP address and associated log data.",
-            "* Right to rectification: if the logged data is inaccurate or incomplete, you can request rectification although IP address is not typically something that can be corrected in the same way as other data.",
-            "* Right to erasure: you can request deletion of your IP address within 7 days of your last visit to this website since your address is deleted automatically after 7 days.",
-            "* Right to object: you can object to the processing of your IP addresses.",
-            "* Right to lodge a complaint: you can lodge a complaint to the supervisory authority if you think that your data is not processed following GDPR provisions.",
-            "### 10. Updates to This Privacy Notice:",
-            "We may update this notice to reflect changes in our data processing practices or legal requirements. We will notify you of any changes.",
-            "We value your privacy and we are committed to protect your data and ensuring GDPR compliance. If you have questions or want to exercise your rights, contact us at nicolas.pope@uef.fi."
-        ]
+        "privacyTitle": "Privacy Notice"
     },
     "app": {
         "little": "Little",
@@ -62,14 +22,15 @@
             "confirm": "Load"
         },
         "workflow": {
-            "empty_desc": "Design your model structure and start from scratch.",
-            "base_desc": "Use a base model and adapt it to a new task with your data.",
-            "complete_desc": "Cover all the stages in making a chatbot.",
+            "empty_desc": "Design your language model architecture and start from scratch.",
+            "base_desc": "Use an already trained model and adapt it to a new topic with your data.",
+            "complete_desc": "Cover all the stages in making a chatbot, from architecture to deployment.",
             "finetune_desc": "Adjust the style and personality of an existing model.",
             "advanced_desc": "Access additional settings and features for advanced use.",
             "model_desc": "Select your model size and shape.",
             "data_desc": "Add your own text data for the model to learn from.",
-            "pretrain_desc": "Train the model to learn from your data."
+            "pretrain_desc": "Train the model to learn from your data.",
+            "deployment_desc": "Deploy your model to let others chat with it."
         },
         "settings": {
             "title": "Settings",
@@ -133,12 +94,12 @@
             "heads": "Attention Heads",
             "headsHelp": "Change the number of attention heads in the transformer blocks. More heads can allow the model to focus on different parts of the input simultaneously.",
             "arch": "Model Settings",
-            "contextHelp": "The number of tokens the model can see to make its predictions.",
-            "batchHelp": "The number of samples processed at the same time to average out any problems.",
-            "lrHelp": "How fast to tune the parameters with each training step.",
+            "contextHelp": "The **number of previous tokens** the model can see to make its predictions.",
+            "batchHelp": "The number of samples processed at the same time to average out any problems.\n\nA larger number can also speed up training but will require more memory.",
+            "lrHelp": "How fast to tune the parameters with each training step.\n\nToo low and nothing changes, too high and learning becomes unstable.",
             "sizeLimit": "Model Size Limit (Millions of Parameters)",
             "speed": "Animation speed",
-            "temperatureHelp": "Higher temperature produces more random outputs as it is less likely to select the most obvious next token.",
+            "temperatureHelp": "After making a prediction, the actual token needs to be selected by using the probability. Some randomness is added to increase diversity.\n\nA **higher temperature produces more random outputs** as it is less likely to select the most obvious next token.",
             "trainingVis": "Training",
             "inferenceVis": "Generation",
             "promptMode": "Prompt Mode",
@@ -181,7 +142,7 @@
     "workflow": {
         "model": "Model",
         "empty": "Empty Model",
-        "base": "Base Model",
+        "base": "Pre-trained Model",
         "complete": "Entire Workflow",
         "advanced": "Advanced Workflow",
         "data": "Data",
@@ -196,7 +157,7 @@
         "datasetTooltip": "Search our dataset library",
         "writeTip": "Write or paste your own text data.",
         "uploadTip": "Upload files containing text data. Supported formats: txt, csv, pdf, docx.",
-        "dataHint": "Use our dataset library to find text, or drop files here (txt, csv, pdf, docx) for training text. Any text can be used but there should be a lot.",
+        "dataHint": "Use our dataset library to find text, or drop files here (txt, csv, pdf, docx, jsonl or zip) for training text. Any text can be used but there should be a lot.",
         "modelHint": "Please select a model first.",
         "add": "Write",
         "upload": "Upload",
@@ -213,7 +174,7 @@
         "downloading": "Downloading {{count}} file(s)",
         "load": "Load",
         "errors": {
-            "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx).",
+            "fileLoadError": "You can only drop files with text (txt, csv, pdf, docx, json, jsonl or zipped versions).",
             "downloadLoadError": "There was an unknown error loading the downloaded file.",
             "libraryError": "Could not load the dataset library. Please check your internet connection."
         },
@@ -226,7 +187,7 @@
         "sortLargest": "Largest",
         "sortSimple": "Simplest",
         "sortComplex": "Most Complex",
-        "help": "A language model learns from example text. The more text you provide, the better it can learn. You can write your own text, upload files or use our dataset library."
+        "help": "## Text Data\n\nA language model **learns patterns** from example text. The more text you provide, the better it can learn. Even tiny models require **at least 30 million (30M) characters**.\n\nUse **plain unstructured text** like essays, novels or articles that do not include a lot of styling or structure.\n\nYou can write your own text, upload files or use our dataset library."
     },
     "checkmodel": {
         "title": "Build Model",
@@ -234,7 +195,7 @@
         "refresh": "Reset",
         "outdated": "The model needs to be rebuilt",
         "upToDate": "Model is ready to use.",
-        "help": "Building a model will allocate resources and assign random numbers to the parameters.",
+        "help": "## Making the Model\n\nBuilding a model will allocate memory resources and assign random numbers to the parameters.\n\nIf you change the architecture or size of the model, it will need to be rebuilt. Rebuilding will **lose any training you have done** because the parameters become random again.",
         "exceedsSizeLimit": "The model has too many parameters.",
         "confirm": {
             "title": "Rebuild Model",
@@ -242,7 +203,8 @@
         }
     },
     "foundation": {
-        "title": "Base Models"
+        "title": "Pre-trained Models",
+        "help": "## Foundation Models\n\nFoundation models are **pre-trained** on a large amount of text data and can be used as a starting point for your own model.\n\nSelect a model that is close to what you want and then adjust it with your own data.\n\nUsing a pre-trained model saves time and energy because it has already learned general patterns in language that can be reused."
     },
     "model": {
         "parameters": "Parameters",
@@ -287,10 +249,10 @@
         "busy": "Model working...",
         "noModel": "No model",
         "error": "Model broke",
-        "parametersHelp": "The total number of numeric parameters in the model.",
-        "help": "Your model stores the parameters and architecture that are adjusted during training and used to predict the next token.",
+        "parametersHelp": "The **total number of numeric parameters** in the model.\n\nMore parameters allow the model to learn more patterns but will require more memory, time and data to train.",
+        "help": "## Your model\n\nThis box represents the model you are creating.\n\nA model is a **mathematical representation** of the patterns in your data. It is made up of **numeric parameters** that are adjusted during training to learn those patterns.\n\nParameters are inputs to equations that predict the next piece in a sequence of text (for example, a word or letter).",
         "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed.",
-        "archHelp": "Select the size and shape of your language model before training it."
+        "archHelp": "## Model Architecture\n\nYour model **stores the parameters** that are adjusted during training and used to predict the next token.\n\nThe architecture of the model determines how many parameters it has and how they are arranged. Changing where the parameters are located will influence the kinds of patterns it can learn."
     },
     "training": {
         "title": "Training",
@@ -332,7 +294,7 @@
             "tokeniserNotTrained": "The tokeniser has not been trained."
         },
         "predictionsHeader": "Top predictions",
-        "help": "The learning process where the parameters are slowly adjusted up or down until it can reproduce the patterns found in your example data. Time remaining is how long it will take to look at all of your data.",
+        "help": "## Model Training\n\nThe learning process where the **parameters are slowly adjusted** up or down until it can reproduce the patterns found in your example data.\n\nYou can click the circular progress indicator to switch between power and time. Time (or power) remaining is how long it will take to look at all of your data.",
         "attentionHelp": "A short example taken from your data. The model is trying to predict the highlighted token based on the previous text. The example is converted to numeric tokens. Each layer of the model pays attention to different parts of the text.",
         "modelBoxHelp": "Each layer of your model contributes towards the final prediction, one layer at a time. The parameters inside each layer are tuned by how well they contributed or not.",
         "lossBoxHelp": "After the model has made its prediction it is scored against the correct answer. Loss is a measure of how wrong the model's prediction was, so the training process tries to reduce this number.",
@@ -364,7 +326,8 @@
         "errors": {
             "modelNotReady": "Model is not ready for generation, try again in a moment.",
             "generationError": "An unknown error occurred during text generation."
-        }
+        },
+        "help": "## Generating Text\n\nAfter training the model parameters, they can be used to predict the next token (**\"inference\"**) in a sequence of text by using your prompt and any previous predictions (called **context**). This sequential process is known as **autoregressive generation**.\n\nHow well your model generates or responds to prompts depends on how well it was trained and the quality of the data."
     },
     "evaluation": {
         "title": "Evaluation",
@@ -417,13 +380,13 @@
         "pause": "Pause",
         "step": "Step",
         "training": {
-            "title": "Training Log",
+            "title": "Training Monitor",
             "validation": "Validation",
-            "history": "History",
+            "history": "History Log",
             "performance": "Performance",
-            "validationHelp": "Some of your data is used to test how well the model is learning. This validation data is not shown to the model during training so it cannot cheat.",
-            "accuracyHelp": "Accuracy is the percentage of predictions that were correct.",
-            "lossHelp": "Loss is a measure of how wrong the model's predictions were. It refers to the loss of information."
+            "validationHelp": "## Validation Data\n\nSome of your data is used to test how well the model is learning instead of memorising.\n\nThis validation data is not shown to the model during training so it cannot cheat.",
+            "accuracyHelp": "**Accuracy** is the percentage of predictions that were correct.",
+            "lossHelp": "**Loss** is a measure of how wrong the model's predictions were. It refers to the loss of information."
         },
         "inferenceHint": "Start generating text to see the animated visualisation of how it works.",
         "trainingHint": "Start training to see the animated visualisation of how training works.",
@@ -457,8 +420,9 @@
         "tokenising": "{{size}} tokens",
         "noData": "No data available",
         "noModel": "No model selected",
-        "includeSpecial": "Include special tokens",
-        "help": "The vocabulary is a set of letters, words or parts of words that are the building blocks of language for the model. These building blocks are called tokens and are assigned a unique number. Building a vocabulary will process your data to find the best tokens."
+        "includeSpecial": "Include special tokens.",
+        "includeSpecialHelp": "Special tokens are control tokens that help structure the text and output.",
+        "help": "## Token Vocabulary\n\nThe vocabulary is a set of letters, words or parts of words that are the building blocks of language for the model. These building blocks are called **tokens** and are each **assigned a unique number**.\n\nBuilding a vocabulary involves processing your data to find the most common tokens in the text. Since the size of the vocabulary is limited, it is important to choose the best common tokens."
     },
     "tokeniseData": {
         "title": "Tokenise Data",
@@ -477,7 +441,7 @@
         "progressHelp": "Target number of tokens needed.",
         "deleteAll": "Delete All Tokens",
         "busy": "Converting to tokens...",
-        "help": "Your text data needs to be split into the numeric tokens that the mathematical model can work with. Larger models need more tokens so the progress bar shows how many you may need."
+        "help": "## Tokenising\n\nYour text data needs to be split into the numeric tokens that the mathematical model can work with.\n\nA progress bar indicates how many tokens have been generated from your data. **Larger models need more tokens** so the progress bar shows how many you may need to train it well."
     },
     "instruct": {
         "title": "Tuning Data",
