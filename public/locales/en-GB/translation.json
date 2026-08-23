@@ -422,7 +422,11 @@
         "noModel": "No model selected",
         "includeSpecial": "Include special tokens.",
         "includeSpecialHelp": "Special tokens are control tokens that help structure the text and output.",
-        "help": "## Token Vocabulary\n\nThe vocabulary is a set of letters, words or parts of words that are the building blocks of language for the model. These building blocks are called **tokens** and are each **assigned a unique number**.\n\nBuilding a vocabulary involves processing your data to find the most common tokens in the text. Since the size of the vocabulary is limited, it is important to choose the best common tokens."
+        "help": "## Token Vocabulary\n\nThe vocabulary is a set of letters, words or parts of words that are the building blocks of language for the model. These building blocks are called **tokens** and are each **assigned a unique number**.\n\nBuilding a vocabulary involves processing your data to find the most common tokens in the text. Since the size of the vocabulary is limited, it is important to choose the best common tokens.",
+        "errors": {
+            "unknown": "Unable to build the vocabulary.",
+            "too_small_vocab": "The vocabulary size is too small for the data."
+        }
     },
     "tokeniseData": {
         "title": "Tokenise Data",

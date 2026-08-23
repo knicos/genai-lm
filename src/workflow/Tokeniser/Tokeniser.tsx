@@ -119,7 +119,9 @@ export default function Tokeniser() {
                                             console.error(e);
                                             setTokenising(false);
                                             setMessage({
-                                                notice: t('tokeniser.trainError'),
+                                                notice: t(`tokeniser.errors.${e.message}`, {
+                                                    defaultValue: t('tokeniser.errors.unknown'),
+                                                }),
                                                 level: 'error',
                                             });
                                         });
