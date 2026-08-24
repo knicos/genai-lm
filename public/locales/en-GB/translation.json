@@ -468,7 +468,9 @@
         "botPlaceholder": "AI response...",
         "save": "Update",
         "cancel": "Cancel",
-        "addMessage": "Add Message"
+        "addMessage": "Add Message",
+        "trainingOutput": "Training Progress",
+        "trainingStep": "Training Step {{step}}"
     },
     "finetune": {
         "title": "Fine-tuning",

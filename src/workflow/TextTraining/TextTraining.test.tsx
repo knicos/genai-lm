@@ -1,5 +1,5 @@
 import { describe, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TextTraining from './TextTraining';
 import { tokenise, data as dataModule, type ConversationStream, type TeachableLLM } from '@genai-fi/nanogpt';
@@ -56,8 +56,8 @@ describe('TextTraining', () => {
         store.set(loadedModelAtom, mockModel);
 
         const task = new dataModule.MemoryConversationStream(dataset.map((text) => [{ role: 'text', content: text }]));
-        const tokens = await tokenise.tokensFromStreams([task], tokeniser);
-        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: '', datasetId: '' });
+        const tokens = await tokenise.tokensFromStreams([task], tokeniser, 'dataset1');
+        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: 'test-tokeniser', datasetId: 'dataset1' });
 
         render(
             <TestWrapper initializeState={store}>
@@ -121,9 +121,10 @@ describe('TextTraining', () => {
         const dataset = ['some test text'];
         const tokeniser = new tokenise.CharTokeniser(100);
         const streams = textToConversations(dataset);
-        await tokeniser.train(streams);
-        const tokens = await tokenise.tokensFromStreams(streams, tokeniser);
-        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: 'test-tokeniser', datasetId: '' });
+        await tokeniser.train(streams, undefined, 'dataset2');
+        mockModel.tokeniser.id = tokeniser.id;
+        const tokens = await tokenise.tokensFromStreams(streams, tokeniser, 'dataset2');
+        store.set(dataTokens, { tokens: tokens.trainingTokens, tokeniserId: tokeniser.id, datasetId: 'dataset2' });
 
         render(
             <TestWrapper initializeState={store}>
@@ -137,9 +138,9 @@ describe('TextTraining', () => {
 
         await user.click(screen.getByText('training.start'));
 
-        await waitFor(() => expect(mockModel.training.job).toHaveBeenCalled());
-        await waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('completed', expect.any(Function)));
-        await waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('cancelled', expect.any(Function)));
-        await waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('error', expect.any(Function)));
+        await vi.waitFor(() => expect(mockModel.training.job).toHaveBeenCalled());
+        await vi.waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('completed', expect.any(Function)));
+        await vi.waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('cancelled', expect.any(Function)));
+        await vi.waitFor(() => expect(trainOnEvent).toHaveBeenCalledWith('error', expect.any(Function)));
     });
 });

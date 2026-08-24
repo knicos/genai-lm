@@ -1,34 +1,36 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import style from './style.module.css';
 import { generatorSettings, rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
-// import { trainerAtom, trainerSettings } from '../../state/trainer';
+import { trainerJobIdAtom, trainerSettings } from '../../state/trainer';
 import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
 import { conversationDataAtom } from '../../state/data';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
-    const setOutput = useSetAtom(rawGeneratedTextAtom);
+    const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [id, setID] = useAtom(rawGenerationIDAtom);
-    //const trainer = useAtomValue(trainerAtom);
+    const trainerJobId = useAtomValue(trainerJobIdAtom);
     const [generate, setGenerate] = useState(false);
-    const [hasGenerated, setHasGenerated] = useState(false);
+    //const [hasGenerated, setHasGenerated] = useState(false);
     const settings = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
     const busyRef = useRef<string | null>(null);
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ref = useRef<HTMLDivElement>(null);
-    //const outputText = useAtomValue(trainerSettings).outputText;
+    const outputText = useAtomValue(trainerSettings).outputText;
     const promptRef = useRef<string>('');
     const setConversationLog = useSetAtom(conversationDataAtom);
 
     const disable = status === 'training';
+
+    const hasGenerated = output.length > 0;
 
     /*useEffect(() => {
         if (model) {
@@ -59,47 +61,75 @@ export default function ChatPrompt() {
         }
     }, [generator, model, topP, outputText, promptMode]);*/
 
-    // FIX
-    /*useEffect(() => {
-        if (trainer && outputText && generator) {
+    useEffect(() => {
+        if (trainerJobId && outputText && model) {
             const state = {
                 count: 0,
             };
+
+            model.training.breakpoints(trainerJobId, true);
+
             const h = async () => {
+                //if (id !== trainerJobId) return;
                 state.count++;
-                if (state.count % 2 !== 0) return;
+                if (state.count % 2 !== 0) {
+                    setTimeout(() => model.training.resume(trainerJobId), 10);
+                    return;
+                }
                 try {
                     if (promptRef.current.length > 0) {
-                        await generator.generate([{ role: 'assistant', content: promptRef.current }], {
+                        const response = await model.responses.create({
+                            input: [{ role: 'assistant', content: promptRef.current }],
                             nonConversational: true,
                             continuation: true,
                             maxLength: 200,
                             temperature: 0.8,
-                            includeProbabilities: false,
-                            topP: topP > 0 ? topP : undefined,
+                            topP: 0.9,
+                            outputScore: true,
+                            outputConfidence: true,
                         });
+
+                        setOutput((prev) => [...prev, ...response.output]);
+                        //setHasGenerated(true);
                     } else {
-                        const isConversational = trainer.model.metaData.mode === 'conversational';
-                        await generator.generate({
+                        const isConversational = model?.meta.mode === 'conversational';
+                        const response = await model.responses.create({
                             nonConversational: !isConversational,
                             maxLength: 200,
                             temperature: 0.8,
-                            includeProbabilities: false,
-                            topP: topP > 0 ? topP : undefined,
+                            topP: 0.9,
+                            outputScore: true,
+                            outputConfidence: true,
                         });
+
+                        if (response.output.length > 0) {
+                            const job = model.training.getJob(trainerJobId);
+                            const step = job ? job.history?.[job.history.length - 1].step : null;
+                            if (step !== null) {
+                                response.output[0]._step = step;
+                            }
+                            response.output[0]._trainingOutput = true;
+                            response.output[0]._timestamp = Date.now();
+                        }
+
+                        setOutput((prev) => [...prev, ...response.output]);
+                        //setHasGenerated(true);
                     }
-                } catch {
-                    console.error('Auto-generation error');
+                } catch (e) {
+                    console.error('Auto-generation error', e);
                 }
 
                 //await wait(10);
+                model.training.resume(trainerJobId);
             };
-            trainer.on('log', h);
+            model.training.on('progress', h);
             return () => {
-                trainer.off('log', h);
+                model.training.off('progress', h);
             };
+        } else if (model && trainerJobId) {
+            model.training.breakpoints(trainerJobId, false);
         }
-    }, [trainer, outputText, promptMode, topP, generator]);*/
+    }, [trainerJobId, outputText, model, setOutput]);
 
     const doGenerate = async (maxLength: number, prompt?: string) => {
         if (!model || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
@@ -114,7 +144,7 @@ export default function ChatPrompt() {
             return;
         }
         if (maxLength > 1) setGenerate(true);
-        setHasGenerated(true);
+        //setHasGenerated(true);
 
         const text: GeneratorConversation[] = [];
 

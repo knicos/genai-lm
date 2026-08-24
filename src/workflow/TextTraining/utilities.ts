@@ -17,7 +17,7 @@ export async function autoTokeniseData(
         await model.tokeniser.train(conversations, undefined, datasetId);
     }
 
-    const newTokens = await tokensFromStreams(conversations, model.tokeniser, {
+    const newTokens = await tokensFromStreams(conversations, model.tokeniser, datasetId, {
         validationSplit: 0.1,
     });
 

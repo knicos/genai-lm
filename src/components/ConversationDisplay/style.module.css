@@ -56,12 +56,11 @@
 }
 
 .assistantItem {
-    padding: 1rem;
     width: 100%;
     box-sizing: border-box;
     white-space: pre-wrap;
     word-break: break-word;
-    margin-top: 1rem;
+    margin-top: 2rem;
     margin-bottom: 0;
 }
 .assistantItem.injected {
@@ -76,9 +75,10 @@
 }
 
 .assistantActions {
-    margin-top: 0;
+    margin-top: 0.5rem;
     display: flex;
     margin-bottom: 1rem;
+    align-items: center;
 }
 
 .conversationList {
@@ -123,4 +123,19 @@
     display: flex;
     justify-content: center;
     margin-top: 0.5rem;
+}
+
+.trainingOutputBadge {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.timestamp {
+    font-size: 0.7rem;
+    color: #444;
+    margin-left: 0.5rem;
 }

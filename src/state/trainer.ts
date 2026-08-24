@@ -5,7 +5,7 @@ import { TrainingOptions } from '@genai-fi/nanogpt';
 import { observe } from 'jotai-effect';
 import { modelAtom } from './model';
 import { store } from './store';
-import { dataTokens } from './data';
+// import { dataTokens } from './data';
 
 export interface TrainingSettings extends TrainingOptions {
     outputText: boolean;
@@ -68,6 +68,7 @@ export const trainerJobIdAtom = atom<string | null>(null);
 observe((get, set) => {
     const model = get(modelAtom);
     if (model) {
+        console.warn('Clearing trainer job ID');
         set(trainerJobIdAtom, null);
 
         const h = () => {
@@ -75,6 +76,7 @@ observe((get, set) => {
             if (job) {
                 set(trainerJobIdAtom, job.id);
             } else {
+                console.warn('Clearing trainer job ID');
                 set(trainerJobIdAtom, null);
             }
         };
@@ -87,17 +89,18 @@ observe((get, set) => {
 }, store);
 
 // Make sure the trainer resets if dataset changes
-observe((get, set) => {
+/*observe((get, set) => {
     const dataset = get(dataTokens);
     const model = get(modelAtom);
     const id = get(trainerJobIdAtom);
     if (model && id && dataset) {
         const job = model.training.getJob(id);
         if (job && job.datasetId && job.datasetId !== dataset.datasetId) {
+            console.warn('Clearing trainer job ID', job.datasetId, dataset.datasetId);
             set(trainerJobIdAtom, null);
         }
     }
-}, store);
+}, store);*/
 
 export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',

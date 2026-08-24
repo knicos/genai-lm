@@ -2,7 +2,7 @@ import { createJSONStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const storage = createJSONStorage<any>(() => localStorage);
+export const storage = createJSONStorage<any>(() => sessionStorage);
 
 const dirPromise = (async () => {
     if (navigator?.storage?.getDirectory) {

@@ -11,6 +11,12 @@ export interface GeneratorSettings extends IGenerateOptions {
     promptMode: 'none' | 'completion' | 'conversation';
 }
 
+export interface ExtendedGeneratorConversation extends GeneratorConversation {
+    _trainingOutput?: boolean;
+    _step?: number;
+    _timestamp?: number;
+}
+
 export const generatorSettings = atomWithStorage<GeneratorSettings>(
     'generatorSettings',
     {
@@ -38,7 +44,7 @@ export const chatSettings = atomWithStorage<GeneratorSettings>(
     storage
 );
 
-export const rawGeneratedTextAtom = atom<GeneratorConversation[]>([]);
+export const rawGeneratedTextAtom = atom<ExtendedGeneratorConversation[]>([]);
 export const rawGenerationIDAtom = atom<string | null>(null);
 export const conversationGeneratedAtom = atom<GeneratorConversation[]>([]);
 export const conversationIDAtom = atom<string | null>(null);

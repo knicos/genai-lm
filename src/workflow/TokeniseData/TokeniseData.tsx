@@ -107,7 +107,7 @@ export default function TokeniseData() {
                                     setTokens(null);
 
                                     const task = await createDatasetFromEntries(dataset);
-                                    return tokensFromStreams(task, model.tokeniser, {
+                                    return tokensFromStreams(task, model.tokeniser, datasetId, {
                                         cb: (tokens: number) => {
                                             setTokenCount(tokens);
                                         },

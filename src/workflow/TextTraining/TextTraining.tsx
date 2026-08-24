@@ -144,12 +144,38 @@ export default function TextTraining({ autoTokenise = false }: Props) {
         let datasetTokens = dataset?.tokens;
         let validationTokens = validation?.tokens;
 
-        if (!dataset || dataset.tokens.getShardCount() === 0 || dataset.tokeniserId !== model.tokeniser.id) {
+        let previousJobId = trainerJobId;
+
+        if (previousJobId) {
+            const job = model.training.getJob(previousJobId);
+            if (job) {
+                if (job.state === 'running' || job.state === 'paused' || job.state === 'pausing') {
+                    setStopping(true);
+                    model.training.cancel(previousJobId);
+                    return;
+                } else if (job.state !== 'completed' && job.state !== 'cancelled') {
+                    return;
+                }
+
+                if (autoTokenise && job.datasetId && datasetId && job.datasetId !== datasetId) {
+                    console.log('Reset training job because dataset has changed', job.datasetId, datasetId);
+                    datasetTokens = undefined;
+                    validationTokens = undefined;
+                    previousJobId = null;
+                }
+            } else {
+                console.warn('Previous training job not found, starting new training');
+                previousJobId = null;
+            }
+        }
+
+        if (!datasetTokens || datasetTokens.getShardCount() === 0 || datasetTokens.tokeniserId !== model.tokeniser.id) {
             if (autoTokenise) {
                 setPreparing(t('training.tokenising'));
                 try {
                     const newTokens = await autoTokeniseData(entries, model, datasetId);
                     setDataset(newTokens.trainingTokens);
+                    console.log('Auto-tokenised training dataset', newTokens.trainingTokens);
                     datasetTokens = newTokens.trainingTokens.tokens;
 
                     if (newTokens.validationTokens) {
@@ -165,24 +191,12 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     return;
                 }
             } else {
+                console.log('No dataset tokens available, cannot start training', datasetTokens, model.tokeniser.id);
                 setMessage({
                     notice: t('training.errors.noData'),
                     level: 'warning',
                 });
                 return;
-            }
-        }
-
-        if (trainerJobId) {
-            const job = model.training.getJob(trainerJobId);
-            if (job) {
-                if (job.state === 'running' || job.state === 'paused' || job.state === 'pausing') {
-                    setStopping(true);
-                    model.training.cancel(trainerJobId);
-                    return;
-                } else if (job.state !== 'completed' && job.state !== 'cancelled') {
-                    return;
-                }
             }
         }
 
@@ -205,12 +219,15 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             setPreparing(t('training.preparing'));
 
             const realSettings = trainingMode === 'partial' ? partialSettings : settings;
-            if (trainerJobId) {
-                realSettings.previous_job_id = trainerJobId;
+            if (previousJobId) {
+                realSettings.previous_job_id = previousJobId;
+            } else {
+                realSettings.previous_job_id = undefined;
             }
             configureModelForTraining(model, realSettings);
 
             try {
+                console.log('Create job', realSettings, datasetTokens, validationTokens);
                 const job = await model.training.job(realSettings, datasetTokens, entries, validationTokens);
 
                 if (!job) {
@@ -262,6 +279,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
                 logger.log({ action: 'training_started', modelSize: model.getNumParams(), totalTokens, batchSize });
 
+                console.log('Setting trainer job ID', job.id);
                 setTrainerJobId(job.id);
             } catch (err) {
                 console.error('Error preparing training', err);
@@ -271,6 +289,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 });
                 setTraining(false);
                 setDone(true);
+                setPreparing(null);
             }
         }
     };

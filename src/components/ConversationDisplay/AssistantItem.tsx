@@ -6,11 +6,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Button } from '@genai-fi/base';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { GeneratorConversation } from '@genai-fi/nanogpt';
+import type { ExtendedGeneratorConversation } from '../../state/generator';
 import ConfidenceHighlights from './ConfidenceHighlights';
 
 interface Props {
-    item: GeneratorConversation;
+    item: ExtendedGeneratorConversation;
     active?: boolean;
     busy?: boolean;
     editable?: boolean;
@@ -37,13 +37,6 @@ export default function AssistantItem({
         }
     }, [active]);
 
-    /*const minConfidence = useMemo(() => {
-        if (!item._output || item._output.length === 0) {
-            return 0;
-        }
-        return item._output.reduce((min, output) => Math.min(min, output.confidence ?? 0), Infinity);
-    }, [item]);*/
-
     const content =
         item.content.length === 0 ? (
             <div
@@ -58,16 +51,6 @@ export default function AssistantItem({
                 mode={highlightMode}
             />
         ) : (
-            /*item._output.map((output, index) => (
-                    <span
-                        style={{
-                            backgroundColor: `rgba(180, 200, 255, ${((output.confidence ?? 0) - minConfidence) / (1 - minConfidence)})`,
-                        }}
-                        key={index}
-                    >
-                        {output.text}
-                    </span>
-                ))*/
             <div
                 ref={ref}
                 className={`${style.assistantItem} ${editable ? style.editable : ''} ${item.content.length === 0 ? style.injected : ''}`}
@@ -156,6 +139,17 @@ export default function AssistantItem({
                                 <DeleteOutlineIcon fontSize="small" />
                             </IconButton>
                         </>
+                    )}
+                    {item._timestamp && (
+                        <div className={style.timestamp}>{new Date(item._timestamp).toLocaleTimeString()}</div>
+                    )}
+                    <div style={{ flex: 1 }}></div>
+                    {item._trainingOutput && (
+                        <div className={style.trainingOutputBadge}>
+                            {item._step
+                                ? t('conversation.trainingStep', { step: item._step })
+                                : t('conversation.trainingOutput')}
+                        </div>
                     )}
                 </div>
             )}

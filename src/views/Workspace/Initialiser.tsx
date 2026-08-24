@@ -42,7 +42,7 @@ export default function Initialiser() {
         newModel.meta.name = t('model.defaultName');
         newModel.meta.trained = false;
         setModel(newModel);
-        await deleteData();
+        deleteData();
     };
 
     const doInit = async () => {
@@ -58,7 +58,8 @@ export default function Initialiser() {
 
             newModel.on('loaded', async () => {
                 if (existingData?.tokeniserId === newModel.tokeniser.id && existingData.datasetId) {
-                    setDataTokens({
+                    console.log('Existing data', existingData, newModel.tokeniser.id);
+                    const tokenData = {
                         tokens: await createTokenStore(
                             'training-tokens',
                             existingData.tokeniserId,
@@ -66,7 +67,9 @@ export default function Initialiser() {
                         ),
                         tokeniserId: existingData.tokeniserId,
                         datasetId: existingData.datasetId,
-                    });
+                    };
+                    console.log('Restored training tokens', tokenData);
+                    setDataTokens(tokenData);
                     setValidationTokens({
                         tokens: await createTokenStore(
                             'validation-tokens',
