@@ -143,7 +143,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
         let datasetTokens = dataset?.tokens;
         let validationTokens = validation?.tokens;
-
         let previousJobId = trainerJobId;
 
         if (previousJobId) {
@@ -154,13 +153,15 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     model.training.cancel(previousJobId);
                     return;
                 } else if (job.state !== 'completed' && job.state !== 'cancelled') {
+                    setMessage({
+                        notice: t('training.errors.jobNotCompleted'),
+                        level: 'error',
+                    });
                     return;
                 }
 
-                if (autoTokenise && job.datasetId && datasetId && job.datasetId !== datasetId) {
+                if (job.datasetId && datasetId && job.datasetId !== datasetId) {
                     console.log('Reset training job because dataset has changed', job.datasetId, datasetId);
-                    datasetTokens = undefined;
-                    validationTokens = undefined;
                     previousJobId = null;
                 }
             } else {
@@ -227,7 +228,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             configureModelForTraining(model, realSettings);
 
             try {
-                console.log('Create job', realSettings, datasetTokens, validationTokens);
                 const job = await model.training.job(realSettings, datasetTokens, entries, validationTokens);
 
                 if (!job) {
@@ -246,7 +246,9 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                         logger.error({ action: 'training_error', message: err.message });
                         model.training.off('error', errorHandler);
                         setMessage({
-                            notice: t('training.errors.trainingFailed'),
+                            notice: t(`training.errors.${err.message}`, {
+                                defaultValue: 'training.errors.trainingFailed',
+                            }),
                             level: 'error',
                         });
                     }

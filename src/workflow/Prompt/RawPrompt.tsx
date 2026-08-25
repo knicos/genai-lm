@@ -160,7 +160,7 @@ export default function ChatPrompt() {
             ...settings,
             noCache: false,
             nonConversational: promptMode !== 'conversation',
-            continuation: promptMode === 'none' || (!!prompt && prompt.length > 0 && promptMode === 'completion'),
+            continuation: !!prompt && prompt.length > 0 && promptMode === 'completion',
             input: filteredText.length > 0 ? filteredText : undefined,
             background: true,
             previous_response_id: id ?? undefined,
