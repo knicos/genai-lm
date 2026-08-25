@@ -54,23 +54,12 @@ export default function ConfidenceHighlights({ item, mode }: Props) {
                 lastCountRef.current = 0;
             }
 
-            // confidence mode: compute min/max to normalize alpha
-            let min = Infinity;
-            let max = -Infinity;
-            for (const o of outputs) {
-                const c = mode === 'confidence' ? (o.confidence ?? 0) : (o.score ?? 0);
-                if (c < min) min = c;
-                if (c > max) max = c;
-            }
-            const range = Math.max(1e-6, max - min);
-
             // append only new spans
             const frag = document.createDocumentFragment();
             for (let i = lastCountRef.current; i < outputs.length; i++) {
                 const out = outputs[i];
                 const span = document.createElement('span');
-                const alpha =
-                    mode === 'confidence' ? ((out.confidence ?? 0) - min) / range : ((out.score ?? 0) - min) / range;
+                const alpha = mode === 'confidence' ? (out.confidence ?? 0) : (out.score ?? 0);
                 const colorR = ((1 - alpha) * 0xf4).toFixed(0);
                 const colorG = ((1 - alpha) * 0x43).toFixed(0);
                 const colorB = ((1 - alpha) * 0x36).toFixed(0);

@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import useModelMode from '../../hooks/useModelMode';
 import style from './style.module.css';
 import { generatorSettings, rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
 import { useRef, useState, useEffect } from 'react';
@@ -18,7 +19,7 @@ export default function ChatPrompt() {
     const trainerJobId = useAtomValue(trainerJobIdAtom);
     const [generate, setGenerate] = useState(false);
     //const [hasGenerated, setHasGenerated] = useState(false);
-    const settings = useAtomValue(generatorSettings);
+    const [settings, setSettings] = useAtom(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
     const busyRef = useRef<string | null>(null);
     const model = useAtomValue(loadedModelAtom);
@@ -27,39 +28,11 @@ export default function ChatPrompt() {
     const outputText = useAtomValue(trainerSettings).outputText;
     const promptRef = useRef<string>('');
     const setConversationLog = useSetAtom(conversationDataAtom);
+    const mode = useModelMode(model ?? undefined);
 
     const disable = status === 'training';
 
     const hasGenerated = output.length > 0;
-
-    /*useEffect(() => {
-        if (model) {
-            setHasGenerated(generator.getConversation().length > 0);
-            const onReset = () => {
-                setHasGenerated(false);
-            };
-            generator.on('reset', onReset);
-
-            const onStart = () => {
-                setHasGenerated(true);
-                setGenerate(true);
-            };
-            generator.on('start', onStart);
-
-            const onStop = () => {
-                setGenerate(false);
-                //busyRef.current = false;
-            };
-            generator.on('stop', onStop);
-
-            return () => {
-                generator.off('reset', onReset);
-                generator.off('start', onStart);
-            };
-        } else {
-            setHasGenerated(false);
-        }
-    }, [generator, model, topP, outputText, promptMode]);*/
 
     useEffect(() => {
         if (trainerJobId && outputText && model) {
@@ -235,6 +208,14 @@ export default function ChatPrompt() {
                 onStop={() => model && busyRef.current && model.responses.cancel(busyRef.current)}
                 noPrompt={settings.promptMode === 'none'}
                 placeholder={t('deploy.placeholder')}
+                promptMode={settings.promptMode}
+                onPromptModeChange={(mode) => {
+                    setSettings((prev) => ({
+                        ...prev,
+                        promptMode: mode,
+                    }));
+                }}
+                conversationSupported={mode === 'conversational'}
             />
             {messages && (
                 <BoxNotice
