@@ -291,7 +291,8 @@
             "trainingFailed": "Training this model failed. Refresh the page and try a smaller model or batch size.",
             "noLoRA": "No tuning extension selected.",
             "noJob": "Could not start training.",
-            "tokeniserNotTrained": "The tokeniser has not been trained."
+            "tokeniserNotTrained": "The tokeniser has not been trained.",
+            "noRemainingTokens": "Not enough remaining tokens or epochs."
         },
         "predictionsHeader": "Top predictions",
         "help": "## Model Training\n\nThe learning process where the **parameters are slowly adjusted** up or down until it can reproduce the patterns found in your example data.\n\nYou can click the circular progress indicator to switch between power and time. Time (or power) remaining is how long it will take to look at all of your data.",

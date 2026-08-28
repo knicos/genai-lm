@@ -31,11 +31,15 @@ interface Props {
 
 export default function ModelControls({ steps, onStepChange, model, responseId }: Props) {
     const { t } = useTranslation();
-    const [speed, setSpeed] = useState(4);
+    const [speed, setSpeed] = useState(1);
     const [paused, setPaused] = useState(false);
-    const playRef = useRef<{ resolve?: () => void; interval?: number; paused: boolean; takeStep: boolean } | null>(
-        null
-    );
+    const playRef = useRef<{
+        resolve?: () => void;
+        interval?: number;
+        paused: boolean;
+        takeStep: boolean;
+        step: number;
+    } | null>(null);
     const trainerJobId = useAtomValue(trainerJobIdAtom);
     const speedRef = useRef(speed);
 
@@ -57,19 +61,27 @@ export default function ModelControls({ steps, onStepChange, model, responseId }
         let decayStep = -1;
 
         const stepFn = () => {
-            if (playRef.current) {
-                playRef.current.interval = undefined;
-
-                if (playRef.current.paused) {
-                    if (!playRef.current.takeStep) {
-                        playRef.current.interval = window.setTimeout(stepFn, Math.floor(200 / speedRef.current));
-                        return;
-                    }
-                    playRef.current.takeStep = false;
-                }
-            }
             onStepChange((step) => {
-                if (!playRef.current?.paused) {
+                const isPaused = playRef.current?.paused;
+
+                if (playRef.current?.interval) {
+                    clearTimeout(playRef.current.interval);
+                    playRef.current.interval = undefined;
+                }
+
+                if (playRef.current) {
+                    if (isPaused) {
+                        if (!playRef.current.takeStep) {
+                            playRef.current.interval = window.setTimeout(stepFn, Math.floor(200 / speedRef.current));
+                            return step;
+                        }
+                        playRef.current.takeStep = false;
+                    }
+                }
+
+                // If not pause then continue counting down to the next step change
+                // If paused, it may be taking a step so skip any decay delay
+                if (!isPaused) {
                     if (decayStep === -1 && step?.multiplier) {
                         decayStep = step.index;
                         decaySteps = step.multiplier;
@@ -81,33 +93,29 @@ export default function ModelControls({ steps, onStepChange, model, responseId }
                             decayStep = -1;
                         }
                     }
+
+                    // Schedule next update but return now to prevent any step change.
                     if (decayStep >= 0) {
                         if (playRef.current) {
-                            if (playRef.current.interval) {
-                                clearTimeout(playRef.current.interval);
-                            }
                             playRef.current.interval = window.setTimeout(stepFn, Math.floor(200 / speedRef.current));
                         }
                         return step;
                     }
                 }
 
+                // Finish entire sequence and reset. Allow training to continue
                 if (step?.index === steps.length - 1 && !step.locked && playRef.current?.resolve) {
                     playRef.current.resolve();
-                    if (playRef.current.interval) {
-                        clearTimeout(playRef.current.interval);
-                    }
                     playRef.current = null;
                     return steps[(step.index + 1) % steps.length];
                 }
 
+                // Otherwise, schedule the next step change.
                 if (playRef.current) {
-                    if (playRef.current.interval) {
-                        clearTimeout(playRef.current.interval);
-                    }
                     playRef.current.interval = window.setTimeout(stepFn, Math.floor(200 / speedRef.current));
                 }
 
+                // Return the appropriate next step based on the current state.
                 return step === null ? (steps[0] ?? null) : step.locked ? step : steps[(step.index + 1) % steps.length];
             });
         };
@@ -116,6 +124,7 @@ export default function ModelControls({ steps, onStepChange, model, responseId }
             interval: window.setTimeout(stepFn, Math.floor(200 / speedRef.current)),
             paused: false,
             takeStep: false,
+            step: 0,
         };
     }, [onStepChange, steps]);
 

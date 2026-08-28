@@ -29,7 +29,8 @@ function createModel() {
                 id: 'test-job',
                 state: 'running',
             })),
-            breakpoints: vi.fn(),
+            addBreak: vi.fn(),
+            deleteBreak: vi.fn(),
         },
     } as unknown as TeachableLLM;
 }

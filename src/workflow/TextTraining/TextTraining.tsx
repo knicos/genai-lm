@@ -164,6 +164,17 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     console.log('Reset training job because dataset has changed', job.datasetId, datasetId);
                     previousJobId = null;
                 }
+
+                const lastStep = job.history?.[job.history.length - 1]?.step || 0;
+                if (previousJobId && (settings.maxEpochs || 1) * (settings.epochSteps || 1) <= lastStep) {
+                    if ((settings.maxEpochs || 1) * (settings.epochSteps || 1) <= lastStep) {
+                        setMessage({
+                            notice: t('training.errors.noRemainingTokens'),
+                            level: 'warning',
+                        });
+                        return;
+                    }
+                }
             } else {
                 console.warn('Previous training job not found, starting new training');
                 previousJobId = null;
@@ -225,6 +236,15 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             } else {
                 realSettings.previous_job_id = undefined;
             }
+
+            // Logging rate from total tokens to avoid logging too frequently or slowly.
+            const totalTokens = datasetTokens.getTokenCount();
+            const MAX_LOG_STEPS = 40;
+            const MIN_LOG_STEPS = 10;
+            const scaling = Math.min(1, Math.floor(totalTokens / 1_000_000));
+            const logSteps = MIN_LOG_STEPS + Math.floor((MAX_LOG_STEPS - MIN_LOG_STEPS) * scaling);
+            realSettings.logInterval = logSteps;
+
             configureModelForTraining(model, realSettings);
 
             try {
@@ -257,6 +277,13 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
                 const doneHandler = async (jobId: string) => {
                     if (jobId === job.id) {
+                        if (job.history) {
+                            const log = job.history[job.history.length - 1];
+                            setTrainingProgress(log);
+                            if (log) {
+                                setTokens(log.totalTokens);
+                            }
+                        }
                         setDone(true);
                         setTraining(false);
                         setStopping(false);
@@ -281,7 +308,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
                 logger.log({ action: 'training_started', modelSize: model.getNumParams(), totalTokens, batchSize });
 
-                console.log('Setting trainer job ID', job.id);
                 setTrainerJobId(job.id);
             } catch (err) {
                 console.error('Error preparing training', err);

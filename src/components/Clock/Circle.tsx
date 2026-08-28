@@ -37,16 +37,7 @@ export default function Circle({ radius, children, progress, color, animated, da
                     cx={radius}
                     cy={radius}
                 />
-                {Array.isArray(color) && colourIndex > 0 && (
-                    <circle
-                        stroke={color[colourIndex - 1]}
-                        fill="none"
-                        strokeWidth={stroke}
-                        r={normalizedRadius}
-                        cx={radius}
-                        cy={radius}
-                    />
-                )}
+
                 <circle
                     stroke={
                         color

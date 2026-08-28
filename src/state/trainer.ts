@@ -17,7 +17,7 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
     {
         method: { type: 'pretraining' },
         batchSize: 16,
-        maxEpochs: 2,
+        maxEpochs: 40,
         learningRate: 1e-3,
         minLearningRate: 1e-4,
         outputText: true,
@@ -41,7 +41,7 @@ export const pftSettings = atomWithStorage<TrainingSettings>(
     {
         method: { type: 'pretraining' },
         batchSize: 16,
-        maxEpochs: 1,
+        maxEpochs: 40,
         learningRate: 1e-4,
         minLearningRate: 1e-4,
         outputText: false,
@@ -87,20 +87,6 @@ observe((get, set) => {
         };
     }
 }, store);
-
-// Make sure the trainer resets if dataset changes
-/*observe((get, set) => {
-    const dataset = get(dataTokens);
-    const model = get(modelAtom);
-    const id = get(trainerJobIdAtom);
-    if (model && id && dataset) {
-        const job = model.training.getJob(id);
-        if (job && job.datasetId && job.datasetId !== dataset.datasetId) {
-            console.warn('Clearing trainer job ID', job.datasetId, dataset.datasetId);
-            set(trainerJobIdAtom, null);
-        }
-    }
-}, store);*/
 
 export const tunerSettings = atomWithStorage<TrainingSettings>(
     'tunerSettings',

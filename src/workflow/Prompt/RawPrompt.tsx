@@ -40,7 +40,7 @@ export default function ChatPrompt() {
                 count: 0,
             };
 
-            model.training.breakpoints(trainerJobId, true);
+            const bpid = model.training.addBreak(trainerJobId);
 
             const h = async () => {
                 //if (id !== trainerJobId) return;
@@ -97,10 +97,11 @@ export default function ChatPrompt() {
             };
             model.training.on('progress', h);
             return () => {
+                if (bpid !== undefined) {
+                    model.training.deleteBreak(trainerJobId, bpid);
+                }
                 model.training.off('progress', h);
             };
-        } else if (model && trainerJobId) {
-            model.training.breakpoints(trainerJobId, false);
         }
     }, [trainerJobId, outputText, model, setOutput]);
 

@@ -51,8 +51,10 @@ export function Training({ model, step, loaded }: Props) {
             model.training.on('completed', hEnd);
             model.training.on('cancelled', hEnd);
 
+            let bpid: number | undefined;
+
             if (job) {
-                model.training.breakpoints(job.id, true);
+                bpid = model.training.addBreak(job.id);
             }
 
             setIsTraining(job?.state === 'running');
@@ -61,8 +63,8 @@ export function Training({ model, step, loaded }: Props) {
                 model.training.off('running', hStart);
                 model.training.off('completed', hEnd);
                 model.training.off('cancelled', hEnd);
-                if (job) {
-                    model.training.breakpoints(job.id, false);
+                if (bpid !== undefined && job) {
+                    model.training.deleteBreak(job.id, bpid);
                 }
             };
         }
