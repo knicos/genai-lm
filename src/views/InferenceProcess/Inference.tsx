@@ -84,6 +84,7 @@ export function Inference({ responseId, step, model, loaded }: Props) {
             model.responses.on('done', handleEnd);
 
             return () => {
+                model.responses.unhook(responseId);
                 model.responses.off('hook', handleUpdate);
                 model.responses.off('done', handleEnd);
             };

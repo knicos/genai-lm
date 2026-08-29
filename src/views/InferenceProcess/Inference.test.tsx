@@ -19,6 +19,7 @@ function createModel() {
             on: vi.fn(),
             off: vi.fn(),
             hook: vi.fn(),
+            unhook: vi.fn(),
             resume: vi.fn(),
         },
     } as never;
