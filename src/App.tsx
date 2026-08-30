@@ -1,66 +1,14 @@
 import { Suspense } from 'react';
-import {
-    RouterProvider,
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    useRouteError,
-    Navigate,
-} from 'react-router';
+import { RouterProvider, Route, createBrowserRouter, createRoutesFromElements, Navigate } from 'react-router';
 import { Provider } from 'jotai';
 import './App.css';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { theme } from '@genai-fi/base';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import logger from './utilities/logger';
 import { store } from './state/store';
 import About from './views/About/About';
-
-interface RouterError {
-    status: number;
-}
-
-function ErrorComponent() {
-    const error = useRouteError();
-
-    if ((error as RouterError).status === 404) {
-        return (
-            <section className="errorView">
-                <h1>Page not found</h1>
-            </section>
-        );
-    }
-
-    const json = JSON.stringify(error);
-    const str = json === '{}' && 'toString' in (error as Error) ? (error as Error).toString() : 'Unknown';
-
-    logger.error({
-        errorString: str,
-        userAgent: navigator.userAgent,
-        url: window.location.href,
-    });
-
-    console.error(error);
-
-    return (
-        <section className="errorView">
-            <h1>Something went wrong</h1>
-            <p>
-                Please report this issue to{' '}
-                <a
-                    href="https://github.com/knicos/genai-/issues"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    our project on github
-                </a>{' '}
-                if you have time, including the information below. Refresh the page to try again.
-            </p>
-            <p className="code">{str}</p>
-        </section>
-    );
-}
+import ErrorComponent from './components/ErrorComponent/ErrorComponent';
 
 export const routes = createRoutesFromElements(
     <Route
@@ -75,6 +23,10 @@ export const routes = createRoutesFromElements(
                     to="/workspace/home"
                 />
             }
+        />
+        <Route
+            path="/error"
+            element={<ErrorComponent />}
         />
         <Route
             path="about"

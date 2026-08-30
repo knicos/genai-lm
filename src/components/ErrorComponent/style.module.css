@@ -1,0 +1,32 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.errorView {
+    background: white;
+    border-radius: 6px;
+    padding: 2rem;
+    max-width: 400px;
+}
+
+.errorView h1 {
+    color: var(--error);
+}
+
+.code {
+    font-family: monospace;
+    font-size: 0.6rem;
+    margin-top: 2rem;
+    color: #666;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+}

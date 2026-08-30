@@ -26,7 +26,7 @@
             "other": "Other reason",
             "message": "Message",
             "send": "Send",
-            "error": "Failed to send report. Please try again."
+            "error": "Failed to send report."
         },
         "confirmLoad": {
             "title": "Continue Session",
@@ -146,7 +146,15 @@
         },
         "billion": "B",
         "million": "M",
-        "thousand": "k"
+        "thousand": "k",
+        "error": {
+            "title": "An error occurred",
+            "message": "Something went wrong. Please consider sending an anonymous report to us by clicking the button below. Reloading the page might recover your work.",
+            "retry": "Reload",
+            "send": "Send Report",
+            "showDetails": "Show Details",
+            "hideDetails": "Hide Details"
+        }
     },
     "deviceProbe": {
         "probing": "Checking your hardware..."

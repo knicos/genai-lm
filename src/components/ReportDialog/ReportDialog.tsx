@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 interface Props {
     open: boolean;
     onClose: () => void;
+    message?: string;
+    alertText?: string;
 }
 
 export default function ReportDialog({ open, onClose }: Props) {
@@ -24,6 +26,7 @@ export default function ReportDialog({ open, onClose }: Props) {
     const textRef = useRef<HTMLInputElement>(null);
     const selectRef = useRef<HTMLSelectElement>(null);
     const [hadError, setHadError] = useState(false);
+    const [hasSent, setHasSent] = useState(false);
 
     return (
         <Dialog
@@ -72,17 +75,21 @@ export default function ReportDialog({ open, onClose }: Props) {
                 </Button>
                 <Button
                     variant="contained"
+                    disabled={hasSent}
                     onClick={() => {
                         const reportText = textRef.current?.value;
                         const reportReason = selectRef.current?.value;
-                        if (reportText && reportReason) {
+                        if (reportText && reportReason && reportText.trim() !== '') {
+                            setHasSent(true);
                             const severity = reportReason === 'bug' ? 'error' : 'info';
+                            const truncatedReportText =
+                                reportText.length > 4000 ? reportText.slice(0, 4000) : reportText;
                             fetch(`${import.meta.env.VITE_APP_API}/report`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({ message: reportText, application: 'llm', severity }),
+                                body: JSON.stringify({ message: truncatedReportText, application: 'llm', severity }),
                             })
                                 .catch((error) => {
                                     console.error('Failed to send report:', error);
