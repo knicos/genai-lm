@@ -16,6 +16,18 @@
         "saveName": "Modellnamn",
         "saveSave": "Spara",
         "saveCancel": "Avbryt",
+        "reportProblem": "Feedback",
+        "reportProblemTip": "Rapportera ett problem eller en idé till oss.",
+        "report": {
+            "title": "Feedback eller bugg",
+            "reason": "Orsak",
+            "bug": "Det finns ett problem",
+            "feedback": "Jag har ett förslag",
+            "other": "Annan orsak",
+            "message": "Meddelande",
+            "send": "Skicka",
+            "error": "Det gick inte att skicka rapporten. Försök igen."
+        },
         "confirmLoad": {
             "title": "Fortsätt session",
             "message": "En tidigare session hittades. Vill du ladda den?",

@@ -13,7 +13,7 @@ export type WorkflowSteps =
     | 'generator'
     | 'share';
 
-const DEFAULT_STEPS: WorkflowSteps[] = [
+/*const DEFAULT_STEPS: WorkflowSteps[] = [
     'architecture',
     'data',
     'tokeniser',
@@ -24,9 +24,9 @@ const DEFAULT_STEPS: WorkflowSteps[] = [
     'finetune',
     'generator',
     'share',
-];
+];*/
 
-export const workflowSteps = atom<Set<WorkflowSteps>>(new Set<WorkflowSteps>(DEFAULT_STEPS));
+export const workflowSteps = atom<Set<WorkflowSteps>>(new Set<WorkflowSteps>());
 
 type WorkflowStage = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
 

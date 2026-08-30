@@ -16,6 +16,18 @@
         "saveName": "モデル名",
         "saveSave": "保存",
         "saveCancel": "キャンセル",
+        "reportProblem": "フィードバック",
+        "reportProblemTip": "問題やアイデアをお知らせください。",
+        "report": {
+            "title": "フィードバックまたは不具合",
+            "reason": "理由",
+            "bug": "問題があります",
+            "feedback": "提案があります",
+            "other": "その他の理由",
+            "message": "メッセージ",
+            "send": "送信",
+            "error": "レポートの送信に失敗しました。もう一度お試しください。"
+        },
         "confirmLoad": {
             "title": "セッションを続行",
             "message": "前回のセッションが見つかりました。読み込みますか？",

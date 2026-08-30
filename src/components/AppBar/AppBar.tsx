@@ -4,13 +4,15 @@ import style from './AppBar.module.css';
 import { IconButton, Tooltip } from '@mui/material';
 import { Link } from 'react-router';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { uiShowSettings } from '../../state/uiState';
+import { uiShowSettings, featureFlagsAtom } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
 import logger from '../../utilities/logger';
 import WorkflowStatusBar from './WorkflowStatusBar';
-import { LangSelect } from '@genai-fi/base';
+import { Button, LangSelect } from '@genai-fi/base';
+import ReportDialog from '../ReportDialog/ReportDialog';
+import ReportIcon from '@mui/icons-material/Report';
 
 interface Props {
     noSettings?: boolean;
@@ -24,6 +26,8 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
     const showSettings = useSetAtom(uiShowSettings);
     const istraining = useAtomValue(trainingAnimation);
     const [logId, setLogId] = useState<string | null>(null);
+    const { allowReportProblem } = useAtomValue(featureFlagsAtom);
+    const [showReportDialog, setShowReportDialog] = useState(false);
 
     useEffect(() => {
         const h = (_: string, idNumber: number) => {
@@ -65,6 +69,22 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
                     />
                 )}
                 {hideWorkflow && <div style={{ flexGrow: 1 }}></div>}
+                {allowReportProblem && (
+                    <Tooltip
+                        title={t('app.reportProblemTip')}
+                        arrow
+                    >
+                        <Button
+                            variant="outlined"
+                            color="inherit"
+                            startIcon={<ReportIcon fontSize="small" />}
+                            sx={{ fontSize: '0.75rem', marginRight: '1rem' }}
+                            onClick={() => setShowReportDialog(true)}
+                        >
+                            {t('app.reportProblem')}
+                        </Button>
+                    </Tooltip>
+                )}
                 <LangSelect
                     languages={LANGS}
                     dark
@@ -84,6 +104,12 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
                             <SettingsIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
+                )}
+                {allowReportProblem && showReportDialog && (
+                    <ReportDialog
+                        open={showReportDialog}
+                        onClose={() => setShowReportDialog(false)}
+                    />
                 )}
             </div>
         </nav>

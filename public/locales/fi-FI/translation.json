@@ -16,6 +16,18 @@
         "saveName": "Mallin nimi",
         "saveSave": "Tallenna",
         "saveCancel": "Peruuta",
+        "reportProblem": "Palaute",
+        "reportProblemTip": "Ilmoita meille ongelmasta tai ideasta.",
+        "report": {
+            "title": "Palaute tai bugi",
+            "reason": "Syy",
+            "bug": "Sovelluksessa on ongelma",
+            "feedback": "Minulla on ehdotus",
+            "other": "Muu syy",
+            "message": "Viesti",
+            "send": "Lähetä",
+            "error": "Raportin lähetys epäonnistui. Yritä uudelleen."
+        },
         "confirmLoad": {
             "title": "Jatka istuntoa",
             "message": "Aiempi istunto löytyi. Haluatko ladata kyseisen mallin?",

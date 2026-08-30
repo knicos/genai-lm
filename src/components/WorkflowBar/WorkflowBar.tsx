@@ -73,14 +73,16 @@ export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
             className={style.container}
             ref={containerRef}
         >
-            <Link
-                to="/workspace/home"
-                className={`${style.homeButton} ${flow === 'home' ? style.selected : ''}`}
-                style={disabled ? { pointerEvents: 'none', opacity: 0.5 } : undefined}
-                aria-disabled={disabled}
-            >
-                <HomeIcon fontSize="inherit" />
-            </Link>
+            {items.length > 0 && (
+                <Link
+                    to="/workspace/home"
+                    className={`${style.homeButton} ${flow === 'home' ? style.selected : ''}`}
+                    style={disabled ? { pointerEvents: 'none', opacity: 0.5 } : undefined}
+                    aria-disabled={disabled}
+                >
+                    <HomeIcon fontSize="inherit" />
+                </Link>
+            )}
             <div
                 className={style.itemList}
                 ref={listRef}

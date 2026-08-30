@@ -16,6 +16,18 @@
         "saveName": "Model Name",
         "saveSave": "Save",
         "saveCancel": "Cancel",
+        "reportProblem": "Feedback",
+        "reportProblemTip": "Report an issue or idea to us.",
+        "report": {
+            "title": "Feedback or Bug",
+            "reason": "Reason",
+            "bug": "There is a problem",
+            "feedback": "I have a suggestion",
+            "other": "Other reason",
+            "message": "Message",
+            "send": "Send",
+            "error": "Failed to send report. Please try again."
+        },
         "confirmLoad": {
             "title": "Continue Session",
             "message": "A previous session was found. Do you want to load that model?",
