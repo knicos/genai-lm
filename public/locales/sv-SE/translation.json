@@ -261,6 +261,8 @@
         "busy": "Modellen arbetar...",
         "noModel": "Ingen modell",
         "error": "Modellen har ett fel",
+        "inputContext": "Indatavokabulär",
+        "outputProbabilities": "Utdata sannolikheter",
         "parametersHelp": "Det **totala antalet numeriska parametrar** i modellen.\n\nFler parametrar gör att modellen kan lära fler mönster men kräver mer minne, tid och data för träning.",
         "help": "## Din modell\n\nDenna ruta representerar modellen du bygger.\n\nEn modell är en **matematisk representation** av mönstren i din data. Den består av **numeriska parametrar** som justeras under träning för att lära dessa mönster.\n\nParametrar är indata till ekvationer som förutsäger nästa del i en textsekvens (till exempel ett ord eller en bokstav).",
         "visualHelp": "Diagrammet visar din modells struktur. Det finns indata, lager och utdata.",

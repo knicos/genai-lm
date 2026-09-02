@@ -261,6 +261,8 @@
         "busy": "Malli työskentelee...",
         "noModel": "Ei mallia",
         "error": "Mallissa tapahtui virhe",
+        "inputContext": "Syötesanasto",
+        "outputProbabilities": "Tulostodennäköisyydet",
         "parametersHelp": "Mallin **numeeristen parametrien kokonaismäärä**.\n\nUseammat parametrit mahdollistavat monimutkaisempien kuvioiden oppimisen, mutta vaativat enemmän muistia, aikaa ja dataa opetukseen.",
         "help": "## Oma mallisi\n\nTämä laatikko edustaa mallia, jota olet luomassa.\n\nMalli on **matemaattinen esitys** datasi kuvioista. Se koostuu **numeerisista parametreista**, joita säädetään opetuksen aikana.\n\nParametrit ovat yhtälöiden syötteitä, joiden avulla ennustetaan seuraava tekstin osa (esimerkiksi sana tai kirjain).",
         "visualHelp": "Tämä kaavio näyttää mallin rakenteen eli arkkitehtuurin. Siinä on syötteitä, useita parametrikerroksia ja ulostulo. Voit muokata mallin muotoa muuttaaksesi parametrien määrää ja sijaintia.",

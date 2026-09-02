@@ -1,4 +1,5 @@
 import { MouseEvent, PointerEvent, Ref, useEffect, useImperativeHandle, useRef, useState, WheelEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { calcAutoCamera, calculateViewBox, DEFAULT_EXTENTS, Mover, wheelZoom, ZoomState } from './camera';
 import VocabBox from './VocabBox';
 import style from './style.module.css';
@@ -21,6 +22,7 @@ export interface ArchitectureRef {
 }
 
 export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
+    const { t } = useTranslation();
     const [internalArchitecture, setInternalArchitecture] = useAtom(modelConfigAtom);
     const svgRef = useRef<SVGSVGElement>(null);
     const parentRef = useRef<HTMLDivElement>(null);
@@ -201,7 +203,7 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
                         setInternalArchitecture((old) => ({ ...old, vocabSize: next }))
                     }
                     scaling={scaling}
-                    preLabel="Input Context"
+                    preLabel={t('model.inputContext')}
                     layered
                     onClick={(element) => {
                         setAnchor(element);
@@ -254,7 +256,7 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
                         setInternalArchitecture((old) => ({ ...old, vocabSize: next }))
                     }
                     scaling={scaling}
-                    postLabel="Output Probabilities"
+                    postLabel={t('model.outputProbabilities')}
                     onClick={(element) => {
                         setAnchor(element);
                         setSelectedLayer(-1);

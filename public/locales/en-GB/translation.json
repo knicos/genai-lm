@@ -269,6 +269,8 @@
         "busy": "Model working...",
         "noModel": "No model",
         "error": "Model broke",
+        "inputContext": "Input Vocabulary",
+        "outputProbabilities": "Output Probabilities",
         "parametersHelp": "The **total number of numeric parameters** in the model.\n\nMore parameters allow the model to learn more patterns but will require more memory, time and data to train.",
         "help": "## Your model\n\nThis box represents the model you are creating.\n\nA model is a **mathematical representation** of the patterns in your data. It is made up of **numeric parameters** that are adjusted during training to learn those patterns.\n\nParameters are inputs to equations that predict the next piece in a sequence of text (for example, a word or letter).",
         "visualHelp": "This diagram shows the structure, or architecture, of your model. There are inputs, multiple layers of parameters and an output. You can edit the shape of the model to change the number of parameters and where they are placed.",
