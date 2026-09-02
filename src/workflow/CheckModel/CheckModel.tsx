@@ -1,4 +1,5 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { uiFatalError } from '../../state/uiState';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { modelAtom, modelConfigAtom, modelSizeLimit } from '../../state/model';
 import style from './style.module.css';
@@ -38,6 +39,7 @@ export default function CheckModel() {
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
     const [showConfirm, setShowConfirm] = useState(false);
+    const setFatalError = useSetAtom(uiFatalError);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
     const paramCount = utilities.estimateParameterCount(architecture);
@@ -56,6 +58,12 @@ export default function CheckModel() {
             if (old) {
                 newModel.meta.name = old.meta.name;
             }
+
+            newModel['ee'].on('lost', () => {
+                window.sessionStorage.setItem('fatalError', 'true');
+                setFatalError(true);
+            });
+
             deleteCheckpoint();
             return newModel;
         });

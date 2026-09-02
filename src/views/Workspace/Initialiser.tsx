@@ -3,6 +3,7 @@ import { TeachableLLM, tokenise } from '@genai-fi/nanogpt';
 const { createTokenStore } = tokenise;
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom, modelConfigAtom } from '../../state/model';
+import { uiFatalError } from '../../state/uiState';
 import { createEntriesFromManifest, dataEntries, dataTokens, validationTokens } from '../../state/data';
 import { useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -31,18 +32,28 @@ export default function Initialiser() {
     const setDevMode = useSetAtom(uiDeveloperMode);
     const setCompact = useSetAtom(uiCompactMode);
     const setTrainingMode = useSetAtom(trainingModeAtom);
+    const setFatalError = useSetAtom(uiFatalError);
     const [params] = useSearchParams();
     const [showConfirm, setShowConfirm] = useState(false);
 
     const pageLog = useRef(new Set<string>());
 
     const buildModel = async () => {
-        const newModel = TeachableLLM.create(modelConfig.vocabSize <= 256 ? 'char' : 'bpe', modelConfig);
-        newModel.meta.id = 'untrained-custom';
-        newModel.meta.name = t('model.defaultName');
-        newModel.meta.trained = false;
-        setModel(newModel);
-        deleteData();
+        setModel((old) => {
+            if (old) {
+                old.dispose();
+            }
+            const newModel = TeachableLLM.create(modelConfig.vocabSize <= 256 ? 'char' : 'bpe', modelConfig);
+            newModel.meta.id = 'untrained-custom';
+            newModel.meta.name = t('model.defaultName');
+            newModel.meta.trained = false;
+            newModel['ee'].on('lost', () => {
+                window.sessionStorage.setItem('fatalError', 'true');
+                setFatalError(true);
+            });
+            deleteData();
+            return newModel;
+        });
     };
 
     const doInit = async () => {
@@ -52,13 +63,16 @@ export default function Initialiser() {
 
         if (checkpoint) {
             const newModel = TeachableLLM.loadModel(checkpoint as File);
+            newModel['ee'].on('lost', () => {
+                window.sessionStorage.setItem('fatalError', 'true');
+                setFatalError(true);
+            });
             setModel(newModel);
 
             const existingData = getData();
 
             newModel.on('loaded', async () => {
                 if (existingData?.tokeniserId === newModel.tokeniser.id && existingData.datasetId) {
-                    console.log('Existing data', existingData, newModel.tokeniser.id);
                     const tokenData = {
                         tokens: await createTokenStore(
                             'training-tokens',

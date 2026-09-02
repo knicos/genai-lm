@@ -153,7 +153,10 @@
             "retry": "Reload",
             "send": "Send Report",
             "showDetails": "Show Details",
-            "hideDetails": "Hide Details"
+            "hideDetails": "Hide Details",
+            "fatalTitle": "Problem",
+            "fatalMessage": "Something went wrong with your device. Reload to try a simplified version that may work for your computer.",
+            "reload": "Reload Page"
         }
     },
     "deviceProbe": {

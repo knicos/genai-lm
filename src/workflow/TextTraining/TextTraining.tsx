@@ -267,7 +267,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                         model.training.off('error', errorHandler);
                         setMessage({
                             notice: t(`training.errors.${err.message}`, {
-                                defaultValue: 'training.errors.trainingFailed',
+                                defaultValue: t('training.errors.trainingFailed'),
                             }),
                             level: 'error',
                         });

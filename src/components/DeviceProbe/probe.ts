@@ -58,17 +58,52 @@ async function hasWebGL1(): Promise<boolean> {
     }
 }
 
+interface UserAgentData {
+    brands: { brand: string; version: string }[];
+    mobile: boolean;
+    platform: string;
+}
+
 export async function getDeviceInfo(lowPower?: boolean): Promise<{
     hasWebGPU: boolean;
     hasWebGL2: boolean;
     hasWebGL1: boolean;
+    lowEndDevice: boolean;
     deviceCapabilities: DeviceCapabilities;
 }> {
+    let lowEndDevice = false;
+
+    if ('userAgentData' in navigator) {
+        const data = navigator.userAgentData as UserAgentData;
+        /*if (data.platform === 'Chrome OS') {
+            lowEndDevice = true;
+        }*/
+        if (data.mobile) {
+            lowEndDevice = true;
+        }
+    }
+    if ('hardwareConcurrency' in navigator) {
+        if (navigator.hardwareConcurrency <= 4) {
+            lowEndDevice = true;
+        }
+    }
+    if ('deviceMemory' in navigator) {
+        if ((navigator.deviceMemory as number) <= 4) {
+            lowEndDevice = true;
+        }
+    }
+    if (window.sessionStorage.getItem('fatalError') === 'true') {
+        lowEndDevice = true;
+    }
+
     const [gpu, gl2, gl1] = await Promise.all([hasWebGPU(lowPower), hasWebGL2(), hasWebGL1()]);
+
     return {
         hasWebGPU: !!gpu,
         hasWebGL2: gl2,
         hasWebGL1: gl1,
+        lowEndDevice,
+
         deviceCapabilities: gpu ?? {
             backend: gl2 ? 'webgl' : gl1 ? 'webgl' : 'cpu',
             subgroups: false,

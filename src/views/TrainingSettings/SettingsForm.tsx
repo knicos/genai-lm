@@ -7,6 +7,7 @@ import { uiDeveloperMode } from '../../state/uiState';
 import { Help } from '@genai-fi/base';
 import { loadedModelAtom } from '../../state/model';
 import { useState } from 'react';
+import { lowEndDevice } from '../../state/device';
 
 interface Props {
     settings: TrainingSettings;
@@ -18,6 +19,7 @@ export function SettingsForm({ settings, setSettings }: Props) {
     const devMode = useAtomValue(uiDeveloperMode);
     const [advanced, setAdvanced] = useState<boolean>(false);
     const model = useAtomValue(loadedModelAtom);
+    const lowEnd = useAtomValue(lowEndDevice);
 
     const showDev = devMode || advanced;
 
@@ -65,7 +67,7 @@ export function SettingsForm({ settings, setSettings }: Props) {
                     value={settings.batchSize}
                     onChange={(_, value) => setSettings({ ...settings, batchSize: value as number })}
                     min={2}
-                    max={64}
+                    max={lowEnd ? 4 : 64}
                     step={null}
                     marks={[
                         { value: 1, label: '1' },
@@ -190,27 +192,29 @@ export function SettingsForm({ settings, setSettings }: Props) {
                             />
                         </FormControl>
                     )}
-                    <FormControl>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={settings.disableCheckpointing}
-                                    onChange={(_, checked) =>
-                                        setSettings({ ...settings, disableCheckpointing: checked })
-                                    }
-                                />
-                            }
-                            label={
-                                <Help
-                                    message={t('app.settings.help.checkpointing')}
-                                    inplace
-                                    dark
-                                >
-                                    {t('app.settings.checkpointing')}
-                                </Help>
-                            }
-                        />
-                    </FormControl>
+                    {!lowEnd && (
+                        <FormControl>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={settings.disableCheckpointing}
+                                        onChange={(_, checked) =>
+                                            setSettings({ ...settings, disableCheckpointing: checked })
+                                        }
+                                    />
+                                }
+                                label={
+                                    <Help
+                                        message={t('app.settings.help.checkpointing')}
+                                        inplace
+                                        dark
+                                    >
+                                        {t('app.settings.checkpointing')}
+                                    </Help>
+                                }
+                            />
+                        </FormControl>
+                    )}
                     <FormControl>
                         <FormControlLabel
                             control={

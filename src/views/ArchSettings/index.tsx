@@ -1,8 +1,9 @@
 import { FormControl, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { modelConfigAtom, modelSizeLimit } from '../../state/model';
+import { lowEndDevice } from '../../state/device';
 import { Help } from '@genai-fi/base';
 
 export function Component() {
@@ -10,6 +11,7 @@ export function Component() {
 
     const [settings, setSettings] = useAtom(modelConfigAtom);
     const [sizeLimit, setSizeLimit] = useAtom(modelSizeLimit);
+    const lowEnd = useAtomValue(lowEndDevice);
     const { blockSize, mlpFactor } = settings;
 
     return (
@@ -34,7 +36,7 @@ export function Component() {
                     value={blockSize}
                     onChange={(_, value) => setSettings({ ...settings, blockSize: value as number })}
                     min={32}
-                    max={1024}
+                    max={lowEnd ? 128 : 1024}
                     step={32}
                     valueLabelDisplay="auto"
                 />
@@ -57,7 +59,7 @@ export function Component() {
                     value={mlpFactor}
                     onChange={(_, value) => setSettings({ ...settings, mlpFactor: value as number })}
                     min={1}
-                    max={8}
+                    max={lowEnd ? 4 : 8}
                     step={1}
                     valueLabelDisplay="auto"
                 />
@@ -97,7 +99,7 @@ export function Component() {
                     value={sizeLimit}
                     onChange={(_, value) => setSizeLimit(value as number)}
                     min={1}
-                    max={100}
+                    max={lowEnd ? 4 : 100}
                     step={1}
                     valueLabelDisplay="auto"
                 />

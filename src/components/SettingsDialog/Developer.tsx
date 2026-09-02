@@ -9,6 +9,7 @@ import {
     deviceCapabilities,
     deviceLowPower,
     deviceDisableSubgroups,
+    lowEndDevice,
 } from '../../state/device';
 import { uiDeveloperMode } from '../../state/uiState';
 import { modelQuantizeSave } from '../../state/model';
@@ -23,6 +24,7 @@ export default function DeveloperSettings() {
     const hasWebGPU = useAtomValue(deviceHasWebGPU);
     const hasWebGL = useAtomValue(deviceHasWebGL);
     const capabilities = useAtomValue(deviceCapabilities);
+    const lowEnd = useAtomValue(lowEndDevice);
 
     return (
         <div className={style.columns}>
@@ -76,6 +78,7 @@ export default function DeveloperSettings() {
                 <div>
                     <div>WebGL: {hasWebGL ? 'Available' : 'Not Available'}</div>
                     <div>WebGPU: {hasWebGPU ? 'Available' : 'Not Available'}</div>
+                    <div>Low End Device: {lowEnd ? 'Yes' : 'No'}</div>
                     <div>Has Subgroups: {capabilities?.subgroups ? 'Yes' : 'No'}</div>
                     <div>Subgroup Size: {capabilities?.subgroupSize ?? 'N/A'}</div>
                     <div>Float16 Support: {capabilities?.float16 ? 'Yes' : 'No'}</div>

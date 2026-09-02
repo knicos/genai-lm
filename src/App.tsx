@@ -9,6 +9,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { store } from './state/store';
 import About from './views/About/About';
 import ErrorComponent from './components/ErrorComponent/ErrorComponent';
+import FatalDialog from './components/FatalDialog/FatalDialog';
 
 export const routes = createRoutesFromElements(
     <Route
@@ -128,6 +129,7 @@ function App({ router }: Props) {
                             <RouterProvider router={router || defaultRouter} />
                         </Suspense>
                     </DndProvider>
+                    <FatalDialog />
                 </Provider>
             </ThemeProvider>
         </StyledEngineProvider>

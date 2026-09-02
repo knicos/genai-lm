@@ -6,6 +6,7 @@ export const uiShowVisualisation = atom(false);
 export const uiShowSidePanel = atom(false);
 export const uiDeveloperMode = atomWithStorage('uiDeveloperMode', false);
 export const uiCompactMode = atomWithStorage('uiCompactMode', false);
+export const uiFatalError = atom(false);
 
 interface FeatureFlags {
     allowReportProblem?: boolean;
@@ -21,7 +22,7 @@ export const featureFlagsAtom = atom(async () => {
         return data.features;
     } catch {
         return {
-            allowReportProblem: true,
+            allowReportProblem: false,
         };
     }
 });

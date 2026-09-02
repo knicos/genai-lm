@@ -5,6 +5,7 @@ import { storage } from './storage';
 export const deviceDetected = atom<boolean>(false);
 export const deviceHasWebGPU = atom<boolean>(false);
 export const deviceHasWebGL = atom<boolean>(false);
+export const lowEndDevice = atom<boolean>(false);
 
 export interface DeviceCapabilities {
     backend: 'webgpu' | 'webgl' | 'cpu' | 'unknown';
