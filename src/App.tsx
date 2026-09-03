@@ -110,6 +110,10 @@ export const routes = createRoutesFromElements(
                 path="tokenised-data"
                 lazy={() => import('./views/TokenisedData')}
             />
+            <Route
+                path="audit"
+                lazy={() => import('./views/Audit')}
+            />
         </Route>
     </Route>
 );

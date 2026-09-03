@@ -347,6 +347,7 @@
         "scoreValue": "Probability: {{value}}%",
         "confidenceTooltip": "Show prediction confidence for each token",
         "scoreTooltip": "Show predicted probability of each token",
+        "audit": "Audit",
         "autoGenerateAriaLabel": "Toggle auto-generate",
         "autoGenerate": "Auto-generate",
         "step": "Next",
@@ -355,6 +356,10 @@
             "generationError": "An unknown error occurred during text generation."
         },
         "help": "## Generating Text\n\nAfter training the model parameters, they can be used to predict the next token (**\"inference\"**) in a sequence of text by using your prompt and any previous predictions (called **context**). This sequential process is known as **autoregressive generation**.\n\nHow well your model generates or responds to prompts depends on how well it was trained and the quality of the data."
+    },
+    "audit": {
+        "title": "Audit",
+        "phrasePattern": "Phrase Pattern"
     },
     "evaluation": {
         "title": "Evaluation",

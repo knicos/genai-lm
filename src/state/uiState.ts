@@ -10,6 +10,7 @@ export const uiFatalError = atom(false);
 
 interface FeatureFlags {
     allowReportProblem?: boolean;
+    allowAudit?: boolean;
 }
 
 export const featureFlagsAtom = atom(async () => {
@@ -23,6 +24,7 @@ export const featureFlagsAtom = atom(async () => {
     } catch {
         return {
             allowReportProblem: false,
+            allowAudit: false,
         };
     }
 });

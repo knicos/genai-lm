@@ -1,0 +1,41 @@
+.title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tools {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.toolButton {
+    border: 0;
+    border-radius: 6px;
+    background: #333;
+    color: #00d4f5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font: inherit;
+    font-weight: 700;
+    padding: 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.toolButton:hover {
+    filter: brightness(1.08);
+}
+
+.toolButton svg {
+    flex: 0 0 auto;
+}
+
+.active {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}

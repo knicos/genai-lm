@@ -111,6 +111,13 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'chatOutput',
+        end: 'audit-output',
+        startPoint: 'right',
+        endPoint: 'left',
+        startOffset: 0,
+    },
+    {
+        start: 'chatOutput',
         end: 'tuneData',
         startPoint: 'right',
         endPoint: 'left',

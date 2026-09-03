@@ -334,6 +334,7 @@
         "scoreValue": "Pisteet: {{value}}%",
         "confidenceTooltip": "Näytä ennusteen luottamus jokaiselle tokenille",
         "scoreTooltip": "Näytä jokaisen tokenin ennustettu todennäköisyys",
+        "audit": "Auditointi",
         "autoGenerateAriaLabel": "Vaihda automaattinen generointi",
         "autoGenerate": "Automaattinen generointi",
         "step": "Seuraava",
@@ -342,6 +343,10 @@
             "generationError": "Tekstin generoinnissa tapahtui tuntematon virhe."
         },
         "help": "## Tekstin generointi\n\nKun mallin parametrit on opetettu, niitä voidaan käyttää ennustamaan seuraava token (**\"päättely\"**) tekstijonossa hyödyntäen kehotettasi ja aiempia ennusteita (eli **kontekstia**). Tätä vaiheittaista prosessia kutsutaan **autoregressiiviseksi generoinniksi**.\n\nSe, kuinka hyvin malli generoi tai vastaa kehotteisiin, riippuu opetuksen laadusta ja datan laadusta."
+    },
+    "audit": {
+        "title": "Auditointi",
+        "phrasePattern": "Fraasimalli"
     },
     "evaluation": {
         "title": "Arviointi",
