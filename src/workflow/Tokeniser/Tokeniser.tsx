@@ -70,7 +70,7 @@ export default function Tokeniser() {
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniser.title')}
-                        status={done ? 'done' : 'waiting'}
+                        status={done && !invalid ? 'done' : 'waiting'}
                     />
                     <div className={style.progressBox}>
                         <DataProgress

@@ -123,6 +123,7 @@
             "tokenise": "Tokenise Settings",
             "validationSplit": "Validation Split",
             "saveToOPFS": "Use disk storage for tokens",
+            "logInterval": "Log Interval (ms)",
             "help": {
                 "layerLimits": "How many of the last model layers should be trained. Fewer is faster but may not learn as well. The other layers are locked so they cannot change.",
                 "checkpointing": "Using gradient checkpointing reduces memory usage but slows down training because it must recalculate values instead of saving them.",
@@ -467,6 +468,7 @@
         "showNumbers": "Show token numbers",
         "enoughTokens": "You have enough tokens",
         "notEnoughTokens": "There should be more tokens",
+        "needsNewTokens": "Tokenise again, the data changed",
         "tooManyTokens": "You have more tokens than needed",
         "progressHelp": "Target number of tokens needed.",
         "deleteAll": "Delete All Tokens",

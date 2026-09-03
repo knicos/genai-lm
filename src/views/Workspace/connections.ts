@@ -42,6 +42,14 @@ export const CONNECTIONS: IConnection[] = [
         startOffset: -0.1,
     },
     {
+        start: 'textData',
+        end: 'tokeniseData',
+        startPoint: 'right',
+        endPoint: 'left',
+        endOffset: -0.1,
+        startOffset: -0.1,
+    },
+    {
         start: 'tokeniser',
         end: 'tokeniseData',
         startPoint: 'bottom',

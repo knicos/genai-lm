@@ -1,1 +1,9 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
 
+.content {
+    overflow-y: scroll;
+}

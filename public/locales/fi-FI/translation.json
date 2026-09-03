@@ -451,6 +451,7 @@
         "showNumbers": "Näytä tokenien numerot",
         "enoughTokens": "Tokeneita on riittävästi",
         "notEnoughTokens": "Tokeneita tarvitaan lisää",
+        "needsNewTokens": "Tokenisoi uudelleen, data muuttui",
         "tooManyTokens": "Tokeneita on enemmän kuin tarvitaan",
         "progressHelp": "Tarvittavien tokenien tavoitemäärä.",
         "deleteAll": "Poista kaikki tokenit",

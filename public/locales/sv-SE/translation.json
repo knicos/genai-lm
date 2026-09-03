@@ -451,6 +451,7 @@
         "showNumbers": "Visa tokennummer",
         "enoughTokens": "Du har tillräckligt med token",
         "notEnoughTokens": "Det behövs fler token",
+        "needsNewTokens": "Tokenisera igen, datan har ändrats",
         "tooManyTokens": "Du har för många token",
         "progressHelp": "Målet för antalet token som behövs.",
         "deleteAll": "Radera alla token",

@@ -131,6 +131,28 @@ export function SettingsForm({ settings, setSettings }: Props) {
                 <>
                     <FormControl className={style.sliderControl}>
                         <div
+                            id="loginterval-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.logInterval')}
+                        </div>
+                        <Slider
+                            aria-labelledby="loginterval-label"
+                            value={settings.logInterval}
+                            onChange={(_, value) =>
+                                setSettings({
+                                    ...settings,
+                                    logInterval: value as number,
+                                })
+                            }
+                            min={20}
+                            max={2000}
+                            step={20}
+                            valueLabelDisplay="auto"
+                        />
+                    </FormControl>
+                    <FormControl className={style.sliderControl}>
+                        <div
                             id="minLearningRate-label"
                             className={style.label}
                         >

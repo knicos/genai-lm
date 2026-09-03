@@ -20,7 +20,7 @@ export default function Foundation() {
             <Box
                 widget="foundation"
                 active={model !== null}
-                style={{ maxWidth: '1000px', maxHeight: '80%' }}
+                style={{ maxWidth: '800px', maxHeight: '75vh', display: 'flex', flexDirection: 'column' }}
                 disableHiding
                 useParent
             >

@@ -40,7 +40,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const entries = useAtomValue(dataEntries);
     const saveCheckpoints = useAtomValue(modelSaveCheckpoints);
     const [settings, setSettings] = useAtom(trainerSettings);
-    const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const [trainingProgress, setTrainingProgress] = useState<TrainingLogEntry | null>(null);
     const navigate = useNavigate();
@@ -50,6 +49,8 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const datasetId = useAtomValue(datasetIdAtom);
     const trainingMode = useAtomValue(trainingModeAtom);
     const partialSettings = useAtomValue(pftSettings);
+
+    const batchSize = trainingMode === 'partial' ? partialSettings.batchSize : settings.batchSize;
 
     useWakeLock(training);
 
@@ -160,20 +161,31 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     return;
                 }
 
-                if (job.datasetId && datasetId && job.datasetId !== datasetId) {
-                    console.log('Reset training job because dataset has changed', job.datasetId, datasetId);
+                if (autoTokenise && job.datasetId && datasetId && job.datasetId !== datasetId) {
+                    console.log(
+                        'Reset training job because dataset has changed',
+                        job.datasetId,
+                        datasetId,
+                        datasetTokens?.datasetId
+                    );
+                    previousJobId = null;
+                } else if (datasetTokens && job.datasetId && datasetTokens.datasetId !== job.datasetId) {
+                    console.log(
+                        'Reset training job because dataset has changed',
+                        job.datasetId,
+                        datasetId,
+                        datasetTokens?.datasetId
+                    );
                     previousJobId = null;
                 }
 
                 const lastStep = job.history?.[job.history.length - 1]?.step || 0;
-                if (previousJobId && (settings.maxEpochs || 1) * (settings.epochSteps || 1) <= lastStep) {
-                    if ((settings.maxEpochs || 1) * (settings.epochSteps || 1) <= lastStep) {
-                        setMessage({
-                            notice: t('training.errors.noRemainingTokens'),
-                            level: 'warning',
-                        });
-                        return;
-                    }
+                if (previousJobId && (job.options.maxEpochs || 1) * (job.options.epochSteps || 1) <= lastStep) {
+                    setMessage({
+                        notice: t('training.errors.noRemainingTokens'),
+                        level: 'warning',
+                    });
+                    return;
                 }
             } else {
                 console.warn('Previous training job not found, starting new training');
@@ -181,35 +193,41 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             }
         }
 
-        if (!datasetTokens || datasetTokens.getShardCount() === 0 || datasetTokens.tokeniserId !== model.tokeniser.id) {
-            if (autoTokenise) {
-                setPreparing(t('training.tokenising'));
-                try {
-                    const newTokens = await autoTokeniseData(entries, model, datasetId);
-                    setDataset(newTokens.trainingTokens);
-                    console.log('Auto-tokenised training dataset', newTokens.trainingTokens);
-                    datasetTokens = newTokens.trainingTokens.tokens;
+        if (
+            autoTokenise &&
+            (!datasetTokens ||
+                datasetTokens.getShardCount() === 0 ||
+                datasetTokens.tokeniserId !== model.tokeniser.id ||
+                datasetTokens.datasetId !== datasetId)
+        ) {
+            setPreparing(t('training.tokenising'));
+            try {
+                const newTokens = await autoTokeniseData(entries, model, datasetId);
+                setDataset(newTokens.trainingTokens);
+                console.log('Auto-tokenised training dataset', newTokens.trainingTokens);
+                datasetTokens = newTokens.trainingTokens.tokens;
 
-                    if (newTokens.validationTokens) {
-                        setValidationTokens(newTokens.validationTokens);
-                        validationTokens = newTokens.validationTokens.tokens;
-                    }
-                } catch (error) {
-                    console.error('Error tokenising data', error);
-                    setMessage({
-                        notice: t('training.errors.tokenisationFailed'),
-                        level: 'error',
-                    });
-                    return;
+                if (newTokens.validationTokens) {
+                    setValidationTokens(newTokens.validationTokens);
+                    validationTokens = newTokens.validationTokens.tokens;
                 }
-            } else {
-                console.log('No dataset tokens available, cannot start training', datasetTokens, model.tokeniser.id);
+            } catch (error) {
+                console.error('Error tokenising data', error);
                 setMessage({
-                    notice: t('training.errors.noData'),
-                    level: 'warning',
+                    notice: t('training.errors.tokenisationFailed'),
+                    level: 'error',
                 });
                 return;
             }
+        }
+
+        if (!datasetTokens || datasetTokens.getShardCount() === 0 || datasetTokens.tokeniserId !== model.tokeniser.id) {
+            console.log('No dataset tokens available, cannot start training', datasetTokens, model.tokeniser.id);
+            setMessage({
+                notice: t('training.errors.noData'),
+                level: 'warning',
+            });
+            return;
         }
 
         if (model && datasetTokens && datasetTokens.getShardCount() > 0) {
@@ -236,14 +254,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             } else {
                 realSettings.previous_job_id = undefined;
             }
-
-            // Logging rate from total tokens to avoid logging too frequently or slowly.
-            const totalTokens = datasetTokens.getTokenCount();
-            const MAX_LOG_STEPS = 40;
-            const MIN_LOG_STEPS = 10;
-            const scaling = Math.min(1, Math.floor(totalTokens / 1_000_000));
-            const logSteps = MIN_LOG_STEPS + Math.floor((MAX_LOG_STEPS - MIN_LOG_STEPS) * scaling);
-            realSettings.logInterval = logSteps;
 
             configureModelForTraining(model, realSettings);
 

@@ -35,7 +35,11 @@ export default function ModelFrame({ observer, scrollFrame }: Props) {
                     {steps.has('architecture') && <ModelDesign />}
                 </div>
             )}
-            {steps.has('model') && <Foundation />}
+            {steps.has('model') && (
+                <div style={{ marginLeft: '2rem' }}>
+                    <Foundation />
+                </div>
+            )}
             {steps.has('architecture') && <CheckModel />}
         </Frame>
     );

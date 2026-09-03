@@ -451,6 +451,7 @@
         "showNumbers": "トークン番号を表示",
         "enoughTokens": "十分なトークンがあります",
         "notEnoughTokens": "もっとトークンが必要です",
+        "needsNewTokens": "再トークン化が必要です。データが変更されました。",
         "tooManyTokens": "トークンが多すぎます",
         "progressHelp": "必要なトークン数の目標です。",
         "deleteAll": "全てのトークンを削除",

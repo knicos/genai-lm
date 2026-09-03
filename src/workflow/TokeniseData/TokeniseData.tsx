@@ -51,6 +51,7 @@ export default function TokeniseData() {
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
     const hasTooManyTokens = tokenCount > desiredTokens * 1.1;
     const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;
+    const needsNewTokens = datasetId !== tokens?.datasetId;
 
     return (
         <Help
@@ -70,7 +71,7 @@ export default function TokeniseData() {
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniseData.title')}
-                        status={done ? 'done' : 'waiting'}
+                        status={done && !needsNewTokens ? 'done' : 'waiting'}
                         onSettings={() => navigate('tokenise-settings')}
                     />
                     <div className={style.progressBox}>
@@ -85,15 +86,17 @@ export default function TokeniseData() {
                     </div>
                     <Alert
                         severity={tokenising ? 'info' : hasEnoughTokens ? 'success' : 'warning'}
-                        sx={{ marginTop: '1rem' }}
+                        sx={{ margin: '1rem 1rem 0 1rem' }}
                     >
                         {tokenising
                             ? t('tokeniseData.busy')
-                            : hasEnoughTokens
-                              ? t('tokeniseData.enoughTokens')
-                              : hasTooManyTokens
-                                ? t('tokeniseData.tooManyTokens')
-                                : t('tokeniseData.notEnoughTokens')}
+                            : needsNewTokens
+                              ? t('tokeniseData.needsNewTokens')
+                              : hasEnoughTokens
+                                ? t('tokeniseData.enoughTokens')
+                                : hasTooManyTokens
+                                  ? t('tokeniseData.tooManyTokens')
+                                  : t('tokeniseData.notEnoughTokens')}
                     </Alert>
                     <div className={style.buttonBox}>
                         <Button
