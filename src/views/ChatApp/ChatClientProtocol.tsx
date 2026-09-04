@@ -8,9 +8,10 @@ interface Props {
     conversation: Conversation[];
     onResponse: (response: string, completed: boolean) => void;
     onIdChange?: (id: string) => void;
+    onModelName?: (modelName: string) => void;
 }
 
-export default function ChatClientProtocol({ loRA, conversation, onResponse, onIdChange }: Props) {
+export default function ChatClientProtocol({ loRA, conversation, onResponse, onIdChange, onModelName }: Props) {
     const id = useRef<string | null>(null);
     const lastLength = useRef(0);
     const send = usePeerSender<EventProtocol>();
@@ -34,6 +35,11 @@ export default function ChatClientProtocol({ loRA, conversation, onResponse, onI
                 if (onIdChange) {
                     onIdChange(data.conversation);
                 }
+            }
+        } else if (data.event === 'info') {
+            console.log('Model info received:', data.modelName);
+            if (onModelName) {
+                onModelName(data.modelName);
             }
         }
     });

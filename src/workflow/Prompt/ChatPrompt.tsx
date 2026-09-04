@@ -1,6 +1,6 @@
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useAtom } from 'jotai';
 import style from './style.module.css';
-import { conversationGeneratedAtom, generatorSettings } from '../../state/generator';
+import { conversationGeneratedAtom, conversationIDAtom, generatorSettings } from '../../state/generator';
 import { useRef, useState } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
+import { conversationDataAtom } from '../../state/data';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
@@ -17,10 +18,12 @@ export default function ChatPrompt() {
     const settings = useAtomValue(generatorSettings);
     const [messages, setMessage] = useState<Notice | null>(null);
     const busyRef = useRef<string | null>(null);
+    const [id, setID] = useAtom(conversationIDAtom);
     const model = useAtomValue(loadedModelAtom);
     const status = useModelStatus(model ?? undefined);
     const ref = useRef<HTMLDivElement>(null);
     const loraName = useAtomValue(modelLoRAName);
+    const setConversationLog = useSetAtom(conversationDataAtom);
 
     const disable = status === 'training';
 
@@ -60,6 +63,7 @@ export default function ChatPrompt() {
             loraName: loraName ?? undefined,
             input: filteredText.length === 0 ? undefined : filteredText,
             background: true,
+            previous_response_id: id ?? undefined,
         };
 
         const doneHandler = (id: string) => {
@@ -67,6 +71,15 @@ export default function ChatPrompt() {
                 busyRef.current = null;
                 setGenerate(false);
                 model.responses.off('done', doneHandler);
+
+                setConversationLog(async (prev) => {
+                    const convo = model.responses.getResponse(id)?.output ?? [];
+                    const data = await prev;
+                    if (data.includes(convo)) {
+                        return [...data];
+                    }
+                    return [...data, convo];
+                });
             }
         };
 
@@ -91,6 +104,7 @@ export default function ChatPrompt() {
             model.responses.on('done', doneHandler);
             const response = await model.responses.create(options, h);
             busyRef.current = response.id;
+            setID(response.id);
         } catch {
             setMessage({
                 level: 'error',

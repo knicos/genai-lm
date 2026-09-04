@@ -96,7 +96,7 @@ export default function TuneTraining() {
     }, [conversations]);
 
     const startTraining = async () => {
-        if (trainerJobId && model) {
+        if (training && trainerJobId && model) {
             model?.training.cancel(trainerJobId);
             setTraining(false);
             return;
@@ -145,42 +145,45 @@ export default function TuneTraining() {
                 settings.gradientCheckpointing = true;
             }
             settings.loraName = selectedLoRA ?? undefined;
-
-            const errorHandler = (id: string, err: Error) => {
-                if (id === trainerJobId) {
-                    setDone(true);
-                    setTraining(false);
-                    logger.error({ action: 'training_error', message: err.message });
-                    model.training.off('error', errorHandler);
-                    setMessage({
-                        notice: t('training.errors.trainingFailed'),
-                        level: 'error',
-                    });
-                }
-            };
-            model.training.on('error', errorHandler);
-
-            const doneHandler = async (jobId: string) => {
-                if (jobId === trainerJobId) {
-                    setDone(true);
-                    setTraining(false);
-                    logger.log({ action: 'training_stopped' });
-                    model.training.off('completed', doneHandler);
-                    model.training.off('error', errorHandler);
-                }
-            };
-            model.training.on('completed', doneHandler);
+            settings.previous_job_id = trainerJobId ?? undefined;
 
             try {
-                const job = trainerJobId
-                    ? model.training.getJob(trainerJobId)
-                    : await model.training.job(settings, new dataModule.MemoryConversationStream(conversations), [
-                          { id: 'conversations_log', name: 'Conversations Log', conversational: true },
-                      ]);
+                const job = await model.training.job(
+                    settings,
+                    [new dataModule.MemoryConversationStream(conversations)],
+                    [{ id: 'conversations_log', name: 'Conversations Log', conversational: true }]
+                );
 
                 if (!job) {
                     return;
                 }
+
+                const errorHandler = (id: string, err: Error) => {
+                    if (id === job.id) {
+                        setDone(true);
+                        setTraining(false);
+                        logger.error({ action: 'training_error', message: err.message });
+                        model.training.off('error', errorHandler);
+                        setMessage({
+                            notice: t('training.errors.trainingFailed'),
+                            level: 'error',
+                        });
+                    }
+                };
+                model.training.on('error', errorHandler);
+
+                const doneHandler = async (jobId: string) => {
+                    if (jobId === job.id) {
+                        setDone(true);
+                        setTraining(false);
+                        logger.log({ action: 'training_stopped' });
+                        model.training.off('completed', doneHandler);
+                        model.training.off('cancelled', doneHandler);
+                        model.training.off('error', errorHandler);
+                    }
+                };
+                model.training.on('completed', doneHandler);
+                model.training.on('cancelled', doneHandler);
 
                 setTotalSamples(job.totalTokens);
 

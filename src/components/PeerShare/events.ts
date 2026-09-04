@@ -1,4 +1,4 @@
-import { PeerEvent } from '@genai-fi/base';
+import { BuiltinEvent, PeerEvent } from '@genai-fi/base';
 import { Conversation } from '@genai-fi/nanogpt';
 
 export interface ChatEvent extends PeerEvent {
@@ -27,4 +27,20 @@ export interface StopEvent extends PeerEvent {
     conversation: string;
 }
 
-export type EventProtocol = ChatEvent | ResponseEvent | ErrorEvent | StopEvent;
+export interface InfoRequestEvent extends PeerEvent {
+    event: 'inforequest';
+}
+
+export interface InfoEvent extends PeerEvent {
+    event: 'info';
+    modelName: string;
+}
+
+export type EventProtocol =
+    | ChatEvent
+    | ResponseEvent
+    | ErrorEvent
+    | StopEvent
+    | InfoRequestEvent
+    | InfoEvent
+    | BuiltinEvent;

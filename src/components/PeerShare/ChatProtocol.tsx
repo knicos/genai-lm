@@ -3,7 +3,6 @@ import { EventProtocol } from './events';
 import { Connection } from '@genai-fi/base';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { modelAtom } from '../../state/model';
-import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useRef, useState } from 'react';
 import ChatManager from './ChatManager';
 import { allowRecordAtom, conversationDataAtom } from '../../state/data';
@@ -32,10 +31,9 @@ export default function ChatProtocol() {
     usePeerData(async (data: EventProtocol, conn: Connection<EventProtocol>) => {
         if (data.event === 'chat') {
             if (manager) {
-                const conversationId = data.conversation || uuidv4();
+                const conversationId = data.conversation;
 
                 manager.startConversation(
-                    conversationId,
                     data.input,
                     (id, message, completed) => {
                         if (completed && recordRef.current) {
@@ -60,6 +58,7 @@ export default function ChatProtocol() {
                     (_, error) => {
                         conn.send({ event: 'error', message: error });
                     },
+                    conversationId,
                     data.loRA
                 );
             } else {
@@ -70,6 +69,14 @@ export default function ChatProtocol() {
             if (manager) {
                 manager.stopConversation(data.conversation);
             }
+        } else if (data.event === 'eter:join') {
+            console.log('Info request received');
+            conn.send({
+                event: 'info',
+                modelName: model?.meta.name ?? 'unknown',
+            });
+        } else {
+            console.warn('Unknown event received:', data);
         }
     });
 

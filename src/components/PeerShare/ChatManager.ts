@@ -1,7 +1,7 @@
 import { Conversation, TeachableLLM, IGeneratorResponse } from '@genai-fi/nanogpt';
 
 interface ChatQueue {
-    id: string;
+    id?: string;
     active: boolean;
     input: string | Conversation[];
     loRA?: string;
@@ -17,21 +17,23 @@ export default class ChatManager {
     constructor(private model: TeachableLLM) {}
 
     startConversation(
-        id: string,
         input: string | Conversation[],
         onUpdate: (id: string, message: string, completed: boolean) => void,
         onError: (id: string, error: string) => void,
+        id?: string,
         loRA?: string
     ) {
         // Append or add user conversation
         const userMessage: Conversation[] = Array.isArray(input) ? input : [{ role: 'user', content: input }];
 
-        if (this.conversations.has(id)) {
-            const existingConvo = this.conversations.get(id) || [];
-            existingConvo.push(...userMessage);
-            this.conversations.set(id, existingConvo);
-        } else {
-            this.conversations.set(id, [...userMessage]);
+        if (id) {
+            if (this.conversations.has(id)) {
+                const existingConvo = this.conversations.get(id) || [];
+                existingConvo.push(...userMessage);
+                this.conversations.set(id, existingConvo);
+            } else {
+                this.conversations.set(id, [...userMessage]);
+            }
         }
 
         // Queue the conversation for generation
@@ -44,6 +46,9 @@ export default class ChatManager {
         const convo = this.queue.find((c) => c.id === id);
         if (convo) {
             convo.active = false;
+            if (convo.id) {
+                this.model.responses.cancel(convo.id);
+            }
         }
     }
 
@@ -79,23 +84,28 @@ export default class ChatManager {
                     topP: 0.9,
                     temperature: 0.8,
                     loraName: q.loRA,
+                    noCache: false,
+                    nonConversational: false,
                     background: true,
+                    previous_response_id: id ?? undefined,
                 },
                 (output: IGeneratorResponse) => {
                     step++;
                     if (step % 5 !== 0) return; // Throttle updates to every 5 tokens
+
                     const convo = output.output || [];
                     const lastMessage = convo[convo.length - 1];
 
                     if (q.active === false) {
                         this.model.responses.cancel(output.id);
-                        onUpdate(id, lastMessage.content, true);
+                        onUpdate(output.id, lastMessage.content, true);
                     } else {
-                        onUpdate(id, lastMessage.content, false);
+                        onUpdate(output.id, lastMessage.content, false);
                     }
                 }
             );
             let step = 0;
+            q.id = generator.id;
 
             const doneHandler = (id: string) => {
                 if (id === generator.id) {
@@ -109,7 +119,7 @@ export default class ChatManager {
             this.model.responses.on('done', doneHandler);
         } catch (error) {
             console.error('Error processing conversation:', error);
-            onError(id, 'An error occurred while generating the response.');
+            onError(id ?? '', 'An error occurred while generating the response.');
         } finally {
             // Remove the processed conversation from the queue and process the next one
             this.queue.shift();

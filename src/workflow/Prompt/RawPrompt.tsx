@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import useModelMode from '../../hooks/useModelMode';
 import style from './style.module.css';
 import { generatorSettings, rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
@@ -10,7 +10,7 @@ import { loadedModelAtom } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { trainerJobIdAtom, trainerSettings } from '../../state/trainer';
 import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
-import { conversationDataAtom } from '../../state/data';
+// import { conversationDataAtom } from '../../state/data';
 
 export default function ChatPrompt() {
     const { t } = useTranslation();
@@ -27,7 +27,7 @@ export default function ChatPrompt() {
     const ref = useRef<HTMLDivElement>(null);
     const outputText = useAtomValue(trainerSettings).outputText;
     const promptRef = useRef<string>('');
-    const setConversationLog = useSetAtom(conversationDataAtom);
+    // const setConversationLog = useSetAtom(conversationDataAtom);
     const mode = useModelMode(model ?? undefined);
 
     const disable = status === 'training';
@@ -145,15 +145,6 @@ export default function ChatPrompt() {
                 busyRef.current = null;
                 setGenerate(false);
                 model.responses.off('done', doneHandler);
-
-                setConversationLog(async (prev) => {
-                    const convo = model.responses.getResponse(id)?.output ?? [];
-                    const data = await prev;
-                    if (data.includes(convo)) {
-                        return [...data];
-                    }
-                    return [...data, convo];
-                });
             }
         };
 

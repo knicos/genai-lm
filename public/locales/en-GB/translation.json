@@ -530,7 +530,8 @@
     "deploy": {
         "actions": {
             "copy": "Copy Link",
-            "close": "Close"
+            "close": "Close",
+            "newChat": "New Chat"
         },
         "welcome_message": "Try talking with me!",
         "placeholder": "Type a message..."

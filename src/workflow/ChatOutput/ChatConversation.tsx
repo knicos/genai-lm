@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import style from './style.module.css';
 import { useAtomValue } from 'jotai';
-import { conversationGeneratedAtom } from '../../state/generator';
+import { conversationGeneratedAtom, conversationIDAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router';
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router';
 export default function ChatConversation() {
     const model = useAtomValue(loadedModelAtom);
     const [output, setOutput] = useAtom(conversationGeneratedAtom);
+    const setID = useSetAtom(conversationIDAtom);
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
 
@@ -30,6 +31,7 @@ export default function ChatConversation() {
             <ChatMenu
                 onReset={() => {
                     setOutput([]);
+                    setID(null);
                 }}
                 onShowSettings={() => {
                     navigate('generator-settings');

@@ -51,3 +51,18 @@
     bottom: 20px;
     left: 20px;
 }
+
+.menu {
+    width: 100%;
+    max-width: 49rem;
+    margin: 1rem auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modelName {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #444;
+}

@@ -43,7 +43,7 @@ describe('ChatManager', () => {
         const onUpdate = vi.fn();
         const onError = vi.fn();
 
-        manager.startConversation('chat-1', 'Hi there', onUpdate, onError);
+        manager.startConversation('Hi there', onUpdate, onError);
         await flushPromises();
 
         await waitFor(() => expect(model.responses.create).toHaveBeenCalledTimes(1));

@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { usePeerSender } from '@genai-fi/base/hooks/peer';
 import { EventProtocol } from '../../components/PeerShare/events';
 import { useSearchParams } from 'react-router';
+import { VerticalButton } from '@genai-fi/base';
+import EditSquareIcon from '@mui/icons-material/EditSquare';
 
 export default function Page() {
     const { t } = useTranslation();
@@ -17,13 +19,17 @@ export default function Page() {
     const send = usePeerSender<EventProtocol>();
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [params] = useSearchParams();
+    const [modelName, setModelName] = useState<string | null>(null);
+
+    const lora = params.get('lora') ?? undefined;
 
     return (
         <>
             <ChatClientProtocol
-                loRA={params.get('lora') ?? undefined}
+                loRA={lora}
                 conversation={conversation}
                 onIdChange={setConversationId}
+                onModelName={setModelName}
                 onResponse={(response, completed) => {
                     setConversation((prev) => {
                         const isAssistant = prev.length > 0 && prev[prev.length - 1].role === 'assistant';
@@ -39,6 +45,20 @@ export default function Page() {
                     }
                 }}
             />
+            <div className={style.menu}>
+                <VerticalButton
+                    onClick={() => {
+                        setConversation([]);
+                    }}
+                    startIcon={<EditSquareIcon />}
+                >
+                    {t('deploy.actions.newChat')}
+                </VerticalButton>
+                <div style={{ flexGrow: 1 }} />
+                <div className={style.modelName}>
+                    {modelName ? `${modelName}: ${lora ?? ''}` : `${lora ?? 'No name'}`}
+                </div>
+            </div>
             <section>
                 <div className={style.conversationBox}>
                     <ConversationDisplay conversation={conversation} />
