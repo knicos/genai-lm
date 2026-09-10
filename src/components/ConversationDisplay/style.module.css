@@ -63,9 +63,17 @@
     margin-top: 2rem;
     margin-bottom: 0;
 }
+.assistantItem.tokenMode {
+    user-select: none;
+    cursor: pointer;
+    touch-action: none;
+}
 .assistantItem.injected {
     font-style: italic;
     opacity: 0.8;
+}
+.assistantItem.dragging {
+    cursor: grabbing;
 }
 
 .assistantEditing {
@@ -138,4 +146,12 @@
     font-size: 0.7rem;
     color: #444;
     margin-left: 0.5rem;
+}
+
+span.selected {
+    background-color: rgb(174, 37, 174) !important;
+    color: white !important;
+    box-sizing: border-box;
+    /*border: 1px solid white;*/
+    border-radius: 4px;
 }

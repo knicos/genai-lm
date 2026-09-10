@@ -1,28 +1,40 @@
 import UserItem from './UserItem';
 import AssistantItem from './AssistantItem';
 import style from './style.module.css';
-import { useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import { GeneratorConversation } from '@genai-fi/nanogpt';
+import type { GeneratorConversation } from '@genai-fi/nanogpt';
+import type { TokenSelectState } from '../../state/uiState';
 
 interface Props {
     conversation?: GeneratorConversation[];
     editable?: boolean;
     highlightMode?: 'none' | 'confidence' | 'score';
+    selectLength?: number;
     onRetry?: (index: number) => void;
+    onSelect?: (selection: TokenSelectState | null) => void;
 }
 
 export default function ConversationDisplay({
     conversation,
     onRetry,
+    onSelect,
     editable = false,
     highlightMode = 'none',
+    selectLength = 0,
 }: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const { t } = useTranslation();
+    const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+
+    useEffect(() => {
+        if (onSelect) {
+            onSelect(null);
+        }
+    }, [conversation, onSelect]);
 
     return (
         <div className={style.conversationList}>
@@ -48,11 +60,20 @@ export default function ConversationDisplay({
                 ) : (
                     <AssistantItem
                         key={index}
+                        index={index}
                         item={part}
                         active={!editable && index === conversation.length - 1}
                         busy={!part._completed}
                         editable={editable}
                         highlightMode={highlightMode}
+                        selectLength={selectLength}
+                        onSelect={(selection) => {
+                            setActiveIndex(index);
+                            if (onSelect) {
+                                onSelect(selection);
+                            }
+                        }}
+                        activeIndex={activeIndex}
                         onDelete={
                             editable
                                 ? () => {

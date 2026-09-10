@@ -3,6 +3,9 @@
     margin: 0.5rem;
     display: flex;
     align-items: center;
+    outline: none;
+    background: none;
+    border: none;
 }
 
 .loadingIcon {
@@ -25,6 +28,11 @@
     overflow: hidden;
     animation: fadein 0.5s 1;
     position: relative;
+    transition: width 0.2s ease-in-out;
+}
+
+.modelThread.minimised {
+    width: 5.5rem;
 }
 
 .modelThread :global .MuiOutlinedInput-root {

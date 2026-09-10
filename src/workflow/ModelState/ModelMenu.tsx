@@ -61,7 +61,10 @@ export default function ModelMenu({ onSearch, onDownload, onUpload, disabled }: 
                 {onUpload && (
                     <MenuItem
                         disabled={disabled}
-                        onClick={onUpload}
+                        onClick={() => {
+                            onUpload?.();
+                            handleClose();
+                        }}
                     >
                         <ListItemIcon>
                             <UploadIcon color="inherit" />
@@ -72,7 +75,10 @@ export default function ModelMenu({ onSearch, onDownload, onUpload, disabled }: 
                 {onSearch && (
                     <MenuItem
                         disabled={disabled}
-                        onClick={onSearch}
+                        onClick={() => {
+                            onSearch?.();
+                            handleClose();
+                        }}
                     >
                         <ListItemIcon>
                             <SearchIcon color="inherit" />
@@ -83,7 +89,10 @@ export default function ModelMenu({ onSearch, onDownload, onUpload, disabled }: 
                 {onDownload && (
                     <MenuItem
                         disabled={disabled}
-                        onClick={onDownload}
+                        onClick={() => {
+                            onDownload?.();
+                            handleClose();
+                        }}
                     >
                         <ListItemIcon>
                             <DownloadIcon color="inherit" />

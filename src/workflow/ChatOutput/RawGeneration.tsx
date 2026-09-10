@@ -3,12 +3,12 @@ import ConversationDisplay from '../../components/ConversationDisplay/Conversati
 import style from './style.module.css';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { generatorSettings } from '../../state/generator';
-import { useState } from 'react';
 import { rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router';
+import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../../state/uiState';
 
 export default function RawGeneration() {
     const model = useAtomValue(loadedModelAtom);
@@ -18,8 +18,10 @@ export default function RawGeneration() {
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
     const responseId = useAtomValue(rawGenerationIDAtom);
-    const [highlightMode, setHighlightMode] = useState<'none' | 'confidence' | 'score'>('none');
+    const highlightMode = useAtomValue(uiTokenHighlightMode);
     const setSettings = useSetAtom(generatorSettings);
+    const setSelection = useSetAtom(uiSelectedTokens);
+    const selectionLength = useAtomValue(uiTokenSelectLength);
 
     useEffect(() => {
         if (model) {
@@ -61,15 +63,10 @@ export default function RawGeneration() {
                 onReset={() => {
                     setOutput([]);
                     setID(null);
+                    setSelection(null);
                 }}
                 onShowSettings={() => {
                     navigate('generator-settings');
-                }}
-                onConfidence={() => {
-                    setHighlightMode((prev) => (prev !== 'confidence' ? 'confidence' : 'none'));
-                }}
-                onScore={() => {
-                    setHighlightMode((prev) => (prev !== 'score' ? 'score' : 'none'));
                 }}
                 highlightMode={highlightMode}
             />
@@ -77,6 +74,8 @@ export default function RawGeneration() {
                 conversation={output}
                 onRetry={doRetry}
                 highlightMode={highlightMode}
+                onSelect={setSelection}
+                selectLength={selectionLength}
             />
         </div>
     );

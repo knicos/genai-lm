@@ -7,24 +7,33 @@ import { Button } from '@genai-fi/base';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import type { ExtendedGeneratorConversation } from '../../state/generator';
-import ConfidenceHighlights from './ConfidenceHighlights';
+import TokenRender from './TokenRender';
+import { TokenSelectState } from '../../state/uiState';
 
 interface Props {
     item: ExtendedGeneratorConversation;
     active?: boolean;
     busy?: boolean;
+    index: number;
+    activeIndex?: number;
     editable?: boolean;
     highlightMode?: 'none' | 'confidence' | 'score';
+    selectLength?: number;
     onDelete?: () => void;
+    onSelect?: (selection: TokenSelectState | null) => void;
 }
 
 export default function AssistantItem({
     item,
     active,
     busy,
+    index,
+    activeIndex,
     editable = false,
     highlightMode = 'none',
+    selectLength = 0,
     onDelete,
+    onSelect,
 }: Props) {
     const ref = useRef<HTMLDivElement>(null);
     const { t } = useTranslation();
@@ -45,10 +54,14 @@ export default function AssistantItem({
             >
                 {t('conversation.botPlaceholder')}
             </div>
-        ) : item._output && highlightMode !== 'none' ? (
-            <ConfidenceHighlights
+        ) : (item._output && highlightMode !== 'none') || selectLength > 0 ? (
+            <TokenRender
                 item={item}
-                mode={highlightMode}
+                backgroundMode={highlightMode}
+                index={index}
+                activeIndex={activeIndex}
+                onSelect={onSelect}
+                selectLength={selectLength}
             />
         ) : (
             <div

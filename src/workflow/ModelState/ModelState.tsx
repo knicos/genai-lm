@@ -30,6 +30,7 @@ export default function ModelState() {
     const anchorRef = useRef<HTMLDivElement>(null);
     const downloader = useAtomValue(modelDownloadAtom);
     const quantize = useAtomValue(modelQuantizeSave);
+    const [minimise, setMinimise] = useState(false);
 
     // Prevent double loading issues
     const modelRef = useRef<TeachableLLM | undefined>(model);
@@ -115,7 +116,7 @@ export default function ModelState() {
             keepOpen
         >
             <BoxStandalone
-                className={style.modelThread}
+                className={`${style.modelThread} ${minimise ? style.minimised : ''}`}
                 active={done}
             >
                 <input
@@ -142,7 +143,10 @@ export default function ModelState() {
                     className={style.container}
                     ref={anchorRef}
                 >
-                    <div className={style.icon}>
+                    <button
+                        className={style.icon}
+                        onClick={() => setMinimise(!minimise)}
+                    >
                         {!spin && <ModelIcon model={model ?? undefined} />}
                         {spin && (
                             <div className={style.loadingIcon}>
@@ -152,47 +156,53 @@ export default function ModelState() {
                                 />
                             </div>
                         )}
-                    </div>
-                    {!spin && model && (
-                        <div className={style.nameStatusGroup}>
-                            <ModelName
-                                title={title}
-                                setTitle={updateModelTitle}
-                                style={{ borderBottom: 'none', backgroundColor: '#945fbf' }}
-                                placeholder={t('model.languageModel')}
-                            />
-                            <ModelStage model={model ?? null} />
-                        </div>
-                    )}
-                    {downloader && <div className={style.statusMessage}>{t('model.downloading')}</div>}
-                    {model && status === 'loading' && !downloader && (
-                        <div className={style.statusMessage}>{t('model.loading')}</div>
-                    )}
-                    {!model && !downloader && <div className={style.statusMessage}>{t('model.noModel')}</div>}
-                    {status === 'training' && !downloader && (
-                        <div className={style.statusMessage}>{t('model.training')}</div>
-                    )}
-                    {(status === 'busy' || status == 'warmup') && !downloader && (
-                        <div className={style.statusMessage}>{t('model.busy')}</div>
-                    )}
-                    {status === 'error' && !downloader && <div className={style.statusMessage}>{t('model.error')}</div>}
+                    </button>
+                    {!minimise && (
+                        <>
+                            {!spin && model && (
+                                <div className={style.nameStatusGroup}>
+                                    <ModelName
+                                        title={title}
+                                        setTitle={updateModelTitle}
+                                        style={{ borderBottom: 'none', backgroundColor: '#945fbf' }}
+                                        placeholder={t('model.languageModel')}
+                                    />
+                                    <ModelStage model={model ?? null} />
+                                </div>
+                            )}
+                            {downloader && <div className={style.statusMessage}>{t('model.downloading')}</div>}
+                            {model && status === 'loading' && !downloader && (
+                                <div className={style.statusMessage}>{t('model.loading')}</div>
+                            )}
+                            {!model && !downloader && <div className={style.statusMessage}>{t('model.noModel')}</div>}
+                            {status === 'training' && !downloader && (
+                                <div className={style.statusMessage}>{t('model.training')}</div>
+                            )}
+                            {(status === 'busy' || status == 'warmup') && !downloader && (
+                                <div className={style.statusMessage}>{t('model.busy')}</div>
+                            )}
+                            {status === 'error' && !downloader && (
+                                <div className={style.statusMessage}>{t('model.error')}</div>
+                            )}
 
-                    <ModelMenu
-                        disabled={modelBusy}
-                        onUpload={() => {
-                            fileRef.current?.click();
-                        }}
-                        onSearch={() => {
-                            setShowSearch(true);
-                        }}
-                        onDownload={
-                            model
-                                ? () => {
-                                      doSave(model?.meta.name || 'model');
-                                  }
-                                : undefined
-                        }
-                    />
+                            <ModelMenu
+                                disabled={modelBusy}
+                                onUpload={() => {
+                                    fileRef.current?.click();
+                                }}
+                                onSearch={() => {
+                                    setShowSearch(true);
+                                }}
+                                onDownload={
+                                    model
+                                        ? () => {
+                                              doSave(model?.meta.name || 'model');
+                                          }
+                                        : undefined
+                                }
+                            />
+                        </>
+                    )}
                 </div>
             </BoxStandalone>
         </Help>
