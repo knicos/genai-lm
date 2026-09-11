@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Button } from '@genai-fi/base';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import type { ExtendedGeneratorConversation } from '../../state/generator';
+import type { ConversationHighlight, ExtendedGeneratorConversation } from '../../state/generator';
 import TokenRender from './TokenRender';
 import { TokenSelectState } from '../../state/uiState';
 
@@ -19,6 +19,7 @@ interface Props {
     editable?: boolean;
     highlightMode?: 'none' | 'confidence' | 'score';
     selectLength?: number;
+    highlights?: ConversationHighlight[];
     onDelete?: () => void;
     onSelect?: (selection: TokenSelectState | null) => void;
 }
@@ -32,6 +33,7 @@ export default function AssistantItem({
     editable = false,
     highlightMode = 'none',
     selectLength = 0,
+    highlights,
     onDelete,
     onSelect,
 }: Props) {
@@ -62,6 +64,7 @@ export default function AssistantItem({
                 activeIndex={activeIndex}
                 onSelect={onSelect}
                 selectLength={selectLength}
+                highlights={highlights}
             />
         ) : (
             <div

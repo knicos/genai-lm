@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import type { GeneratorConversation } from '@genai-fi/nanogpt';
 import type { TokenSelectState } from '../../state/uiState';
+import type { ConversationHighlight } from '../../state/generator';
 
 interface Props {
     conversation?: GeneratorConversation[];
     editable?: boolean;
     highlightMode?: 'none' | 'confidence' | 'score';
     selectLength?: number;
+    highlights?: ConversationHighlight[];
     onRetry?: (index: number) => void;
     onSelect?: (selection: TokenSelectState | null) => void;
 }
@@ -25,6 +27,7 @@ export default function ConversationDisplay({
     editable = false,
     highlightMode = 'none',
     selectLength = 0,
+    highlights,
 }: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const { t } = useTranslation();
@@ -67,6 +70,7 @@ export default function ConversationDisplay({
                         editable={editable}
                         highlightMode={highlightMode}
                         selectLength={selectLength}
+                        highlights={highlights}
                         onSelect={(selection) => {
                             setActiveIndex(index);
                             if (onSelect) {

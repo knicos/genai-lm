@@ -148,6 +148,14 @@
     margin-left: 0.5rem;
 }
 
+span.highlighted {
+    background-color: color-mix(in srgb, var(--highlight-color) 20%, white 80%);
+    color: black;
+    box-sizing: border-box;
+    border-radius: 0;
+    border-bottom: 2px solid var(--highlight-color);
+}
+
 span.selected {
     background-color: rgb(174, 37, 174) !important;
     color: white !important;

@@ -1,21 +1,16 @@
-import { IGeneratorOutput, GeneratorConversation } from '@genai-fi/nanogpt';
+import { IGeneratorOutput } from '@genai-fi/nanogpt';
 import { PointerEvent, useEffect, useRef, useState } from 'react';
 import type { TokenSelectState } from '../../state/uiState';
 import style from './style.module.css';
-
-interface Highlights {
-    start: number;
-    end: number;
-    colour: string;
-}
+import { ConversationHighlight, ExtendedGeneratorConversation } from '../../state/generator';
 
 interface Props {
-    item: GeneratorConversation;
+    item: ExtendedGeneratorConversation;
     backgroundMode: 'confidence' | 'score' | 'none' | 'custom';
     selectLength: number;
-    highlights?: Highlights[];
     index: number;
     activeIndex?: number;
+    highlights?: ConversationHighlight[];
     onSelect?: (selection: TokenSelectState | null) => void;
 }
 
@@ -51,6 +46,22 @@ function updateSpanSelections(container: HTMLDivElement, selection: SelectState 
     });
 }
 
+function updateHighlights(container: HTMLDivElement, highlights: ConversationHighlight[] | undefined, index: number) {
+    if (!container) {
+        return;
+    }
+    const spans = container.querySelectorAll('span');
+    spans.forEach((span, i) => {
+        const hl = testInHighlight(highlights, i, index);
+        if (hl) {
+            span.style.setProperty('--highlight-color', hl);
+            span.classList.add(style.highlighted);
+        } else {
+            span.classList.remove(style.highlighted);
+        }
+    });
+}
+
 function findSpanIndexFromPoint(x: number, y: number, height: number): HTMLElement | null {
     for (let tries = 0; tries < 5; tries++) {
         const el = document.elementFromPoint(x, y) as HTMLElement | null;
@@ -75,14 +86,38 @@ function clampSelection(selection: SelectState, index: number, selectLength: num
     }
 }
 
+function testInHighlight(
+    highlights: ConversationHighlight[] | undefined,
+    index: number,
+    conversationIndex: number
+): string | null {
+    if (!highlights) {
+        return null;
+    }
+    for (const highlight of highlights) {
+        if (index >= highlight.start && index <= highlight.end && highlight.index === conversationIndex) {
+            return highlight.colour;
+        }
+    }
+    return null;
+}
+
+const COLOURS: Record<string, string> = {
+    red: '#e53935',
+    blue: '#42a5f5',
+    purple: '#9c27b0',
+    green: '#4caf50',
+    orange: '#ff8f00',
+};
+
 export default function TokenRender({
     item,
     backgroundMode,
-    // highlights,
     index,
     activeIndex,
     onSelect,
     selectLength,
+    highlights,
 }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const lastCountRef = useRef<number>(0);
@@ -90,7 +125,7 @@ export default function TokenRender({
     const rafRef = useRef<number | null>(null);
     const selectionRef = useRef<SelectState | null>(null);
     const [dragging, setDragging] = useState(false);
-    const propChangeRef = useRef<unknown[]>([backgroundMode]);
+    const propChangeRef = useRef<unknown[]>([backgroundMode, highlights]);
 
     useEffect(() => {
         if (activeIndex !== undefined && activeIndex !== index) {
@@ -101,13 +136,19 @@ export default function TokenRender({
         }
     }, [activeIndex, index]);
 
+    useEffect(() => {
+        if (containerRef.current) {
+            updateHighlights(containerRef.current, highlights, index);
+        }
+    }, [highlights, index]);
+
     const tokens = item._output ?? [];
     latestRef.current = tokens;
     // schedule a single rAF update (coalesces rapid updates)
     if (rafRef.current === null) {
         rafRef.current = requestAnimationFrame(() => {
             // Check if props have changed since the last render, and if so, reset the container
-            const currentProps = [backgroundMode];
+            const currentProps = [backgroundMode, highlights];
             const propsChanged = currentProps.some((prop, i) => prop !== propChangeRef.current[i]);
             if (propsChanged) {
                 if (containerRef.current) {
@@ -146,9 +187,18 @@ export default function TokenRender({
                 }
                 span.textContent = out.text; // safe: use textContent to avoid XSS
                 span.setAttribute('data-index', i.toString());
+
+                const hl = testInHighlight(highlights, i, index);
+                if (hl) {
+                    span.style.setProperty('--highlight-color', COLOURS[hl]);
+                    span.classList.add(style.highlighted);
+                }
+
                 frag.appendChild(span);
             }
+
             container.appendChild(frag);
+            updateSpanSelections(container, selectionRef.current);
             lastCountRef.current = outputs.length;
         });
     }

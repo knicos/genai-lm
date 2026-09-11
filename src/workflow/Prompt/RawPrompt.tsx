@@ -1,7 +1,12 @@
 import { useAtom, useAtomValue } from 'jotai';
 import useModelMode from '../../hooks/useModelMode';
 import style from './style.module.css';
-import { generatorSettings, rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
+import {
+    ExtendedGeneratorConversation,
+    generatorSettings,
+    rawGeneratedTextAtom,
+    rawGenerationIDAtom,
+} from '../../state/generator';
 import { useRef, useState, useEffect } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
@@ -148,7 +153,7 @@ export default function ChatPrompt() {
             }
         };
 
-        const convoRef = { current: [] as GeneratorConversation[] };
+        const convoRef = { current: [] as ExtendedGeneratorConversation[] };
         const animationFrameRef = { current: -1 };
 
         const h = (output: IGeneratorResponse) => {

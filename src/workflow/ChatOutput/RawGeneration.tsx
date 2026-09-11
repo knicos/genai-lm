@@ -3,7 +3,7 @@ import ConversationDisplay from '../../components/ConversationDisplay/Conversati
 import style from './style.module.css';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { generatorSettings } from '../../state/generator';
-import { rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
+import { rawGeneratedTextAtom, rawGenerationIDAtom, rawHighlightsAtom } from '../../state/generator';
 import { loadedModelAtom } from '../../state/model';
 import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
@@ -22,6 +22,7 @@ export default function RawGeneration() {
     const setSettings = useSetAtom(generatorSettings);
     const setSelection = useSetAtom(uiSelectedTokens);
     const selectionLength = useAtomValue(uiTokenSelectLength);
+    const highlights = useAtomValue(rawHighlightsAtom);
 
     useEffect(() => {
         if (model) {
@@ -74,6 +75,7 @@ export default function RawGeneration() {
                 conversation={output}
                 onRetry={doRetry}
                 highlightMode={highlightMode}
+                highlights={highlights}
                 onSelect={setSelection}
                 selectLength={selectionLength}
             />

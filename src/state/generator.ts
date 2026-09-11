@@ -11,6 +11,15 @@ export interface GeneratorSettings extends IGenerateOptions {
     promptMode: 'none' | 'completion' | 'conversation';
 }
 
+export interface ConversationHighlight {
+    index: number;
+    start: number;
+    end: number;
+    colour: 'red' | 'blue' | 'purple' | 'green' | 'orange';
+    id?: string;
+    strike?: boolean;
+}
+
 export interface ExtendedGeneratorConversation extends GeneratorConversation {
     _trainingOutput?: boolean;
     _step?: number;
@@ -45,6 +54,7 @@ export const chatSettings = atomWithStorage<GeneratorSettings>(
 );
 
 export const rawGeneratedTextAtom = atom<ExtendedGeneratorConversation[]>([]);
+export const rawHighlightsAtom = atom<ConversationHighlight[]>([]);
 export const rawGenerationIDAtom = atom<string | null>(null);
 export const conversationGeneratedAtom = atom<GeneratorConversation[]>([]);
 export const conversationIDAtom = atom<string | null>(null);
