@@ -361,6 +361,7 @@
         "title": "Audit Toolkit",
         "tools": {
             "beam": "Variants",
+            "memorization": "Exact Match",
             "confidence": "Confidence",
             "score": "Probability"
         },

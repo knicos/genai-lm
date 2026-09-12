@@ -4,8 +4,9 @@ import style from './style.module.css';
 import Beaming from './Beaming';
 import { VerticalButton } from '@genai-fi/base';
 import HighlightIcon from '@mui/icons-material/Highlight';
+import FindInPageIcon from '@mui/icons-material/FindInPage';
 
-type AuditModes = 'none' | 'beam';
+type AuditModes = 'none' | 'beam' | 'memorization';
 
 export function Component() {
     const { t } = useTranslation();
@@ -22,6 +23,14 @@ export function Component() {
                     color={mode === 'beam' ? 'secondary' : 'primary'}
                 >
                     {t('audit.tools.beam')}
+                </VerticalButton>
+                <VerticalButton
+                    startIcon={<FindInPageIcon />}
+                    onClick={() => setMode('memorization')}
+                    aria-pressed={mode === 'memorization'}
+                    color={mode === 'memorization' ? 'secondary' : 'primary'}
+                >
+                    {t('audit.tools.memorization')}
                 </VerticalButton>
             </div>
             {mode === 'beam' && <Beaming />}
