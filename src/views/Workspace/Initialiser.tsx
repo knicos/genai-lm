@@ -144,7 +144,9 @@ export default function Initialiser() {
             steps.add('tokeniser');
             steps.add('tokenise');
             steps.add('trainer');
-            steps.add('pretrain-output');
+            steps.add('generator');
+            steps.add('visualise');
+            steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
             setCompact(false);
@@ -154,8 +156,10 @@ export default function Initialiser() {
             steps.add('model');
             steps.add('data');
             steps.add('trainer');
-            steps.add('pretrain-output');
+            steps.add('generator');
             steps.add('share');
+            steps.add('visualise');
+            steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
             setCompact(false);
@@ -167,6 +171,7 @@ export default function Initialiser() {
             steps.add('finetune');
             steps.add('generator');
             steps.add('share');
+            steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
             setCompact(false);
@@ -183,6 +188,8 @@ export default function Initialiser() {
             steps.add('finetune');
             steps.add('generator');
             steps.add('share');
+            steps.add('visualise');
+            steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
             setCompact(false);
@@ -199,6 +206,8 @@ export default function Initialiser() {
             steps.add('finetune');
             steps.add('generator');
             steps.add('share');
+            steps.add('visualise');
+            steps.add('audit');
             setWorkflowSteps(steps);
             setDevMode(true);
             setCompact(true);

@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import useModelMode from '../../hooks/useModelMode';
 import style from './style.module.css';
 import {
@@ -11,13 +11,18 @@ import { useRef, useState, useEffect } from 'react';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useTranslation } from 'react-i18next';
 import useModelStatus from '../../hooks/useModelStatus';
-import { loadedModelAtom } from '../../state/model';
+import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { trainerJobIdAtom, trainerSettings } from '../../state/trainer';
 import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
+import { conversationDataAtom } from '../../state/data';
 // import { conversationDataAtom } from '../../state/data';
 
-export default function ChatPrompt() {
+interface Props {
+    record?: boolean;
+}
+
+export default function ChatPrompt({ record }: Props) {
     const { t } = useTranslation();
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [id, setID] = useAtom(rawGenerationIDAtom);
@@ -32,12 +37,37 @@ export default function ChatPrompt() {
     const ref = useRef<HTMLDivElement>(null);
     const outputText = useAtomValue(trainerSettings).outputText;
     const promptRef = useRef<string>('');
-    // const setConversationLog = useSetAtom(conversationDataAtom);
+    const loraName = useAtomValue(modelLoRAName);
     const mode = useModelMode(model ?? undefined);
+    const setConversationLog = useSetAtom(conversationDataAtom);
 
     const disable = status === 'training';
 
     const hasGenerated = output.length > 0;
+
+    useEffect(() => {
+        if (id && model) {
+            const response = model.responses.getResponse(id);
+
+            if (!response || response.done) {
+                setGenerate(false);
+            } else {
+                setGenerate(true);
+                busyRef.current = id;
+            }
+            const h = (id: string) => {
+                if (id === response.id) {
+                    busyRef.current = null;
+                    setGenerate(false);
+                }
+            };
+            model.responses.on('done', h);
+
+            return () => {
+                model.responses.off('done', h);
+            };
+        }
+    }, [id, model]);
 
     useEffect(() => {
         if (trainerJobId && outputText && model) {
@@ -110,7 +140,7 @@ export default function ChatPrompt() {
         }
     }, [trainerJobId, outputText, model, setOutput]);
 
-    const doGenerate = async (maxLength: number, prompt?: string) => {
+    const doGenerate = async (prompt?: string) => {
         if (!model || (status !== 'ready' && status !== 'busy' && status !== 'awaitingTokens')) {
             setMessage({
                 level: 'warning',
@@ -122,8 +152,6 @@ export default function ChatPrompt() {
             model.responses.cancel(busyRef.current);
             return;
         }
-        if (maxLength > 1) setGenerate(true);
-        //setHasGenerated(true);
 
         const text: GeneratorConversation[] = [];
 
@@ -138,6 +166,7 @@ export default function ChatPrompt() {
         const options: IGenerateOptions = {
             ...settings,
             noCache: false,
+            loraName: loraName ?? undefined,
             nonConversational: promptMode !== 'conversation',
             continuation: !!prompt && prompt.length > 0 && promptMode === 'completion',
             input: filteredText.length > 0 ? filteredText : undefined,
@@ -148,8 +177,19 @@ export default function ChatPrompt() {
         const doneHandler = (id: string) => {
             if (busyRef.current === id) {
                 busyRef.current = null;
-                setGenerate(false);
+                //setGenerate(false);
                 model.responses.off('done', doneHandler);
+
+                if (record) {
+                    setConversationLog(async (prev) => {
+                        const convo = model.responses.getResponse(id)?.output ?? [];
+                        const data = await prev;
+                        if (data.includes(convo)) {
+                            return [...data];
+                        }
+                        return [...data, convo];
+                    });
+                }
             }
         };
 
@@ -180,7 +220,7 @@ export default function ChatPrompt() {
                 level: 'error',
                 notice: t('generator.errors.generationError'),
             });
-            setGenerate(false);
+            //setGenerate(false);
             busyRef.current = null;
         }
     };
@@ -195,7 +235,7 @@ export default function ChatPrompt() {
             <ChatPromptInput
                 onSend={(prompt) => {
                     promptRef.current = '';
-                    doGenerate(settings.maxLength ?? 1, prompt);
+                    doGenerate(prompt);
                 }}
                 onChange={(value) => {
                     promptRef.current = value;

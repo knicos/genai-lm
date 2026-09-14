@@ -35,6 +35,11 @@
     border-radius: 8px;
     margin: 0.5rem 0;
     padding-left: 0.5rem;
+    cursor: pointer;
+}
+
+.beamingList li:hover {
+    background: color-mix(in srgb, var(--primary) 10%, white 90%);
 }
 
 .beamingText {
@@ -65,4 +70,9 @@
 
 .original {
     font-weight: bold;
+}
+
+.candidates {
+    text-align: center;
+    font-style: italic;
 }

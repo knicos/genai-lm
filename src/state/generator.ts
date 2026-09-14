@@ -56,8 +56,8 @@ export const chatSettings = atomWithStorage<GeneratorSettings>(
 export const rawGeneratedTextAtom = atom<ExtendedGeneratorConversation[]>([]);
 export const rawHighlightsAtom = atom<ConversationHighlight[]>([]);
 export const rawGenerationIDAtom = atom<string | null>(null);
-export const conversationGeneratedAtom = atom<GeneratorConversation[]>([]);
-export const conversationIDAtom = atom<string | null>(null);
+//export const conversationGeneratedAtom = atom<GeneratorConversation[]>([]);
+//export const conversationIDAtom = atom<string | null>(null);
 
 observe((get, set) => {
     const model = get(loadedModelAtom);

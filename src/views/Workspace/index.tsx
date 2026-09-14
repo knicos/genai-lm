@@ -93,6 +93,9 @@ export function Component() {
         if (steps.has('tokenise')) {
             return CONNECTIONS.filter((c) => !(c.start === 'textData' && c.end === 'trainer'));
         }
+        if (steps.has('trainer')) {
+            return CONNECTIONS.filter((c) => !(c.start === 'foundation' && c.end === 'chatOutput'));
+        }
         return CONNECTIONS;
     }, [steps]);
 
@@ -126,11 +129,11 @@ export function Component() {
                                 observer={intersectionObserver.current}
                                 scrollFrame={scrollFrame || ''}
                             />
-                            <FinetuneFrame
+                            <DeploymentFrame
                                 observer={intersectionObserver.current}
                                 scrollFrame={scrollFrame || ''}
                             />
-                            <DeploymentFrame
+                            <FinetuneFrame
                                 observer={intersectionObserver.current}
                                 scrollFrame={scrollFrame || ''}
                             />

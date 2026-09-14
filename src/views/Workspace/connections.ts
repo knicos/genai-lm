@@ -27,7 +27,7 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'foundation',
-        end: 'tuneData',
+        end: 'chatOutput',
         startPoint: 'right',
         endPoint: 'left',
         endOffset: 0.0,
@@ -121,7 +121,7 @@ export const CONNECTIONS: IConnection[] = [
         end: 'tuneData',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: -0.3,
+        startOffset: -0.6,
         endOffset: -0.5,
     },
     {
@@ -148,24 +148,16 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'finetuner',
-        end: 'conversationOutput',
-        startPoint: 'right',
-        endPoint: 'left',
-        startOffset: -0.2,
-        endOffset: -0.4,
-    },
-    {
-        start: 'finetuner',
         end: 'tuning-monitor',
         startPoint: 'right',
         endPoint: 'left',
         startOffset: 0,
     },
     {
-        start: 'conversationOutput',
+        start: 'chatOutput',
         end: 'sharing',
         startPoint: 'right',
         endPoint: 'left',
-        startOffset: 0.3,
+        startOffset: 0,
     },
 ];

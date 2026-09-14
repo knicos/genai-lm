@@ -11,6 +11,8 @@ export type WorkflowSteps =
     | 'conversations'
     | 'finetune'
     | 'generator'
+    | 'visualise'
+    | 'audit'
     | 'share';
 
 /*const DEFAULT_STEPS: WorkflowSteps[] = [

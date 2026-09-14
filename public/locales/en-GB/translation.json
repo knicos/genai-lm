@@ -369,7 +369,8 @@
             "title": "Variants",
             "help": "The **Variants** tool shows the most likely alternative sequences for the selected tokens, along with the probability.\n\n**Usage:** Select text in the output box.\n\nIt uses an algorithm called *beam search* to explore multiple most likely continuations simultaneously.",
             "noBeams": "Select some text in the output to see variants.",
-            "highlightProbs": "Highlight token probabilities"
+            "highlightProbs": "Highlight token probabilities",
+            "candidates": "Predicted {{count}} variations."
         }
     },
     "evaluation": {

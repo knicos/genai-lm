@@ -1,5 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../../state/uiState';
+import { generatorSettings, rawGenerationIDAtom } from '../../state/generator';
 import { useEffect, useState } from 'react';
 import type { IBeam, GeneratorConversation } from '@genai-fi/nanogpt';
 import { loadedModelAtom } from '../../state/model';
@@ -8,18 +9,17 @@ import { Help, PercentageBar } from '@genai-fi/base';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
+import useGenerate from '../../hooks/useGenerate';
 
 function sliceConversation(conversation: GeneratorConversation[], index: number, tokenIndex: number) {
     const sliceConvo = conversation.slice(0, index + 1);
     if (sliceConvo.length > 0) {
         const lastMessage = sliceConvo[sliceConvo.length - 1];
+        const slicedOutput = lastMessage._output?.slice(0, tokenIndex);
         sliceConvo[sliceConvo.length - 1] = {
             ...lastMessage,
-            content:
-                lastMessage._output
-                    ?.slice(0, tokenIndex)
-                    .map((o) => o.text)
-                    .join('') ?? '',
+            _output: slicedOutput,
+            content: slicedOutput?.map((o) => o.text).join('') ?? '',
         };
     }
     return sliceConvo;
@@ -43,9 +43,12 @@ export default function Beaming() {
     const setSelectionLength = useSetAtom(uiTokenSelectLength);
     const [beams, setBeams] = useState<ExtendedIBeam[]>([]);
     const model = useAtomValue(loadedModelAtom);
-    const conversation = useAtomValue(rawGeneratedTextAtom);
+    const [conversation, setConversation] = useAtom(rawGeneratedTextAtom);
+    const setId = useSetAtom(rawGenerationIDAtom);
     const [busy, setBusy] = useState(false);
     const [highlightProbs, setHighlightProbs] = useAtom(uiTokenHighlightMode);
+    const { generate } = useGenerate(setConversation);
+    const settings = useAtomValue(generatorSettings);
 
     useEffect(() => {
         setSelectionLength(24);
@@ -116,7 +119,40 @@ export default function Beaming() {
             ) : (
                 <ul className={style.beamingList}>
                     {beams.map((beam, index) => (
-                        <li key={index}>
+                        <li
+                            key={index}
+                            role="button"
+                            onClick={() => {
+                                if (selection) {
+                                    setSelection(null);
+
+                                    const convo = sliceConversation(
+                                        conversation,
+                                        selection.conversationIndex,
+                                        selection.startToken
+                                    );
+                                    const selectionLength = selection.endToken - selection.startToken + 1;
+                                    const beamOut = beam._output?.slice(0, selectionLength) ?? [];
+                                    const last = convo[convo.length - 1];
+                                    const newLast: GeneratorConversation = {
+                                        role: last.role,
+                                        content: last.content + beamOut.map((o) => o.text).join(''),
+                                        _output: [...(last._output ?? []), ...beamOut],
+                                    };
+
+                                    convo[convo.length - 1] = newLast;
+                                    generate(
+                                        {
+                                            ...settings,
+                                            continuation: true,
+                                        },
+                                        convo
+                                    )
+                                        .then((id) => setId(id))
+                                        .catch((error) => console.error(error));
+                                }
+                            }}
+                        >
                             <PercentageBar
                                 value={busy ? 0 : beam.score * 100}
                                 colour={beam.isOriginal ? 'green' : 'blue'}
@@ -128,6 +164,9 @@ export default function Beaming() {
                         </li>
                     ))}
                 </ul>
+            )}
+            {beams.length > 0 && (
+                <div className={style.candidates}>{t('audit.beaming.candidates', { count: beams[0].candidates })}</div>
             )}
             <FormControlLabel
                 sx={{ marginTop: '1rem' }}

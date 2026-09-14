@@ -148,6 +148,11 @@
     margin-left: 0.5rem;
 }
 
+.assistantItem span:hover {
+    background-color: color-mix(in srgb, var(--secondary) 20%, white 80%);
+    border-radius: 4px;
+}
+
 span.highlighted {
     background-color: color-mix(in srgb, var(--highlight-color) 20%, white 80%);
     color: black;

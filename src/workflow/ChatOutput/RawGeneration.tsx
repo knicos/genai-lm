@@ -13,11 +13,10 @@ import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../
 export default function RawGeneration() {
     const model = useAtomValue(loadedModelAtom);
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
-    const setID = useSetAtom(rawGenerationIDAtom);
+    const [responseId, setID] = useAtom(rawGenerationIDAtom);
     const status = useModelStatus(model ?? undefined);
     const navigate = useNavigate();
     const ref = useRef<HTMLDivElement>(null);
-    const responseId = useAtomValue(rawGenerationIDAtom);
     const highlightMode = useAtomValue(uiTokenHighlightMode);
     const setSettings = useSetAtom(generatorSettings);
     const setSelection = useSetAtom(uiSelectedTokens);
