@@ -62,7 +62,7 @@ export default function TokeniseData() {
             keepOpen
         >
             <Box
-                style={{ width: '290px', minHeight: '200px' }}
+                style={{ width: '320px', minHeight: '200px' }}
                 active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
                 disabled={istraining}
                 useParent
