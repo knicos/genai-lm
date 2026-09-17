@@ -211,6 +211,7 @@ export default function TuneTraining() {
             widget="finetuner"
             active={!!model || (!!conversations && conversations.length > 0)}
             style={{ minWidth: '260px', minHeight: '200px' }}
+            deactivateOnAudit
         >
             <div className={style.container}>
                 <BoxTitle

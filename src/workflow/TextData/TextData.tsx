@@ -118,7 +118,7 @@ export default function TextData() {
         <Box
             widget="textData"
             style={{ flexGrow: 1, width: '40rem' }}
-            active={!!model}
+            active={!!model && data.length > 0}
             disabled={disable}
             fullWidth
         >

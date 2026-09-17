@@ -1,4 +1,5 @@
 import { useAtomValue } from 'jotai';
+import type { WorkflowStage } from '../../../state/workflowSettings';
 import { workflowSteps } from '../../../state/workflowSettings';
 import Sharing from '../../../workflow/Sharing/Sharing';
 import Frame from '../Frame';
@@ -7,30 +8,32 @@ import style from '../style.module.css';
 import { useTranslation } from 'react-i18next';
 import RawGeneration from '../../../workflow/ChatOutput/RawGeneration';
 import RawPrompt from '../../../workflow/Prompt/RawPrompt';
-import { BoxButton } from '../../../components/BoxButton/BoxButton';
-import { featureFlagsAtom } from '../../../state/uiState';
+import { BoxButton } from '@genai-fi/base';
+import { featureFlagsAtom, uiAuditOutput } from '../../../state/uiState';
 import PolicyIcon from '@mui/icons-material/Policy';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import { useChangePath } from '../../../hooks/useChangePath';
 
 interface Props {
-    observer: IntersectionObserver;
-    scrollFrame: string;
+    registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
 }
 
-export default function DeploymentFrame({ observer, scrollFrame }: Props) {
+export default function DeploymentFrame(props: Props) {
     const steps = useAtomValue(workflowSteps);
     const { t } = useTranslation();
     const changeFlow = useChangePath();
     const { allowAudit } = useAtomValue(featureFlagsAtom);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     return (
         <Frame
             name="deployment"
-            observer={observer}
-            scroll={scrollFrame === 'deployment'}
+            {...props}
         >
-            <div className={style.titleColumn}>
+            <div
+                className={style.titleColumn}
+                data-pan
+            >
                 <h3>{t('generator.title')}</h3>
                 <FullSizeGroup widget="chatOutput">
                     <RawGeneration />
@@ -43,7 +46,10 @@ export default function DeploymentFrame({ observer, scrollFrame }: Props) {
                         icon={<PolicyIcon />}
                         label={t('generator.audit')}
                         widget="audit-output"
-                        onClick={() => changeFlow({ sidepanel: 'audit' })}
+                        onClick={() =>
+                            changeFlow(auditMode ? { sidepanel: null } : { sidepanel: 'audit', flow: 'deployment' })
+                        }
+                        active={auditMode}
                     />
                 )}
                 <BoxButton
@@ -51,6 +57,7 @@ export default function DeploymentFrame({ observer, scrollFrame }: Props) {
                     icon={<AccountTreeIcon />}
                     label={t('training.visualize')}
                     widget="inference-visualize"
+                    blur={auditMode}
                     onClick={() =>
                         changeFlow({
                             sidepanel: 'inference-process',

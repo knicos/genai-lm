@@ -1,4 +1,5 @@
-import { BoxButton } from '../../../components/BoxButton/BoxButton';
+import { BoxButton } from '@genai-fi/base';
+import type { WorkflowStage } from '../../../state/workflowSettings';
 import InstructData from '../../../workflow/InstructData/InstructData';
 import TuneTraining from '../../../workflow/TuneTraining/TuneTraining';
 import Frame from '../Frame';
@@ -6,21 +7,22 @@ import style from '../style.module.css';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useChangePath } from '../../../hooks/useChangePath';
 import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { uiAuditOutput } from '../../../state/uiState';
 
 interface Props {
-    observer: IntersectionObserver;
-    scrollFrame: string;
+    registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
 }
 
-export default function FinetuneFrame({ observer, scrollFrame }: Props) {
+export default function FinetuneFrame(props: Props) {
     const { t } = useTranslation();
     const changeFlow = useChangePath();
+    const auditMode = useAtomValue(uiAuditOutput);
 
     return (
         <Frame
             name="finetune"
-            observer={observer}
-            scroll={scrollFrame === 'finetune'}
+            {...props}
         >
             <div className={style.titleColumn}>
                 <h3>{t('instruct.title')}</h3>
@@ -34,6 +36,7 @@ export default function FinetuneFrame({ observer, scrollFrame }: Props) {
                     widget="tuning-monitor"
                     onClick={() => changeFlow({ sidepanel: 'tune-log' })}
                     style={{ marginTop: '120px' }}
+                    blur={auditMode}
                 />
             </div>
         </Frame>

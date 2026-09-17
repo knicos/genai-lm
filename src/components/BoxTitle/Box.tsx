@@ -1,6 +1,8 @@
 import { CSSProperties, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import boxstyle from './style.module.css';
 import { useWorkflowContext } from '@genai-fi/base';
+import { useAtomValue } from 'jotai';
+import { uiAuditOutput } from '../../state/uiState';
 
 interface Props extends PropsWithChildren {
     style?: CSSProperties;
@@ -11,6 +13,7 @@ interface Props extends PropsWithChildren {
     fullWidth?: boolean;
     disableHiding?: boolean;
     useParent?: boolean;
+    deactivateOnAudit?: boolean;
 }
 
 const isTest = globalThis?.process?.env?.NODE_ENV === 'test';
@@ -25,10 +28,12 @@ export default function Box({
     fullWidth = false,
     disableHiding = false,
     useParent = false,
+    deactivateOnAudit = false,
 }: Props) {
     const ref = useRef<HTMLDivElement>(null);
     const [visible, setVisible] = useState(false);
     const workflowContext = useWorkflowContext();
+    const auditMode = useAtomValue(uiAuditOutput);
 
     useEffect(() => {
         if (ref.current) {
@@ -51,9 +56,10 @@ export default function Box({
     return (
         <div
             ref={ref}
-            className={`${boxstyle.box} ${fullWidth ? boxstyle.fullWidth : ''} ${className || ''}`}
+            className={`${boxstyle.box} ${fullWidth ? boxstyle.fullWidth : ''} ${className || ''} box ${deactivateOnAudit && auditMode ? boxstyle.deactivated : ''}`}
             data-widget={widget}
             data-active={active ? 'true' : 'false'}
+            data-deactivated={deactivateOnAudit && auditMode ? 'true' : 'false'}
             style={style}
         >
             {(visible || disableHiding || isTest) && children}

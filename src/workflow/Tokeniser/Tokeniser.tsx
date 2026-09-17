@@ -1,4 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
+import { uiAuditOutput } from '../../state/uiState';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { dataEntries, datasetIdAtom, dataTokens } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
@@ -29,6 +30,7 @@ export default function Tokeniser() {
     const [message, setMessage] = useState<Notice | null>(null);
     const [count, setCount] = useState(0);
     const istraining = useAtomValue(trainingAnimation);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     const isTrained = model?.loaded && model.tokeniser.trained;
 
@@ -56,16 +58,18 @@ export default function Tokeniser() {
         <Help
             widget="tokeniser"
             message={t('tokeniser.help')}
-            active={dataset !== null && dataset.length > 0}
+            active={done && !invalid}
             keepOpen
             placement="right"
+            deactivated={auditMode}
         >
             <Box
                 style={{ width: '250px', minHeight: '180px' }}
-                active={dataset !== null && dataset.length > 0}
+                active={done && !invalid}
                 widget="tokeniser"
                 disabled={istraining}
                 useParent
+                deactivateOnAudit
             >
                 <div className={style.container}>
                     <BoxTitle

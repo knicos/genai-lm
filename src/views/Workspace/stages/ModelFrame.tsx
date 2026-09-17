@@ -1,3 +1,4 @@
+import type { WorkflowStage } from '../../../state/workflowSettings';
 import CheckModel from '../../../workflow/CheckModel/CheckModel';
 import ModelDesign from '../../../workflow/ModelDesign/ModelDesign';
 import Frame from '../Frame';
@@ -9,19 +10,17 @@ import { useTranslation } from 'react-i18next';
 import { Help } from '@genai-fi/base';
 
 interface Props {
-    observer: IntersectionObserver;
-    scrollFrame: string;
+    registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
 }
 
-export default function ModelFrame({ observer, scrollFrame }: Props) {
+export default function ModelFrame(props: Props) {
     const steps = useAtomValue(workflowSteps);
     const { t } = useTranslation();
 
     return (
         <Frame
             name="model"
-            observer={observer}
-            scroll={scrollFrame === 'model'}
+            {...props}
         >
             {steps.has('architecture') && (
                 <div className={style.titleColumn}>

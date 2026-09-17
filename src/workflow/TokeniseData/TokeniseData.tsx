@@ -9,6 +9,7 @@ import {
     tokeniseSettingsAtom,
 } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
+import { uiAuditOutput } from '../../state/uiState';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Button, Help } from '@genai-fi/base';
@@ -17,7 +18,6 @@ import { useState } from 'react';
 import DataProgress from '../../components/DataProgress/DataProgress';
 import useModelLoaded from '../../hooks/useModelLoaded';
 import ProgressBox from '../TextData/ProgressBox';
-import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { createDatasetFromEntries } from '../../utilities/dataset';
 import { Alert } from '@mui/material';
@@ -34,7 +34,6 @@ export default function TokeniseData() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const model = useAtomValue(loadedModelAtom);
-    const status = useModelStatus(model ?? undefined);
     const ready = useModelLoaded(model ?? undefined);
     const dataset = useAtomValue(dataEntries);
     const datasetId = useAtomValue(datasetIdAtom);
@@ -46,6 +45,7 @@ export default function TokeniseData() {
     const [message, setMessage] = useState<Notice | null>(null);
     const istraining = useAtomValue(trainingAnimation);
     const settings = useAtomValue(tokeniseSettingsAtom);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     const tokenCount = _tokenCount === 0 ? tokens?.tokens.getTokenCount() || 0 : _tokenCount;
     const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
@@ -57,16 +57,18 @@ export default function TokeniseData() {
         <Help
             widget="tokeniseData"
             placement="right"
-            active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
+            active={done}
             message={t('tokeniseData.help')}
             keepOpen
+            deactivated={auditMode}
         >
             <Box
                 style={{ width: '320px', minHeight: '200px' }}
-                active={dataset !== null && dataset.length > 0 && ready && status !== 'awaitingTokens'}
+                active={done}
                 disabled={istraining}
                 useParent
                 widget="tokeniseData"
+                deactivateOnAudit
             >
                 <div className={style.container}>
                     <BoxTitle

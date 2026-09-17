@@ -30,7 +30,7 @@ export type WorkflowSteps =
 
 export const workflowSteps = atom<Set<WorkflowSteps>>(new Set<WorkflowSteps>());
 
-type WorkflowStage = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
+export type WorkflowStage = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
 
 export const workflowStages = atom<Set<WorkflowStage>>((get) => {
     const steps = get(workflowSteps);

@@ -6,6 +6,10 @@ import EditSquareIcon from '@mui/icons-material/EditSquare';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import { Tooltip } from '@mui/material';
+import { uiAuditOutput } from '../../state/uiState';
+import { useAtomValue } from 'jotai';
+import style from './style.module.css';
+import PolicyIcon from '@mui/icons-material/Policy';
 
 interface Props {
     onShowSettings: () => void;
@@ -18,6 +22,7 @@ interface Props {
 
 export default function ChatMenu({ onShowSettings, onReset, onConfidence, onScore, disabled, highlightMode }: Props) {
     const { t } = useTranslation();
+    const auditMode = useAtomValue(uiAuditOutput);
 
     return (
         <BoxMenu>
@@ -59,6 +64,16 @@ export default function ChatMenu({ onShowSettings, onReset, onConfidence, onScor
                 </Tooltip>
             )}
             <div style={{ flex: 1 }} />
+            {auditMode && (
+                <Tooltip
+                    title={<div style={{ maxWidth: 200, textAlign: 'center' }}>{t('generator.auditMode')}</div>}
+                    arrow
+                >
+                    <div className={style.auditMode}>
+                        <PolicyIcon />
+                    </div>
+                </Tooltip>
+            )}
             <VerticalButton
                 disabled={disabled}
                 startIcon={<TuneIcon />}

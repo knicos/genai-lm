@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import style from './style.module.css';
 import { SidePanel, WorkflowLayout } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { Outlet, useLocation, useOutlet, useParams } from 'react-router';
-import logger from '../../utilities/logger';
-import { uiShowSidePanel } from '../../state/uiState';
 import useOrientation from '../../hooks/useOrientation';
 import ModelState from '../../workflow/ModelState/ModelState';
 import Initialiser from './Initialiser';
@@ -29,65 +27,104 @@ export function Component() {
     const detected = useAtomValue(deviceDetected);
     const performProbe = useAtomValue(devicePerformProbe);
     const { flow } = useParams() as { flow: FlowType };
-    const [sidePanelOpen, setSidePanelOpen] = useAtom(uiShowSidePanel);
     const location = useLocation();
     const outlet = useOutlet();
     const changeFlow = useChangePath();
     const orientation = useOrientation();
-    const routeToScrollLock = useRef<FlowType | null>(flow);
-    const visibleFlow = useRef<FlowType | null>(null);
+    const programmaticScroll = useRef<boolean>(false);
+    const visibleFlow = useRef<Set<FlowType>>(new Set());
+    const flowRef = useRef<FlowType | null>(flow);
     const intersectionObserver = useRef<IntersectionObserver | null>(null);
-    const [scrollFrame, setScrollFrame] = useState<FlowType | null>(null);
     const steps = useAtomValue(workflowSteps);
+    const resizeObserver = useRef<ResizeObserver | null>(null);
+    const workspaceContainerRef = useRef<HTMLDivElement | null>(null);
+    const frameMapRef = useRef<Map<FlowType, HTMLDivElement>>(new Map());
+
+    flowRef.current = flow;
+
+    const doScroll = useCallback((flow: FlowType) => {
+        // If frame is visible already then do not scroll again
+        if (visibleFlow.current.has(flow)) {
+            return;
+        }
+        const element = frameMapRef.current.get(flow);
+        if (element) {
+            programmaticScroll.current = true;
+            element.scrollIntoView({
+                behavior: performance.now() > 5000 ? 'smooth' : 'instant',
+                block: 'center',
+            });
+        } else {
+            console.warn('No element found for frame:', flow);
+        }
+    }, []);
+
+    if (!resizeObserver.current) {
+        const resizeState = {
+            timer: -1,
+        };
+        resizeObserver.current = new ResizeObserver(() => {
+            clearTimeout(resizeState.timer);
+            resizeState.timer = window.setTimeout(() => {
+                const flow = flowRef.current;
+                if (flow) {
+                    doScroll(flow);
+                }
+            }, 400);
+        });
+    }
 
     if (!intersectionObserver.current) {
         intersectionObserver.current = new IntersectionObserver(
             (entries) => {
-                const intersecting = entries.filter((e) => e.isIntersecting);
+                const newSet = new Set<FlowType>(visibleFlow.current);
 
-                if (intersecting.length === 1) {
-                    const name = intersecting[0].target.id.replace('frame-', '') as FlowType;
-                    visibleFlow.current = name;
-                    if (routeToScrollLock.current === null) {
-                        changeFlow({ flow: name, replace: true, preserveSearch: true });
+                entries.forEach((entry) => {
+                    const name = entry.target.id.replace('frame-', '') as FlowType;
+                    if (entry.isIntersecting) {
+                        newSet.add(name);
+                    } else {
+                        newSet.delete(name);
                     }
-                    if (routeToScrollLock.current === name) {
-                        routeToScrollLock.current = null;
-                    }
-                }
+                });
+
+                visibleFlow.current = newSet;
             },
             { threshold: 0.55 }
         );
     }
 
-    const hasOutlet = !!outlet;
+    const registerFrame = useCallback(
+        (flow: FlowType, element: HTMLDivElement | null) => {
+            if (!element) {
+                const oldElement = frameMapRef.current.get(flow);
+                if (oldElement) {
+                    intersectionObserver.current?.unobserve(oldElement);
+                    frameMapRef.current.delete(flow);
+                }
+                return;
+            }
+            frameMapRef.current.set(flow, element);
+            intersectionObserver.current?.observe(element);
+            if (flowRef.current === flow) {
+                doScroll(flow);
+            }
+        },
+        [doScroll]
+    );
 
-    useEffect(() => {
-        if (hasOutlet) {
-            logger.log({ action: 'side_panel_opened', url: location.pathname });
-            setSidePanelOpen(true);
-        } else {
-            logger.log({ action: 'side_panel_closed' });
-            setSidePanelOpen(false);
-        }
-    }, [location.key, hasOutlet, setSidePanelOpen, location.pathname]);
+    const hasOutlet = !!outlet;
 
     useEffect(() => {
         if (flow) {
             if (flow === 'home') {
-                visibleFlow.current = null;
-                setScrollFrame(null);
-                return;
-            }
-            // If frame is visible already then do not scroll again
-            if (visibleFlow.current === flow) {
+                visibleFlow.current.clear();
                 return;
             }
 
-            routeToScrollLock.current = flow;
-            setScrollFrame(flow);
+            doScroll(flow);
         }
-    }, [flow]);
+    }, [flow, doScroll]);
 
     const connections = useMemo(() => {
         if (steps.has('tokenise')) {
@@ -98,6 +135,34 @@ export function Component() {
         }
         return CONNECTIONS;
     }, [steps]);
+
+    const onScrollEnd = useCallback(() => {
+        if (flowRef.current && visibleFlow.current.has(flowRef.current)) {
+            return;
+        }
+        const name = Array.from(visibleFlow.current).pop();
+        if (!programmaticScroll.current) {
+            changeFlow({ flow: name, replace: true, preserveSearch: true });
+        }
+        programmaticScroll.current = false;
+    }, [changeFlow]);
+
+    const setRef = useCallback(
+        (el: HTMLDivElement | null) => {
+            if (workspaceContainerRef.current) {
+                resizeObserver.current?.unobserve(workspaceContainerRef.current);
+                workspaceContainerRef.current.firstElementChild?.removeEventListener('scrollend', onScrollEnd);
+            }
+
+            workspaceContainerRef.current = el;
+
+            if (el && resizeObserver.current) {
+                resizeObserver.current.observe(el);
+                el.firstElementChild?.addEventListener('scrollend', onScrollEnd);
+            }
+        },
+        [onScrollEnd]
+    );
 
     return performProbe && !detected ? (
         <DeviceProbe />
@@ -113,30 +178,18 @@ export function Component() {
                 className={style.mainContainer}
                 style={{ flexDirection: orientation === 'portrait' ? 'column' : 'row' }}
             >
-                <div className={`${style.workspaceContainer} ${flow === 'home' ? style.homeWorkspace : ''}`}>
+                <div
+                    className={`${style.workspaceContainer} ${flow === 'home' ? style.homeWorkspace : ''}`}
+                    ref={setRef}
+                >
                     {flow === 'home' && <Home />}
                     {flow !== 'home' && (
                         <WorkflowLayout connections={connections}>
-                            <ModelFrame
-                                observer={intersectionObserver.current}
-                                scrollFrame={scrollFrame || ''}
-                            />
-                            <DataFrame
-                                observer={intersectionObserver.current}
-                                scrollFrame={scrollFrame || ''}
-                            />
-                            <PretrainFrame
-                                observer={intersectionObserver.current}
-                                scrollFrame={scrollFrame || ''}
-                            />
-                            <DeploymentFrame
-                                observer={intersectionObserver.current}
-                                scrollFrame={scrollFrame || ''}
-                            />
-                            <FinetuneFrame
-                                observer={intersectionObserver.current}
-                                scrollFrame={scrollFrame || ''}
-                            />
+                            <ModelFrame registerFrame={registerFrame} />
+                            <DataFrame registerFrame={registerFrame} />
+                            <PretrainFrame registerFrame={registerFrame} />
+                            <DeploymentFrame registerFrame={registerFrame} />
+                            <FinetuneFrame registerFrame={registerFrame} />
                         </WorkflowLayout>
                     )}
                     {flow !== 'home' && (
@@ -148,12 +201,12 @@ export function Component() {
                 <ThemeProvider theme={darkTheme}>
                     <SidePanel
                         dark
-                        open={sidePanelOpen}
+                        open={hasOutlet}
                         position={orientation === 'portrait' ? 'bottom' : 'right'}
                         onClose={() => {
+                            //programmaticScroll.current = true;
                             changeFlow({ sidepanel: null });
                         }}
-                        onOpen={() => setSidePanelOpen(true)}
                     >
                         <Outlet />
                     </SidePanel>

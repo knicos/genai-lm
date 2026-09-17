@@ -1,49 +1,27 @@
-import { PropsWithChildren, Suspense, useEffect } from 'react';
+import { PropsWithChildren, Suspense, useCallback } from 'react';
 import style from './style.module.css';
 import { workflowStages } from '../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
 import { uiCompactMode } from '../../state/uiState';
+import type { WorkflowStage } from '../../state/workflowSettings';
 
 interface Props extends PropsWithChildren {
-    name: 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
+    name: WorkflowStage;
     columns?: number;
     ignoredColumns?: number;
-    observer: IntersectionObserver;
-    scroll?: boolean;
+    registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
 }
 
-export default function Frame({ name, children, columns, ignoredColumns, observer, scroll }: Props) {
+export default function Frame({ name, children, columns, ignoredColumns, registerFrame }: Props) {
     const stages = useAtomValue(workflowStages);
     const compact = useAtomValue(uiCompactMode);
 
-    useEffect(() => {
-        const element = document.getElementById(`frame-${name}`);
-        if (element) {
-            observer.observe(element);
-        }
-        return () => {
-            if (element) {
-                observer.unobserve(element);
-            }
-        };
-    }, [observer, name]);
-
-    useEffect(() => {
-        if (scroll) {
-            const element = document.getElementById(`frame-${name}`);
-            if (element) {
-                const t = setTimeout(() => {
-                    element.scrollIntoView({
-                        behavior: performance.now() > 5000 ? 'smooth' : 'instant',
-                        block: 'center',
-                    });
-                }, 100);
-                return () => clearTimeout(t);
-            } else {
-                console.warn('No element found for frame:', name);
-            }
-        }
-    }, [scroll, name]);
+    const setRef = useCallback(
+        (element: HTMLDivElement | null) => {
+            registerFrame(name, element);
+        },
+        [registerFrame, name]
+    );
 
     if (!stages.has(name)) {
         return null;
@@ -53,6 +31,8 @@ export default function Frame({ name, children, columns, ignoredColumns, observe
         <div
             id={`frame-${name}`}
             data-widget="container"
+            ref={setRef}
+            data-pan
             className={`${style.frame} ${compact ? style.compact : ''}`}
             style={{
                 gridTemplateColumns: `repeat(${

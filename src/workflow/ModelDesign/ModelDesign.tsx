@@ -33,6 +33,7 @@ export default function ModelDesign() {
             fullWidth
             style={{ width: '40rem' }}
             disabled={istraining}
+            deactivateOnAudit
         >
             {showSearch && (
                 <ModelSearch

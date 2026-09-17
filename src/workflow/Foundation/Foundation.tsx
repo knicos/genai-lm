@@ -6,16 +6,19 @@ import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import SearchDiagContent from '../../components/ModelSearch/SearchDiagContent';
 import { Help } from '@genai-fi/base';
+import { uiAuditOutput } from '../../state/uiState';
 
 export default function Foundation() {
     const { t } = useTranslation();
     const model = useAtomValue(loadedModelAtom);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     return (
         <Help
             message={t('foundation.help')}
             keepOpen
             placement="right"
+            deactivated={auditMode}
         >
             <Box
                 widget="foundation"
@@ -23,6 +26,7 @@ export default function Foundation() {
                 style={{ maxWidth: '800px', maxHeight: '75vh', display: 'flex', flexDirection: 'column' }}
                 disableHiding
                 useParent
+                deactivateOnAudit
             >
                 <div className={style.container}>
                     <BoxTitle

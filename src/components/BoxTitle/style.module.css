@@ -71,6 +71,11 @@
     position: relative;
 }
 
+.box.deactivated {
+    pointer-events: none;
+    filter: grayscale(1) brightness(1.5) blur(4px);
+}
+
 .box.fullWidth {
     width: 100%;
     height: calc(100% - 2rem);

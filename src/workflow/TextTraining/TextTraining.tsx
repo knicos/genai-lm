@@ -21,6 +21,7 @@ import { loadedModelAtom, modelSaveCheckpoints } from '../../state/model';
 import { dataEntries, datasetIdAtom, dataTokens, validationTokens } from '../../state/data';
 import { autoTokeniseData, configureModelForTraining, saveCheckpoint } from './utilities';
 import Box from '../../components/BoxTitle/Box';
+import { uiAuditOutput } from '../../state/uiState';
 
 interface Props {
     autoTokenise?: boolean;
@@ -49,6 +50,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const datasetId = useAtomValue(datasetIdAtom);
     const trainingMode = useAtomValue(trainingModeAtom);
     const partialSettings = useAtomValue(pftSettings);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     const batchSize = trainingMode === 'partial' ? partialSettings.batchSize : settings.batchSize;
 
@@ -339,12 +341,14 @@ export default function TextTraining({ autoTokenise = false }: Props) {
             active={!!model && !!dataset && dataset.tokens.getShardCount() > 0}
             keepOpen
             placement="right"
+            deactivated={auditMode}
         >
             <Box
                 style={{ width: '300px', minHeight: '360px' }}
                 active={!!model && !!dataset && dataset.tokens.getShardCount() > 0}
                 widget="trainer"
                 useParent
+                deactivateOnAudit
             >
                 <div className={style.container}>
                     <BoxTitle

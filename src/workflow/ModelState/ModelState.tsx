@@ -1,6 +1,7 @@
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
+import { uiAuditOutput } from '../../state/uiState';
 import style from './style.module.css';
 import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -31,10 +32,17 @@ export default function ModelState() {
     const downloader = useAtomValue(modelDownloadAtom);
     const quantize = useAtomValue(modelQuantizeSave);
     const [minimise, setMinimise] = useState(false);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     // Prevent double loading issues
     const modelRef = useRef<TeachableLLM | undefined>(model);
     modelRef.current = model;
+
+    useEffect(() => {
+        if (auditMode) {
+            setMinimise(true);
+        }
+    }, [auditMode]);
 
     const doSave = useCallback(
         (name: string) => {

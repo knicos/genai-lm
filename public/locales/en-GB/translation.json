@@ -351,6 +351,7 @@
         "autoGenerateAriaLabel": "Toggle auto-generate",
         "autoGenerate": "Auto-generate",
         "step": "Next",
+        "auditMode": "Auditing",
         "errors": {
             "modelNotReady": "Model is not ready for generation, try again in a moment.",
             "generationError": "An unknown error occurred during text generation."

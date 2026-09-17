@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { uiFatalError } from '../../state/uiState';
+import { uiAuditOutput, uiFatalError } from '../../state/uiState';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import { modelAtom, modelConfigAtom, modelSizeLimit } from '../../state/model';
 import style from './style.module.css';
@@ -40,6 +40,7 @@ export default function CheckModel() {
     const istraining = useAtomValue(trainingAnimation);
     const [showConfirm, setShowConfirm] = useState(false);
     const setFatalError = useSetAtom(uiFatalError);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     const isUpToDate = !!model && ready && isConfigEqual(model.config, architecture);
     const paramCount = utilities.estimateParameterCount(architecture);
@@ -76,6 +77,7 @@ export default function CheckModel() {
             active={ready}
             keepOpen
             placement="right"
+            deactivated={auditMode}
         >
             <Box
                 style={{ minWidth: '290px', minHeight: '100px' }}
@@ -83,6 +85,7 @@ export default function CheckModel() {
                 widget="checkmodel"
                 disabled={istraining}
                 useParent
+                deactivateOnAudit
             >
                 <div className={style.container}>
                     <BoxTitle

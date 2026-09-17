@@ -1,4 +1,3 @@
-import { BoxButton } from '../../../components/BoxButton/BoxButton';
 import TextData from '../../../workflow/TextData/TextData';
 import TokeniseData from '../../../workflow/TokeniseData/TokeniseData';
 import Tokeniser from '../../../workflow/Tokeniser/Tokeniser';
@@ -8,28 +7,28 @@ import AbcIcon from '@mui/icons-material/Abc';
 import MarginIcon from '@mui/icons-material/Margin';
 import { useTranslation } from 'react-i18next';
 import { useChangePath } from '../../../hooks/useChangePath';
-import { workflowSteps } from '../../../state/workflowSettings';
+import { WorkflowStage, workflowSteps } from '../../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
-import { Help } from '@genai-fi/base';
+import { uiAuditOutput } from '../../../state/uiState';
+import { Help, BoxButton } from '@genai-fi/base';
 import Markdown from 'react-markdown';
 
 interface Props {
-    observer: IntersectionObserver;
-    scrollFrame: string;
+    registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
 }
 
-export default function DataFrame({ observer, scrollFrame }: Props) {
+export default function DataFrame(props: Props) {
     const { t } = useTranslation();
     const changeFlow = useChangePath();
     const steps = useAtomValue(workflowSteps);
+    const auditMode = useAtomValue(uiAuditOutput);
 
     const hasTokenStep = steps.has('tokenise') || steps.has('tokeniser');
 
     return (
         <Frame
             name="data"
-            observer={observer}
-            scroll={scrollFrame === 'data'}
+            {...props}
         >
             <div className={style.titleColumn}>
                 <Help
@@ -54,6 +53,7 @@ export default function DataFrame({ observer, scrollFrame }: Props) {
                                 label={t('tokeniser.vocabulary')}
                                 widget="vocabulary"
                                 onClick={() => changeFlow({ sidepanel: 'vocabulary' })}
+                                blur={auditMode}
                             />
                         </div>
                     )}
@@ -66,6 +66,7 @@ export default function DataFrame({ observer, scrollFrame }: Props) {
                                 widget="tokenised-data"
                                 onClick={() => changeFlow({ sidepanel: 'tokenised-data' })}
                                 style={{ marginTop: '70px' }}
+                                blur={auditMode}
                             />
                         </div>
                     )}
