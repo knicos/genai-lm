@@ -102,7 +102,7 @@ function testInHighlight(
     return null;
 }
 
-const COLOURS: Record<string, string> = {
+export const HIGHLIGHT_COLOURS: Record<string, string> = {
     red: '#e53935',
     blue: '#42a5f5',
     purple: '#9c27b0',
@@ -190,7 +190,7 @@ export default function TokenRender({
 
                 const hl = testInHighlight(highlights, i, index);
                 if (hl) {
-                    span.style.setProperty('--highlight-color', COLOURS[hl]);
+                    span.style.setProperty('--highlight-color', HIGHLIGHT_COLOURS[hl]);
                     span.classList.add(style.highlighted);
                 }
 

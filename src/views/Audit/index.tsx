@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import style from './style.module.css';
 import Beaming from './Beaming';
+import SynSearch from './SynSearch';
 import { VerticalButton } from '@genai-fi/base';
 import HighlightIcon from '@mui/icons-material/Highlight';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
@@ -42,6 +43,7 @@ export function Component() {
                 </VerticalButton>
             </div>
             {mode === 'beam' && <Beaming />}
+            {mode === 'memorization' && <SynSearch />}
         </div>
     );
 }

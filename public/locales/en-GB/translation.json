@@ -372,6 +372,17 @@
             "noBeams": "Select some text in the output to see variants.",
             "highlightProbs": "Highlight token probabilities",
             "candidates": "Predicted {{count}} variations."
+        },
+        "syntactic": {
+            "title": "Exact Match Search",
+            "help": "The **Exact Match** tool will find the best matches in the training data for the selected output text.",
+            "approximate": "Approximately {{count}} exact matches",
+            "exact": "{{count}} exact match(es)",
+            "partial": "{{count}} partial match(es)",
+            "more": "Show more",
+            "indexing": "Indexing...",
+            "noSelection": "Select some text in the output to see results.",
+            "noResults": "No matches found."
         }
     },
     "evaluation": {
