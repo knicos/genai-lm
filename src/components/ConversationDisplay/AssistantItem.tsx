@@ -1,5 +1,5 @@
 import style from './style.module.css';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -41,12 +41,6 @@ export default function AssistantItem({
     const { t } = useTranslation();
     const [editing, setEditing] = useState<boolean>(false);
     const [draft, setDraft] = useState<string>(item.content);
-
-    useEffect(() => {
-        if (active && ref.current) {
-            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-        }
-    }, [active]);
 
     const content =
         item.content.length === 0 ? (

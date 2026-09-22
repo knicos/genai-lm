@@ -1,7 +1,7 @@
 import UserItem from './UserItem';
 import AssistantItem from './AssistantItem';
 import style from './style.module.css';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useState, useRef } from 'react';
 
 import { Button } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
@@ -32,15 +32,28 @@ export default function ConversationDisplay({
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const { t } = useTranslation();
     const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+    const listRef = useRef<HTMLDivElement>(null);
+    const lengthRef = useRef<number>(0);
 
     useEffect(() => {
         if (onSelect) {
             onSelect(null);
         }
+        if (listRef.current && conversation && conversation.length !== lengthRef.current) {
+            setTimeout(() => {
+                if (listRef.current) {
+                    listRef.current.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+                }
+            }, 100);
+        }
+        lengthRef.current = conversation?.length ?? 0;
     }, [conversation, onSelect]);
 
     return (
-        <div className={style.conversationList}>
+        <div
+            className={style.conversationList}
+            ref={listRef}
+        >
             {conversation?.map((part, index) =>
                 part.role === 'user' ? (
                     <UserItem
