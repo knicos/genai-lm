@@ -35,9 +35,6 @@ export default class BloomSearch extends EE<BloomSearchEvents> {
         if (!Number.isInteger(blockSize) || blockSize <= 0) {
             throw new Error('blockSize must be a positive integer');
         }
-        if (tokens.shardSize % blockSize !== 0) {
-            throw new Error('shardSize must be a multiple of blockSize');
-        }
 
         this.tokens = tokens;
         this.n = n;
@@ -136,15 +133,6 @@ export default class BloomSearch extends EE<BloomSearchEvents> {
 
         const blockCount = Math.ceil(totalTokens / this.blockSize);
         this.blooms = new Array(blockCount);
-
-        //console.log(`Building ${blockCount} bloom filters for ${totalTokens} tokens with block size ${this.blockSize}`);
-
-        /*for (let blockIndex = 0; blockIndex < blockCount; blockIndex++) {
-            const start = blockIndex * this.blockSize;
-            const end = Math.min(start + this.blockSize, totalTokens);
-            const slice = await this.getSlice(start, end);
-            this.blooms[blockIndex] = createNGramBloom(slice, this.n, this.m, this.k);
-        }*/
 
         const shardCount = this.tokens.getShardCount();
         let blockStartIndex = 0;

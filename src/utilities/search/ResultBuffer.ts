@@ -35,7 +35,11 @@ export default class ResultBuffer<T extends ScoredResult> {
             if (this.otherResults.length > maxSize) {
                 this.otherResults.pop();
             }
-            this.minScore = this.otherResults[this.otherResults.length - 1].score;
+            if (this.otherResults.length === 0) {
+                this.minScore = -Infinity;
+            } else {
+                this.minScore = this.otherResults[this.otherResults.length - 1].score;
+            }
         }
     }
 
