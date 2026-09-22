@@ -1,5 +1,5 @@
 import { Button, Help } from '@genai-fi/base';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import { ITrainingJob, TrainingLogEntry } from '@genai-fi/nanogpt';
 import BoxTitle from '../../components/BoxTitle/BoxTitle';
@@ -51,6 +51,11 @@ export default function TextTraining({ autoTokenise = false }: Props) {
     const trainingMode = useAtomValue(trainingModeAtom);
     const partialSettings = useAtomValue(pftSettings);
     const auditMode = useAtomValue(uiAuditOutput);
+    const idRef = useRef(trainerJobId);
+
+    if (!idRef.current) {
+        idRef.current = trainerJobId;
+    }
 
     const batchSize = trainingMode === 'partial' ? partialSettings.batchSize : settings.batchSize;
 
@@ -146,10 +151,10 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
         let datasetTokens = dataset?.tokens;
         let validationTokens = validation?.tokens;
-        let previousJobId = trainerJobId;
+        let previousJobId = idRef.current ?? trainerJobId;
 
         if (previousJobId) {
-            const job = model.training.getJob(previousJobId);
+            const job = model.training.getJob(previousJobId) ?? model.training.getPretrainingJob();
             if (job) {
                 if (job.state === 'running' || job.state === 'paused' || job.state === 'pausing') {
                     setStopping(true);
@@ -164,20 +169,8 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 }
 
                 if (autoTokenise && job.datasetId && datasetId && job.datasetId !== datasetId) {
-                    console.log(
-                        'Reset training job because dataset has changed',
-                        job.datasetId,
-                        datasetId,
-                        datasetTokens?.datasetId
-                    );
                     previousJobId = null;
                 } else if (datasetTokens && job.datasetId && datasetTokens.datasetId !== job.datasetId) {
-                    console.log(
-                        'Reset training job because dataset has changed',
-                        job.datasetId,
-                        datasetId,
-                        datasetTokens?.datasetId
-                    );
                     previousJobId = null;
                 }
 
@@ -191,6 +184,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 }
             } else {
                 console.warn('Previous training job not found, starting new training');
+                idRef.current = null;
                 previousJobId = null;
             }
         }
@@ -296,9 +290,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                                 setTokens(log.totalTokens);
                             }
                         }
-                        setDone(true);
-                        setTraining(false);
-                        setStopping(false);
+
                         logger.log({ action: 'training_stopped' });
 
                         if (saveCheckpoints) {
@@ -307,6 +299,10 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                         model.training.off('completed', doneHandler);
                         model.training.off('cancelled', doneHandler);
                         model.training.off('error', errorHandler);
+
+                        setDone(true);
+                        setTraining(false);
+                        setStopping(false);
                     }
                 };
                 model.training.on('completed', doneHandler);
@@ -320,6 +316,7 @@ export default function TextTraining({ autoTokenise = false }: Props) {
 
                 logger.log({ action: 'training_started', modelSize: model.getNumParams(), totalTokens, batchSize });
 
+                idRef.current = job.id;
                 setTrainerJobId(job.id);
             } catch (err) {
                 console.error('Error preparing training', err);

@@ -14,7 +14,7 @@ import useModelStatus from '../../hooks/useModelStatus';
 import { loadedModelAtom, modelLoRAName } from '../../state/model';
 import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { trainerJobIdAtom, trainerSettings } from '../../state/trainer';
-import { GeneratorConversation, IGenerateOptions, IGeneratorResponse } from '@genai-fi/nanogpt';
+import { GeneratorConversation, IGenerateOptions, IGeneratorResponse, ITrainingJob } from '@genai-fi/nanogpt';
 import { conversationDataAtom } from '../../state/data';
 // import { conversationDataAtom } from '../../state/data';
 
@@ -51,6 +51,7 @@ export default function ChatPrompt({ record }: Props) {
 
             if (!response || response.done) {
                 setGenerate(false);
+                return;
             } else {
                 setGenerate(true);
                 busyRef.current = id;
@@ -77,13 +78,24 @@ export default function ChatPrompt({ record }: Props) {
 
             const bpid = model.training.addBreak(trainerJobId);
 
-            const h = async () => {
-                //if (id !== trainerJobId) return;
+            const autoGenState = {
+                busyCount: 0,
+            };
+
+            const h = async (job: ITrainingJob) => {
                 state.count++;
                 if (state.count % 2 !== 0) {
                     setTimeout(() => model.training.resume(trainerJobId), 10);
                     return;
                 }
+
+                if ((job.state !== 'pausing' && job.state !== 'paused') || autoGenState.busyCount > 0) {
+                    model.training.resume(trainerJobId);
+                    return;
+                }
+
+                autoGenState.busyCount++;
+
                 try {
                     if (promptRef.current.length > 0) {
                         const response = await model.responses.create({
@@ -123,6 +135,7 @@ export default function ChatPrompt({ record }: Props) {
                         setOutput((prev) => [...prev, ...response.output]);
                         //setHasGenerated(true);
                     }
+                    autoGenState.busyCount--;
                 } catch (e) {
                     console.error('Auto-generation error', e);
                 }
@@ -132,10 +145,10 @@ export default function ChatPrompt({ record }: Props) {
             };
             model.training.on('progress', h);
             return () => {
+                model.training.off('progress', h);
                 if (bpid !== undefined) {
                     model.training.deleteBreak(trainerJobId, bpid);
                 }
-                model.training.off('progress', h);
             };
         }
     }, [trainerJobId, outputText, model, setOutput]);

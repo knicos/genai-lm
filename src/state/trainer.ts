@@ -72,18 +72,18 @@ observe((get, set) => {
         set(trainerJobIdAtom, null);
 
         const h = () => {
+            // For saved training state
             const job = model.training.getPretrainingJob();
             if (job) {
                 set(trainerJobIdAtom, job.id);
-            } else {
-                console.warn('Clearing trainer job ID');
-                set(trainerJobIdAtom, null);
             }
         };
         model.on('loaded', h);
 
         return () => {
             model.off('loaded', h);
+            model.dispose();
+            set(trainerJobIdAtom, null);
         };
     }
 }, store);
