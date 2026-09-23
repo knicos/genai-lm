@@ -18,7 +18,11 @@ import { Spinner, Help } from '@genai-fi/base';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
 import { setCheckpoint } from '../../utilities/db';
 
-export default function ModelState() {
+interface Props {
+    minimised?: boolean;
+}
+
+export default function ModelState({ minimised }: Props) {
     const { t } = useTranslation();
     const [model, setModel] = useAtom(modelAtom);
     const status = useModelStatus(model ?? undefined);
@@ -31,7 +35,7 @@ export default function ModelState() {
     const anchorRef = useRef<HTMLDivElement>(null);
     const downloader = useAtomValue(modelDownloadAtom);
     const quantize = useAtomValue(modelQuantizeSave);
-    const [minimise, setMinimise] = useState(false);
+    const [minimise, setMinimise] = useState(minimised ?? false);
     const auditMode = useAtomValue(uiAuditOutput);
 
     // Prevent double loading issues

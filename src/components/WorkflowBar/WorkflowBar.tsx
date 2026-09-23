@@ -10,6 +10,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { theme } from '../../theme';
 import InfoPop from '../InfoPop/InfoPop';
 import HomeIcon from '@mui/icons-material/Home';
+import { TeachableLLM } from '@genai-fi/nanogpt';
 
 const ITEM_WIDTH = 200;
 
@@ -22,9 +23,10 @@ export interface Props {
     items: WorkflowItem[];
     disabled?: boolean;
     sidepanel?: string;
+    model?: TeachableLLM;
 }
 
-export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
+export default function WorkflowBar({ items, disabled, sidepanel, model }: Props) {
     const { t } = useTranslation();
     const [width, setWidth] = useState(0);
     const [itemWidth, setItemWidth] = useState(ITEM_WIDTH);
@@ -73,7 +75,7 @@ export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
             className={style.container}
             ref={containerRef}
         >
-            {items.length > 0 && (
+            {(items.length > 0 || model) && (
                 <Link
                     to="/workspace/home"
                     className={`${style.homeButton} ${flow === 'home' ? style.selected : ''}`}
@@ -87,6 +89,7 @@ export default function WorkflowBar({ items, disabled, sidepanel }: Props) {
                 className={style.itemList}
                 ref={listRef}
             >
+                {items.length === 0 && model && <h2>{model.meta.name}</h2>}
                 {items.map((item, ix) => (
                     <Fragment key={item.id}>
                         <Link

@@ -40,6 +40,9 @@ export default function useWorkflowItems(): Item[] {
     if (stages.has('deployment')) {
         items.push({ id: 'deployment', status: step4 ? 'available' : 'blocked' });
     }
+    if (stages.has('audit')) {
+        items.push({ id: 'audit', status: 'available' });
+    }
 
     return items;
 }

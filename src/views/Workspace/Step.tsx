@@ -7,9 +7,10 @@ interface Props {
     description: string;
     id: string;
     flow: string;
+    sidepanel?: string;
 }
 
-export default function Step({ step, description, id, flow }: Props) {
+export default function Step({ step, description, id, flow, sidepanel }: Props) {
     const { t } = useTranslation();
     return (
         <section className={style.step}>
@@ -17,7 +18,9 @@ export default function Step({ step, description, id, flow }: Props) {
             <div className={style.stepContent}>
                 <h2>{t(`workflow.${id}`)}</h2>
                 <p>{description}</p>
-                <Link to={`/workspace/${id}/${flow}`}>{t('app.startHere')}</Link>
+                <Link to={sidepanel ? `/workspace/${id}/${flow}/${sidepanel}` : `/workspace/${id}/${flow}`}>
+                    {t('app.startHere')}
+                </Link>
             </div>
         </section>
     );

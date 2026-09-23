@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import style from './home.module.css';
 import Step from './Step';
 import { HomeBanner, Privacy } from '@genai-fi/base';
+import { useAtomValue } from 'jotai';
+import { featureFlagsAtom } from '../../state/uiState';
 
 const TEMPLATES = [
     {
@@ -21,15 +23,19 @@ const TEMPLATES = [
         step: 'model',
     },
     {
-        variant: 'advanced',
+        variant: 'audit',
         step: 'model',
+        sidepanel: 'audit',
     },
 ];
 
 const gitTag = typeof __GIT_TAG__ !== 'undefined' ? __GIT_TAG__ : 'unknown';
 
 export default function Home() {
+    const { allowAudit } = useAtomValue(featureFlagsAtom);
     const { t } = useTranslation();
+
+    const templates = allowAudit ? TEMPLATES : TEMPLATES.filter((item) => item.variant !== 'audit');
 
     return (
         <div className={style.homeContainer}>
@@ -46,13 +52,14 @@ export default function Home() {
                 githubLabel={t('app.githubText')}
             />
             <div className={style.cards}>
-                {TEMPLATES.map((item, index) => (
+                {templates.map((item, index) => (
                     <Step
                         flow={item.step}
                         description={t(`app.workflow.${item.variant}_desc`)}
                         step={index + 1}
                         id={item.variant}
                         key={item.variant}
+                        sidepanel={item.sidepanel}
                     />
                 ))}
             </div>

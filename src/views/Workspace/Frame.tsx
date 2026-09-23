@@ -1,6 +1,5 @@
 import { PropsWithChildren, Suspense, useCallback } from 'react';
 import style from './style.module.css';
-import { workflowStages } from '../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
 import { uiCompactMode } from '../../state/uiState';
 import type { WorkflowStage } from '../../state/workflowSettings';
@@ -13,7 +12,6 @@ interface Props extends PropsWithChildren {
 }
 
 export default function Frame({ name, children, columns, ignoredColumns, registerFrame }: Props) {
-    const stages = useAtomValue(workflowStages);
     const compact = useAtomValue(uiCompactMode);
 
     const setRef = useCallback(
@@ -22,10 +20,6 @@ export default function Frame({ name, children, columns, ignoredColumns, registe
         },
         [registerFrame, name]
     );
-
-    if (!stages.has(name)) {
-        return null;
-    }
 
     return (
         <div

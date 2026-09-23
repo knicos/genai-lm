@@ -28,6 +28,12 @@
             "send": "Send",
             "error": "Failed to send report."
         },
+        "dndmodel": {
+            "title": "Select a Model",
+            "description": "Drag and drop a model file here or search our library of models.",
+            "search": "Search",
+            "upload": "Upload"
+        },
         "confirmLoad": {
             "title": "Continue Session",
             "message": "A previous session was found. Do you want to load that model?",
@@ -42,7 +48,8 @@
             "model_desc": "Select your model size and shape.",
             "data_desc": "Add your own text data for the model to learn from.",
             "pretrain_desc": "Train the model to learn from your data.",
-            "deployment_desc": "Deploy your model to let others chat with it."
+            "deployment_desc": "Deploy your model to let others chat with it.",
+            "audit_desc": "Review and investigate a model's outputs."
         },
         "settings": {
             "title": "Settings",
@@ -172,7 +179,8 @@
         "data": "Data",
         "pretrain": "Training",
         "finetune": "Fine-tuning",
-        "deployment": "Deployment"
+        "deployment": "Deployment",
+        "audit": "Audit"
     },
     "data": {
         "title": "Training Data",
@@ -352,6 +360,7 @@
         "autoGenerate": "Auto-generate",
         "step": "Next",
         "auditMode": "Auditing",
+        "open": "Select Model",
         "errors": {
             "modelNotReady": "Model is not ready for generation, try again in a moment.",
             "generationError": "An unknown error occurred during text generation."
@@ -360,6 +369,7 @@
     },
     "audit": {
         "title": "Audit Toolkit",
+        "startPrompt": "Audit the model",
         "tools": {
             "beam": "Variants",
             "memorization": "Exact Match",

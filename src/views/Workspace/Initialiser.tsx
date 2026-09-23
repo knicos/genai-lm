@@ -15,7 +15,7 @@ import { deleteData, getData, getCheckpoint, deleteCheckpoint } from '../../util
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 import { trainingModeAtom } from '../../state/trainer';
 
-type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced';
+type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced' | 'audit';
 
 const INIT_COMPLETE_KEY = 'init_complete';
 
@@ -110,7 +110,7 @@ export default function Initialiser() {
             return;
         }
 
-        if (flow !== 'home' && variant !== 'base' && variant !== 'finetune') {
+        if (flow !== 'home' && variant !== 'base' && variant !== 'finetune' && variant !== 'audit') {
             buildModel().catch((e) => {
                 console.error('Failed to build model', e);
             });
@@ -211,6 +211,13 @@ export default function Initialiser() {
             setWorkflowSteps(steps);
             setDevMode(true);
             setCompact(true);
+            setTrainingMode('pretrain');
+        } else if (variant === 'audit') {
+            const steps = new Set<WorkflowSteps>();
+            steps.add('audit');
+            setWorkflowSteps(steps);
+            setDevMode(false);
+            setCompact(false);
             setTrainingMode('pretrain');
         }
     }, [variant, setWorkflowSteps, setDevMode, setCompact, setTrainingMode]);

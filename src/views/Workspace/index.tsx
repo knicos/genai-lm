@@ -1,27 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import style from './style.module.css';
-import { SidePanel, WorkflowLayout } from '@genai-fi/base';
+import { SidePanel } from '@genai-fi/base';
 import AppBar from '../../components/AppBar';
 import { useAtomValue } from 'jotai';
+import { uiWhiteWorkspace } from '../../state/uiState';
 import SettingsDialog from '../../components/SettingsDialog/SettingsDialog';
 import DeviceProbe from '../../components/DeviceProbe/DeviceProbe';
 import { deviceDetected, devicePerformProbe } from '../../state/device';
 import { Outlet, useLocation, useOutlet, useParams } from 'react-router';
 import useOrientation from '../../hooks/useOrientation';
-import ModelState from '../../workflow/ModelState/ModelState';
 import Initialiser from './Initialiser';
 import PeerShareWrap from '../../components/PeerShare/PeerShareWrap';
-import Home from './Home';
 import { CONNECTIONS } from './connections';
 import { darkTheme } from '@genai-fi/base';
 import { ThemeProvider } from '@mui/material';
 import { FlowType, useChangePath } from '../../hooks/useChangePath';
-import DeploymentFrame from './stages/DeploymentFrame';
-import FinetuneFrame from './stages/FinetuneFrame';
-import PretrainFrame from './stages/PretrainFrame';
-import DataFrame from './stages/DataFrame';
-import ModelFrame from './stages/ModelFrame';
 import { workflowSteps } from '../../state/workflowSettings';
+import Workflow from './Workflow';
 
 export function Component() {
     const detected = useAtomValue(deviceDetected);
@@ -39,6 +34,7 @@ export function Component() {
     const resizeObserver = useRef<ResizeObserver | null>(null);
     const workspaceContainerRef = useRef<HTMLDivElement | null>(null);
     const frameMapRef = useRef<Map<FlowType, HTMLDivElement>>(new Map());
+    const whiteWorkspace = useAtomValue(uiWhiteWorkspace);
 
     flowRef.current = flow;
 
@@ -180,23 +176,13 @@ export function Component() {
             >
                 <div
                     className={`${style.workspaceContainer} ${flow === 'home' ? style.homeWorkspace : ''}`}
+                    style={{ backgroundColor: whiteWorkspace ? '#ffffff' : undefined }}
                     ref={setRef}
                 >
-                    {flow === 'home' && <Home />}
-                    {flow !== 'home' && (
-                        <WorkflowLayout connections={connections}>
-                            <ModelFrame registerFrame={registerFrame} />
-                            <DataFrame registerFrame={registerFrame} />
-                            <PretrainFrame registerFrame={registerFrame} />
-                            <DeploymentFrame registerFrame={registerFrame} />
-                            <FinetuneFrame registerFrame={registerFrame} />
-                        </WorkflowLayout>
-                    )}
-                    {flow !== 'home' && (
-                        <div className={style.modelOverlay}>
-                            <ModelState />
-                        </div>
-                    )}
+                    <Workflow
+                        connections={connections}
+                        registerFrame={registerFrame}
+                    />
                 </div>
                 <ThemeProvider theme={darkTheme}>
                     <SidePanel

@@ -1,4 +1,5 @@
 import { VerticalButton } from '@genai-fi/base';
+import { useChangePath } from '../../hooks/useChangePath';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,7 @@ import { uiAuditOutput } from '../../state/uiState';
 import { useAtomValue } from 'jotai';
 import style from './style.module.css';
 import PolicyIcon from '@mui/icons-material/Policy';
+import ModelIcon from '../../icons/ModelIcon';
 
 interface Props {
     onShowSettings: () => void;
@@ -18,11 +20,23 @@ interface Props {
     onScore?: () => void;
     disabled?: boolean;
     highlightMode?: 'none' | 'confidence' | 'score';
+    showAudit?: boolean;
+    onOpen?: () => void;
 }
 
-export default function ChatMenu({ onShowSettings, onReset, onConfidence, onScore, disabled, highlightMode }: Props) {
+export default function ChatMenu({
+    onShowSettings,
+    onReset,
+    onConfidence,
+    onScore,
+    disabled,
+    highlightMode,
+    showAudit,
+    onOpen,
+}: Props) {
     const { t } = useTranslation();
     const auditMode = useAtomValue(uiAuditOutput);
+    const changeFlow = useChangePath();
 
     return (
         <BoxMenu>
@@ -33,6 +47,27 @@ export default function ChatMenu({ onShowSettings, onReset, onConfidence, onScor
             >
                 {t('generator.reset')}
             </VerticalButton>
+            {onOpen && (
+                <VerticalButton
+                    startIcon={<ModelIcon noExtraIcon />}
+                    onClick={onOpen}
+                    disabled={disabled}
+                >
+                    {t('generator.open')}
+                </VerticalButton>
+            )}
+            {showAudit && (
+                <VerticalButton
+                    startIcon={<PolicyIcon />}
+                    color={auditMode ? 'secondary' : 'primary'}
+                    onClick={() => {
+                        changeFlow(auditMode ? { sidepanel: null } : { sidepanel: 'audit', flow: 'deployment' });
+                    }}
+                    disabled={disabled}
+                >
+                    {t('generator.audit')}
+                </VerticalButton>
+            )}
             {onConfidence && (
                 <Tooltip
                     title={<div style={{ maxWidth: 200, textAlign: 'center' }}>{t('generator.confidenceTooltip')}</div>}

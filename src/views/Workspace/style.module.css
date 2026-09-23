@@ -128,6 +128,13 @@
     animation: fadein 0.5s 1;
 }
 
+.chatGroupBoxless {
+    composes: chatGroup;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+}
+
 .inputGroup {
     composes: chatGroup;
     margin-right: 0;
@@ -282,4 +289,11 @@
     color: #444;
     font-size: 1.2rem;
     user-select: none;
+}
+
+.loadModel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }

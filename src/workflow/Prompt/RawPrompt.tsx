@@ -20,9 +20,10 @@ import { conversationDataAtom } from '../../state/data';
 
 interface Props {
     record?: boolean;
+    initialMessage?: string;
 }
 
-export default function ChatPrompt({ record }: Props) {
+export default function ChatPrompt({ record, initialMessage }: Props) {
     const { t } = useTranslation();
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [id, setID] = useAtom(rawGenerationIDAtom);
@@ -244,7 +245,7 @@ export default function ChatPrompt({ record }: Props) {
             data-testid="rawtextgenerator"
             ref={ref}
         >
-            {!hasGenerated && <h2>{t('generator.startPrompt')}</h2>}
+            {!hasGenerated && <h2>{initialMessage ?? t('generator.startPrompt')}</h2>}
             <ChatPromptInput
                 onSend={(prompt) => {
                     promptRef.current = '';

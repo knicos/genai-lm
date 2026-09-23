@@ -30,7 +30,7 @@ export type WorkflowSteps =
 
 export const workflowSteps = atom<Set<WorkflowSteps>>(new Set<WorkflowSteps>());
 
-export type WorkflowStage = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment';
+export type WorkflowStage = 'model' | 'data' | 'pretrain' | 'finetune' | 'deployment' | 'audit';
 
 export const workflowStages = atom<Set<WorkflowStage>>((get) => {
     const steps = get(workflowSteps);
@@ -41,6 +41,7 @@ export const workflowStages = atom<Set<WorkflowStage>>((get) => {
     if (steps.has('trainer') || steps.has('pretrain-output')) stages.add('pretrain');
     if (steps.has('finetune') || steps.has('conversations')) stages.add('finetune');
     if (steps.has('generator')) stages.add('deployment');
+    if (steps.has('audit') && !steps.has('generator')) stages.add('audit');
 
     return stages;
 });

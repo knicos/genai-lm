@@ -4,9 +4,10 @@ import { useWorkflowContext } from '@genai-fi/base';
 
 interface Props extends PropsWithChildren {
     widget: string;
+    boxless?: boolean;
 }
 
-export default function FullSizeGroup({ widget, children }: Props) {
+export default function FullSizeGroup({ widget, children, boxless }: Props) {
     const ref = useRef<HTMLElement>(null);
     const workflowContext = useWorkflowContext();
 
@@ -18,7 +19,7 @@ export default function FullSizeGroup({ widget, children }: Props) {
 
     return (
         <section
-            className={style.chatGroup}
+            className={boxless ? style.chatGroupBoxless : style.chatGroup}
             ref={ref}
         >
             {children}

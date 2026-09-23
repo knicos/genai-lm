@@ -10,6 +10,7 @@ export const uiFatalError = atom(false);
 export const uiTokenSelectLength = atom<number>(0);
 export const uiAuditOutput = atom(false);
 export const uiTokenHighlightMode = atom<'none' | 'confidence' | 'score'>('none');
+export const uiWhiteWorkspace = atom(false);
 
 export interface TokenSelectState {
     startToken: number;
@@ -55,9 +56,9 @@ export const featureFlagsAtom = atom(async () => {
         const features = data.features as FeatureFlags;
         return applyFeatureOverridesFromUrl(features);
     } catch {
-        return {
+        return applyFeatureOverridesFromUrl({
             allowReportProblem: false,
             allowAudit: false,
-        };
+        });
     }
 });

@@ -10,7 +10,12 @@ import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router';
 import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../../state/uiState';
 
-export default function RawGeneration() {
+interface Props {
+    showAudit?: boolean;
+    onOpen?: () => void;
+}
+
+export default function RawGeneration({ showAudit, onOpen }: Props) {
     const model = useAtomValue(loadedModelAtom);
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [responseId, setID] = useAtom(rawGenerationIDAtom);
@@ -60,6 +65,8 @@ export default function RawGeneration() {
             ref={ref}
         >
             <ChatMenu
+                showAudit={showAudit}
+                onOpen={onOpen}
                 onReset={() => {
                     setOutput([]);
                     setID(null);
