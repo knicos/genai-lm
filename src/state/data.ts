@@ -10,6 +10,8 @@ import { setData } from '../utilities/db';
 import { observe } from 'jotai-effect';
 import { store } from './store';
 
+const BASE_STORE_URL = import.meta.env.VITE_BASE_DATA_URL ?? 'https://store.gen-ai.fi/llm/data';
+
 export interface DataManifestEntry {
     id: string;
     title: string;
@@ -299,8 +301,23 @@ export async function createEntriesFromManifest(manifest: DatasetMetadata[]): Pr
                         return new DataEntry(item.id, item.name, downloader, storedSource);
                     }
                 }
-                return new DataEntry(item.id, item.name, undefined, storedSource);
             }
+            const url = item.url ?? `${BASE_STORE_URL}/${item.name}`;
+            // First, check file exists on server
+            // Then estimate type from extension or server response
+            // Finally, create a downloader for it if it exists.
+            try {
+                const testResponse = await fetch(url, { method: 'HEAD' });
+                if (testResponse.ok) {
+                    const contentType = testResponse.headers.get('Content-Type') ?? '';
+                    const type = contentType.split(';')[0];
+                    const downloader = new Downloader(item.id, url, item.name, type);
+                    return new DataEntry(item.id, item.name, downloader, 'search');
+                }
+            } catch (e) {
+                console.warn('Failed to fetch file from server', e);
+            }
+
             return new DataEntry(item.id, item.name);
         })
     );

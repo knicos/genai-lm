@@ -62,11 +62,6 @@ span.highlightedNoBorder {
     align-items: stretch;
 }
 
-.indexProgress label {
-    font-style: italic;
-    text-align: center;
-}
-
 .container {
     position: relative;
     min-height: 200px;

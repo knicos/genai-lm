@@ -391,6 +391,7 @@
             "partial": "{{count}} partial match(es)",
             "more": "Show more",
             "indexing": "Indexing...",
+            "tokenising": "Tokenising... {{count}}",
             "noSelection": "Select some text in the output to see results.",
             "noResults": "No matches found."
         }

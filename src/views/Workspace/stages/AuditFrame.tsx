@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { loadedModelAtom } from '../../../state/model';
+import { dataEntries } from '../../../state/data';
 import { useEffect, useState } from 'react';
 import type { WorkflowStage } from '../../../state/workflowSettings';
 import Frame from '../Frame';
@@ -11,6 +12,7 @@ import RawPrompt from '../../../workflow/Prompt/RawPrompt';
 import { featureFlagsAtom, uiWhiteWorkspace } from '../../../state/uiState';
 import DnDModel from '../../../components/DnDModel/DnDModel';
 import ModelSearch from '../../../components/ModelSearch/ModelSearch';
+import { createEntriesFromManifest } from '../../../state/data';
 
 interface Props {
     registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
@@ -22,11 +24,30 @@ export default function AuditFrame(props: Props) {
     const setWhiteWorkspace = useSetAtom(uiWhiteWorkspace);
     const model = useAtomValue(loadedModelAtom);
     const [showSearch, setShowSearch] = useState(false);
+    const setDataEntries = useSetAtom(dataEntries);
 
     useEffect(() => {
         setWhiteWorkspace(true);
         return () => setWhiteWorkspace(false);
     }, [setWhiteWorkspace]);
+
+    useEffect(() => {
+        if (model) {
+            const pretrainingData = model.meta.pretrainingData;
+            if (pretrainingData) {
+                createEntriesFromManifest(pretrainingData).then((entries) => {
+                    setDataEntries((oldEntries) => {
+                        const nameSet = new Set(oldEntries.map((entry) => entry.name));
+                        const hasDifferent = entries.some((item) => !nameSet.has(item.name));
+                        if (hasDifferent) {
+                            return entries;
+                        }
+                        return oldEntries;
+                    });
+                });
+            }
+        }
+    }, [model, setDataEntries]);
 
     if (!allowAudit) return null;
 

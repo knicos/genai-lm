@@ -6,19 +6,41 @@ import { TrainingSettings } from '../../state/trainer';
 
 const { tokensFromStreams } = tokenise;
 
+// TODO: Should export from nanogpt.
+interface TokensFromTasksOptions {
+    masking?: boolean;
+    maxCachedShards?: number;
+    noOPFS?: boolean;
+    shardSize?: number;
+    validationSplit?: number;
+    validationSeed?: string | number;
+    cb?: (tokens: number) => void;
+}
+
+interface AutoTokeniseOptions extends TokensFromTasksOptions {
+    onDownloadsDone?: () => void;
+    onVocabTrain?: (vocab: number) => void;
+}
+
 export async function autoTokeniseData(
     entries: DataEntry[],
     model: TeachableLLM,
-    datasetId: string
+    datasetId: string,
+    options?: AutoTokeniseOptions
 ): Promise<{ trainingTokens: DataTokens; validationTokens?: DataTokens }> {
     const conversations = await createDatasetFromEntries(entries);
 
+    if (options?.onDownloadsDone) {
+        options.onDownloadsDone();
+    }
+
     if (!model.tokeniser.trained) {
-        await model.tokeniser.train(conversations, undefined, datasetId);
+        await model.tokeniser.train(conversations, options?.onVocabTrain, datasetId);
     }
 
     const newTokens = await tokensFromStreams(conversations, model.tokeniser, datasetId, {
         validationSplit: 0.1,
+        ...options,
     });
 
     return {

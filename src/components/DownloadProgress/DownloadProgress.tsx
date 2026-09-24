@@ -2,14 +2,15 @@ import { IconButton, LinearProgress } from '@mui/material';
 import Downloader from '../../utilities/downloader';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 interface Props {
     downloads: Downloader[] | Downloader;
+    style?: CSSProperties;
 }
 
-export default function DownloadProgress({ downloads }: Props) {
+export default function DownloadProgress({ downloads, style: customStyle }: Props) {
     const { t } = useTranslation();
     const [total, setTotal] = useState(0);
     const [loaded, setLoaded] = useState(0);
@@ -47,9 +48,12 @@ export default function DownloadProgress({ downloads }: Props) {
     if (!Array.isArray(downloads) && !downloads) return null;
 
     return (
-        <div className={style.downloadProgress}>
-            <div>
-                {t('data.downloading', { count: Array.isArray(downloads) ? downloads.length : 1 })}
+        <div
+            className={style.downloadProgress}
+            style={customStyle}
+        >
+            <div style={{ flexGrow: 1 }}>
+                <label>{t('data.downloading', { count: Array.isArray(downloads) ? downloads.length : 1 })}</label>
                 <LinearProgress
                     sx={{ width: '100%' }}
                     variant="determinate"
