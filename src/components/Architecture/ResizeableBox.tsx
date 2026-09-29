@@ -73,96 +73,100 @@ export default function ResizeableBox({
             {children}
 
             {/* Left resize handle */}
-            <g
-                transform={`translate(${leftHandleX}, ${y + HANDLE_PADDING / 2})`}
-                className={style.handleGroup}
-            >
-                <rect
-                    x={-handleWidth * 4}
-                    y={0}
-                    width={handleWidth * 8}
-                    height={height - HANDLE_PADDING}
-                    className={style.handleBg}
-                />
-                <rect
-                    x={0}
-                    y={0}
-                    width={handleWidth}
-                    height={height - HANDLE_PADDING}
-                    className={style.handleBar}
-                    onPointerDown={startDrag('left')}
-                    onPointerMove={onDrag}
-                    onPointerUp={endDrag}
-                    onPointerCancel={endDrag}
-                />
-                <path
-                    d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
+            {onWidthChange && (
+                <g
+                    transform={`translate(${leftHandleX}, ${y + HANDLE_PADDING / 2})`}
+                    className={style.handleGroup}
+                >
+                    <rect
+                        x={-handleWidth * 4}
+                        y={0}
+                        width={handleWidth * 8}
+                        height={height - HANDLE_PADDING}
+                        className={style.handleBg}
+                    />
+                    <rect
+                        x={0}
+                        y={0}
+                        width={handleWidth}
+                        height={height - HANDLE_PADDING}
+                        className={style.handleBar}
+                        onPointerDown={startDrag('left')}
+                        onPointerMove={onDrag}
+                        onPointerUp={endDrag}
+                        onPointerCancel={endDrag}
+                    />
+                    <path
+                        d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
                         L ${handleWidth / 2 - handleWidth * 8} ${(height - HANDLE_PADDING) / 2}
                         L ${handleWidth / 2 - handleWidth * 8 + 4} ${(height - HANDLE_PADDING) / 2 - 4}
                         L ${handleWidth / 2 - handleWidth * 8 + 4} ${(height - HANDLE_PADDING) / 2 + 4}
                         L ${handleWidth / 2 - handleWidth * 8} ${(height - HANDLE_PADDING) / 2}`}
-                    className={style.handle}
-                />
-                <circle
-                    cx={handleWidth / 2}
-                    cy={(height - HANDLE_PADDING) / 2}
-                    r={handleWidth * 3}
-                    fill="white"
-                    stroke="black"
-                    strokeWidth={2}
-                    className={style.handle}
-                    onPointerDown={startDrag('left')}
-                    onPointerMove={onDrag}
-                    onPointerUp={endDrag}
-                    onPointerCancel={endDrag}
-                />
-            </g>
+                        className={style.handle}
+                    />
+                    <circle
+                        cx={handleWidth / 2}
+                        cy={(height - HANDLE_PADDING) / 2}
+                        r={handleWidth * 3}
+                        fill="white"
+                        stroke="black"
+                        strokeWidth={2}
+                        className={style.handle}
+                        onPointerDown={startDrag('left')}
+                        onPointerMove={onDrag}
+                        onPointerUp={endDrag}
+                        onPointerCancel={endDrag}
+                    />
+                </g>
+            )}
 
             {/* Right resize handle */}
-            <g
-                transform={`translate(${rightHandleX}, ${y + HANDLE_PADDING / 2})`}
-                className={style.handleGroup}
-            >
-                <rect
-                    x={-handleWidth * 4}
-                    y={0}
-                    width={handleWidth * 8}
-                    height={height - HANDLE_PADDING}
-                    className={style.handleBg}
-                />
-                <rect
-                    x={0}
-                    y={0}
-                    width={handleWidth}
-                    height={height - HANDLE_PADDING}
-                    className={style.handleBar}
-                    onPointerDown={startDrag('right')}
-                    onPointerMove={onDrag}
-                    onPointerUp={endDrag}
-                    onPointerCancel={endDrag}
-                />
-                <path
-                    d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
+            {onWidthChange && (
+                <g
+                    transform={`translate(${rightHandleX}, ${y + HANDLE_PADDING / 2})`}
+                    className={style.handleGroup}
+                >
+                    <rect
+                        x={-handleWidth * 4}
+                        y={0}
+                        width={handleWidth * 8}
+                        height={height - HANDLE_PADDING}
+                        className={style.handleBg}
+                    />
+                    <rect
+                        x={0}
+                        y={0}
+                        width={handleWidth}
+                        height={height - HANDLE_PADDING}
+                        className={style.handleBar}
+                        onPointerDown={startDrag('right')}
+                        onPointerMove={onDrag}
+                        onPointerUp={endDrag}
+                        onPointerCancel={endDrag}
+                    />
+                    <path
+                        d={`M ${handleWidth / 2} ${(height - HANDLE_PADDING) / 2}
                         L ${handleWidth / 2 + handleWidth * 8} ${(height - HANDLE_PADDING) / 2}
                         L ${handleWidth / 2 + handleWidth * 8 - 4} ${(height - HANDLE_PADDING) / 2 - 4}
                         L ${handleWidth / 2 + handleWidth * 8 - 4} ${(height - HANDLE_PADDING) / 2 + 4}
                         L ${handleWidth / 2 + handleWidth * 8} ${(height - HANDLE_PADDING) / 2}`}
-                    className={style.handle}
-                />
-                <circle
-                    cx={handleWidth / 2}
-                    cy={(height - HANDLE_PADDING) / 2}
-                    r={handleWidth * 3}
-                    fill="white"
-                    stroke="black"
-                    strokeWidth={2}
-                    className={style.handle}
-                    onPointerDown={startDrag('right')}
-                    onPointerMove={onDrag}
-                    onPointerUp={endDrag}
-                    onPointerCancel={endDrag}
-                />
-            </g>
+                        className={style.handle}
+                    />
+                    <circle
+                        cx={handleWidth / 2}
+                        cy={(height - HANDLE_PADDING) / 2}
+                        r={handleWidth * 3}
+                        fill="white"
+                        stroke="black"
+                        strokeWidth={2}
+                        className={style.handle}
+                        onPointerDown={startDrag('right')}
+                        onPointerMove={onDrag}
+                        onPointerUp={endDrag}
+                        onPointerCancel={endDrag}
+                    />
+                </g>
+            )}
         </g>
     );
 }

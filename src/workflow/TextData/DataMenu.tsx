@@ -3,7 +3,7 @@ import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import DatasetIcon from '@mui/icons-material/Dataset';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { Tooltip } from '@mui/material';
 
 interface Props {
@@ -27,7 +27,7 @@ export default function DataMenu({ disabled, onWrite, onUpload, onSearch }: Prop
                     color="primary"
                     variant="text"
                     onClick={onSearch}
-                    startIcon={<DatasetIcon color="inherit" />}
+                    startIcon={<LocalLibraryIcon color="inherit" />}
                 >
                     {t('data.search')}
                 </VerticalButton>

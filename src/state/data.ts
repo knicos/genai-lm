@@ -1,6 +1,13 @@
 import { atom } from 'jotai';
 import Downloader from '../utilities/downloader';
-import { Conversation, DatasetMetadata, ConversationStream, data as dataModule, tokenise } from '@genai-fi/nanogpt';
+import {
+    Conversation,
+    DatasetMetadata,
+    ConversationStream,
+    data as dataModule,
+    tokenise,
+    GeneratorConversation,
+} from '@genai-fi/nanogpt';
 import { atomWithStorage } from 'jotai/utils';
 import { createOPFSStorage, set, get, del, storage } from './storage';
 import EE from 'eventemitter3';
@@ -128,6 +135,11 @@ export class DataEntry implements DatasetMetadata {
             }
         } else {
             this._stream = content || null;
+            if (content) {
+                firstConversation(content).then((conversation) => {
+                    this.conversational = conversation.some((part) => part.role !== 'text');
+                });
+            }
         }
     }
 
@@ -370,11 +382,11 @@ export const dataTokensReady = atom<boolean>((get) => {
 });
 
 // Fine-tuning
-const initialValue: Conversation[][] = [];
-export const conversationDataAtom = atomWithStorage<Conversation[][]>(
+const initialValue: GeneratorConversation[][] = [];
+export const conversationDataAtom = atomWithStorage<GeneratorConversation[][]>(
     'conversationData',
     initialValue,
-    createOPFSStorage<Conversation[][]>()
+    createOPFSStorage<GeneratorConversation[][]>()
 );
 
 export const allowRecordAtom = atom<boolean>(false);

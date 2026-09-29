@@ -3,11 +3,11 @@ import { IConnection } from '@genai-fi/base';
 export const CONNECTIONS: IConnection[] = [
     {
         start: 'thread',
-        end: 'checkmodel',
+        end: 'tokeniser',
         startPoint: 'right',
         endPoint: 'left',
-        endOffset: 0.0,
-        startOffset: 0.2,
+        endOffset: -0.5,
+        startOffset: -0.7,
     },
     {
         start: 'checkmodel',
@@ -19,11 +19,11 @@ export const CONNECTIONS: IConnection[] = [
     },
     {
         start: 'foundation',
-        end: 'textData',
+        end: 'trainer',
         startPoint: 'right',
         endPoint: 'left',
-        endOffset: 0.0,
-        startOffset: 0.2,
+        endOffset: -0.8,
+        startOffset: -0.8,
     },
     {
         start: 'foundation',
@@ -39,7 +39,7 @@ export const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
         endOffset: -0.5,
-        startOffset: -0.1,
+        startOffset: -0.4,
     },
     {
         start: 'textData',
@@ -47,7 +47,7 @@ export const CONNECTIONS: IConnection[] = [
         startPoint: 'right',
         endPoint: 'left',
         endOffset: -0.1,
-        startOffset: -0.1,
+        startOffset: -0.4,
     },
     {
         start: 'tokeniser',
@@ -69,7 +69,7 @@ export const CONNECTIONS: IConnection[] = [
         end: 'trainer',
         startPoint: 'right',
         endPoint: 'left',
-        endOffset: -0.2,
+        endOffset: -0.8,
         startOffset: -0.6,
     },
     {

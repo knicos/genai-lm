@@ -1,6 +1,5 @@
 import { GPTConfig } from '@genai-fi/nanogpt';
 import { BAR_BUTTON_SIZE, BAR_BUTTON_SPACING, endVocabStart, vocabToWidth } from './sizeUtils';
-import { theme } from '../../theme';
 
 interface Props {
     config: GPTConfig;
@@ -21,8 +20,7 @@ export default function Flow({ config, startY, height, gap }: Props) {
 
     return (
         <path
-            opacity={0.2}
-            fill={theme.light.success}
+            fill="var(--bg-subdued1)"
             d={`M${vX},${vY1} L${lX},${lY1} L${lX},${lY2} L${vX},${vY2} L${vX + vW},${vY2} L${lX + lW},${lY2} L${lX + lW},${lY1} L${vX + vW},${vY1} Z`}
         />
     );

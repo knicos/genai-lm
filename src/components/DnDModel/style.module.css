@@ -1,5 +1,5 @@
 .dndModel {
-    border: 1px dashed #ccc;
+    border: 2px dashed rgba(0, 130, 151, 0.2);
     border-radius: 6px;
     padding: 1rem;
     display: flex;

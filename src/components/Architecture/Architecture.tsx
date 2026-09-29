@@ -1,14 +1,24 @@
-import { MouseEvent, PointerEvent, Ref, useEffect, useImperativeHandle, useRef, useState, WheelEvent } from 'react';
+import {
+    useCallback,
+    MouseEvent,
+    PointerEvent,
+    Ref,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+    WheelEvent,
+    CSSProperties,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { calcAutoCamera, calculateViewBox, DEFAULT_EXTENTS, Mover, wheelZoom, ZoomState } from './camera';
 import VocabBox from './VocabBox';
 import style from './style.module.css';
 import TransformerBoxes from './TransformerBoxes';
-import { useAtom } from 'jotai';
-import { modelConfigAtom } from '../../state/model';
+import { ExtendedConfig } from '../../state/model';
 import LayerInfo from './LayerInfo';
 import Flow from './Flow';
-import { BLOCK_GAP, BLOCK_HEIGHT, endVocabStart, totalHeight, vocabToWidth } from './sizeUtils';
+import { BLOCK_GAP, BLOCK_HEIGHT, endVocabStart, totalHeight } from './sizeUtils';
 import InfoPop from '../InfoPop/InfoPop';
 
 // const CAMERA_DURATION = 0.3;
@@ -21,10 +31,19 @@ export interface ArchitectureRef {
     zoomOut: () => void;
 }
 
-export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
+interface Props {
+    ref?: Ref<ArchitectureRef>;
+    noLabels?: boolean;
+    autoFit?: boolean;
+    style?: CSSProperties;
+    architecture: ExtendedConfig;
+    onChange?: (architecture: ExtendedConfig) => void;
+}
+
+export default function Architecture({ ref, noLabels, autoFit, style: customStyle, architecture, onChange }: Props) {
     const { t } = useTranslation();
-    const [internalArchitecture, setInternalArchitecture] = useAtom(modelConfigAtom);
     const svgRef = useRef<SVGSVGElement>(null);
+    const contentRef = useRef<SVGGElement>(null);
     const parentRef = useRef<HTMLDivElement>(null);
     const extents = useRef<[number, number, number, number]>([0, 0, 0, 0]);
     const [scaling, setScaling] = useState(1);
@@ -39,71 +58,70 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
         cy: 0,
         duration: 0,
     });
-    const startY = totalHeight(internalArchitecture) / -2;
+    const startY = totalHeight(architecture) / -2;
+    const noControls = !onChange;
 
-    const doCameraUpdate = (newZoom: ZoomState, noSetScaling?: boolean) => {
+    const doCameraUpdate = useCallback((newZoom: ZoomState, noSetScaling?: boolean) => {
         actualZoom.current = newZoom;
         // Ensure aspect ratio is correct
         if (svgRef.current) {
             const width = svgRef.current.clientWidth;
             const height = svgRef.current.clientHeight;
-            const ratio = height / width;
-            const h = (DEFAULT_EXTENTS.maxX - DEFAULT_EXTENTS.minX) * ratio;
-            DEFAULT_EXTENTS.maxY = h / 2;
-            DEFAULT_EXTENTS.minY = -h / 2;
+            if (!width || !height) return;
 
-            const newExtents = calculateViewBox(DEFAULT_EXTENTS, newZoom);
+            const ratio = height / width;
+            const w = DEFAULT_EXTENTS.maxX - DEFAULT_EXTENTS.minX;
+            const h = w * ratio;
+            const viewportExtents = {
+                minX: DEFAULT_EXTENTS.minX,
+                maxX: DEFAULT_EXTENTS.maxX,
+                minY: -h / 2,
+                maxY: h / 2,
+            };
+
+            const newExtents = calculateViewBox(viewportExtents, newZoom);
             extents.current = newExtents;
             if (!noSetScaling) {
                 setScaling(newExtents[2] / width);
             }
-            /*gsap.to(svgRef.current, {
-            attr: {
-                viewBox: `${Math.floor(newExtents[0])} ${Math.floor(newExtents[1])} ${Math.floor(
-                    newExtents[2]
-                )} ${Math.floor(newExtents[3])}`,
-            },
-            duration: actualZoom.duration,
-            //ease: 'none',
-        });*/
+
             svgRef.current.setAttribute(
                 'viewBox',
                 `${Math.floor(newExtents[0])} ${Math.floor(newExtents[1])} ${Math.floor(newExtents[2])} ${Math.floor(newExtents[3])}`
             );
         }
-    };
+    }, []);
 
-    useEffect(() => {
-        const startY = totalHeight(internalArchitecture) / -2;
+    const zoomToFitContent = useCallback(() => {
+        const content = contentRef.current;
+        if (!content) return;
 
+        const box = content.getBBox();
+        if (!box.width || !box.height) return;
+
+        const MARGIN = 24;
         doCameraUpdate(
             calcAutoCamera({
-                minX:
-                    Math.max(vocabToWidth(internalArchitecture.vocabSize), internalArchitecture.nEmbed * 2) / -2 - 100,
-                minY: startY - 50,
-                maxX: Math.max(vocabToWidth(internalArchitecture.vocabSize), internalArchitecture.nEmbed * 2) / 2 + 100,
-                maxY: -startY + 50,
+                minX: box.x - MARGIN,
+                minY: box.y - MARGIN,
+                maxX: box.x + box.width + MARGIN,
+                maxY: box.y + box.height + MARGIN,
             })
         );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // FIXME: Correct but is there a better way?
+    }, [doCameraUpdate]);
+
+    useEffect(() => {
+        zoomToFitContent();
+    }, [zoomToFitContent]);
+
+    useEffect(() => {
+        if (!autoFit) return;
+        zoomToFitContent();
+    }, [autoFit, architecture, zoomToFitContent]);
 
     useImperativeHandle(ref, () => ({
         zoomToFit: () => {
-            const startY = totalHeight(internalArchitecture) / -2;
-
-            doCameraUpdate(
-                calcAutoCamera({
-                    minX:
-                        Math.max(vocabToWidth(internalArchitecture.vocabSize), internalArchitecture.nEmbed * 2) / -2 -
-                        100,
-                    minY: startY - 50,
-                    maxX:
-                        Math.max(vocabToWidth(internalArchitecture.vocabSize), internalArchitecture.nEmbed * 2) / 2 +
-                        100,
-                    maxY: -startY + 50,
-                })
-            );
+            zoomToFitContent();
         },
         zoomIn: () => {
             doCameraUpdate({
@@ -123,30 +141,18 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
         <div
             className={style.container}
             ref={parentRef}
+            style={customStyle}
         >
             <InfoPop
                 open={!!anchor}
                 anchorEl={anchor}
                 placement="right"
-                modifiers={[
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: (popper: { reference: { x: number; width: number } }) => {
-                                if (svgRef.current) {
-                                    const rect = svgRef.current.getBoundingClientRect();
-                                    const offsetX = rect.right - popper.reference.x - popper.reference.width;
-                                    return [0, offsetX];
-                                }
-                                return [0, 0];
-                            },
-                        },
-                    },
-                ]}
+                style={{ zIndex: 10000 }}
             >
                 <LayerInfo
+                    arch={architecture}
                     index={selectedLayer}
-                    hiddenSize={internalArchitecture?.nEmbed || 0}
+                    hiddenSize={architecture?.nEmbed || 0}
                 />
             </InfoPop>
             <svg
@@ -165,111 +171,165 @@ export default function Architecture({ ref }: { ref: Ref<ArchitectureRef> }) {
                     //if (onUnselect && focusNode && e.target === e.currentTarget) onUnselect();
                     mover.current = undefined;
                 }}
-                onPointerMove={(e: PointerEvent<SVGSVGElement>) => {
-                    const pressed = e.pointerType === 'touch' || e.buttons === 1;
-                    if (pressed && svgRef.current) {
-                        if (!mover.current) {
-                            mover.current = new Mover(actualZoom.current, extents.current, svgRef.current);
-                            setSelectedLayer(-1);
-                            setAnchor(null);
-                        }
-                        doCameraUpdate(mover.current.move(e), true);
-                    }
-                }}
-                onPointerUp={(e: PointerEvent<SVGSVGElement>) => {
-                    //pointerCache.current.clear();
-                    //if (e.pointerType === 'touch') movement.current = [0, 0];
-                    if (e.pointerType === 'touch') mover.current = undefined;
-                    //if (onDragStop) onDragStop();
-                }}
-                onWheel={(e: WheelEvent<SVGSVGElement>) => {
-                    if (svgRef.current) {
-                        doCameraUpdate(wheelZoom(e, svgRef.current, extents.current, actualZoom.current));
-                    }
-                }}
+                onPointerMove={
+                    noControls
+                        ? undefined
+                        : (e: PointerEvent<SVGSVGElement>) => {
+                              const pressed = e.pointerType === 'touch' || e.buttons === 1;
+                              if (pressed && svgRef.current) {
+                                  if (!mover.current) {
+                                      mover.current = new Mover(actualZoom.current, extents.current, svgRef.current);
+                                      setSelectedLayer(-1);
+                                      setAnchor(null);
+                                  }
+                                  doCameraUpdate(mover.current.move(e), true);
+                              }
+                          }
+                }
+                onPointerUp={
+                    noControls
+                        ? undefined
+                        : (e: PointerEvent<SVGSVGElement>) => {
+                              //pointerCache.current.clear();
+                              //if (e.pointerType === 'touch') movement.current = [0, 0];
+                              if (e.pointerType === 'touch') mover.current = undefined;
+                              //if (onDragStop) onDragStop();
+                          }
+                }
+                onWheel={
+                    noControls
+                        ? undefined
+                        : (e: WheelEvent<SVGSVGElement>) => {
+                              if (svgRef.current) {
+                                  doCameraUpdate(wheelZoom(e, svgRef.current, extents.current, actualZoom.current));
+                              }
+                          }
+                }
             >
-                <Flow
-                    config={internalArchitecture}
-                    startY={startY}
-                    height={BLOCK_HEIGHT}
-                    gap={BLOCK_GAP}
-                />
+                <g ref={contentRef}>
+                    <Flow
+                        config={architecture}
+                        startY={startY}
+                        height={BLOCK_HEIGHT}
+                        gap={BLOCK_GAP}
+                    />
 
-                <VocabBox
-                    vocabSize={internalArchitecture?.vocabSize || 0}
-                    y={startY}
-                    height={BLOCK_HEIGHT / 2}
-                    onVocabSizeChange={(next: number) =>
-                        setInternalArchitecture((old) => ({ ...old, vocabSize: next }))
-                    }
-                    scaling={scaling}
-                    preLabel={t('model.inputContext')}
-                    layered
-                    onClick={(element) => {
-                        setAnchor(element);
-                        setSelectedLayer(-1);
-                    }}
-                    onHover={(element) => {
-                        if (mover.current) return;
-                        setAnchor(element);
-                        setSelectedLayer(-1);
-                    }}
-                    onLeave={() => {
-                        setAnchor(null);
-                    }}
-                />
-                <TransformerBoxes
-                    layers={internalArchitecture?.nLayer ?? 0}
-                    hiddenSize={internalArchitecture?.nEmbed ?? 0}
-                    heads={internalArchitecture?.nHead ?? 0}
-                    y={startY + BLOCK_HEIGHT / 2 + BLOCK_GAP}
-                    height={BLOCK_HEIGHT}
-                    gap={BLOCK_GAP}
-                    scaling={scaling}
-                    showNumbers={internalArchitecture.nLayer < 12 && actualZoom.current.zoom < 3}
-                    onChangeHiddenSize={(next: number) => setInternalArchitecture((old) => ({ ...old, nEmbed: next }))}
-                    onChangeLayers={(next: number) => setInternalArchitecture((old) => ({ ...old, nLayer: next }))}
-                    onLayerClick={(index, element) => {
-                        setAnchor(element);
-                        setSelectedLayer(index);
-                    }}
-                    onLayerHover={(index, element) => {
-                        if (mover.current) return;
-                        setAnchor(element);
-                        setSelectedLayer(index);
-                    }}
-                    onLayerLeave={() => {
-                        setAnchor(null);
-                        setSelectedLayer(-1);
-                    }}
-                />
-                <VocabBox
-                    vocabSize={internalArchitecture?.vocabSize || 0}
-                    y={endVocabStart(
-                        startY,
-                        internalArchitecture || {
-                            nLayer: 0,
+                    <VocabBox
+                        vocabSize={architecture?.vocabSize || 0}
+                        y={startY}
+                        height={BLOCK_HEIGHT / 2}
+                        onVocabSizeChange={
+                            !onChange ? undefined : (next: number) => onChange({ ...architecture, vocabSize: next })
                         }
-                    )}
-                    height={BLOCK_HEIGHT / 2}
-                    onVocabSizeChange={(next: number) =>
-                        setInternalArchitecture((old) => ({ ...old, vocabSize: next }))
-                    }
-                    scaling={scaling}
-                    postLabel={t('model.outputProbabilities')}
-                    onClick={(element) => {
-                        setAnchor(element);
-                        setSelectedLayer(-1);
-                    }}
-                    onHover={(element) => {
-                        if (mover.current) return;
-                        setAnchor(element);
-                        setSelectedLayer(-1);
-                    }}
-                    onLeave={() => {
-                        setAnchor(null);
-                    }}
-                />
+                        scaling={scaling}
+                        preLabel={noLabels ? undefined : t('model.inputContext')}
+                        layered
+                        onClick={
+                            noControls
+                                ? undefined
+                                : (element) => {
+                                      setAnchor(element);
+                                      setSelectedLayer(-1);
+                                  }
+                        }
+                        onHover={
+                            noControls
+                                ? undefined
+                                : (element) => {
+                                      if (mover.current) return;
+                                      setAnchor(element);
+                                      setSelectedLayer(-1);
+                                  }
+                        }
+                        onLeave={
+                            noControls
+                                ? undefined
+                                : () => {
+                                      setAnchor(null);
+                                  }
+                        }
+                    />
+                    <TransformerBoxes
+                        layers={architecture?.nLayer ?? 0}
+                        hiddenSize={architecture?.nEmbed ?? 0}
+                        heads={architecture?.nHead ?? 0}
+                        y={startY + BLOCK_HEIGHT / 2 + BLOCK_GAP}
+                        height={BLOCK_HEIGHT}
+                        gap={BLOCK_GAP}
+                        scaling={scaling}
+                        showNumbers={architecture.nLayer < 12 && actualZoom.current.zoom < 3}
+                        onChangeHiddenSize={
+                            !onChange ? undefined : (next: number) => onChange({ ...architecture, nEmbed: next })
+                        }
+                        onChangeLayers={
+                            !onChange ? undefined : (next: number) => onChange({ ...architecture, nLayer: next })
+                        }
+                        onLayerClick={
+                            noControls
+                                ? undefined
+                                : (index, element) => {
+                                      setAnchor(element);
+                                      setSelectedLayer(index);
+                                  }
+                        }
+                        onLayerHover={
+                            noControls
+                                ? undefined
+                                : (index, element) => {
+                                      if (mover.current) return;
+                                      setAnchor(element);
+                                      setSelectedLayer(index);
+                                  }
+                        }
+                        onLayerLeave={
+                            noControls
+                                ? undefined
+                                : () => {
+                                      setAnchor(null);
+                                      setSelectedLayer(-1);
+                                  }
+                        }
+                    />
+                    <VocabBox
+                        vocabSize={architecture?.vocabSize || 0}
+                        y={endVocabStart(
+                            startY,
+                            architecture || {
+                                nLayer: 0,
+                            }
+                        )}
+                        height={BLOCK_HEIGHT / 2}
+                        onVocabSizeChange={
+                            !onChange ? undefined : (next: number) => onChange({ ...architecture, vocabSize: next })
+                        }
+                        scaling={scaling}
+                        postLabel={noLabels ? undefined : t('model.outputProbabilities')}
+                        onClick={
+                            noControls
+                                ? undefined
+                                : (element) => {
+                                      setAnchor(element);
+                                      setSelectedLayer(-1);
+                                  }
+                        }
+                        onHover={
+                            noControls
+                                ? undefined
+                                : (element) => {
+                                      if (mover.current) return;
+                                      setAnchor(element);
+                                      setSelectedLayer(-1);
+                                  }
+                        }
+                        onLeave={
+                            noControls
+                                ? undefined
+                                : () => {
+                                      setAnchor(null);
+                                  }
+                        }
+                    />
+                </g>
             </svg>
         </div>
     );

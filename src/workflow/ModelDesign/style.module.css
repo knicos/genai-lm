@@ -33,20 +33,43 @@
     width: 1rem;
 }
 
-.parameters {
-    text-align: right;
-    font-size: 1rem;
-    padding-left: 2rem;
-    margin-left: auto;
-    user-select: none;
-    flex-grow: 1;
+.modelInfo {
     display: flex;
-    align-items: center;
+    padding: 1rem;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.infoColumn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: center;
 }
 
+.buttonColumn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.parameters {
+    text-align: left;
+    font-size: 0.8rem;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+.parameters h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
 .number {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     margin-right: 0.5rem;
 }
@@ -55,4 +78,13 @@
     .spacer {
         display: none;
     }
+}
+
+.buildContainer {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
 }

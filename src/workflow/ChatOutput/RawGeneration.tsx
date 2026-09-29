@@ -12,10 +12,11 @@ import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../
 
 interface Props {
     showAudit?: boolean;
+    editable?: boolean;
     onOpen?: () => void;
 }
 
-export default function RawGeneration({ showAudit, onOpen }: Props) {
+export default function RawGeneration({ showAudit, onOpen, editable }: Props) {
     const model = useAtomValue(loadedModelAtom);
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [responseId, setID] = useAtom(rawGenerationIDAtom);
@@ -84,6 +85,7 @@ export default function RawGeneration({ showAudit, onOpen }: Props) {
                 highlights={highlights}
                 onSelect={setSelection}
                 selectLength={selectionLength}
+                editable={editable}
             />
         </div>
     );

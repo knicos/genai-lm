@@ -64,7 +64,7 @@ export default function Tokeniser() {
             deactivated={auditMode}
         >
             <Box
-                style={{ width: '250px', minHeight: '180px' }}
+                style={{ width: '250px', minHeight: '195px' }}
                 active={done && !invalid}
                 widget="tokeniser"
                 disabled={istraining}
@@ -74,7 +74,7 @@ export default function Tokeniser() {
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniser.title')}
-                        status={done && !invalid ? 'done' : 'waiting'}
+                        status={done && !invalid ? 'done' : !model || dataset.length === 0 ? 'disabled' : 'waiting'}
                     />
                     <div className={style.progressBox}>
                         <DataProgress

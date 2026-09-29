@@ -1,22 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import Box from '../../components/BoxTitle/Box';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
 import style from './style.module.css';
 import InstructMenu from './InstructMenu';
 import { useRef, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { conversationDataAtom } from '../../state/data';
 import ConversationList from './ConversationList';
-import ConversationDisplay from '../../components/ConversationDisplay/ConversationDisplay';
 import { Conversation } from '@genai-fi/nanogpt';
 import { saveAs } from 'file-saver';
 import { useNavigate } from 'react-router';
+import { rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
 export default function InstructData() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [conversations, setConversations] = useAtom(conversationDataAtom);
-    const [selected, setSelected] = useState<number>(0);
+    const setConversation = useSetAtom(rawGeneratedTextAtom);
+    const setResponseID = useSetAtom(rawGenerationIDAtom);
+    const [, setSelected] = useState<number>(-1);
     const [message, setMessage] = useState<Notice | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     const disable = false;
@@ -26,12 +29,15 @@ export default function InstructData() {
     return (
         <Box
             widget="tuneData"
-            style={{ width: '40rem', display: 'flex', flexDirection: 'column' }}
+            style={{ width: '30rem', display: 'flex', flexDirection: 'column' }}
             active={done}
             disabled={disable}
-            fullWidth
         >
             <div className={style.container}>
+                <BoxTitle
+                    title={t('instruct.title')}
+                    status={done ? 'done' : 'waiting'}
+                />
                 <input
                     type="file"
                     accept=".json,.jsonl"
@@ -101,31 +107,20 @@ export default function InstructData() {
                         fileRef.current?.click();
                     }}
                     disabled={disable || busy}
-                    onNewConversation={() => {
-                        const newConvo: Conversation[][] = [
-                            ...conversations,
-                            [
-                                { role: 'user', content: '' },
-                                { role: 'assistant', content: '' },
-                            ],
-                        ];
-                        setConversations(newConvo);
-                        setSelected(newConvo.length - 1);
-                    }}
                 />
                 <div className={style.content}>
                     <h3>{t('instruct.conversations', { count: conversations.length })}</h3>
                     <ConversationList
                         data={conversations}
-                        onSelect={setSelected}
+                        onSelect={(index) => {
+                            setSelected(index);
+                            if (index >= 0 && index < conversations.length) {
+                                setConversation(conversations[index]);
+                                setResponseID(null);
+                            }
+                        }}
                         onChange={setConversations}
                     />
-                    <div className={style.chatContainer}>
-                        <ConversationDisplay
-                            conversation={conversations[selected]}
-                            editable
-                        />
-                    </div>
                 </div>
                 {message && (
                     <BoxNotice

@@ -4,7 +4,7 @@
     display: inline-block;
     user-select: none;
     flex-shrink: 0;
-    font-size: 3rem;
+    font-size: 1.8rem;
     cursor: pointer;
     line-height: 1;
 }
@@ -26,11 +26,13 @@
 }
 
 .vocab {
-    fill: #00a0b8;
+    stroke: currentColor;
+    stroke-width: 2;
 }
 
 .layer {
-    fill: #00a0b8;
+    stroke: currentColor;
+    stroke-width: 2;
 }
 
 .circle {
@@ -45,8 +47,8 @@
 
 .extraIcon {
     position: absolute;
-    bottom: -0.05em;
-    right: -0.1em;
+    bottom: -0.5em;
+    right: -0.4em;
     display: flex;
     color: var(--secondary);
     background-color: white;

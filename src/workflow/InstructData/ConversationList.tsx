@@ -64,14 +64,6 @@ export default function ConversationList({ data, onSelect, onChange }: Props) {
     const lastLen = useRef<number>(data.length);
 
     useEffect(() => {
-        if (selected !== -1) {
-            onSelect(selected);
-        } else {
-            onSelect(0);
-        }
-    }, [selected, onSelect]);
-
-    useEffect(() => {
         if (data.length > lastLen.current) {
             listRef.current?.scrollToRow({ index: data.length - 1, behavior: 'smooth' });
             setSelected(data.length - 1);
@@ -99,7 +91,6 @@ export default function ConversationList({ data, onSelect, onChange }: Props) {
                 listRef={listRef}
                 style={{
                     minWidth: '100%',
-                    borderBottom: '2px solid rgba(0, 0, 0, 0.06)',
                     borderTop: '2px solid rgba(0, 0, 0, 0.06)',
                 }}
                 rowComponent={RowComponent}
@@ -112,7 +103,10 @@ export default function ConversationList({ data, onSelect, onChange }: Props) {
                             ? t('conversation.userPlaceholder')
                             : conversation[0].content
                     ),
-                    onClick: setSelected,
+                    onClick: (index: number) => {
+                        setSelected(index);
+                        onSelect(index);
+                    },
                     onDelete: doDelete,
                 }}
             />

@@ -34,6 +34,7 @@ export default function Box({
     const [visible, setVisible] = useState(false);
     const workflowContext = useWorkflowContext();
     const auditMode = useAtomValue(uiAuditOutput);
+    const sizeRef = useRef<{ width: number; height: number } | null>(null);
 
     useEffect(() => {
         if (ref.current) {
@@ -41,6 +42,12 @@ export default function Box({
             const remove = widget ? workflowContext.registerElement(widget, element) : undefined;
             const io = new IntersectionObserver(
                 ([entry]) => {
+                    if (!entry.isIntersecting) {
+                        sizeRef.current = {
+                            width: entry.boundingClientRect.width,
+                            height: entry.boundingClientRect.height,
+                        };
+                    }
                     setVisible(entry.isIntersecting);
                 },
                 { rootMargin: '50px' }
@@ -60,7 +67,15 @@ export default function Box({
             data-widget={widget}
             data-active={active ? 'true' : 'false'}
             data-deactivated={deactivateOnAudit && auditMode ? 'true' : 'false'}
-            style={style}
+            style={
+                sizeRef.current && !visible
+                    ? {
+                          width: sizeRef.current.width,
+                          height: sizeRef.current.height,
+                          ...style,
+                      }
+                    : style
+            }
         >
             {(visible || disableHiding || isTest) && children}
             {disabled && <div className={boxstyle.disabled} />}

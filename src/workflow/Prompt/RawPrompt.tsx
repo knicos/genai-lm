@@ -21,9 +21,10 @@ import { conversationDataAtom } from '../../state/data';
 interface Props {
     record?: boolean;
     initialMessage?: string;
+    forceConversational?: boolean;
 }
 
-export default function ChatPrompt({ record, initialMessage }: Props) {
+export default function ChatPrompt({ record, initialMessage, forceConversational }: Props) {
     const { t } = useTranslation();
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [id, setID] = useAtom(rawGenerationIDAtom);
@@ -167,7 +168,7 @@ export default function ChatPrompt({ record, initialMessage }: Props) {
             return;
         }
 
-        const text: GeneratorConversation[] = [];
+        const text: GeneratorConversation[] = id ? [] : output;
 
         const promptMode = settings.promptMode;
 
@@ -175,7 +176,7 @@ export default function ChatPrompt({ record, initialMessage }: Props) {
             text.push({ role: promptMode === 'conversation' ? 'user' : 'text', content: prompt ?? '' });
         }
 
-        const filteredText = promptMode === 'none' ? [] : text.filter((part) => part.content.trim().length > 0);
+        const filteredText = promptMode === 'none' ? [] : text; // text.filter((part) => part.content.trim().length > 0);
 
         const options: IGenerateOptions = {
             ...settings,
@@ -266,7 +267,7 @@ export default function ChatPrompt({ record, initialMessage }: Props) {
                         promptMode: mode,
                     }));
                 }}
-                conversationSupported={mode === 'conversational'}
+                conversationSupported={forceConversational || mode === 'conversational'}
             />
             {messages && (
                 <BoxNotice

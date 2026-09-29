@@ -3,7 +3,7 @@
 }
 
 .innerContainer {
-    background: rgba(0, 130, 151, 0.06);
+    /*background: rgba(0, 130, 151, 0.06);*/
     display: flex;
     flex-direction: column;
     align-items: center;

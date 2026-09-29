@@ -50,7 +50,7 @@ export default function VocabBox({
             width={width}
             height={height}
             y={y}
-            onWidthChange={(next: number) => onVocabSizeChange?.(widthToVocab(next))}
+            onWidthChange={onVocabSizeChange ? (next: number) => onVocabSizeChange(widthToVocab(next)) : undefined}
             minWidth={minWidth}
             scaling={scaling}
             snapping={snapping}

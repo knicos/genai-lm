@@ -24,10 +24,7 @@ export default function FinetuneFrame(props: Props) {
             name="finetune"
             {...props}
         >
-            <div className={style.titleColumn}>
-                <h3>{t('instruct.title')}</h3>
-                <InstructData />
-            </div>
+            <InstructData />
             <TuneTraining />
             <div className={style.buttongroup}>
                 <BoxButton

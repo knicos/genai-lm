@@ -1,71 +1,43 @@
-import { VerticalButton, Help } from '@genai-fi/base';
+import { VerticalButton } from '@genai-fi/base';
 import { useTranslation } from 'react-i18next';
-import TuneIcon from '@mui/icons-material/Tune';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
-import prettyNumber from '../../utilities/prettyNumber';
-import style from './style.module.css';
-import { utilities } from '@genai-fi/nanogpt';
-import { useAtomValue } from 'jotai';
-import { modelConfigAtom, modelSizeLimit } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
-import WarningIcon from '@mui/icons-material/Warning';
+import EditIcon from '@mui/icons-material/Edit';
+import UndoIcon from '@mui/icons-material/Undo';
 
 interface Props {
     disableInspect?: boolean;
-    onSearch?: () => void;
-    onShowSettings?: () => void;
-    onReset?: () => void;
+    onSearch: () => void;
+    onEdit: () => void;
+    onUndo?: () => void;
 }
 
-export default function ModelMenu({ onSearch, onShowSettings, onReset }: Props) {
+export default function ModelMenu({ onSearch, onEdit, onUndo }: Props) {
     const { t } = useTranslation();
-    const arch = useAtomValue(modelConfigAtom);
-    const sizeLimit = useAtomValue(modelSizeLimit) * 1_000_000;
-    const estimated = utilities.estimateParameterCount(arch);
 
     return (
         <BoxMenu>
-            {onSearch && (
-                <VerticalButton
-                    disabled={!onSearch}
-                    variant="text"
-                    onClick={onSearch}
-                    startIcon={<ModelIcon noExtraIcon />}
-                >
-                    {t('model.examples')}
-                </VerticalButton>
-            )}
             <VerticalButton
-                startIcon={<RestartAltIcon />}
-                onClick={onReset}
+                variant="text"
+                onClick={onSearch}
+                startIcon={<ModelIcon noExtraIcon />}
             >
-                {t('model.reset')}
+                {t('model.examples')}
             </VerticalButton>
-
-            <div className={style.parameters}>
-                <Help
-                    message={t('model.parametersHelp')}
-                    inplace
-                    keepOpen
-                >
-                    {estimated > sizeLimit && (
-                        <WarningIcon
-                            color="warning"
-                            fontSize="medium"
-                            sx={{ marginRight: '0.5rem' }}
-                        />
-                    )}
-                    <span className={style.number}>{`${prettyNumber(estimated, t)}`}</span>
-                    {`${t('model.parameters')}`}
-                </Help>
-            </div>
-
             <VerticalButton
-                startIcon={<TuneIcon />}
-                onClick={onShowSettings}
+                variant="text"
+                onClick={onEdit}
+                startIcon={<EditIcon />}
             >
-                {t('training.settings')}
+                {t('model.edit')}
+            </VerticalButton>
+            <VerticalButton
+                disabled={!onUndo}
+                variant="text"
+                onClick={onUndo}
+                startIcon={<UndoIcon />}
+            >
+                {t('model.undo')}
             </VerticalButton>
         </BoxMenu>
     );

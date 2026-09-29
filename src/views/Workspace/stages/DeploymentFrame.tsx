@@ -30,16 +30,17 @@ export default function DeploymentFrame(props: Props) {
             name="deployment"
             {...props}
         >
-            <div
-                className={style.titleColumn}
-                data-pan
+            <FullSizeGroup
+                widget="chatOutput"
+                boxless
             >
-                <h3>{t('generator.title')}</h3>
-                <FullSizeGroup widget="chatOutput">
-                    <RawGeneration />
-                    <RawPrompt record={steps.has('finetune')} />
-                </FullSizeGroup>
-            </div>
+                <RawGeneration editable={steps.has('finetune')} />
+                <RawPrompt
+                    record={steps.has('finetune')}
+                    forceConversational={steps.has('finetune')}
+                />
+            </FullSizeGroup>
+
             <div className={style.buttongroup}>
                 {allowAudit && (
                     <BoxButton

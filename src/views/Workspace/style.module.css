@@ -133,6 +133,7 @@
     box-shadow: none;
     border-radius: 0;
     margin: 0;
+    height: 100%;
 }
 
 .inputGroup {

@@ -1,11 +1,13 @@
 .icon {
     font-size: 3rem;
     margin: 0.5rem;
+    margin-left: 1rem;
     display: flex;
     align-items: center;
     outline: none;
     background: none;
     border: none;
+    color: white;
 }
 
 .loadingIcon {
@@ -70,6 +72,7 @@
     position: relative;
     align-items: center;
     color: white;
+    height: 72px;
 }
 
 .modelMenu {

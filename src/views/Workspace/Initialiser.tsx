@@ -146,10 +146,11 @@ export default function Initialiser() {
             steps.add('trainer');
             steps.add('generator');
             steps.add('visualise');
+            steps.add('share');
             steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
-            setCompact(false);
+            setCompact(true);
             setTrainingMode('pretrain');
         } else if (variant === 'base') {
             const steps = new Set<WorkflowSteps>();
@@ -162,7 +163,7 @@ export default function Initialiser() {
             steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
-            setCompact(false);
+            setCompact(true);
             setTrainingMode('partial');
         } else if (variant === 'finetune') {
             const steps = new Set<WorkflowSteps>();
@@ -174,7 +175,7 @@ export default function Initialiser() {
             steps.add('audit');
             setWorkflowSteps(steps);
             //setDevMode(false);
-            setCompact(false);
+            setCompact(true);
             setTrainingMode('lora');
         } else if (variant === 'complete') {
             const steps = new Set<WorkflowSteps>();

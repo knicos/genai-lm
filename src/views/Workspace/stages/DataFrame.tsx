@@ -10,8 +10,7 @@ import { useChangePath } from '../../../hooks/useChangePath';
 import { WorkflowStage, workflowSteps } from '../../../state/workflowSettings';
 import { useAtomValue } from 'jotai';
 import { uiAuditOutput } from '../../../state/uiState';
-import { Help, BoxButton } from '@genai-fi/base';
-import Markdown from 'react-markdown';
+import { BoxButton } from '@genai-fi/base';
 
 interface Props {
     registerFrame: (flow: WorkflowStage, element: HTMLDivElement | null) => void;
@@ -30,16 +29,10 @@ export default function DataFrame(props: Props) {
             name="data"
             {...props}
         >
-            <div className={style.titleColumn}>
-                <Help
-                    message={<Markdown>{t('data.help')}</Markdown>}
-                    inplace
-                    keepOpen
-                >
-                    <h3>{t('data.title')}</h3>
-                </Help>
+            <div style={{ marginTop: 'calc(50% - 50px)' }}>
                 <TextData />
             </div>
+
             {hasTokenStep && (
                 <div
                     data-widget="container"

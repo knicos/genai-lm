@@ -48,30 +48,32 @@ export default function TransformerBoxes({
             width={width}
             height={height * layers + gap * (layers - 1) + (BAR_BUTTON_SIZE + BAR_BUTTON_SPACING) * 2}
             scaling={scaling}
-            onWidthChange={(next: number) => onChangeHiddenSize?.(next / WIDTH_SCALING)}
+            onWidthChange={onChangeHiddenSize ? (next: number) => onChangeHiddenSize(next / WIDTH_SCALING) : undefined}
             snapping={32 * heads * WIDTH_SCALING}
             minWidth={32 * heads * WIDTH_SCALING}
         >
-            <g
-                onClick={() => onChangeLayers?.(Math.max(1, layers - 1))}
-                className={style.tableButton}
-            >
-                <circle
-                    cx={0}
-                    cy={y + BAR_BUTTON_SIZE / 2}
-                    r={BAR_BUTTON_SIZE * 0.75}
-                />
-                <foreignObject
-                    x={-width / 2}
-                    y={y}
-                    width={width}
-                    height={BAR_BUTTON_SIZE}
+            {onChangeLayers && (
+                <g
+                    onClick={() => onChangeLayers?.(Math.max(1, layers - 1))}
+                    className={style.tableButton}
                 >
-                    <div className={style.iconContainer}>
-                        <RemoveIcon fontSize="inherit" />
-                    </div>
-                </foreignObject>
-            </g>
+                    <circle
+                        cx={0}
+                        cy={y + BAR_BUTTON_SIZE / 2}
+                        r={BAR_BUTTON_SIZE * 0.75}
+                    />
+                    <foreignObject
+                        x={-width / 2}
+                        y={y}
+                        width={width}
+                        height={BAR_BUTTON_SIZE}
+                    >
+                        <div className={style.iconContainer}>
+                            <RemoveIcon fontSize="inherit" />
+                        </div>
+                    </foreignObject>
+                </g>
+            )}
             {Array(layers)
                 .fill(0)
                 .map((_, i) => (
@@ -87,26 +89,28 @@ export default function TransformerBoxes({
                         onLayerLeave={onLayerLeave}
                     />
                 ))}
-            <g
-                onClick={() => onChangeLayers?.(Math.min(128, layers + 1))}
-                className={style.tableButton}
-            >
-                <circle
-                    cx={0}
-                    cy={addLayerButtonY + BAR_BUTTON_SPACING + BAR_BUTTON_SIZE / 2}
-                    r={BAR_BUTTON_SIZE * 0.75}
-                />
-                <foreignObject
-                    x={-width / 2}
-                    y={addLayerButtonY + BAR_BUTTON_SPACING}
-                    width={width}
-                    height={BAR_BUTTON_SIZE}
+            {onChangeLayers && (
+                <g
+                    onClick={() => onChangeLayers?.(Math.min(128, layers + 1))}
+                    className={style.tableButton}
                 >
-                    <div className={style.iconContainer}>
-                        <AddIcon fontSize="inherit" />
-                    </div>
-                </foreignObject>
-            </g>
+                    <circle
+                        cx={0}
+                        cy={addLayerButtonY + BAR_BUTTON_SPACING + BAR_BUTTON_SIZE / 2}
+                        r={BAR_BUTTON_SIZE * 0.75}
+                    />
+                    <foreignObject
+                        x={-width / 2}
+                        y={addLayerButtonY + BAR_BUTTON_SPACING}
+                        width={width}
+                        height={BAR_BUTTON_SIZE}
+                    >
+                        <div className={style.iconContainer}>
+                            <AddIcon fontSize="inherit" />
+                        </div>
+                    </foreignObject>
+                </g>
+            )}
         </ResizeableBox>
     );
 }

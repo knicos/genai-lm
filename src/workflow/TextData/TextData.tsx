@@ -17,6 +17,9 @@ import { useAtom, useAtomValue } from 'jotai';
 import { dataEntries, DataEntry } from '../../state/data';
 import { loadedModelAtom } from '../../state/model';
 import ProgressiveDocumentFeed from './ProgressiveDocumentFeed';
+import BoxTitle from '../../components/BoxTitle/BoxTitle';
+import CloseIcon from '@mui/icons-material/Close';
+import { Button, Help } from '@genai-fi/base';
 
 interface DragObject {
     files?: File[];
@@ -115,126 +118,151 @@ export default function TextData() {
     const selectedItem = selected >= 0 && selected < data.length ? data[selected] : null;
 
     return (
-        <Box
+        <Help
             widget="textData"
-            style={{ flexGrow: 1, width: '40rem' }}
+            message={t('data.help')}
             active={!!model && data.length > 0}
-            disabled={disable}
-            fullWidth
+            keepOpen
+            placement="right"
         >
-            <div className={style.container}>
-                <DataMenu
-                    disabled={showInput || showSearch}
-                    onWrite={() => {
-                        setSelected(-1);
-                        setData((prev) => [
-                            ...prev,
-                            new DataEntry(uuid(), t('data.untitled'), [[{ role: 'text', content: '' }]], 'input'),
-                        ]);
-                    }}
-                    onSearch={() => setShowSearch(true)}
-                    onUpload={() => fileRef.current?.click()}
-                />
-                <div
-                    className={style.content}
-                    ref={drop as unknown as RefObject<HTMLDivElement>}
-                >
-                    <DataListing
-                        data={data}
-                        onDelete={(index) =>
-                            setData((prev) =>
-                                prev.filter((entry, i) => {
-                                    if (i === index) {
-                                        entry.dispose();
-                                    }
-                                    return i !== index;
-                                })
-                            )
-                        }
-                        selected={selected}
-                        setSelected={setSelected}
+            <Box
+                widget="textData"
+                style={{ width: '30rem' }}
+                active={!!model && data.length > 0}
+                disabled={disable}
+                useParent
+            >
+                <div className={style.container}>
+                    <BoxTitle
+                        title={t('data.title')}
+                        status={data.length > 0 ? 'done' : 'waiting'}
                     />
-
-                    <ProgressiveDocumentFeed
-                        data={selected >= 0 ? data[selected] : null}
-                        initialCount={8}
-                        step={6}
-                        rootMargin="800px"
+                    <DataMenu
+                        disabled={showInput || showSearch}
+                        onWrite={() => {
+                            setSelected(-1);
+                            setData((prev) => [
+                                ...prev,
+                                new DataEntry(uuid(), t('data.untitled'), [[{ role: 'text', content: '' }]], 'input'),
+                            ]);
+                        }}
+                        onSearch={() => setShowSearch(true)}
+                        onUpload={() => fileRef.current?.click()}
                     />
-                    {showInput && (
-                        <TextInput
-                            initialText={
-                                selectedItem && selectedItem.source === 'input'
-                                    ? selectedItem.content?.[0][0].content
-                                    : undefined
+                    <div
+                        className={style.content}
+                        ref={drop as unknown as RefObject<HTMLDivElement>}
+                    >
+                        <DataListing
+                            data={data}
+                            onDelete={(index) =>
+                                setData((prev) =>
+                                    prev.filter((entry, i) => {
+                                        if (i === index) {
+                                            entry.dispose();
+                                        }
+                                        return i !== index;
+                                    })
+                                )
                             }
-                            onClose={() => setShowInput(false)}
-                            onText={(text) => {
-                                if (selectedItem) {
-                                    setData((prev) =>
-                                        prev.map((entry, i) => {
-                                            if (i === selected) {
-                                                entry.content = [[{ role: 'text', content: text }]];
-                                            }
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
 
-                                            return entry;
-                                        })
-                                    );
-                                } else {
-                                    logger.log({ action: 'added_input_text', size: text.length });
+                        {selected >= 0 && (
+                            <div className={style.dataListContainer}>
+                                <ProgressiveDocumentFeed
+                                    data={selected >= 0 ? data[selected] : null}
+                                    initialCount={8}
+                                    step={6}
+                                    rootMargin="800px"
+                                />
+                                <div className={style.closeDataButton}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setSelected(-1)}
+                                        startIcon={<CloseIcon color="inherit" />}
+                                    >
+                                        {t('data.close')}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        {showInput && (
+                            <TextInput
+                                initialText={
+                                    selectedItem && selectedItem.source === 'input'
+                                        ? selectedItem.content?.[0][0].content
+                                        : undefined
+                                }
+                                onClose={() => setShowInput(false)}
+                                onText={(text) => {
+                                    if (selectedItem) {
+                                        setData((prev) =>
+                                            prev.map((entry, i) => {
+                                                if (i === selected) {
+                                                    entry.content = [[{ role: 'text', content: text }]];
+                                                }
+
+                                                return entry;
+                                            })
+                                        );
+                                    } else {
+                                        logger.log({ action: 'added_input_text', size: text.length });
+                                        setData((prev) => [
+                                            ...prev,
+                                            new DataEntry(
+                                                uuid(),
+                                                t('data.untitled'),
+                                                [[{ role: 'text', content: text }]],
+                                                'input'
+                                            ),
+                                        ]);
+                                    }
+                                    setShowInput(false);
+                                }}
+                            />
+                        )}
+                        {showSearch && (
+                            <TextSearch
+                                selectedSet={selectedSet}
+                                onClose={() => setShowSearch(false)}
+                                downloads={[]}
+                                onDownload={(downloader) => {
                                     setData((prev) => [
                                         ...prev,
-                                        new DataEntry(
-                                            uuid(),
-                                            t('data.untitled'),
-                                            [[{ role: 'text', content: text }]],
-                                            'input'
-                                        ),
+                                        new DataEntry(downloader.id, downloader.name, downloader, 'search'),
                                     ]);
-                                }
-                                setShowInput(false);
-                            }}
-                        />
-                    )}
-                    {showSearch && (
-                        <TextSearch
-                            selectedSet={selectedSet}
-                            onClose={() => setShowSearch(false)}
-                            downloads={[]}
-                            onDownload={(downloader) => {
-                                setData((prev) => [
-                                    ...prev,
-                                    new DataEntry(downloader.id, downloader.name, downloader, 'search'),
-                                ]);
-                            }}
-                        />
-                    )}
-                    {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
-                </div>
+                                }}
+                            />
+                        )}
+                        {dropProps.hovered && <div className={style.dropHint}>{t('data.dropHint')}</div>}
+                    </div>
 
-                <input
-                    type="file"
-                    accept=".txt,.csv,.pdf,.doc,.docx,.parquet,.json,.jsonl,.zip"
-                    ref={fileRef}
-                    style={{ display: 'none' }}
-                    onChange={async (e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                            const file = e.target.files[0];
-                            setBusy(true);
-                            logger.log({ action: 'file_input_selected', name: file.name });
-                            const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
-                            await handleTextLoad(uuid(), file.name, text, 'file', setData);
-                            setBusy(false);
-                        }
-                    }}
-                />
-                {message && (
-                    <BoxNotice
-                        notice={message}
-                        onClose={() => setMessage(null)}
+                    <input
+                        type="file"
+                        accept=".txt,.csv,.pdf,.doc,.docx,.parquet,.json,.jsonl,.zip"
+                        ref={fileRef}
+                        style={{ display: 'none' }}
+                        onChange={async (e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                                const file = e.target.files[0];
+                                setBusy(true);
+                                logger.log({ action: 'file_input_selected', name: file.name });
+                                const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
+                                await handleTextLoad(uuid(), file.name, text, 'file', setData);
+                                setBusy(false);
+                            }
+                        }}
                     />
-                )}
-            </div>
-        </Box>
+                    {message && (
+                        <BoxNotice
+                            notice={message}
+                            onClose={() => setMessage(null)}
+                        />
+                    )}
+                </div>
+            </Box>
+        </Help>
     );
 }

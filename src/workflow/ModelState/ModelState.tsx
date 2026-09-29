@@ -17,6 +17,7 @@ import useModelStatus from '../../hooks/useModelStatus';
 import { Spinner, Help } from '@genai-fi/base';
 import ModelSearch from '../../components/ModelSearch/ModelSearch';
 import { setCheckpoint } from '../../utilities/db';
+import { IconButton } from '@mui/material';
 
 interface Props {
     minimised?: boolean;
@@ -155,7 +156,7 @@ export default function ModelState({ minimised }: Props) {
                     className={style.container}
                     ref={anchorRef}
                 >
-                    <button
+                    <IconButton
                         className={style.icon}
                         onClick={() => setMinimise(!minimise)}
                     >
@@ -168,7 +169,7 @@ export default function ModelState({ minimised }: Props) {
                                 />
                             </div>
                         )}
-                    </button>
+                    </IconButton>
                     {!minimise && (
                         <>
                             {!spin && model && (

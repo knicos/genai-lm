@@ -16,7 +16,6 @@ import { Button, Help } from '@genai-fi/base';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import { useState } from 'react';
 import DataProgress from '../../components/DataProgress/DataProgress';
-import useModelLoaded from '../../hooks/useModelLoaded';
 import ProgressBox from '../TextData/ProgressBox';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { createDatasetFromEntries } from '../../utilities/dataset';
@@ -25,6 +24,7 @@ import { trainingAnimation } from '../../state/animations';
 import { tokenise } from '@genai-fi/nanogpt';
 import { useNavigate } from 'react-router';
 import Box from '../../components/BoxTitle/Box';
+import useModelStatus from '../../hooks/useModelStatus';
 
 const { tokensFromStreams } = tokenise;
 
@@ -34,7 +34,7 @@ export default function TokeniseData() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const model = useAtomValue(loadedModelAtom);
-    const ready = useModelLoaded(model ?? undefined);
+    const status = useModelStatus(model ?? undefined);
     const dataset = useAtomValue(dataEntries);
     const datasetId = useAtomValue(datasetIdAtom);
     const [tokens, setTokens] = useAtom(dataTokens);
@@ -48,7 +48,7 @@ export default function TokeniseData() {
     const auditMode = useAtomValue(uiAuditOutput);
 
     const tokenCount = _tokenCount === 0 ? tokens?.tokens.getTokenCount() || 0 : _tokenCount;
-    const desiredTokens = ready ? (model?.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
+    const desiredTokens = model ? (model.getNumParams() || 0) * CHINCHILLA_OPTIMISATION_RATIO : 0;
     const hasTooManyTokens = tokenCount > desiredTokens * 1.1;
     const hasEnoughTokens = tokenCount >= desiredTokens * 0.9 && !hasTooManyTokens;
     const needsNewTokens = datasetId !== tokens?.datasetId;
@@ -63,7 +63,7 @@ export default function TokeniseData() {
             deactivated={auditMode}
         >
             <Box
-                style={{ width: '320px', minHeight: '200px' }}
+                style={{ width: '320px', minHeight: '260px' }}
                 active={done}
                 disabled={istraining}
                 useParent
@@ -73,7 +73,13 @@ export default function TokeniseData() {
                 <div className={style.container}>
                     <BoxTitle
                         title={t('tokeniseData.title')}
-                        status={done && !needsNewTokens ? 'done' : 'waiting'}
+                        status={
+                            done && !needsNewTokens
+                                ? 'done'
+                                : !model || status === 'awaitingTokens'
+                                  ? 'disabled'
+                                  : 'waiting'
+                        }
                         onSettings={() => navigate('tokenise-settings')}
                     />
                     <div className={style.progressBox}>

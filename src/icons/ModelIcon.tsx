@@ -51,41 +51,35 @@ export default function ModelIcon({ model, noExtraIcon }: Props) {
         <div className={style.container}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox={noExtraIcon ? '0 0 48 48' : '0 0 64 64'}
+                viewBox={'0 0 24 24'}
                 fill="currentColor"
-                width={noExtraIcon ? '1em' : '1.2em'}
-                height={noExtraIcon ? '1em' : '1.2em'}
+                width={'1em'}
+                height={'1em'}
                 className={noExtraIcon ? style.smallIcon : style.icon}
             >
-                <circle
-                    cx={noExtraIcon ? '24' : '32'}
-                    cy={noExtraIcon ? '24' : '32'}
-                    r={noExtraIcon ? '23' : '31'}
-                    className={style.circle}
-                />
-                <g transform={noExtraIcon ? 'translate(12 10)' : 'translate(16 14)'}>
+                <g>
                     <path
-                        d="M0 1 L8 7 L8 25 L0 31 L32 31 L24 25 L24 7 L32 1 Z"
-                        className={style.hourglass}
-                    />
-                    <path
-                        d="M0 1 L32 1 L32 3 L0 3 Z"
+                        d="M0 2 L24 2"
                         className={style.vocab}
                     />
                     <path
-                        d="M8 7 L 24 7 L24 11 L8 11 Z"
+                        d="M6 6 L 18 6"
                         className={style.layer}
                     />
                     <path
-                        d="M8 14 L 24 14 L24 18 L8 18 Z"
+                        d="M6 10 L 18 10"
                         className={style.layer}
                     />
                     <path
-                        d="M8 21 L 24 21 L24 25 L8 25 Z"
+                        d="M6 14 L 18 14"
                         className={style.layer}
                     />
                     <path
-                        d="M0 29 L32 29 L32 31 L0 31 Z"
+                        d="M6 18 L 18 18"
+                        className={style.layer}
+                    />
+                    <path
+                        d="M0 22 L24 22"
                         className={style.vocab}
                     />
                 </g>

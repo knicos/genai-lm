@@ -2,10 +2,6 @@ import UserItem from './UserItem';
 import AssistantItem from './AssistantItem';
 import style from './style.module.css';
 import { useEffect, useReducer, useState, useRef } from 'react';
-
-import { Button } from '@genai-fi/base';
-import { useTranslation } from 'react-i18next';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import type { GeneratorConversation } from '@genai-fi/nanogpt';
 import type { TokenSelectState } from '../../state/uiState';
 import type { ConversationHighlight } from '../../state/generator';
@@ -30,7 +26,6 @@ export default function ConversationDisplay({
     highlights,
 }: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
-    const { t } = useTranslation();
     const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
     const listRef = useRef<HTMLDivElement>(null);
     const lengthRef = useRef<number>(0);
@@ -103,29 +98,6 @@ export default function ConversationDisplay({
                         }
                     />
                 )
-            )}
-            {editable && (
-                <div className={style.buttonRow}>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<AddBoxIcon />}
-                        disabled={conversation === undefined}
-                        onClick={() => {
-                            conversation?.push({
-                                role:
-                                    conversation.length === 0 ||
-                                    conversation[conversation.length - 1].role === 'assistant'
-                                        ? 'user'
-                                        : 'assistant',
-                                content: '',
-                            });
-                            forceRender();
-                        }}
-                    >
-                        {t('conversation.addMessage')}
-                    </Button>
-                </div>
             )}
         </div>
     );

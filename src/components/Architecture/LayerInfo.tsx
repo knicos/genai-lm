@@ -1,13 +1,13 @@
 import style from './style.module.css';
 import { GPTConfig } from '@genai-fi/nanogpt';
-import { useAtomValue } from 'jotai';
-import { modelConfigAtom } from '../../state/model';
+import { ExtendedConfig } from '../../state/model';
 import prettyNumber from '../../utilities/prettyNumber';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
     index: number;
     hiddenSize: number;
+    arch: ExtendedConfig;
 }
 
 function estimateLayerParameters(config: GPTConfig): number {
@@ -19,8 +19,7 @@ function estimateLayerParameters(config: GPTConfig): number {
     return attentionParams + mlpParams;
 }
 
-export default function LayerInfo({ index, hiddenSize }: Props) {
-    const arch = useAtomValue(modelConfigAtom);
+export default function LayerInfo({ index, hiddenSize, arch }: Props) {
     const params = index >= 0 ? estimateLayerParameters(arch) : arch.nEmbed * arch.vocabSize;
     const { t } = useTranslation();
 
