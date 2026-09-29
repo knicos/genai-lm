@@ -12,7 +12,7 @@ export const apiSettingsAtom = atomWithStorage<ApiSettings>(
     {
         endpoint: 'http://localhost:1234',
         apiKey: undefined,
-        modelName: 'google/gemma-3-1b',
+        modelName: 'mistralai/ministral-3-3b',
     },
     storage
 );

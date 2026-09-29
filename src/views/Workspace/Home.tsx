@@ -3,7 +3,7 @@ import style from './home.module.css';
 import Step from './Step';
 import { HomeBanner, Privacy } from '@genai-fi/base';
 import { useAtomValue } from 'jotai';
-import { featureFlagsAtom } from '../../state/uiState';
+import { featureFlagsAtom, FeatureFlags } from '../../state/uiState';
 
 const TEMPLATES = [
     {
@@ -31,11 +31,22 @@ const TEMPLATES = [
 
 const gitTag = typeof __GIT_TAG__ !== 'undefined' ? __GIT_TAG__ : 'unknown';
 
+function filterTemplates(templates: typeof TEMPLATES, features: FeatureFlags) {
+    return templates.filter((item) => {
+        if (item.variant === 'audit' && !features.allowAudit) {
+            return false;
+        } else if (item.variant === 'finetune' && !features.allowFineTune) {
+            return false;
+        }
+        return true;
+    });
+}
+
 export default function Home() {
-    const { allowAudit } = useAtomValue(featureFlagsAtom);
+    const features = useAtomValue(featureFlagsAtom);
     const { t } = useTranslation();
 
-    const templates = allowAudit ? TEMPLATES : TEMPLATES.filter((item) => item.variant !== 'audit');
+    const templates = filterTemplates(TEMPLATES, features);
 
     return (
         <div className={style.homeContainer}>

@@ -21,9 +21,11 @@ export interface TokenSelectState {
 
 export const uiSelectedTokens = atom<TokenSelectState | null>(null);
 
-interface FeatureFlags {
+export interface FeatureFlags {
     allowReportProblem?: boolean;
     allowAudit?: boolean;
+    allowFineTune?: boolean;
+    allowAutoTune?: boolean;
 }
 
 function applyFeatureOverridesFromUrl(features: FeatureFlags): FeatureFlags {
@@ -54,11 +56,14 @@ export const featureFlagsAtom = atom(async () => {
         );
         const data: { features: FeatureFlags } = await response.json();
         const features = data.features as FeatureFlags;
+        console.log('Fetched feature flags:', features);
         return applyFeatureOverridesFromUrl(features);
     } catch {
         return applyFeatureOverridesFromUrl({
             allowReportProblem: false,
             allowAudit: false,
+            allowFineTune: false,
+            allowAutoTune: false,
         });
     }
 });

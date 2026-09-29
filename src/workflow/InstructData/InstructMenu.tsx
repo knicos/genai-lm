@@ -5,6 +5,8 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import { featureFlagsAtom } from '../../state/uiState';
+import { useAtomValue } from 'jotai';
 
 interface Props {
     onAutoPrompt: () => void;
@@ -16,6 +18,7 @@ interface Props {
 
 export default function InstructMenu({ onAutoPrompt, disabled, onUpload, onDownload, onDeleteAll }: Props) {
     const { t } = useTranslation();
+    const features = useAtomValue(featureFlagsAtom);
 
     return (
         <BoxMenu>
@@ -44,15 +47,17 @@ export default function InstructMenu({ onAutoPrompt, disabled, onUpload, onDownl
                 {t('instruct.deleteAll')}
             </VerticalButton>
             <div style={{ flexGrow: 1 }} />
-            <VerticalButton
-                disabled={disabled}
-                color="primary"
-                variant="text"
-                onClick={onAutoPrompt}
-                startIcon={<AutoAwesomeIcon color="inherit" />}
-            >
-                {t('instruct.autoTune')}
-            </VerticalButton>
+            {features.allowAutoTune && (
+                <VerticalButton
+                    disabled={disabled}
+                    color="primary"
+                    variant="text"
+                    onClick={onAutoPrompt}
+                    startIcon={<AutoAwesomeIcon color="inherit" />}
+                >
+                    {t('instruct.autoTune')}
+                </VerticalButton>
+            )}
         </BoxMenu>
     );
 }

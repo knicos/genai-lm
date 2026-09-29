@@ -7,6 +7,20 @@ import { conversationDataAtom } from '../../state/data';
 
 vi.mock('file-saver', () => ({ saveAs: vi.fn() }));
 vi.mock('../../state/storage');
+vi.mock('../../state/uiState', async (importOriginal) => {
+    const original = await importOriginal<typeof import('../../state/uiState')>();
+    const { atom } = await import('jotai');
+
+    return {
+        ...original,
+        featureFlagsAtom: atom({
+            allowReportProblem: false,
+            allowAudit: true,
+            allowFineTune: true,
+            allowAutoTune: true,
+        }),
+    };
+});
 
 describe('InstructData workflow', () => {
     it('renders', async ({ expect }) => {

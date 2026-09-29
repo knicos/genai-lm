@@ -1,81 +1,117 @@
-import { Button } from '@genai-fi/base';
-import { TextField } from '@mui/material';
+import { Button, Spinner } from '@genai-fi/base';
+import { FormControl, Slider, TextField } from '@mui/material';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { conversationDataAtom, dataEntries } from '../../state/data';
+import { conversationDataAtom } from '../../state/data';
 // import InstructGenerator from '../../utilities/InstructGenerator';
 // import { Conversation } from '@genai-fi/nanogpt';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { loadedModelAtom } from '../../state/model';
+import { apiSettingsAtom } from '../../state/api';
 // import { createDatasetFromEntries } from '../../utilities/dataset';
+import AutoTune from '../../services/AutoTune';
+import style from './style.module.css';
 
 export function Component() {
     const { t } = useTranslation();
-    const dataset = useAtomValue(dataEntries);
+    const model = useAtomValue(loadedModelAtom);
+    const settings = useAtomValue(apiSettingsAtom);
     const setConversations = useSetAtom(conversationDataAtom);
     const [generating, setGenerating] = useState(false);
     const [prompt, setPrompt] = useState('');
+    const [user, setUser] = useState('');
+    const [size, setSize] = useState(10);
+    const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-        if (generating) {
-            /*const generator = new InstructGenerator();
-            console.log('Starting instruction generation...');
-            generator.on('conversation', (convo: Conversation[]) => {
-                console.log('New conversation generated:', convo);
-                setConversations(async (old: Conversation[][] | Promise<Conversation[][]>) => [...(await old), convo]);
-            });
-            generator
-                .initialize()
-                .then(async () => {
-                    const data = await createDatasetFromEntries(dataset);
-                    generator
-                        .start({
-                            dataSet: data.map((entry) => entry.map((item) => item.content).flat()).flat(2) as string[],
-                            count: 10,
-                            rate: 1,
-                            mode: 'direct',
-                            templates: [{ template: prompt }],
-                        })
-                        .then(() => {
-                            setGenerating(false);
-                        })
-                        .catch((err) => {
-                            console.error('Error during instruction generation:', err);
-                            setGenerating(false);
-                        });
-                })
-                .catch((err) => {
-                    console.error('Error initializing generator:', err);
-                    setGenerating(false);
+    const doTune = async () => {
+        setGenerating(true);
+        try {
+            if (model) {
+                const tuner = new AutoTune(model, settings);
+
+                const counter = {
+                    count: 0,
+                };
+
+                tuner.on('conversation', (conversation) => {
+                    setConversations(async (prev) => [...(await prev), conversation]);
+                    counter.count += 1;
+                    setProgress(counter.count / size);
                 });
-            return () => {
-                generator.stop();
-            };*/
+
+                await tuner.tune({
+                    instruction: prompt,
+                    size: size,
+                    user: user.length > 0 ? user : undefined,
+                });
+                //setConversations(conversations);
+
+                tuner.removeAllListeners();
+            }
+        } catch (err) {
+            console.error('Error during AutoTune:', err);
+        } finally {
+            setGenerating(false);
         }
-    }, [generating, dataset, setConversations, prompt]);
+    };
 
     return (
         <div className="sidePanel">
             <h2>{t('instruct.autoTune')}</h2>
-            <TextField
-                label={t('instruct.autoTunePrompt')}
-                multiline
-                minRows={6}
-                maxRows={12}
-                variant="outlined"
-                fullWidth
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                style={{ marginBottom: '16px' }}
-            />
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={async () => {
-                    setGenerating(true);
-                }}
-            >
-                {t('instruct.generateTuneData')}
-            </Button>
+            <div className={style.container}>
+                <TextField
+                    label={t('instruct.userCharacteristics')}
+                    multiline
+                    minRows={4}
+                    maxRows={8}
+                    variant="outlined"
+                    fullWidth
+                    value={user}
+                    onChange={(e) => setUser(e.target.value)}
+                    style={{ marginBottom: '16px' }}
+                />
+                <TextField
+                    label={t('instruct.autoTunePrompt')}
+                    multiline
+                    minRows={6}
+                    maxRows={12}
+                    variant="outlined"
+                    fullWidth
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    style={{ marginBottom: '16px' }}
+                />
+                <FormControl className={style.sliderControl}>
+                    <div
+                        id="epochs-label"
+                        className={style.label}
+                    >
+                        {t('instruct.autotuneSize')}
+                    </div>
+                    <Slider
+                        aria-labelledby="epochs-label"
+                        value={size}
+                        onChange={(_: unknown, value: number) => setSize(value as number)}
+                        min={1}
+                        max={100}
+                        step={1}
+                        valueLabelDisplay="auto"
+                    />
+                </FormControl>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={doTune}
+                >
+                    {t('instruct.generateTuneData')}
+                </Button>
+                {generating && (
+                    <div className={style.overlay}>
+                        <Spinner size="large" />
+                        <div>{Math.round(progress * 100)}%</div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

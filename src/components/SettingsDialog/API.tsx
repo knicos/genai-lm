@@ -24,6 +24,13 @@ export default function APISettings() {
                     onChange={(e) => setApiSettings({ ...apiSettings, apiKey: e.target.value })}
                     fullWidth
                 />
+                <div className={style.spacer} />
+                <TextField
+                    label={t('app.settings.modelName')}
+                    value={apiSettings.modelName || ''}
+                    onChange={(e) => setApiSettings({ ...apiSettings, modelName: e.target.value })}
+                    fullWidth
+                />
             </div>
         </div>
     );
