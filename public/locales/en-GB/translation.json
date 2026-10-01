@@ -409,7 +409,8 @@
             "indexing": "Indexing...",
             "tokenising": "Tokenising... {{count}}",
             "noSelection": "Select some text in the output to see results.",
-            "noResults": "No matches found."
+            "noResults": "No matches found.",
+            "noData": "Training data is not available for this model."
         }
     },
     "evaluation": {

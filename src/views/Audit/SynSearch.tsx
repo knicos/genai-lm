@@ -106,7 +106,8 @@ export default function SynSearch() {
             {isReady && selection && results.length === 0 && (
                 <Alert severity="info">{t('audit.syntactic.noResults')}</Alert>
             )}
-            {!selection && <Alert severity="info">{t('audit.syntactic.noSelection')}</Alert>}
+            {!selection && entries.length > 0 && <Alert severity="info">{t('audit.syntactic.noSelection')}</Alert>}
+            {entries.length === 0 && <Alert severity="warning">{t('audit.syntactic.noData')}</Alert>}
             <ul className={style.resultList}>
                 {results.map((result, i) => (
                     <TextSearchResult

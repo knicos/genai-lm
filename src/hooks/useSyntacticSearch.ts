@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { TokenSelectState } from '../state/uiState';
 import type { ExtendedGeneratorConversation } from '../state/generator';
-import { TeachableLLM } from '@genai-fi/nanogpt';
+import { TeachableLLM, tokenise } from '@genai-fi/nanogpt';
 import { DataTokens, DataEntry } from '../state/data';
 import Downloader from '../utilities/downloader';
 import { autoTokeniseData } from '../workflow/TextTraining/utilities';
@@ -15,6 +15,19 @@ interface ResultStats {
     partialMatches: number;
 }
 
+const indexCache = new Map<string, NGramSearch>();
+
+function getOrCreateIndex(datasetId: string, tokens: tokenise.TokenStore, n: number) {
+    const index = indexCache.get(datasetId);
+    if (index) {
+        return index;
+    }
+    const newIndex = new NGramSearch(tokens, n);
+    indexCache.clear();
+    indexCache.set(datasetId, newIndex);
+    return newIndex;
+}
+
 export default function useSyntacticSearch(
     model: TeachableLLM | null,
     dataset: DataTokens | null,
@@ -26,15 +39,11 @@ export default function useSyntacticSearch(
     const [tokeniseProgress, setTokeniseProgress] = useState<number | null>(null);
     const busyRef = useRef(false);
     const [indexProgress, setIndexProgress] = useState<number | null>(null);
-    const indexRef = useRef<NGramSearch | null>(null);
+    //const indexRef = useRef<NGramSearch | null>(null);
     const [results, setResults] = useState<PrettyResult[]>([]);
     const [searching, setSearching] = useState(false);
     const [resultStats, setResultStats] = useState<ResultStats | null>(null);
     const fullResultsRef = useRef<ContextualisedResult[] | null>(null);
-
-    useEffect(() => {
-        indexRef.current = null;
-    }, [dataset]);
 
     const doClear = useCallback(() => {
         setResults([]);
@@ -51,7 +60,7 @@ export default function useSyntacticSearch(
 
             let actualDataset = dataset;
 
-            if (!dataset && entries && model) {
+            if (!dataset && entries && model && entries.length > 0) {
                 const downloaders = entries
                     .map((entry) => (entry.downloader && !entry.hasLoaded ? entry.downloader : null))
                     .filter(Boolean) as Downloader[];
@@ -79,9 +88,7 @@ export default function useSyntacticSearch(
                 if (selectedText && model) {
                     const startTime = performance.now();
                     try {
-                        const ngramSearch = indexRef.current
-                            ? indexRef.current
-                            : new NGramSearch(actualDataset.tokens, 5);
+                        const ngramSearch = getOrCreateIndex(datasetId, actualDataset.tokens, 5);
 
                         ngramSearch.on('indexProgress', (progress) => setIndexProgress(progress));
                         ngramSearch.on('status', (status) => {
@@ -93,7 +100,6 @@ export default function useSyntacticSearch(
                         });
 
                         await ngramSearch.assertReady();
-                        indexRef.current = ngramSearch;
 
                         setSearching(true);
 
