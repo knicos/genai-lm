@@ -73,6 +73,8 @@ export default function useGenerate(setOutput: (output: ExtendedGeneratorConvers
             try {
                 model.responses.on('done', doneHandler);
                 const response = await model.responses.create(options, h);
+                convoRef.current = response.output;
+                setOutput(response.output.slice());
                 busyRef.current = response.id;
                 return response.id;
             } catch {

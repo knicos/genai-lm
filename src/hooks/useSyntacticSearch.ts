@@ -58,6 +58,9 @@ export default function useSyntacticSearch(
             }
             busyRef.current = true;
 
+            setResults([]);
+            setResultStats(null);
+
             let actualDataset = dataset;
 
             if (!dataset && entries && model && entries.length > 0) {

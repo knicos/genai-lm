@@ -297,6 +297,9 @@
         "busy": "Model working...",
         "noModel": "No model",
         "error": "Model broke",
+        "archType": {
+            "label": "Architecture"
+        },
         "inputContext": "Input Vocabulary",
         "outputProbabilities": "Output Probabilities",
         "parametersHelp": "The **total number of numeric parameters** in the model.\n\nMore parameters allow the model to learn more patterns but will require more memory, time and data to train.",
@@ -387,17 +390,18 @@
         "title": "Audit Toolkit",
         "startPrompt": "Audit the model",
         "tools": {
-            "beam": "Variants",
+            "beam": "Alternatives",
             "memorization": "Exact Match",
             "confidence": "Confidence",
             "score": "Probability"
         },
         "beaming": {
-            "title": "Variants",
-            "help": "The **Variants** tool shows the most likely alternative sequences for the selected tokens, along with the probability.\n\n**Usage:** Select text in the output box.\n\nIt uses an algorithm called *beam search* to explore multiple most likely continuations simultaneously.",
-            "noBeams": "Select some text in the output to see variants.",
+            "title": "Alternatives",
+            "help": "The **Alternatives** tool shows the most likely alternative sequences for the selected tokens, along with the probability.\n\n**Usage:** Select text in the output box.\n\nIt uses a best-first search algorithm to explore multiple most likely continuations simultaneously.",
+            "noBeams": "Select some text in the output to see alternatives.",
             "highlightProbs": "Highlight token probabilities",
-            "candidates": "Predicted {{count}} variations."
+            "candidates": "Predicted {{count}} alternatives.",
+            "more": "Show more"
         },
         "syntactic": {
             "title": "Exact Match Search",

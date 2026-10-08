@@ -5,10 +5,9 @@ import { useEffect } from 'react';
 import { uiSelectedTokens, uiTokenSelectLength } from '../../state/uiState';
 import { rawGeneratedTextAtom } from '../../state/generator';
 import style from './SynSearch.module.css';
-import { Button, Spinner } from '@genai-fi/base';
+import { BusyButton } from '@genai-fi/base';
 import { Alert, LinearProgress } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Help } from '@genai-fi/base';
 import DownloadProgress from '../../components/DownloadProgress/DownloadProgress';
 import prettyNumber from '../../utilities/prettyNumber';
@@ -116,24 +115,20 @@ export default function SynSearch() {
                     />
                 ))}
             </ul>
-            {hasMore && (
-                <div className={style.moreButtonContainer}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<ExpandMoreIcon />}
-                        onClick={() => {
-                            more(selection, conversation);
-                        }}
-                    >
-                        {t('audit.syntactic.more')}
-                    </Button>
-                </div>
-            )}
-            {searching && (
-                <div className={style.searchingIndicator}>
-                    <Spinner />
-                </div>
-            )}
+
+            <div className={style.moreButtonContainer}>
+                <BusyButton
+                    busy={searching}
+                    disabled={!selection || !hasMore}
+                    variant="contained"
+                    fullWidth
+                    onClick={() => {
+                        more(selection, conversation);
+                    }}
+                >
+                    {t('audit.syntactic.more')}
+                </BusyButton>
+            </div>
         </div>
     );
 }

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import type { IBeam, GeneratorConversation } from '@genai-fi/nanogpt';
 import { loadedModelAtom } from '../../state/model';
 import { rawGeneratedTextAtom } from '../../state/generator';
-import { Help, PercentageBar } from '@genai-fi/base';
+import { BusyButton, Help, PercentageBar } from '@genai-fi/base';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
@@ -49,6 +49,7 @@ export default function Beaming() {
     const [highlightProbs, setHighlightProbs] = useAtom(uiTokenHighlightMode);
     const { generate } = useGenerate(setConversation);
     const settings = useAtomValue(generatorSettings);
+    const [beamId, setBeamId] = useState<string | null>(null);
 
     useEffect(() => {
         setSelectionLength(24);
@@ -76,7 +77,9 @@ export default function Beaming() {
                 beams: 5,
                 topP: 0.9,
                 endOnWhiteSpace: true,
+                keepDuplicates: false,
             });
+            setBeamId(beamid);
             const progressHandler = (id: string, beams: IBeam[]) => {
                 if (id === beamid) {
                     setBeams(beams);
@@ -115,7 +118,12 @@ export default function Beaming() {
                 <h3>{t('audit.beaming.title')}</h3>
             </Help>
             {beams.length === 0 ? (
-                <Alert severity="info">{t('audit.beaming.noBeams')}</Alert>
+                <Alert
+                    severity="info"
+                    sx={{ marginBottom: '1rem' }}
+                >
+                    {t('audit.beaming.noBeams')}
+                </Alert>
             ) : (
                 <ul className={style.beamingList}>
                     {beams.map((beam, index) => (
@@ -165,8 +173,56 @@ export default function Beaming() {
                     ))}
                 </ul>
             )}
+            <BusyButton
+                busy={busy}
+                disabled={
+                    !model ||
+                    !beamId ||
+                    !selection ||
+                    (beams.length > 0 && beams[beams.length - 1].candidates === beams.length)
+                }
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                    if (!model || !beamId || !selection) return;
+                    const oldBeams = beams;
+                    const progressHandler = (id: string, beams: IBeam[]) => {
+                        if (id === beamId) {
+                            setBeams([...oldBeams, ...beams]);
+                        }
+                    };
+                    const originalText =
+                        conversation[selection.conversationIndex]?._output
+                            ?.slice(selection.startToken, selection.endToken + 1)
+                            .map((o) => o.text)
+                            .join('') ?? '';
+                    model.beaming.on('progress', progressHandler);
+                    const doneHandler = (id: string, beams: IBeam[]) => {
+                        if (id === beamId) {
+                            setBeams([
+                                ...oldBeams,
+                                ...beams.map((beam) => ({
+                                    ...beam,
+                                    isOriginal: beam.text.slice(0, originalText.length) === originalText,
+                                })),
+                            ]);
+                            setBusy(false);
+                            model.beaming.off('progress', progressHandler);
+                            model.beaming.off('done', doneHandler);
+                        }
+                    };
+                    model.beaming.on('done', doneHandler);
+                    model.beaming.on('progress', progressHandler);
+                    model.beaming.more(beamId);
+                }}
+            >
+                {t('audit.beaming.more')}
+            </BusyButton>
             {beams.length > 0 && (
-                <div className={style.candidates}>{t('audit.beaming.candidates', { count: beams[0].candidates })}</div>
+                <div className={style.candidates}>
+                    {t('audit.beaming.candidates', { count: beams[beams.length - 1].candidates })}
+                </div>
             )}
             <FormControlLabel
                 sx={{ marginTop: '1rem' }}
