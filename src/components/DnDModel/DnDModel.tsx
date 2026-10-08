@@ -5,8 +5,8 @@ import { useState, useRef, RefObject, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import BoxNotice, { Notice } from '../BoxTitle/BoxNotice';
-import { useAtom } from 'jotai';
-import { modelAtom } from '../../state/model';
+import { useAtom, useAtomValue } from 'jotai';
+import { modelAtom, modelDownloadAtom } from '../../state/model';
 import { TeachableLLM } from '@genai-fi/nanogpt';
 import SearchIcon from '@mui/icons-material/Search';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -28,6 +28,7 @@ export default function DnDModel({ onSearch }: Props) {
     const [message, setMessage] = useState<Notice | null>(null);
     const fileRef = useRef<HTMLInputElement | null>(null);
     const [model, setModel] = useAtom(modelAtom);
+    const downloader = useAtomValue(modelDownloadAtom);
     const [busy, setBusy] = useState(false);
 
     useEffect(() => {
@@ -73,7 +74,7 @@ export default function DnDModel({ onSearch }: Props) {
         []
     );
 
-    return busy ? (
+    return busy || downloader ? (
         <Spinner size="large" />
     ) : (
         <div

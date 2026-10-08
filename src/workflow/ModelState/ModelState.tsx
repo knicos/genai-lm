@@ -120,6 +120,7 @@ export default function ModelState({ minimised }: Props) {
     );
 
     const spin = (model && status !== 'ready' && status !== 'awaitingTokens') || downloader;
+    const isMinimised = minimise && !spin;
 
     return (
         <Help
@@ -129,7 +130,7 @@ export default function ModelState({ minimised }: Props) {
             keepOpen
         >
             <BoxStandalone
-                className={`${style.modelThread} ${minimise ? style.minimised : ''}`}
+                className={`${style.modelThread} ${isMinimised ? style.minimised : ''}`}
                 active={done}
             >
                 <input
@@ -157,7 +158,7 @@ export default function ModelState({ minimised }: Props) {
                     ref={anchorRef}
                 >
                     <IconButton
-                        className={style.icon}
+                        className={`${style.icon} ${spin ? style.minimisedIcon : ''}`}
                         onClick={() => setMinimise(!minimise)}
                     >
                         {!spin && <ModelIcon model={model ?? undefined} />}
@@ -170,7 +171,7 @@ export default function ModelState({ minimised }: Props) {
                             </div>
                         )}
                     </IconButton>
-                    {!minimise && (
+                    {!isMinimised && (
                         <>
                             {!spin && model && (
                                 <div className={style.nameStatusGroup}>

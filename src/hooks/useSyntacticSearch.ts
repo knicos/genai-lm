@@ -17,6 +17,8 @@ interface ResultStats {
 
 const indexCache = new Map<string, NGramSearch>();
 
+const NGRAM = 5;
+
 function getOrCreateIndex(datasetId: string, tokens: tokenise.TokenStore, n: number) {
     const index = indexCache.get(datasetId);
     if (index) {
@@ -83,15 +85,24 @@ export default function useSyntacticSearch(
             }
 
             if (actualDataset?.tokens && selection) {
-                const selectedText = conversation[selection.conversationIndex]._output?.slice(
-                    selection.startToken,
-                    selection.endToken + 1
+                // Adjust selection to ensure it has at least an n-gram (5 tokens)
+                const adjustedSelection = { ...selection };
+
+                const selectionLength = adjustedSelection.endToken - adjustedSelection.startToken + 1;
+                if (selectionLength < NGRAM) {
+                    const expandBy = NGRAM - selectionLength;
+                    adjustedSelection.startToken = Math.max(0, adjustedSelection.startToken - Math.floor(expandBy / 2));
+                    adjustedSelection.endToken = adjustedSelection.endToken + Math.ceil(expandBy / 2);
+                }
+
+                const selectedText = conversation[adjustedSelection.conversationIndex]._output?.slice(
+                    adjustedSelection.startToken,
+                    adjustedSelection.endToken + 1
                 );
 
                 if (selectedText && model) {
-                    const startTime = performance.now();
                     try {
-                        const ngramSearch = getOrCreateIndex(datasetId, actualDataset.tokens, 5);
+                        const ngramSearch = getOrCreateIndex(datasetId, actualDataset.tokens, NGRAM);
 
                         ngramSearch.on('indexProgress', (progress) => setIndexProgress(progress));
                         ngramSearch.on('status', (status) => {
@@ -117,7 +128,12 @@ export default function useSyntacticSearch(
 
                         ngramSearch.removeAllListeners();
 
-                        const contextResults = addContextToResults(conversation, selection, resultInfo.results, 20);
+                        const contextResults = addContextToResults(
+                            conversation,
+                            adjustedSelection,
+                            resultInfo.results,
+                            20
+                        );
                         fullResultsRef.current = contextResults;
 
                         const slicedResults = contextResults.slice(0, 5);
@@ -128,9 +144,6 @@ export default function useSyntacticSearch(
                     } catch (error) {
                         console.error('Error during bloom search:', error);
                         setSearching(false);
-                    } finally {
-                        const endTime = performance.now();
-                        console.log(`Total search took ${endTime - startTime} ms`);
                     }
                 }
             }

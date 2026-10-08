@@ -391,7 +391,7 @@
         "startPrompt": "Audit the model",
         "tools": {
             "beam": "Alternatives",
-            "memorization": "Exact Match",
+            "memorization": "Data Match",
             "confidence": "Confidence",
             "score": "Probability"
         },
@@ -404,8 +404,8 @@
             "more": "Show more"
         },
         "syntactic": {
-            "title": "Exact Match Search",
-            "help": "The **Exact Match** tool will find the best matches in the training data for the selected output text.",
+            "title": "Data Match",
+            "help": "The **Data Match** tool will find the best matches in the training data for the selected output text.",
             "approximate": "Approximately {{count}} exact matches",
             "exact": "{{count}} exact match(es)",
             "partial": "{{count}} partial match(es)",

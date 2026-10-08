@@ -10,6 +10,10 @@
     color: white;
 }
 
+.icon.minimisedIcon {
+    margin-left: 0.5rem;
+}
+
 .loadingIcon {
     font-size: 3rem;
     width: 1.2em;
