@@ -11,9 +11,10 @@ interface Props {
     onModel?: (updater: (old: TeachableLLM | null) => TeachableLLM) => void;
     config?: ExtendedConfig;
     onConfig?: (config: ExtendedConfig) => void;
+    onClose?: () => void;
 }
 
-export default function SearchContent({ model, config }: Props) {
+export default function SearchContent({ model, config, onClose }: Props) {
     const dataRows = useAtomValue(trainedModelManifest);
     const setDownload = useSetAtom(modelDownloadAtom);
     const selectedSet =
@@ -30,8 +31,9 @@ export default function SearchContent({ model, config }: Props) {
                 // Not possible
                 console.warn('No URL or downloader for trained model, cannot load');
             }
+            onClose?.();
         },
-        [setDownload]
+        [setDownload, onClose]
     );
 
     return (

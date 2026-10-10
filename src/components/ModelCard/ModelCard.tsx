@@ -140,7 +140,11 @@ export default function ModelCard({ onSelect, onHighlight, used, card, highlight
                         {!isNone && (
                             <div
                                 className={style.sizeText}
-                                style={{ fontSize: `${fontSize}rem`, width: `${fontSize * 2.3}rem` }}
+                                style={{
+                                    fontSize: `${fontSize}rem`,
+                                    width: `${fontSize * 2.3}rem`,
+                                    height: `${fontSize * 2.3}rem`,
+                                }}
                             >
                                 {size >= 1000
                                     ? `${Math.round(size / 1000)}B`

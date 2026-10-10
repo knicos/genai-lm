@@ -11,9 +11,10 @@ interface Props {
     onModel?: (updater: (old: TeachableLLM | null) => TeachableLLM) => void;
     config?: ExtendedConfig;
     onConfig?: (config: ExtendedConfig) => void;
+    onClose?: () => void;
 }
 
-export default function SearchContent({ model, onModel, config, onConfig }: Props) {
+export default function SearchContent({ model, onModel, config, onConfig, onClose }: Props) {
     const dataRows = useAtomValue(untrainedModelManifest);
     const selectedSet =
         model && model.meta.id ? new Set([model.meta.id]) : config && config.id ? new Set([config.id]) : undefined;
@@ -40,8 +41,9 @@ export default function SearchContent({ model, onModel, config, onConfig }: Prop
                     onConfig({ ...card.config, id: card.id });
                 }
             }
+            onClose?.();
         },
-        [onModel, onConfig]
+        [onModel, onConfig, onClose]
     );
 
     return (

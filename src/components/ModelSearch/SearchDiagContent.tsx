@@ -46,8 +46,9 @@ export default function SearchDiagContent({ trained, allowFileOpen, onClose, ...
                     });*/
                 return model;
             });
+            onClose?.();
         },
-        [setModel]
+        [setModel, onClose]
     );
     return (
         <>
@@ -122,7 +123,17 @@ export default function SearchDiagContent({ trained, allowFileOpen, onClose, ...
                     </div>
                 }
             >
-                {trained ? <SearchTrained {...props} /> : <SearchUntrained {...props} />}
+                {trained ? (
+                    <SearchTrained
+                        {...props}
+                        onClose={onClose}
+                    />
+                ) : (
+                    <SearchUntrained
+                        {...props}
+                        onClose={onClose}
+                    />
+                )}
             </Suspense>
         </>
     );
