@@ -153,10 +153,13 @@ export default function Beaming() {
                                         {
                                             ...settings,
                                             continuation: true,
+                                            background: true,
                                         },
                                         convo
                                     )
-                                        .then((id) => setId(id))
+                                        .then((id) => {
+                                            setId(id);
+                                        })
                                         .catch((error) => console.error(error));
                                 }
                             }}

@@ -74,10 +74,11 @@ export default function useGenerate(setOutput: (output: ExtendedGeneratorConvers
                 model.responses.on('done', doneHandler);
                 const response = await model.responses.create(options, h);
                 convoRef.current = response.output;
-                setOutput(response.output.slice());
+                setOutput(response.output ? response.output.slice() : []);
                 busyRef.current = response.id;
                 return response.id;
-            } catch {
+            } catch (e) {
+                console.error(e);
                 setMessage({
                     level: 'error',
                     notice: 'generator.errors.generationError',

@@ -56,7 +56,7 @@ export default function AssistantItem({
                 backgroundMode={highlightMode}
                 index={index}
                 activeIndex={activeIndex}
-                onSelect={onSelect}
+                onSelect={busy ? undefined : onSelect}
                 selectLength={selectLength}
                 highlights={highlights}
             />
