@@ -19,6 +19,18 @@ const indexCache = new Map<string, NGramSearch>();
 
 const NGRAM = 5;
 
+function adjustSelection(selection: TokenSelectState) {
+    const adjustedSelection = { ...selection };
+
+    const selectionLength = adjustedSelection.endToken - adjustedSelection.startToken + 1;
+    if (selectionLength < NGRAM) {
+        const expandBy = NGRAM - selectionLength;
+        adjustedSelection.startToken = Math.max(0, adjustedSelection.startToken - Math.floor(expandBy / 2));
+        adjustedSelection.endToken = adjustedSelection.endToken + Math.ceil(expandBy / 2);
+    }
+    return adjustedSelection;
+}
+
 function getOrCreateIndex(datasetId: string, tokens: tokenise.TokenStore, n: number) {
     const index = indexCache.get(datasetId);
     if (index) {
@@ -86,14 +98,7 @@ export default function useSyntacticSearch(
 
             if (actualDataset?.tokens && selection) {
                 // Adjust selection to ensure it has at least an n-gram (5 tokens)
-                const adjustedSelection = { ...selection };
-
-                const selectionLength = adjustedSelection.endToken - adjustedSelection.startToken + 1;
-                if (selectionLength < NGRAM) {
-                    const expandBy = NGRAM - selectionLength;
-                    adjustedSelection.startToken = Math.max(0, adjustedSelection.startToken - Math.floor(expandBy / 2));
-                    adjustedSelection.endToken = adjustedSelection.endToken + Math.ceil(expandBy / 2);
-                }
+                const adjustedSelection = adjustSelection(selection);
 
                 const selectedText = conversation[adjustedSelection.conversationIndex]._output?.slice(
                     adjustedSelection.startToken,
@@ -157,9 +162,10 @@ export default function useSyntacticSearch(
             if (model && selection && fullResultsRef.current) {
                 const start = results.length;
                 const moreResults = fullResultsRef.current?.slice(start, start + 5) || [];
-                const selectedText = conversation[selection.conversationIndex]._output?.slice(
-                    selection.startToken,
-                    selection.endToken + 1
+                const adjustedSelection = adjustSelection(selection);
+                const selectedText = conversation[adjustedSelection.conversationIndex]._output?.slice(
+                    adjustedSelection.startToken,
+                    adjustedSelection.endToken + 1
                 );
                 if (selectedText) {
                     const query = selectedText.map((s) => s.token);

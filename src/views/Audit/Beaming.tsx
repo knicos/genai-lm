@@ -222,11 +222,6 @@ export default function Beaming() {
             >
                 {t('audit.beaming.more')}
             </BusyButton>
-            {beams.length > 0 && (
-                <div className={style.candidates}>
-                    {t('audit.beaming.candidates', { count: beams[beams.length - 1].candidates })}
-                </div>
-            )}
             <FormControlLabel
                 sx={{ marginTop: '1rem' }}
                 control={
