@@ -12,6 +12,7 @@ interface Props {
     highlightMode?: 'none' | 'confidence' | 'score';
     selectLength?: number;
     highlights?: ConversationHighlight[];
+    busy?: boolean;
     onRetry?: (index: number) => void;
     onSelect?: (selection: TokenSelectState | null) => void;
 }
@@ -24,6 +25,7 @@ export default function ConversationDisplay({
     highlightMode = 'none',
     selectLength = 0,
     highlights,
+    busy = false,
 }: Props) {
     const [, forceRender] = useReducer((x) => x + 1, 0);
     const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
@@ -74,7 +76,7 @@ export default function ConversationDisplay({
                         index={index}
                         item={part}
                         active={!editable && index === conversation.length - 1}
-                        busy={!part._completed}
+                        busy={busy ?? false}
                         editable={editable}
                         highlightMode={highlightMode}
                         selectLength={selectLength}

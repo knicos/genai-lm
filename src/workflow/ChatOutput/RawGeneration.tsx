@@ -86,6 +86,7 @@ export default function RawGeneration({ showAudit, onOpen, editable }: Props) {
                 onSelect={setSelection}
                 selectLength={selectionLength}
                 editable={editable}
+                busy={status === 'busy'}
             />
         </div>
     );

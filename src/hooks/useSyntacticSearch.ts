@@ -77,7 +77,15 @@ export default function useSyntacticSearch(
 
             let actualDataset = dataset;
 
-            if (!dataset && entries && model && entries.length > 0) {
+            if (
+                actualDataset &&
+                model &&
+                (actualDataset.tokeniserId !== model.tokeniser.id || actualDataset.tokens.getTokenCount() === 0)
+            ) {
+                actualDataset = null;
+            }
+
+            if (!actualDataset && entries && model && entries.length > 0) {
                 const downloaders = entries
                     .map((entry) => (entry.downloader && !entry.hasLoaded ? entry.downloader : null))
                     .filter(Boolean) as Downloader[];
