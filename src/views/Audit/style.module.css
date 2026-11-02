@@ -77,3 +77,12 @@
     text-align: center;
     font-style: italic;
 }
+
+.buttonContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}

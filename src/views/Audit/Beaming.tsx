@@ -10,20 +10,7 @@ import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
 import useGenerate from '../../hooks/useGenerate';
-
-function sliceConversation(conversation: GeneratorConversation[], index: number, tokenIndex: number) {
-    const sliceConvo = conversation.slice(0, index + 1);
-    if (sliceConvo.length > 0) {
-        const lastMessage = sliceConvo[sliceConvo.length - 1];
-        const slicedOutput = lastMessage._output?.slice(0, tokenIndex);
-        sliceConvo[sliceConvo.length - 1] = {
-            ...lastMessage,
-            _output: slicedOutput,
-            content: slicedOutput?.map((o) => o.text).join('') ?? '',
-        };
-    }
-    return sliceConvo;
-}
+import { sliceConversation, sliceSelectedText } from './utilities';
 
 function safeText(text: string): string {
     const trimmed = text.trim();
@@ -64,11 +51,7 @@ export default function Beaming() {
     useEffect(() => {
         if (selection && model) {
             const convo = sliceConversation(conversation, selection.conversationIndex, selection.startToken);
-            const originalText =
-                conversation[selection.conversationIndex]?._output
-                    ?.slice(selection.startToken, selection.endToken + 1)
-                    .map((o) => o.text)
-                    .join('') ?? '';
+            const originalText = sliceSelectedText(conversation, selection);
             setBusy(true);
 
             model.beaming.cancel();

@@ -3,6 +3,7 @@ import { useChangePath } from '../../hooks/useChangePath';
 import BoxMenu from '../../components/BoxTitle/BoxMenu';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from 'react-i18next';
+import type { HighlightMode } from '../../state/uiState';
 import EditSquareIcon from '@mui/icons-material/EditSquare';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
@@ -19,7 +20,7 @@ interface Props {
     onConfidence?: () => void;
     onScore?: () => void;
     disabled?: boolean;
-    highlightMode?: 'none' | 'confidence' | 'score';
+    highlightMode?: HighlightMode;
     showAudit?: boolean;
     onOpen?: () => void;
 }

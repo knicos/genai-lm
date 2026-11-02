@@ -5,9 +5,10 @@ import { store } from './store';
 import { loadedModelAtom } from './model';
 import type { GeneratorConversation, IGenerateOptions } from '@genai-fi/nanogpt';
 import { atom } from 'jotai';
+import type { HighlightMode } from './uiState';
 
 export interface GeneratorSettings extends IGenerateOptions {
-    highlightMode: 'none' | 'confidence' | 'probability' | 'attention';
+    highlightMode: HighlightMode;
     promptMode: 'none' | 'completion' | 'conversation';
 }
 
@@ -18,6 +19,8 @@ export interface ConversationHighlight {
     colour: 'red' | 'blue' | 'purple' | 'green' | 'orange';
     id?: string;
     strike?: boolean;
+    erase?: boolean;
+    noBackground?: boolean;
 }
 
 export interface ExtendedGeneratorConversation extends GeneratorConversation {

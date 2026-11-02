@@ -8,7 +8,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import type { ConversationHighlight, ExtendedGeneratorConversation } from '../../state/generator';
 import TokenRender from './TokenRender';
-import { TokenSelectState } from '../../state/uiState';
+import type { TokenSelectState, HighlightMode } from '../../state/uiState';
 
 interface Props {
     item: ExtendedGeneratorConversation;
@@ -17,7 +17,7 @@ interface Props {
     index: number;
     activeIndex?: number;
     editable?: boolean;
-    highlightMode?: 'none' | 'confidence' | 'score';
+    highlightMode?: HighlightMode;
     selectLength?: number;
     highlights?: ConversationHighlight[];
     onDelete?: () => void;

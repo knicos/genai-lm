@@ -21,8 +21,8 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@genai-fi/base": "^6.1.2",
-        "@genai-fi/nanogpt": "^1.5.0",
-        "@lmstudio/sdk": "^1.5.0",
+        "@genai-fi/nanogpt": "^1.6.1",
+        "@lmstudio/sdk": "^2.1.0",
         "@mui/icons-material": "^9.3.1",
         "@mui/material": "^9.3.1",
         "@mui/x-charts": "^9.11.1",
@@ -52,8 +52,8 @@
         "@types/react": "^19.2.8",
         "@types/react-dom": "^19.2.4",
         "@vitejs/plugin-react": "^6.0.2",
-        "@vitest/coverage-v8": "^4.0.18",
-        "@vitest/web-worker": "^4.0.18",
+        "@vitest/coverage-v8": "^5.0.5",
+        "@vitest/web-worker": "^5.0.5",
         "@webgpu/types": "^0.1.65",
         "eslint": "^9.39.2",
         "eslint-plugin-react": "^7.37.5",
@@ -64,7 +64,7 @@
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.56.0",
         "vite": "^8.0.16",
-        "vitest": "^4.0.18"
+        "vitest": "^5.0.5"
     },
     "allowScripts": {
         "@genai-fi/nanogpt@1.0.0": true,

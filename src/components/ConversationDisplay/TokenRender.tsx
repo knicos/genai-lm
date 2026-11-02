@@ -1,12 +1,12 @@
 import { IGeneratorOutput } from '@genai-fi/nanogpt';
 import { PointerEvent, useEffect, useRef, useState } from 'react';
-import type { TokenSelectState } from '../../state/uiState';
+import type { TokenSelectState, HighlightMode } from '../../state/uiState';
 import style from './style.module.css';
 import { ConversationHighlight, ExtendedGeneratorConversation } from '../../state/generator';
 
 interface Props {
     item: ExtendedGeneratorConversation;
-    backgroundMode: 'confidence' | 'score' | 'none' | 'custom';
+    backgroundMode: HighlightMode;
     selectLength: number;
     index: number;
     activeIndex?: number;
@@ -25,10 +25,28 @@ interface SelectState {
     timeoutId?: number;
 }
 
-function updateSpanSelections(container: HTMLDivElement, selection: SelectState | null) {
+function updateSpanSelections(
+    container: HTMLDivElement,
+    selection: SelectState | null,
+    backgroundMode?: HighlightMode,
+    outputs?: IGeneratorOutput[]
+) {
     if (!container) {
         return;
     }
+
+    const maxDelta =
+        backgroundMode === 'rescore' && outputs
+            ? outputs.reduce(
+                  (acc, output) =>
+                      Math.max(
+                          acc,
+                          Math.abs((output.rescore ?? output.score ?? 0) - (output.score ?? output.rescore ?? 0))
+                      ),
+                  0.01
+              )
+            : 1;
+
     const spans = container.querySelectorAll('span');
     spans.forEach((span, index) => {
         if (selection) {
@@ -43,6 +61,47 @@ function updateSpanSelections(container: HTMLDivElement, selection: SelectState 
         } else {
             span.classList.remove(style.selected);
         }
+        if (backgroundMode && backgroundMode !== 'none' && outputs) {
+            const output = outputs[index];
+            if (output) {
+                let alpha = 0;
+                let opacity = false;
+                switch (backgroundMode) {
+                    case 'confidence':
+                        alpha = output.confidence ?? 0;
+                        break;
+                    case 'score':
+                        alpha = output.score ?? 0;
+                        break;
+                    case 'rescore':
+                        alpha =
+                            output.rescore !== undefined
+                                ? 1 -
+                                  Math.abs(
+                                      (output.rescore ?? output.score ?? 0) - (output.score ?? output.rescore ?? 0)
+                                  ) /
+                                      maxDelta
+                                : 1;
+                        if (output.rescore === undefined) {
+                            opacity = true;
+                        }
+                        break;
+                }
+
+                const colourMode = backgroundMode === 'rescore' ? 'blue' : 'red';
+                const colorR = ((1 - alpha) * (colourMode === 'blue' ? 0x36 : 0xf4)).toFixed(0);
+                const colorG = ((1 - alpha) * (colourMode === 'blue' ? 0x43 : 0x43)).toFixed(0);
+                const colorB = ((1 - alpha) * (colourMode === 'blue' ? 0xf4 : 0x36)).toFixed(0);
+                span.style.backgroundColor = `#${colourMode === 'blue' ? '008fff' : 'ff8f00'}${toHex(Math.floor((1 - alpha) * 0.3 * 255))}`;
+                //span.style.color = alpha < 0.3 ? 'white' : 'black';
+                if (opacity) {
+                    span.style.opacity = '0.5';
+                } else {
+                    span.style.opacity = '1';
+                }
+                span.style.color = `rgba(${colorR}, ${colorG}, ${colorB}, 1)`;
+            }
+        }
     });
 }
 
@@ -54,10 +113,18 @@ function updateHighlights(container: HTMLDivElement, highlights: ConversationHig
     spans.forEach((span, i) => {
         const hl = testInHighlight(highlights, i, index);
         if (hl) {
-            span.style.setProperty('--highlight-color', hl);
-            span.classList.add(style.highlighted);
+            span.style.setProperty('--highlight-color', hl.colour);
+            if (hl.erase) {
+                span.classList.add(style.erased);
+            } else if (hl.noBackground) {
+                span.classList.add(style.highlightedNoBG);
+            } else {
+                span.classList.add(style.highlighted);
+            }
         } else {
             span.classList.remove(style.highlighted);
+            span.classList.remove(style.erased);
+            span.classList.remove(style.highlightedNoBG);
         }
     });
 }
@@ -90,13 +157,13 @@ function testInHighlight(
     highlights: ConversationHighlight[] | undefined,
     index: number,
     conversationIndex: number
-): string | null {
+): ConversationHighlight | null {
     if (!highlights) {
         return null;
     }
     for (const highlight of highlights) {
         if (index >= highlight.start && index <= highlight.end && highlight.index === conversationIndex) {
-            return highlight.colour;
+            return highlight;
         }
     }
     return null;
@@ -190,15 +257,26 @@ export default function TokenRender({
 
                 const hl = testInHighlight(highlights, i, index);
                 if (hl) {
-                    span.style.setProperty('--highlight-color', HIGHLIGHT_COLOURS[hl]);
-                    span.classList.add(style.highlighted);
+                    span.style.setProperty('--highlight-color', HIGHLIGHT_COLOURS[hl.colour]);
+                    if (hl.noBackground) {
+                        span.classList.add(style.highlightedNoBG);
+                    } else if (hl.erase) {
+                        span.classList.add(style.erased);
+                    } else {
+                        span.classList.add(style.highlighted);
+                    }
                 }
 
                 frag.appendChild(span);
             }
 
             container.appendChild(frag);
-            updateSpanSelections(container, selectionRef.current);
+            updateSpanSelections(
+                container,
+                selectionRef.current,
+                backgroundMode,
+                backgroundMode !== 'none' ? outputs : undefined
+            );
             lastCountRef.current = outputs.length;
         });
     }

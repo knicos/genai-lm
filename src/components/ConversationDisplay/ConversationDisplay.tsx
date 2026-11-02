@@ -3,13 +3,13 @@ import AssistantItem from './AssistantItem';
 import style from './style.module.css';
 import { useEffect, useReducer, useState, useRef } from 'react';
 import type { GeneratorConversation } from '@genai-fi/nanogpt';
-import type { TokenSelectState } from '../../state/uiState';
+import type { TokenSelectState, HighlightMode } from '../../state/uiState';
 import type { ConversationHighlight } from '../../state/generator';
 
 interface Props {
     conversation?: GeneratorConversation[];
     editable?: boolean;
-    highlightMode?: 'none' | 'confidence' | 'score';
+    highlightMode?: HighlightMode;
     selectLength?: number;
     highlights?: ConversationHighlight[];
     busy?: boolean;

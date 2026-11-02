@@ -393,7 +393,9 @@
             "beam": "Alternatives",
             "memorization": "Data Match",
             "confidence": "Confidence",
-            "score": "Probability"
+            "score": "Probability",
+            "eraser": "Eraser",
+            "replacer": "Replacer"
         },
         "beaming": {
             "title": "Alternatives",
@@ -415,6 +417,17 @@
             "noSelection": "Select some text in the output to see results.",
             "noResults": "No matches found.",
             "noData": "Training data is not available for this model."
+        },
+        "eraser": {
+            "title": "Eraser",
+            "help": "The **Eraser** tool allows you to remove specific tokens from the model's output.\n\n**Usage:** Select text in the output box and use the eraser to remove it."
+        },
+        "replacer": {
+            "title": "Replacer",
+            "help": "The **Replacer** tool allows you to replace specific tokens in the model's output and see how this changes the probabilities of each token.\n\n**Usage:** Select text in the output box, edit the tokens and click Go to re-calculate the probabilities.",
+            "reset": "Undo",
+            "go": "Calculate",
+            "selectedText": "Selected Tokens"
         }
     },
     "evaluation": {

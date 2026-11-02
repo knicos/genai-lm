@@ -13,6 +13,20 @@ import { useNavigate } from 'react-router';
 import { rawGeneratedTextAtom, rawGenerationIDAtom } from '../../state/generator';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 
+function validateConversation(data: unknown): data is Conversation[][] {
+    return (
+        Array.isArray(data) &&
+        data.every(
+            (item) =>
+                Array.isArray(item) &&
+                item.every(
+                    (subItem) =>
+                        typeof subItem === 'object' && subItem !== null && 'role' in subItem && 'content' in subItem
+                )
+        )
+    );
+}
+
 export default function InstructData() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -75,7 +89,7 @@ export default function InstructData() {
                                 }
                                 try {
                                     const data = JSON.parse(text);
-                                    if (Array.isArray(data)) {
+                                    if (validateConversation(data)) {
                                         setConversations(data);
                                         setSelected(0);
                                     } else {

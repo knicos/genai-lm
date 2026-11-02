@@ -154,11 +154,23 @@
 }
 
 span.highlighted {
-    background-color: color-mix(in srgb, var(--highlight-color) 20%, white 80%);
-    color: black;
+    background-color: color-mix(in srgb, var(--highlight-color) 20%, white 80%) !important;
+    color: black !important;
     box-sizing: border-box;
     border-radius: 0;
     border-bottom: 2px solid var(--highlight-color);
+}
+
+span.highlightedNoBG {
+    background-color: initial;
+    color: black !important;
+    box-sizing: border-box;
+    border-radius: 0;
+    border-bottom: 2px solid var(--highlight-color);
+}
+
+span.erased {
+    opacity: 0.2;
 }
 
 span.selected {

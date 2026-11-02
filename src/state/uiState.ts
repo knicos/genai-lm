@@ -1,6 +1,8 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
+export type HighlightMode = 'none' | 'confidence' | 'score' | 'rescore';
+
 export const uiShowSettings = atom(false);
 export const uiShowVisualisation = atom(false);
 export const uiShowSidePanel = atom(false);
@@ -9,7 +11,7 @@ export const uiCompactMode = atomWithStorage('uiCompactMode', true);
 export const uiFatalError = atom(false);
 export const uiTokenSelectLength = atom<number>(0);
 export const uiAuditOutput = atom(false);
-export const uiTokenHighlightMode = atom<'none' | 'confidence' | 'score'>('none');
+export const uiTokenHighlightMode = atom<HighlightMode>('none');
 export const uiWhiteWorkspace = atom(false);
 
 export interface TokenSelectState {

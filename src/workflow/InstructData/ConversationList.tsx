@@ -99,7 +99,7 @@ export default function ConversationList({ data, onSelect, onChange }: Props) {
                 rowProps={{
                     selected,
                     text: data.map((conversation) =>
-                        conversation.length === 0 || conversation[0].content.length === 0
+                        conversation.length === 0 || !conversation[0]?.content || conversation[0].content.length === 0
                             ? t('conversation.userPlaceholder')
                             : conversation[0].content
                     ),

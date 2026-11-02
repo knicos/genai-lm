@@ -6,10 +6,12 @@ import SynSearch from './SynSearch';
 import { VerticalButton } from '@genai-fi/base';
 import HighlightIcon from '@mui/icons-material/Highlight';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
+import BrushIcon from '@mui/icons-material/Brush';
 import { useSetAtom } from 'jotai';
 import { uiAuditOutput } from '../../state/uiState';
+import Replacer from './Replacer';
 
-type AuditModes = 'none' | 'beam' | 'memorization';
+type AuditModes = 'none' | 'beam' | 'memorization' | 'eraser' | 'replacer';
 
 export function Component() {
     const { t } = useTranslation();
@@ -41,9 +43,18 @@ export function Component() {
                 >
                     {t('audit.tools.memorization')}
                 </VerticalButton>
+                <VerticalButton
+                    startIcon={<BrushIcon />}
+                    onClick={() => setMode('replacer')}
+                    aria-pressed={mode === 'replacer'}
+                    color={mode === 'replacer' ? 'secondary' : 'primary'}
+                >
+                    {t('audit.tools.replacer')}
+                </VerticalButton>
             </div>
             {mode === 'beam' && <Beaming />}
             {mode === 'memorization' && <SynSearch />}
+            {mode === 'replacer' && <Replacer />}
         </div>
     );
 }
