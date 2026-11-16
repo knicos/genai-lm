@@ -132,6 +132,9 @@
             "validationSplit": "Validation Split",
             "saveToOPFS": "Use disk storage for tokens",
             "logInterval": "Log Interval (ms)",
+            "lrSchedule": "Learning Rate Schedule",
+            "loops": "Loops",
+            "loopsHelp": "The number of loops to use in the Loop model. More loops can increase model capacity but also increase computation and memory usage.",
             "help": {
                 "layerLimits": "How many of the last model layers should be trained. Fewer is faster but may not learn as well. The other layers are locked so they cannot change.",
                 "checkpointing": "Using gradient checkpointing reduces memory usage but slows down training because it must recalculate values instead of saving them.",

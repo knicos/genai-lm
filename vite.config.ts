@@ -20,6 +20,9 @@ export default defineConfig({
     resolve: {
         preserveSymlinks: false,
     },
+    preview: {
+        port: 5173,
+    },
     test: {
         environment: 'jsdom',
         setupFiles: ['./src/setupTests.ts', '@vitest/web-worker'],

@@ -21,7 +21,7 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@genai-fi/base": "^6.1.2",
-        "@genai-fi/nanogpt": "^1.6.1",
+        "@genai-fi/nanogpt": "^1.7.0",
         "@lmstudio/sdk": "^2.1.0",
         "@mui/icons-material": "^9.3.1",
         "@mui/material": "^9.3.1",
@@ -67,8 +67,8 @@
         "vitest": "^5.0.5"
     },
     "allowScripts": {
-        "@genai-fi/nanogpt@1.0.0": true,
         "core-js@3.29.1": true,
-        "patch-package": true
+        "patch-package": true,
+        "@genai-fi/nanogpt@1.7.0": true
     }
 }

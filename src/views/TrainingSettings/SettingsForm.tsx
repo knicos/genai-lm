@@ -1,4 +1,14 @@
-import { Checkbox, FormControl, FormControlLabel, Slider, Switch } from '@mui/material';
+import {
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Slider,
+    Switch,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import style from './style.module.css';
@@ -343,6 +353,21 @@ export function SettingsForm({ settings, setSettings }: Props) {
                     </FormControl>
                     <fieldset className={style.optimizerFieldset}>
                         <legend className={style.label}>{t('app.settings.optimizer')}</legend>
+                        <FormControl fullWidth>
+                            <InputLabel htmlFor="lr-schedule-label">{t('app.settings.lrSchedule')}</InputLabel>
+                            <Select
+                                labelId="lr-schedule-label"
+                                defaultValue="cosine"
+                                label={t('app.settings.lrSchedule')}
+                                value={settings.schedule ?? 'cosine'}
+                                onChange={(e: SelectChangeEvent<'cosine' | 'linearZero'>) =>
+                                    setSettings({ ...settings, schedule: e.target.value })
+                                }
+                            >
+                                <MenuItem value="cosine">Cosine</MenuItem>
+                                <MenuItem value="linearZero">Linear to Zero</MenuItem>
+                            </Select>
+                        </FormControl>
                         <FormControl className={style.sliderControl}>
                             <div
                                 id="warmup-label"

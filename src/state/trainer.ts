@@ -32,6 +32,7 @@ export const trainerSettings = atomWithStorage<TrainingSettings>(
         dropout: 0.1,
         layerDrop: 0.0,
         labelSmoothing: 0.0,
+        schedule: 'cosine',
     },
     storage
 );

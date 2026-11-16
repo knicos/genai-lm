@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 import style from './style.module.css';
 import { modelConfigAtom, modelSizeLimit } from '../../state/model';
+import type { ExtendedConfig } from '../../state/model';
 import { lowEndDevice } from '../../state/device';
 import { Help } from '@genai-fi/base';
+import { changeModelType } from './changeModelType';
 
 export function Component() {
     const { t } = useTranslation();
@@ -14,7 +16,7 @@ export function Component() {
     const lowEnd = useAtomValue(lowEndDevice);
     const { blockSize, mlpFactor } = settings;
 
-    const hasMLPFactor = settings.modelType === 'GenAI_NanoGPT_v2';
+    const hasMLPFactor = settings.modelType === 'GenAI_NanoGPT_v2' || settings.modelType === 'loop_nano';
 
     return (
         <div className="sidePanel">
@@ -26,17 +28,17 @@ export function Component() {
                     <Select
                         labelId="model-arch-label"
                         label={t('model.archType.label')}
+                        defaultValue="GenAI_NanoGPT_v2"
                         value={settings.modelType}
-                        onChange={(e: SelectChangeEvent) =>
-                            setSettings({
-                                ...settings,
-                                modelType: e.target.value as 'GenAI_NanoGPT_v2' | 'qwen3' | 'llama',
-                            })
-                        }
+                        onChange={(e: SelectChangeEvent<ExtendedConfig['modelType']>) => {
+                            const modelType = e.target.value;
+                            setSettings((current) => changeModelType(current, modelType));
+                        }}
                     >
                         <MenuItem value="GenAI_NanoGPT_v2">GenAI Nano</MenuItem>
                         <MenuItem value="qwen3">Qwen3</MenuItem>
                         <MenuItem value="llama">LLaMA</MenuItem>
+                        <MenuItem value="loop_nano">Loop</MenuItem>
                     </Select>
                 </FormControl>
             </div>
@@ -84,6 +86,31 @@ export function Component() {
                         min={1}
                         max={lowEnd ? 4 : 8}
                         step={0.1}
+                        valueLabelDisplay="auto"
+                    />
+                </FormControl>
+            )}
+            {settings.modelType === 'loop_nano' && (
+                <FormControl className={style.sliderControl}>
+                    <Help
+                        message={t('app.settings.loopsHelp')}
+                        inplace
+                        dark
+                    >
+                        <div
+                            id="loops-label"
+                            className={style.label}
+                        >
+                            {t('app.settings.loops')}
+                        </div>
+                    </Help>
+                    <Slider
+                        aria-labelledby="loops-label"
+                        value={settings.loopSize ?? 2}
+                        onChange={(_, value) => setSettings({ ...settings, loopSize: value as number })}
+                        min={1}
+                        max={8}
+                        step={1}
                         valueLabelDisplay="auto"
                     />
                 </FormControl>

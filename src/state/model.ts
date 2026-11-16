@@ -111,7 +111,7 @@ export const modelConfigAtom = atom<ExtendedConfig>({
     mlpFactor: 4,
     modelType: 'GenAI_NanoGPT_v2',
     blockSize: 128,
-});
+} as ExtendedConfig);
 
 // Ensure config matches the model.
 observe((get, set) => {
