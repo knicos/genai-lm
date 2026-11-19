@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { TeachableLLM, tokenise } from '@genai-fi/nanogpt';
 const { createTokenStore } = tokenise;
 import { useAtomValue, useSetAtom } from 'jotai';
-import { modelAtom, modelConfigAtom } from '../../state/model';
+import { modelAtom, modelConfigAtom, modelDownloadAtom } from '../../state/model';
 import { uiFatalError } from '../../state/uiState';
 import { createEntriesFromManifest, dataEntries, dataTokens, validationTokens } from '../../state/data';
 import { useParams, useSearchParams } from 'react-router';
@@ -14,6 +14,7 @@ import { initializeLogger } from '../../utilities/logger';
 import { deleteData, getData, getCheckpoint, deleteCheckpoint } from '../../utilities/db';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 import { trainingModeAtom } from '../../state/trainer';
+import Downloader from '../../utilities/downloader';
 
 type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced' | 'audit';
 
@@ -33,6 +34,7 @@ export default function Initialiser() {
     const setCompact = useSetAtom(uiCompactMode);
     const setTrainingMode = useSetAtom(trainingModeAtom);
     const setFatalError = useSetAtom(uiFatalError);
+    const setDownload = useSetAtom(modelDownloadAtom);
     const [params] = useSearchParams();
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -59,6 +61,17 @@ export default function Initialiser() {
     const doInit = async () => {
         window.sessionStorage.setItem(INIT_COMPLETE_KEY, 'true');
 
+        const modelName = params.get('m');
+        if (modelName) {
+            if (modelName.startsWith('https://')) {
+                const title = params.get('name') || 'Custom Model';
+                const newDownload = Downloader.downloadFile('custom-model', modelName, title, 'application/zip');
+                setDownload(newDownload);
+                newDownload.start();
+                return;
+            }
+        }
+
         const checkpoint = await getCheckpoint();
 
         if (checkpoint) {
@@ -82,7 +95,7 @@ export default function Initialiser() {
                         tokeniserId: existingData.tokeniserId,
                         datasetId: existingData.datasetId,
                     };
-                    console.log('Restored training tokens', tokenData);
+
                     setDataTokens(tokenData);
                     setValidationTokens({
                         tokens: await createTokenStore(
