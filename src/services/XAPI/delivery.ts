@@ -21,7 +21,6 @@ interface QueueEntry {
 interface Recording {
     sessionId: string;
     sequence: number;
-    ended: boolean;
     queue: QueueEntry[];
 }
 
@@ -78,7 +77,7 @@ export function getRecording(): Recording {
     if (!getResearchIdentity()) throw new Error('Research identification is not ready.');
 
     if (!recording) {
-        recording = { sessionId: uuidv4(), sequence: 0, ended: false, queue: [] };
+        recording = { sessionId: uuidv4(), sequence: 0, queue: [] };
     }
 
     return recording;

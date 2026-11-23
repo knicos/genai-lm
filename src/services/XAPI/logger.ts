@@ -2,7 +2,6 @@ import type { Statement } from '@xapi/xapi';
 import { v4 as uuidv4 } from 'uuid';
 import type {
     AuditTool,
-    Details,
     SelectionContext,
     AlternativeOption,
     AlternativeSelection,
@@ -12,17 +11,12 @@ import type {
 import { getRecording, flushQueue } from './delivery';
 import { getResearchIdentity, initializeResearchIdentity } from './identity';
 import type { ResearchIdentity } from './identity';
-import type { TeachableLLM, GeneratorConversation, IBeam } from '@genai-fi/nanogpt';
+import type { TeachableLLM, GeneratorConversation, IBeam, IGenerateOptions } from '@genai-fi/nanogpt';
 import type { PrettyResult } from '../../utilities/search/prettyResult';
 
 // Stable namespace for research logging identifiers.
 const namespace = 'https://lm.gen-ai.fi/xapi';
 const schemaVersion = '1';
-
-// Create an identifier for linked events.
-function createXapiId(): string {
-    return uuidv4();
-}
 
 interface Generation {
     generationId: string;
@@ -35,7 +29,7 @@ interface GenerationTrigger {
     promptId: string;
     triggeringEventId: string;
     trigger: 'prompt' | 'alternative';
-    settings: Details;
+    settings: IGenerateOptions;
     sourceOutputId?: string;
 }
 
@@ -60,7 +54,6 @@ let instance: Logger | null = null;
 export class Logger {
     private model: TeachableLLM | null = null;
     private active = false;
-    private disposed = false;
     private pendingGeneration: GenerationTrigger | null = null;
     private generations = new Map<string, Generation>();
     private outputs = new WeakMap<GeneratorConversation, { outputId: string; promptId: string }>();
@@ -75,7 +68,7 @@ export class Logger {
         const identity = await initializeResearchIdentity();
         if (!identity) return null;
 
-        if (!instance || instance.disposed) {
+        if (!instance) {
             instance = new Logger(identity);
             void flushQueue();
         }
@@ -90,13 +83,13 @@ export class Logger {
 
     // Limit observation to the audit phase.
     setAuditActive(active: boolean): void {
-        if (this.disposed || this.active === active) return;
+        if (this.active === active) return;
 
         this.active = active;
 
         if (active) {
             const recording = getRecording();
-            if (recording.sequence === 0 || recording.ended) this.inquiryStarted('none');
+            if (recording.sequence === 0) this.inquiryStarted('none');
             else this.inquiryResumed('none');
         } else {
             this.pendingGeneration = null;
@@ -108,7 +101,7 @@ export class Logger {
 
     // Observe the current model without altering its calculation methods.
     setModel(model: TeachableLLM | null): void {
-        if (this.disposed || model === this.model) return;
+        if (model === this.model) return;
 
         this.detachModel();
         this.pendingGeneration = null;
@@ -140,20 +133,6 @@ export class Logger {
         model.beaming.off('done', this.onBeams);
     }
 
-    // Release the observer without cancelling model work or deleting queued events.
-    dispose(): void {
-        this.detachModel();
-        this.active = false;
-        this.disposed = true;
-        this.model = null;
-        this.generations.clear();
-        this.beams.clear();
-        this.searches.clear();
-        this.outputPrompts.clear();
-        this.outputs = new WeakMap();
-        this.pendingGeneration = null;
-    }
-
     // Start recording when the model reports generation, using the reported user trigger.
     private onGenerating = (id: string): void => {
         if (!this.active || !this.model || !this.pendingGeneration || this.generations.has(id)) return;
@@ -162,9 +141,9 @@ export class Logger {
         this.pendingGeneration = null;
 
         const generation = {
-            generationId: createXapiId(),
+            generationId: uuidv4(),
             promptId: trigger.promptId,
-            outputId: createXapiId(),
+            outputId: uuidv4(),
             stopped: false,
         };
         this.generations.set(id, generation);
@@ -185,6 +164,23 @@ export class Logger {
     generationStopRequested(responseId: string): void {
         const generation = this.generations.get(responseId);
         if (generation) generation.stopped = true;
+    }
+
+    // Record a rejected request when the model does not emit an error event.
+    generationRequestFailed(error: unknown = new Error('Generation did not start.')): void {
+        const failure = error instanceof Error ? error : new Error(String(error));
+        if (this.pendingGeneration) {
+            const trigger = this.pendingGeneration;
+            this.pendingGeneration = null;
+            this.generationFailed({
+                generationId: uuidv4(),
+                promptId: trigger.promptId,
+                errorCategory: failure.name,
+                errorMessage: failure.message,
+            });
+        } else {
+            this.onGenerationError(failure);
+        }
     }
 
     // Read final output from the model rather than adding completion callbacks to components.
@@ -248,7 +244,7 @@ export class Logger {
 
         if (!output) return null;
         return {
-            selectionId: createXapiId(),
+            selectionId: uuidv4(),
             outputId: output.outputId,
             selectedText:
                 part._output
@@ -261,11 +257,16 @@ export class Logger {
     }
 
     // Associate a beam job with the selection that caused it.
-    watchBeams(id: string, selection: SelectionContext): void {
-        if (!this.active) return;
+    watchBeams(
+        id: string,
+        conversation: GeneratorConversation[],
+        selectedTokens: { conversationIndex: number; startToken: number; endToken: number }
+    ): void {
+        const selection = this.selectionContext(conversation, selectedTokens);
+        if (!selection) return;
 
         this.beams.clear();
-        const optionsListId = createXapiId();
+        const optionsListId = uuidv4();
         this.beams.set(id, { selection, optionsListId, options: [], previous: 0, snapshot: '' });
         this.alternativesRequested({ ...selection, optionsListId });
     }
@@ -308,7 +309,14 @@ export class Logger {
     };
 
     // Record the actual clicked option and link the following generation to it.
-    beamSelect(id: string, alternativeText: string, position: number, settings: Details = {}): string | null {
+    beamSelect(
+        id: string | null,
+        alternativeText: string,
+        position: number,
+        settings: IGenerateOptions = {}
+    ): string | null {
+        if (!id) return null;
+
         const list = this.beams.get(id);
         if (!list || !this.active) return null;
 
@@ -327,7 +335,7 @@ export class Logger {
                 triggeringEventId: eventId,
                 trigger: 'alternative',
                 sourceOutputId: list.selection.outputId,
-                settings,
+                settings: { ...settings, continuation: true, background: true },
             };
 
         return eventId;
@@ -342,11 +350,10 @@ export class Logger {
         response?: string
     ): string | null {
         const identity = getResearchIdentity();
-        if (!this.active || this.disposed || identity?.actorId !== this.identity.actorId) return null;
+        if (!this.active || identity?.actorId !== this.identity.actorId) return null;
 
         try {
             const state = getRecording();
-            if (state.ended) throw new Error('Recording has ended.');
 
             const statement: Statement = {
                 id: uuidv4(),
@@ -388,14 +395,7 @@ export class Logger {
 
     // Start an inquiry without discarding pending events.
     private inquiryStarted(initialTool: AuditTool): string | null {
-        if (!this.active || this.disposed || getResearchIdentity()?.actorId !== this.identity.actorId) return null;
-
-        const state = getRecording();
-        if (state.ended) {
-            state.sessionId = uuidv4();
-            state.sequence = 0;
-            state.ended = false;
-        }
+        if (getResearchIdentity()?.actorId !== this.identity.actorId) return null;
 
         return this.logEvent('started', 'inquiry', 'Behaviour Inquiry', { initialTool });
     }
@@ -405,21 +405,11 @@ export class Logger {
         return this.logEvent('resumed', 'inquiry', 'Behaviour Inquiry', { initialTool });
     }
 
-    // End recording while delivery continues.
-    inquiryEnded(reason?: string): string | null {
-        const id = this.logEvent('ended', 'inquiry', 'Behaviour Inquiry', { reason });
-        if (id) {
-            getRecording().ended = true;
-        }
-
-        return id;
-    }
-
     // Record the full submitted prompt.
-    promptSubmitted(text: string, settings: Details = {}): string | null {
+    promptSubmitted(text: string, settings: IGenerateOptions = {}): string | null {
         if (!this.model) return null;
 
-        const promptId = createXapiId();
+        const promptId = uuidv4();
         const eventId = this.logEvent('submitted', 'prompt', 'Prompt', { promptId, text, settings }, text);
         if (eventId) this.pendingGeneration = { promptId, triggeringEventId: eventId, trigger: 'prompt', settings };
 
@@ -433,7 +423,7 @@ export class Logger {
         triggeringEventId: string;
         trigger: 'prompt' | 'alternative';
         sourceOutputId?: string;
-        settings: Details;
+        settings: IGenerateOptions;
     }): string | null {
         return this.logEvent('started', 'generation', 'Text generation', data);
     }
@@ -533,8 +523,14 @@ export class Logger {
     }
 
     // Start a linked search without making the component allocate identifiers.
-    dataMatchRequested(selection: SelectionContext, searchText: string): string | null {
-        const searchId = createXapiId();
+    dataMatchRequested(
+        selection: SelectionContext | null | undefined,
+        searchTokens?: readonly { text: string }[]
+    ): string | null {
+        if (!selection) return null;
+
+        const searchText = searchTokens?.map((token) => token.text).join('') ?? selection.selectedText;
+        const searchId = uuidv4();
         if (
             !this.logEvent('requested', 'data-match-search', 'Data Match search', {
                 ...selection,
@@ -548,10 +544,16 @@ export class Logger {
         return searchId;
     }
 
+    // Link a preparation failure to the original selection before a query exists.
+    dataMatchPreparationFailed(selection: SelectionContext | null | undefined, error: unknown): void {
+        const searchId = this.dataMatchRequested(selection);
+        if (searchId) this.dataMatchFailed(searchId, error);
+    }
+
     // Describe only the excerpts actually presented by the search UI.
     private matchResults(results: PrettyResult[], start = 0): MatchResult[] {
         return results.map((result, index) => ({
-            resultId: createXapiId(),
+            resultId: uuidv4(),
             position: start + index + 1,
             excerpt:
                 result.prefixFragments.map((part) => part.text).join('') +
@@ -561,10 +563,18 @@ export class Logger {
     }
 
     // Record initial results, including a successful search with zero matches.
-    dataMatchResultsDisplayed(searchId: string, statistics: MatchStatistics, results: PrettyResult[]): void {
+    dataMatchResultsDisplayed(
+        searchId: string,
+        resultInfo: { estimatedMatches: number; exactMatches: number; results: readonly unknown[] },
+        results: PrettyResult[]
+    ): void {
         const search = this.searches.get(searchId);
         if (!search) return;
 
+        const statistics: MatchStatistics = {
+            approximateExactMatches: resultInfo.estimatedMatches,
+            partialMatches: resultInfo.results.length - resultInfo.exactMatches,
+        };
         search.statistics = statistics;
         search.totalDisplayed = results.length;
 
@@ -622,16 +632,6 @@ export class Logger {
             totalDisplayed: search.totalDisplayed,
         });
         search.moreEventId = undefined;
-    }
-
-    // Record evidence explicitly opened by the learner.
-    dataMatchResultOpened(data: {
-        searchId: string;
-        selectionId: string;
-        outputId: string;
-        result: MatchResult;
-    }): string | null {
-        return this.logEvent('opened', 'data-match-result', 'Data Match result', data);
     }
 
     // Record a new chat within the current inquiry.

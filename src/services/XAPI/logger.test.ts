@@ -130,7 +130,7 @@ describe('model-observing logger service', () => {
         const output = complete('first', 'fox');
         const context = logger.selectionContext(output, { conversationIndex: 0, startToken: 0, endToken: 0 });
         if (!context) throw new Error('Missing output context');
-        logger.watchBeams('beam', context);
+        logger.watchBeams('beam', output, { conversationIndex: 0, startToken: 0, endToken: 0 });
         const first = [{ text: 'rabbit', score: 0.5 }];
         beaming.emit('progress', 'beam', first);
         beaming.emit('done', 'beam', first);
@@ -142,7 +142,7 @@ describe('model-observing logger service', () => {
             addedOptions: [{ text: 'dog', position: 2, score: 0.3 }],
             totalDisplayed: 2,
         });
-        const selected = logger.beamSelect('beam', 'dog', 2);
+        const selected = logger.beamSelect('beam', 'dog', 2, { temperature: 0.8 });
         responses.emit('generating', 'second');
         complete('second', 'dog went home');
         expect(events(statements(), 'submitted', 'prompt')).toHaveLength(1);
@@ -150,11 +150,29 @@ describe('model-observing logger service', () => {
             trigger: 'alternative',
             triggeringEventId: selected,
             sourceOutputId: context.outputId,
+            settings: { temperature: 0.8, continuation: true, background: true },
         });
         expect(events(statements(), 'completed', 'generation')[1].result?.response).toBe('dog went home');
     });
 
-    it('detaches its own listeners on model switch and dispose without touching other listeners', async () => {
+    it('ignores untracked beam selections and records a generation request that returns no ID', async () => {
+        const { logger, statements } = await setup();
+        const before = statements().length;
+        logger.watchBeams('untracked', [], { conversationIndex: 0, startToken: 0, endToken: 0 });
+        expect(logger.beamSelect(null, 'fox', 1)).toBeNull();
+        expect(logger.beamSelect('untracked', 'fox', 1)).toBeNull();
+        expect(statements()).toHaveLength(before);
+
+        logger.promptSubmitted('Story');
+        logger.generationRequestFailed();
+        expect(events(statements(), 'started', 'generation')).toHaveLength(0);
+        expect(events(statements(), 'failed', 'generation')).toHaveLength(1);
+        expect(details(events(statements(), 'failed', 'generation')[0])).toMatchObject({
+            errorMessage: 'Generation did not start.',
+        });
+    });
+
+    it('detaches its own listeners on model switch and workspace cleanup without touching other listeners', async () => {
         const { logger, model, responses, beaming, statements } = await setup();
         const other = vi.fn();
         responses.on('done', other);
@@ -166,7 +184,8 @@ describe('model-observing logger service', () => {
         expect(responses.listenerCount('done')).toBe(1);
         expect(beaming.listenerCount('progress')).toBe(0);
         const count = statements().length;
-        logger.dispose();
+        logger.setModel(null);
+        logger.setAuditActive(false);
         next.responses.emit('generating', 'ignored');
         logger.newChatStarted();
         expect(statements()).toHaveLength(count);
@@ -186,16 +205,31 @@ describe('model-observing logger service', () => {
         });
     });
 
-    it('assigns match IDs and links More results inside the service', async () => {
+    it('prepares search text and counts, assigns match IDs and links More inside the service', async () => {
         const { logger, statements } = await setup();
-        const searchId = logger.dataMatchRequested(selection, 'a fox');
+        const searchId = logger.dataMatchRequested(selection, [{ text: 'a ' }, { text: 'fox' }]);
         if (!searchId) throw new Error('Missing search');
         const result = {
             text: 'fox',
             prefixFragments: [{ text: 'A ' }],
             suffixFragments: [{ text: ' ran.' }],
         } as PrettyResult;
-        logger.dataMatchResultsDisplayed(searchId, { approximateExactMatches: 10, partialMatches: 2 }, [result]);
+        logger.dataMatchResultsDisplayed(
+            searchId,
+            { estimatedMatches: 10, exactMatches: 1, results: [result, result, result] },
+            [result]
+        );
+        expect(details(events(statements(), 'requested', 'data-match-search')[0])).toMatchObject({
+            ...selection,
+            searchId,
+            searchText: 'a fox',
+        });
+        expect(details(events(statements(), 'displayed', 'data-match-results')[0])).toMatchObject({
+            searchId,
+            statistics: { approximateExactMatches: 10, partialMatches: 2 },
+            totalDisplayed: 1,
+            results: [{ resultId: expect.any(String), position: 1, excerpt: 'A fox ran.' }],
+        });
         logger.moreDataMatchesClicked(searchId);
         logger.moreDataMatchesDisplayed(searchId, [result]);
         logger.moreDataMatchesDisplayed(searchId, [result]);
@@ -203,6 +237,7 @@ describe('model-observing logger service', () => {
         expect(more).toHaveLength(1);
         expect(details(more[0])).toMatchObject({
             searchId,
+            statistics: { approximateExactMatches: 10, partialMatches: 2 },
             totalDisplayed: 2,
             addedCount: 1,
             addedResults: [{ resultId: expect.any(String), position: 2, excerpt: 'A fox ran.' }],
@@ -212,15 +247,34 @@ describe('model-observing logger service', () => {
 
     it('retains zero matches as success, search errors as failures, and new chat in the same recording', async () => {
         const { logger, statements } = await setup();
-        const searchId = logger.dataMatchRequested(selection, 'a fox');
-        const failedSearchId = logger.dataMatchRequested(selection, 'other text');
+        const searchId = logger.dataMatchRequested(selection, [{ text: 'a fox' }]);
+        const failedSearchId = logger.dataMatchRequested(selection, [{ text: 'other text' }]);
         if (!searchId || !failedSearchId) throw new Error('Missing search identifiers');
-        logger.dataMatchResultsDisplayed(searchId, { approximateExactMatches: 0, partialMatches: 0 }, []);
+        logger.dataMatchResultsDisplayed(searchId, { estimatedMatches: 0, exactMatches: 0, results: [] }, []);
         logger.dataMatchFailed(failedSearchId, new Error('Unavailable'));
         logger.newChatStarted();
         expect(events(statements(), 'displayed', 'data-match-results')).toHaveLength(1);
         expect(events(statements(), 'failed', 'data-match-search')).toHaveLength(1);
         expect(events(statements(), 'started', 'new-chat')).toHaveLength(1);
         expect(new Set(statements().map((event) => event.context?.registration)).size).toBe(1);
+    });
+
+    it('links preparation failures to the original selection and ignores missing selection context', async () => {
+        const { logger, statements } = await setup();
+        const failure = new Error('Preparation unavailable');
+        const before = statements().length;
+        expect(logger.dataMatchRequested(null, [{ text: 'fox' }])).toBeNull();
+        logger.dataMatchPreparationFailed(undefined, failure);
+        expect(statements()).toHaveLength(before);
+
+        logger.dataMatchPreparationFailed(selection, failure);
+        const requested = events(statements(), 'requested', 'data-match-search')[0];
+        const requestDetails = details(requested) as { searchId: string };
+        expect(details(requested)).toMatchObject({ ...selection, searchText: selection.selectedText });
+        expect(details(events(statements(), 'failed', 'data-match-search')[0])).toMatchObject({
+            ...selection,
+            searchId: requestDetails.searchId,
+            errorMessage: failure.message,
+        });
     });
 });
