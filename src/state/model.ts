@@ -4,7 +4,6 @@ import { atomWithStorage } from 'jotai/utils';
 import { observe } from 'jotai-effect';
 import { store } from './store';
 import Downloader from '../utilities/downloader';
-import logger from '../utilities/logger';
 import { uiDeveloperMode } from './uiState';
 
 export interface ModelManifestEntry {
@@ -125,13 +124,6 @@ observe((get, set) => {
                 ...config,
             });
             set(loadedModelAtom, model);
-
-            logger.log({
-                action: 'model_loaded',
-                name: model.meta.name,
-                id: model.meta.id,
-                params: model.getNumParams(),
-            });
         };
         model.on('loaded', h);
         return () => {

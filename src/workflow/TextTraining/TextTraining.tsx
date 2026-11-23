@@ -13,7 +13,6 @@ import NumberBox from '../../components/NumberBox/NumberBox';
 import { trainingAnimation } from '../../state/animations';
 import Clock from '../../components/Clock/Clock';
 import useWakeLock from '../../hooks/wakeLock';
-import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router';
 import { LinearProgress, Switch, Tooltip } from '@mui/material';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
@@ -57,8 +56,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
         idRef.current = trainerJobId;
     }
 
-    const batchSize = trainingMode === 'partial' ? partialSettings.batchSize : settings.batchSize;
-
     useWakeLock(training);
 
     const canTrain =
@@ -83,15 +80,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     setTrainingProgress(log);
                     if (log) {
                         setTokens(log.totalTokens);
-                    }
-                    if (log.step % 100 === 0) {
-                        logger.log({
-                            action: 'training_step',
-                            step: log.step,
-                            loss: log.trainingMetrics.loss,
-                            tokensPerSecond: log.tokensPerSecond,
-                            validationLoss: log.validationMetrics?.loss,
-                        });
                     }
                 }
             };
@@ -269,7 +257,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                     if (id === job.id) {
                         setDone(true);
                         setTraining(false);
-                        logger.error({ action: 'training_error', message: err.message });
                         model.training.off('error', errorHandler);
                         setMessage({
                             notice: t(`training.errors.${err.message}`, {
@@ -291,8 +278,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                             }
                         }
 
-                        logger.log({ action: 'training_stopped' });
-
                         if (saveCheckpoints) {
                             await saveCheckpoint(model);
                         }
@@ -313,8 +298,6 @@ export default function TextTraining({ autoTokenise = false }: Props) {
                 setTraining(true);
                 setDone(false);
                 setNeedsTraining(false);
-
-                logger.log({ action: 'training_started', modelSize: model.getNumParams(), totalTokens, batchSize });
 
                 idRef.current = job.id;
                 setTrainerJobId(job.id);

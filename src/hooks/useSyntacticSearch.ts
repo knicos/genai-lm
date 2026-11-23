@@ -8,6 +8,7 @@ import { autoTokeniseData } from '../workflow/TextTraining/utilities';
 import prettyResults, { PrettyResult } from '../utilities/search/prettyResult';
 import NGramSearch from '../utilities/search/ExactSearch';
 import addContextToResults, { ContextualisedResult } from '../utilities/search/contextualise';
+import { useLogger } from '../services/XAPI/useLogger';
 
 interface ResultStats {
     exactMatches: number;
@@ -49,6 +50,8 @@ export default function useSyntacticSearch(
     datasetId: string,
     onDataset: (dataset: DataTokens) => void
 ) {
+    const logger = useLogger();
+    const searchIdRef = useRef<string | null>(null);
     const [downloaders, setDownloaders] = useState<Downloader[]>([]);
     const [tokeniseProgress, setTokeniseProgress] = useState<number | null>(null);
     const busyRef = useRef(false);
@@ -60,6 +63,7 @@ export default function useSyntacticSearch(
     const fullResultsRef = useRef<ContextualisedResult[] | null>(null);
 
     const doClear = useCallback(() => {
+        searchIdRef.current = null;
         setResults([]);
         fullResultsRef.current = null;
         setResultStats(null);
@@ -71,6 +75,9 @@ export default function useSyntacticSearch(
                 return;
             }
             busyRef.current = true;
+
+            const context = logger?.selectionContext(conversation, selection);
+            searchIdRef.current = null;
 
             setResults([]);
             setResultStats(null);
@@ -98,6 +105,9 @@ export default function useSyntacticSearch(
                     cb: (progress) => {
                         setTokeniseProgress(progress);
                     },
+                }).catch((error) => {
+                    logger?.dataMatchPreparationFailed(context, error);
+                    throw error;
                 });
                 setTokeniseProgress(null);
                 actualDataset = newData.trainingTokens;
@@ -114,6 +124,8 @@ export default function useSyntacticSearch(
                 );
 
                 if (selectedText && model) {
+                    const searchId = logger?.dataMatchRequested(context, selectedText);
+
                     try {
                         const ngramSearch = getOrCreateIndex(datasetId, actualDataset.tokens, NGRAM);
 
@@ -154,7 +166,12 @@ export default function useSyntacticSearch(
 
                         setSearching(false);
                         setResults(results);
+                        if (searchId) {
+                            searchIdRef.current = searchId;
+                            logger?.dataMatchResultsDisplayed(searchId, resultInfo, results);
+                        }
                     } catch (error) {
+                        if (searchId) logger?.dataMatchFailed(searchId, error);
                         console.error('Error during bloom search:', error);
                         setSearching(false);
                     }
@@ -162,7 +179,7 @@ export default function useSyntacticSearch(
             }
             busyRef.current = false;
         },
-        [dataset, model, datasetId, entries, onDataset]
+        [dataset, model, datasetId, entries, onDataset, logger]
     );
 
     const doMore = useCallback(
@@ -176,13 +193,16 @@ export default function useSyntacticSearch(
                     adjustedSelection.endToken + 1
                 );
                 if (selectedText) {
+                    const searchId = searchIdRef.current;
+                    if (searchId) logger?.moreDataMatchesClicked(searchId);
                     const query = selectedText.map((s) => s.token);
                     const prettyMore = prettyResults(moreResults, query, model.tokeniser);
                     setResults((prevResults) => [...prevResults, ...prettyMore]);
+                    if (searchId) logger?.moreDataMatchesDisplayed(searchId, prettyMore);
                 }
             }
         },
-        [model, fullResultsRef, results]
+        [model, fullResultsRef, results, logger]
     );
 
     return {

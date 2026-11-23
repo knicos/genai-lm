@@ -10,7 +10,6 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 import TextSearch from './TextSearch';
 import Box from '../../components/BoxTitle/Box';
 import { v4 as uuid } from 'uuid';
-import logger from '../../utilities/logger';
 import useModelStatus from '../../hooks/useModelStatus';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { useAtom, useAtomValue } from 'jotai';
@@ -68,21 +67,18 @@ export default function TextData() {
             async drop(items: DragObject) {
                 setBusy(true);
                 if (items.files) {
-                    logger.log({ action: 'dropped_files', count: items.files.length });
                     try {
                         for (const file of items.files) {
                             const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
                             await handleTextLoad(uuid(), file.name, text, 'file', setData);
                         }
-                    } catch (error) {
-                        logger.error({ errorString: JSON.stringify(error) });
+                    } catch {
                         setMessage({
                             level: 'warning',
                             notice: t('data.errors.fileLoadError'),
                         });
                     }
                 } else if (items.text) {
-                    logger.log({ action: 'dropped_text' });
                     await handleTextLoad(
                         uuid(),
                         t('data.untitled'),
@@ -91,7 +87,6 @@ export default function TextData() {
                         setData
                     );
                 } else if (items.html) {
-                    logger.log({ action: 'dropped_html' });
                     const element = document.createElement('div');
                     element.innerHTML = items.html;
                     await handleTextLoad(
@@ -208,7 +203,6 @@ export default function TextData() {
                                             })
                                         );
                                     } else {
-                                        logger.log({ action: 'added_input_text', size: text.length });
                                         setData((prev) => [
                                             ...prev,
                                             new DataEntry(
@@ -248,7 +242,6 @@ export default function TextData() {
                             if (e.target.files && e.target.files.length > 0) {
                                 const file = e.target.files[0];
                                 setBusy(true);
-                                logger.log({ action: 'file_input_selected', name: file.name });
                                 const text = await dataModule.loadTextData(file, { maxSize: 200000000 });
                                 await handleTextLoad(uuid(), file.name, text, 'file', setData);
                                 setBusy(false);

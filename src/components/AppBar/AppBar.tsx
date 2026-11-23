@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './AppBar.module.css';
 import { IconButton, Tooltip } from '@mui/material';
@@ -8,7 +8,7 @@ import { uiShowSettings, featureFlagsAtom } from '../../state/uiState';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { trainingAnimation } from '../../state/animations';
 import { LANGS } from './langs';
-import logger from '../../utilities/logger';
+import { useLogger } from '../../services/XAPI/useLogger';
 import WorkflowStatusBar from './WorkflowStatusBar';
 import { Button, LangSelect } from '@genai-fi/base';
 import ReportDialog from '../ReportDialog/ReportDialog';
@@ -25,19 +25,9 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
     const { t } = useTranslation();
     const showSettings = useSetAtom(uiShowSettings);
     const istraining = useAtomValue(trainingAnimation);
-    const [logId, setLogId] = useState<string | null>(null);
+    const logger = useLogger();
     const { allowReportProblem } = useAtomValue(featureFlagsAtom);
     const [showReportDialog, setShowReportDialog] = useState(false);
-
-    useEffect(() => {
-        const h = (_: string, idNumber: number) => {
-            setLogId(String(idNumber));
-        };
-        logger.onId(h);
-        return () => {
-            logger.offId(h);
-        };
-    });
 
     return (
         <nav className={style.appbar}>
@@ -61,7 +51,7 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
                         </h1>
                     )}
                 </Link>
-                {logId && <div className={style.buttonBar}>{logId}</div>}
+                {logger && <div className={style.buttonBar}>{logger.participantNumber}</div>}
                 {!hideWorkflow && (
                     <WorkflowStatusBar
                         disabled={istraining}

@@ -16,6 +16,7 @@ import ChatPromptInput from '../../components/ChatPromptInput/ChatPromptInput';
 import { trainerJobIdAtom, trainerSettings } from '../../state/trainer';
 import { GeneratorConversation, IGenerateOptions, IGeneratorResponse, ITrainingJob } from '@genai-fi/nanogpt';
 import { conversationDataAtom } from '../../state/data';
+import { useLogger } from '../../services/XAPI/useLogger';
 // import { conversationDataAtom } from '../../state/data';
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function ChatPrompt({ record, initialMessage, forceConversational }: Props) {
+    const logger = useLogger();
     const { t } = useTranslation();
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [id, setID] = useAtom(rawGenerationIDAtom);
@@ -164,6 +166,7 @@ export default function ChatPrompt({ record, initialMessage, forceConversational
             return;
         }
         if (busyRef.current) {
+            logger?.generationStopRequested(busyRef.current);
             model.responses.cancel(busyRef.current);
             return;
         }
@@ -226,11 +229,14 @@ export default function ChatPrompt({ record, initialMessage, forceConversational
         };
 
         try {
+            logger?.promptSubmitted(prompt ?? '', settings);
             model.responses.on('done', doneHandler);
             const response = await model.responses.create(options, h);
+            logger?.generationCreated(response.id, id ?? response.id);
             busyRef.current = response.id;
             setID(response.id);
-        } catch {
+        } catch (error) {
+            logger?.generationRequestFailed(error);
             setMessage({
                 level: 'error',
                 notice: t('generator.errors.generationError'),
@@ -257,7 +263,12 @@ export default function ChatPrompt({ record, initialMessage, forceConversational
                 }}
                 disabled={disable}
                 generating={generate}
-                onStop={() => model && busyRef.current && model.responses.cancel(busyRef.current)}
+                onStop={() => {
+                    if (model && busyRef.current) {
+                        logger?.generationStopRequested(busyRef.current);
+                        model.responses.cancel(busyRef.current);
+                    }
+                }}
                 noPrompt={settings.promptMode === 'none'}
                 placeholder={t('deploy.placeholder')}
                 promptMode={settings.promptMode}

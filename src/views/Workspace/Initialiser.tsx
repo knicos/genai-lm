@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { FlowType } from '../../hooks/useChangePath';
 import { workflowSteps, WorkflowSteps } from '../../state/workflowSettings';
 import { uiCompactMode, uiDeveloperMode } from '../../state/uiState';
-import { initializeLogger } from '../../utilities/logger';
+import { useLoggerSetup } from '../../services/XAPI/useLogger';
 import { deleteData, getData, getCheckpoint, deleteCheckpoint } from '../../utilities/db';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 import { trainingModeAtom } from '../../state/trainer';
@@ -21,6 +21,7 @@ type VariantType = 'empty' | 'base' | 'finetune' | 'complete' | 'advanced' | 'au
 const INIT_COMPLETE_KEY = 'init_complete';
 
 export default function Initialiser() {
+    useLoggerSetup();
     const { t } = useTranslation();
     // const [searchParams] = useSearchParams();
     const modelConfig = useAtomValue(modelConfigAtom);
@@ -237,11 +238,6 @@ export default function Initialiser() {
     }, [variant, setWorkflowSteps, setDevMode, setCompact, setTrainingMode]);
 
     useEffect(() => {
-        const token = params.get('t');
-        if (token) {
-            initializeLogger(token);
-        }
-
         const hf = params.get('hf');
         if (hf) {
             const m = TeachableLLM.loadModel(hf);

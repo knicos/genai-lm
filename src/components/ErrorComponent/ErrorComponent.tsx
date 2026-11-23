@@ -1,7 +1,6 @@
 import { useRouteError } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import logger from '../../utilities/logger';
 import style from './style.module.css';
 import { Button } from '@genai-fi/base';
 
@@ -28,12 +27,6 @@ export default function ErrorComponent() {
     const stack = error instanceof Error ? error.stack : undefined;
     const path = window.location.pathname;
     const message = `${str}\n\n${stack ?? ''}\n\nPath: ${path}`;
-
-    logger.error({
-        errorString: str,
-        userAgent: navigator.userAgent,
-        url: window.location.href,
-    });
 
     console.error(error);
 

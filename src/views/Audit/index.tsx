@@ -10,10 +10,12 @@ import BrushIcon from '@mui/icons-material/Brush';
 import { useSetAtom } from 'jotai';
 import { uiAuditOutput } from '../../state/uiState';
 import Replacer from './Replacer';
+import { useLogger } from '../../services/XAPI/useLogger';
 
 type AuditModes = 'none' | 'beam' | 'memorization' | 'eraser' | 'replacer';
 
 export function Component() {
+    const logger = useLogger();
     const { t } = useTranslation();
     const [mode, setMode] = useState<AuditModes>('none');
     const setAuditMode = useSetAtom(uiAuditOutput);
@@ -29,7 +31,10 @@ export function Component() {
             <div className={style.tools}>
                 <VerticalButton
                     startIcon={<HighlightIcon />}
-                    onClick={() => setMode('beam')}
+                    onClick={() => {
+                        logger?.alternativesToolClicked();
+                        setMode('beam');
+                    }}
                     aria-pressed={mode === 'beam'}
                     color={mode === 'beam' ? 'secondary' : 'primary'}
                 >
@@ -37,7 +42,10 @@ export function Component() {
                 </VerticalButton>
                 <VerticalButton
                     startIcon={<FindInPageIcon />}
-                    onClick={() => setMode('memorization')}
+                    onClick={() => {
+                        logger?.dataMatchToolClicked();
+                        setMode('memorization');
+                    }}
                     aria-pressed={mode === 'memorization'}
                     color={mode === 'memorization' ? 'secondary' : 'primary'}
                 >

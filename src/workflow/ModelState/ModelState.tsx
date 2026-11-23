@@ -7,7 +7,6 @@ import ModelMenu from './ModelMenu';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useModelBusy from '../../hooks/useModelBusy';
 import { saveAs } from 'file-saver';
-import logger from '../../utilities/logger';
 import { modelAtom, modelDownloadAtom, modelQuantizeSave } from '../../state/model';
 import ModelIcon from '../../icons/ModelIcon';
 import BoxStandalone from '../../components/BoxTitle/BoxStandalone';
@@ -90,7 +89,6 @@ export default function ModelState({ minimised }: Props) {
         if (model) {
             setDone(false);
             const h = () => {
-                logger.log({ action: 'model_loaded', model: model.meta });
                 setDone(true);
                 setTitle(model.meta.name || '');
             };
@@ -98,7 +96,6 @@ export default function ModelState({ minimised }: Props) {
 
             const eh = (error: unknown) => {
                 console.error('Error loading model:', error);
-                logger.error({ errorString: String(error), userAgent: navigator.userAgent });
             };
             model.on('error', eh);
 

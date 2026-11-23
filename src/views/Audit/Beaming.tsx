@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
 import useGenerate from '../../hooks/useGenerate';
 import { sliceConversation, sliceSelectedText } from './utilities';
+import { useLogger } from '../../services/XAPI/useLogger';
 
 function safeText(text: string): string {
     const trimmed = text.trim();
@@ -25,6 +26,7 @@ interface ExtendedIBeam extends IBeam {
 }
 
 export default function Beaming() {
+    const logger = useLogger();
     const { t } = useTranslation();
     const [selection, setSelection] = useAtom(uiSelectedTokens);
     const setSelectionLength = useSetAtom(uiTokenSelectLength);
@@ -63,6 +65,7 @@ export default function Beaming() {
                 keepDuplicates: false,
             });
             setBeamId(beamid);
+            logger?.watchBeams(beamid, conversation, selection);
             const progressHandler = (id: string, beams: IBeam[]) => {
                 if (id === beamid) {
                     setBeams(beams);
@@ -87,7 +90,7 @@ export default function Beaming() {
         } else {
             setBeams([]);
         }
-    }, [selection, model, conversation]);
+    }, [selection, model, conversation, logger]);
 
     return (
         <div className={style.toolContainer}>
@@ -115,6 +118,7 @@ export default function Beaming() {
                             role="button"
                             onClick={() => {
                                 if (selection) {
+                                    logger?.beamSelect(beamId, beam.text, index + 1, settings);
                                     setSelection(null);
 
                                     const convo = sliceConversation(
@@ -141,6 +145,7 @@ export default function Beaming() {
                                         convo
                                     )
                                         .then((id) => {
+                                            if (!id) logger?.generationRequestFailed();
                                             setId(id);
                                         })
                                         .catch((error) => console.error(error));
@@ -172,6 +177,7 @@ export default function Beaming() {
                 color="primary"
                 onClick={() => {
                     if (!model || !beamId || !selection) return;
+                    logger?.beamMore(beamId);
                     const oldBeams = beams;
                     const progressHandler = (id: string, beams: IBeam[]) => {
                         if (id === beamId) {

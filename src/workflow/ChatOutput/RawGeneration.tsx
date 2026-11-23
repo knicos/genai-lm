@@ -9,6 +9,7 @@ import useModelStatus from '../../hooks/useModelStatus';
 import ChatMenu from './ChatMenu';
 import { useNavigate } from 'react-router';
 import { uiSelectedTokens, uiTokenHighlightMode, uiTokenSelectLength } from '../../state/uiState';
+import { useLogger } from '../../services/XAPI/useLogger';
 
 interface Props {
     showAudit?: boolean;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function RawGeneration({ showAudit, onOpen, editable }: Props) {
+    const logger = useLogger();
     const model = useAtomValue(loadedModelAtom);
     const [output, setOutput] = useAtom(rawGeneratedTextAtom);
     const [responseId, setID] = useAtom(rawGenerationIDAtom);
@@ -69,6 +71,7 @@ export default function RawGeneration({ showAudit, onOpen, editable }: Props) {
                 showAudit={showAudit}
                 onOpen={onOpen}
                 onReset={() => {
+                    logger?.newChatStarted();
                     setOutput([]);
                     setID(null);
                     setSelection(null);

@@ -12,7 +12,6 @@ import { tunerSettings, tunerJobIdAtom } from '../../state/trainer';
 import Box from '../../components/BoxTitle/Box';
 import { trainingAnimation } from '../../state/animations';
 import useWakeLock from '../../hooks/wakeLock';
-import logger from '../../utilities/logger';
 import { useNavigate } from 'react-router';
 import BoxNotice, { Notice } from '../../components/BoxTitle/BoxNotice';
 import { loadedModelAtom, modelLoRAName } from '../../state/model';
@@ -32,11 +31,9 @@ export default function TuneTraining() {
     const status = useModelStatus(model ?? undefined);
     const conversations = useAtomValue(conversationDataAtom);
     const settings = useAtomValue(tunerSettings);
-    const batchSize = settings.batchSize;
     const setTrainingAnimation = useSetAtom(trainingAnimation);
     const navigate = useNavigate();
     const [message, setMessage] = useState<Notice | null>(null);
-    const [totalSamples, setTotalSamples] = useState(0);
     const [selectedLoRA, setSelectedLoRA] = useAtom(modelLoRAName);
 
     useWakeLock(training);
@@ -55,16 +52,6 @@ export default function TuneTraining() {
                 const log = job.history ? (job.history[job.history.length - 1] as TrainingLogEntry) : null;
                 if (!log) return;
                 setStep(log.step);
-
-                if (log.step % 100 === 0) {
-                    logger.log({
-                        action: 'training_step',
-                        step: log.step,
-                        loss: log.trainingMetrics.loss,
-                        tokensPerSecond: log.tokensPerSecond,
-                        validationLoss: log.validationMetrics?.loss,
-                    });
-                }
             };
             model.training.on('progress', h);
             return () => {
@@ -158,11 +145,10 @@ export default function TuneTraining() {
                     return;
                 }
 
-                const errorHandler = (id: string, err: Error) => {
+                const errorHandler = (id: string) => {
                     if (id === job.id) {
                         setDone(true);
                         setTraining(false);
-                        logger.error({ action: 'training_error', message: err.message });
                         model.training.off('error', errorHandler);
                         setMessage({
                             notice: t('training.errors.trainingFailed'),
@@ -176,7 +162,6 @@ export default function TuneTraining() {
                     if (jobId === job.id) {
                         setDone(true);
                         setTraining(false);
-                        logger.log({ action: 'training_stopped' });
                         model.training.off('completed', doneHandler);
                         model.training.off('cancelled', doneHandler);
                         model.training.off('error', errorHandler);
@@ -185,14 +170,10 @@ export default function TuneTraining() {
                 model.training.on('completed', doneHandler);
                 model.training.on('cancelled', doneHandler);
 
-                setTotalSamples(job.totalTokens);
-
                 setTraining(true);
                 setDone(false);
 
                 setStep(0);
-
-                logger.log({ action: 'training_started', modelSize, totalSamples, batchSize });
 
                 setNeedsTraining(false);
                 setTrainerJobId(job.id);
