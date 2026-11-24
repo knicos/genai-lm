@@ -51,7 +51,7 @@ export default function ApplicationBar({ noSettings, hideTitle, hideWorkflow, si
                         </h1>
                     )}
                 </Link>
-                {logger && <div className={style.buttonBar}>{logger.participantNumber}</div>}
+                {logger && <div className={style.participant}>{logger.participantNumber}</div>}
                 {!hideWorkflow && (
                     <WorkflowStatusBar
                         disabled={istraining}

@@ -105,10 +105,10 @@ export async function flushQueue(): Promise<void> {
                 entry.failed = error instanceof ProxyDeliveryError && !error.retryable;
                 entry.error = error instanceof ProxyDeliveryError ? error.message : 'Proxy delivery failed.';
                 entry.retryAt = Date.now() + Math.min(60000, 1000 * 2 ** Math.min(entry.attempts, 6));
-                console.error('[xAPI] Delivery failed:', {
+                /*console.error('[xAPI] Delivery failed:', {
                     statementId: entry.statement.id,
                     error: entry.error,
-                });
+                });*/
             }
         }
     } finally {

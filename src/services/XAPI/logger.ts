@@ -117,7 +117,7 @@ export class Logger {
         model.responses.on('generating', this.onGenerating);
         model.responses.on('done', this.onGenerationDone);
         model.responses.on('error', this.onGenerationError);
-        model.beaming.on('progress', this.onBeams);
+        // model.beaming.on('progress', this.onBeams);
         model.beaming.on('done', this.onBeams);
     }
 
@@ -129,7 +129,7 @@ export class Logger {
         model.responses.off('generating', this.onGenerating);
         model.responses.off('done', this.onGenerationDone);
         model.responses.off('error', this.onGenerationError);
-        model.beaming.off('progress', this.onBeams);
+        // model.beaming.off('progress', this.onBeams);
         model.beaming.off('done', this.onBeams);
     }
 
